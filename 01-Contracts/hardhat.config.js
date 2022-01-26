@@ -26,6 +26,12 @@ module.exports = {
   paths: {
     artifacts: './src/artifacts',
   },
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 2000,
+    },
+  },
   networks: {
     hardhat: {
       chainId: 1337,
@@ -46,10 +52,11 @@ module.exports = {
     currency: 'USD',
   },
   contractSizer: {
-    //more config for testing
     alphaSort: true,
     runOnCompile: true,
     disambiguatePaths: false,
   },
-  //To do: add etherscan api config
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
 };
