@@ -1,0 +1,137 @@
+Last login: Tue Jan 25 16:48:26 on ttys002
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+isaiahs-mbp:~ isaiah$ cd
+isaiahs-mbp:~ isaiah$ ls
+AndroidStudioProjects		Untitled26.ipynb
+Applications			Untitled27.ipynb
+Creative Cloud Files		Untitled28.ipynb
+Desktop				Untitled29.ipynb
+Documents			Untitled3.ipynb
+Downloads			Untitled30.ipynb
+Exercism			Untitled31.ipynb
+Library				Untitled32.ipynb
+Mikogo-beta-install.log		Untitled33.ipynb
+Movies				Untitled34.ipynb
+Music				Untitled4.ipynb
+MyFirstGame			Untitled5.ipynb
+NetBeansProjects		Untitled6.ipynb
+Pictures			Untitled7.ipynb
+Postman				Untitled8.ipynb
+Public				Untitled9.ipynb
+Topo.ipynb			VirtualBox VMs
+Trie.ipynb			anaconda3
+Untitled.ipynb			cse361s_s20_lab4-IsaiahWare
+Untitled1.ipynb			db.py
+Untitled10.ipynb		eclipse
+Untitled11.ipynb		eclipse-workspace
+Untitled12.ipynb		git
+Untitled13.ipynb		go
+Untitled14.ipynb		if n == 1:
+Untitled15.ipynb		jagex_cl_oldschool_LIVE.dat
+Untitled16.ipynb		jagexcache
+Untitled17.ipynb		major.js
+Untitled18.ipynb		names.txt
+Untitled19.ipynb		ngrok
+Untitled2.ipynb			practice.py
+Untitled20.ipynb		random.dat
+Untitled21.ipynb		status.php
+Untitled22.ipynb		sudo
+Untitled23.ipynb		texput.log
+Untitled24.ipynb		todo
+Untitled25.ipynb		users.txt
+isaiahs-mbp:~ isaiah$ cd Desktop
+isaiahs-mbp:Desktop isaiah$ cd momint/
+isaiahs-mbp:momint isaiah$ cd 02-DApp/
+isaiahs-mbp:02-DApp isaiah$ cd backend/
+isaiahs-mbp:backend isaiah$ ls
+README.md	node_modules	src		yarn.lock
+dist		package.json	tsconfig.json
+isaiahs-mbp:backend isaiah$ cd src
+isaiahs-mbp:src isaiah$ ls
+app.ts		controllers	db.ts		index.ts
+isaiahs-mbp:src isaiah$ pwd
+/Users/isaiah/Desktop/momint/02-DApp/backend/src
+isaiahs-mbp:src isaiah$ cd controllers
+isaiahs-mbp:controllers isaiah$ ls
+statsController.ts
+isaiahs-mbp:controllers isaiah$ cd ..
+isaiahs-mbp:src isaiah$ pwd
+/Users/isaiah/Desktop/momint/02-DApp/backend/src
+isaiahs-mbp:src isaiah$ ls
+app.ts		controllers	db.ts		index.ts
+isaiahs-mbp:src isaiah$ ls
+app.ts		controllers	db.ts		index.ts
+isaiahs-mbp:src isaiah$ ls
+app.ts		controllers	db.ts		index.ts
+isaiahs-mbp:src isaiah$ ls
+app.ts		controllers	db.ts		index.ts
+isaiahs-mbp:src isaiah$ ls
+app.ts		controllers	db.ts		index.ts
+isaiahs-mbp:src isaiah$ cd ..
+isaiahs-mbp:backend isaiah$ ls -la
+total 160
+drwxr-xr-x   10 isaiah  staff    320 Jan 25 01:49 .
+drwxr-xr-x    4 isaiah  staff    128 Jan 25 00:57 ..
+-rw-r--r--    1 isaiah  staff     51 Jan 25 01:37 .env
+-rw-r--r--    1 isaiah  staff      0 Jan 25 01:50 README.md
+drwxr-xr-x    9 isaiah  staff    288 Jan 25 02:12 dist
+drwxr-xr-x  183 isaiah  staff   5856 Jan 25 01:25 node_modules
+-rw-r--r--    1 isaiah  staff    703 Jan 25 02:17 package.json
+drwxr-xr-x    6 isaiah  staff    192 Jan 25 01:25 src
+-rw-r--r--    1 isaiah  staff  11045 Jan 25 00:59 tsconfig.json
+-rw-r--r--    1 isaiah  staff  59171 Jan 25 01:25 yarn.lock
+isaiahs-mbp:backend isaiah$ cd ..
+isaiahs-mbp:02-DApp isaiah$ ls
+backend		frontend
+isaiahs-mbp:02-DApp isaiah$ cd ,,
+-bash: cd: ,,: No such file or directory
+isaiahs-mbp:02-DApp isaiah$ cd ..
+isaiahs-mbp:momint isaiah$ ls
+01-Contracts	02-DApp
+isaiahs-mbp:momint isaiah$ cd 01-Contracts/
+isaiahs-mbp:01-Contracts isaiah$ cd ..
+isaiahs-mbp:momint isaiah$ cd 02-DApp/
+isaiahs-mbp:02-DApp isaiah$ ls
+backend		frontend
+isaiahs-mbp:02-DApp isaiah$ cd frontend/
+isaiahs-mbp:frontend isaiah$ ls
+README.md		package.json		src
+package-lock.json	public			tsconfig.json
+isaiahs-mbp:frontend isaiah$ ls -la
+total 2288
+drwxr-xr-x   9 isaiah  staff      288 Jan 25 00:44 .
+drwxr-xr-x   4 isaiah  staff      128 Jan 25 00:57 ..
+-rw-r--r--   1 isaiah  staff      310 Jan 25 00:44 .gitignore
+-rw-r--r--   1 isaiah  staff     2203 Jan 25 00:44 README.md
+-rw-r--r--   1 isaiah  staff  1151063 Jan 25 00:44 package-lock.json
+-rw-r--r--   1 isaiah  staff     1001 Jan 25 00:44 package.json
+drwxr-xr-x   8 isaiah  staff      256 Jan 25 00:44 public
+drwxr-xr-x  13 isaiah  staff      416 Jan 25 00:44 src
+-rw-r--r--   1 isaiah  staff      535 Jan 25 00:44 tsconfig.json
+isaiahs-mbp:frontend isaiah$ vim .gitignore 
+
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
