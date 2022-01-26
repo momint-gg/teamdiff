@@ -1,8 +1,13 @@
-require("@nomiclabs/hardhat-waffle");
+require('@nomiclabs/hardhat-waffle');
+require('@nomiclabs/hardhat-etherscan');
+require('hardhat-contract-sizer');
+require('hardhat-gas-reporter');
+require('solidity-coverage');
+require('dotenv').config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
@@ -17,5 +22,34 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.4",
+  solidity: '0.8.0',
+  paths: {
+    artifacts: './src/artifacts',
+  },
+  networks: {
+    hardhat: {
+      chainId: 1337,
+    },
+    //Config for Rinkeby
+    rinkeby: {
+      url: 'https://eth-rinkeby.alchemyapi.io/v2/' + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
+      accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+    },
+  },
+  mocha: {
+    //for testing
+    timeout: 500000000,
+  },
+  gasReporter: {
+    //getting gas for testing
+    enabled: process.env.REPORT_GAS !== undefined,
+    currency: 'USD',
+  },
+  contractSizer: {
+    //more config for testing
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
+  },
+  //To do: add etherscan api config
 };
