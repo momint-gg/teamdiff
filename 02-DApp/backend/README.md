@@ -1,10 +1,13 @@
+## Commands
+
 ### `yarn install`
 
-Install dependencies
+Install dependencies.
 
 ### `yarn start`
 
-Runs the app in the development mode
+Runs the app in the development mode.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Connecting
+
+The prod URL to the API is http://54.166.116.138:3000/ whenever it is actually running.
