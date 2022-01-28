@@ -1,14 +1,14 @@
-require('@nomiclabs/hardhat-waffle');
-require('@nomiclabs/hardhat-etherscan');
-require('@nomiclabs/hardhat-truffle5');
-require('hardhat-contract-sizer');
-require('hardhat-gas-reporter');
-require('solidity-coverage');
-require('dotenv').config();
+require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
+require("@nomiclabs/hardhat-truffle5");
+require("hardhat-contract-sizer");
+require("hardhat-gas-reporter");
+require("solidity-coverage");
+require("dotenv").config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
+task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
@@ -23,10 +23,10 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: '0.8.0',
-  paths: {
-    artifacts: './src/artifacts',
-  },
+  solidity: "0.8.0",
+  // paths: { //Need to add path so contract can verify correctly on etherscan
+  //   artifacts: "./build/contracts",
+  // },
   settings: {
     optimizer: {
       enabled: true,
@@ -34,12 +34,9 @@ module.exports = {
     },
   },
   networks: {
-    hardhat: {
-      chainId: 1337,
-    },
     //Config for Rinkeby
     rinkeby: {
-      url: 'https://eth-rinkeby.alchemyapi.io/v2/' + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
+      url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
       accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
     },
   },
@@ -50,7 +47,7 @@ module.exports = {
   gasReporter: {
     //getting gas for testing
     enabled: process.env.REPORT_GAS !== undefined,
-    currency: 'USD',
+    currency: "USD",
   },
   contractSizer: {
     alphaSort: true,
