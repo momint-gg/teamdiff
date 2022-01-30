@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Structs.sol";
 
 // import "./ERC155Mintable.sol";
+// We can read in the total list of players from API or whatever
+// How to do after the contract is deployed?
 
 contract GameItems is ERC1155, Ownable {
     //Counter for NFT IDs
@@ -20,28 +22,18 @@ contract GameItems is ERC1155, Ownable {
     string playerApiUrl =
         "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/";
 
-    //We'd replace the constructor arg with our API url later (just made sample IPFS for now)
     constructor() public ERC1155("") {
-        console.log("Making contract!");
+        console.log("Making contract, minting initial currency supply...");
+        mintCurrency(10000000);
     }
 
     //Minting a new athelete, specify amount of them you want to mint
-    //Also need to figure out how to set URI
+    //Minting a pack will just call this 3 times
+    //Also need to figure out how to set URI (metadata) properly
     function mintAthlete(uint256 amount) public onlyOwner {
         uint256 newPlayerId = _tokenIds.current();
         _mint(msg.sender, newPlayerId, amount, "");
-        setTokenUri(
-            newPlayerId,
-            (
-                string(
-                    abi.encodePacked(
-                        "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/",
-                        newPlayerId + 1,
-                        ".json"
-                    )
-                )
-            )
-        );
+        //Also going to add to a mapping for the metadata
         _tokenIds.increment();
     }
 
@@ -55,15 +47,21 @@ contract GameItems is ERC1155, Ownable {
         return (_uris[tokenId]);
     }
 
-    // //Transfers 3/x NFTs from the contract to the User (if there are enough)
-    // function openPack() {
-
-    // }
-
     //Minting our "SLP", in game currency
     function mintCurrency(uint256 initialSupply) public {
-        uint256 id = _tokenIds.current();
+        uint256 id = _tokenIds.current(); //should be 0
         _mint(msg.sender, id, initialSupply, "");
         _tokenIds.increment();
     }
+
+    //Transfer in game currency
+    function transferCurrency(
+        address from,
+        address to,
+        uint256 amount,
+        bytes memory data
+    ) public {
+        safeTransferFrom(from, to, 0, amount, data);
+    }
+    //Then use safeTransferFrom with ID of NFT to transfer NFTs
 }
