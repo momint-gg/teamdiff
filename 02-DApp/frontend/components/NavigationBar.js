@@ -9,6 +9,7 @@ import {
   } from "react-router-dom";
 import About from '../pages/About';
 import Home from '../pages';
+import ConnectWallet from '../pages/ConnectWallet';
 
 export default function NavigationBar() {
     return (
@@ -37,8 +38,9 @@ export default function NavigationBar() {
                             <Link to="/about">
                                 <a className="nav-link" href="#">About Us</a>
                             </Link>
-
-                            <button className="btn btn-outline-success me-2" type="button">Connect Wallet</button>
+                            <Link to="/connect">
+                                <button className="btn btn-outline-success me-2" type="button">Connect Wallet</button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -46,7 +48,8 @@ export default function NavigationBar() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="about" element={<About />} />
+                <Route path="connect" element={<ConnectWallet />} />
             </Routes>
-            </Router>   
+        </Router>   
     );
 }
