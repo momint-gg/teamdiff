@@ -48,3 +48,5 @@ contract AthleteMetadata is ChainlinkClient, Ownable {
 //SOURCES:
 //Chainlink documentation for GET requests (ChainlinkClient): https://docs.chain.link/docs/make-a-http-get-request/
 //YouTube video for connecting Chainlink to an API: https://www.youtube.com/watch?v=AtHp7me2Yks&t=294s&ab_channel=Chainlink
+//Parsing JSON in solidity is tricky: https://ethereum.stackexchange.com/questions/6121/parse-json-in-solidity/6128
+//Going to be easier to get in our JS and then pass into a function
