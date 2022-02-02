@@ -40,8 +40,8 @@ contract AthleteMetadata is ChainlinkClient, Ownable {
         public
         recordChainlinkFulfillment(_requestId)
     {
-        console.log(res);
-        AthleteList = res;
+        // console.log("Chainlink req fulfilled");
+        // AthleteList = res;
     }
 }
 
