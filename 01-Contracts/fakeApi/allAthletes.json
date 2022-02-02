@@ -1,0 +1,19 @@
+{
+  "players": [
+    {
+      "name": "Esports Athlete 1",
+      "team": "Team 1",
+      "position": "Position 1"
+    },
+    {
+      "name": "Esports Athlete 2",
+      "team": "Team 2",
+      "position": "Position 2"
+    },
+    {
+      "name": "Esports Athlete 3",
+      "team": "Team 3",
+      "position": "Position 3"
+    }
+  ]
+}

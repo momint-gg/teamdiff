@@ -13,28 +13,32 @@ import "./Structs.sol";
 // How to do after the contract is deployed?
 
 contract GameItems is ERC1155, Ownable {
-    //Counter for NFT IDs
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    //Mapping token ID --> URI
+
     mapping(uint256 => string) private _uris;
-    //Our API url for athlete data -- just a sample IPFS url for now with fake API data
     string playerApiUrl =
         "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/";
 
-    constructor() public ERC1155("") {
-        console.log("Making contract, minting initial currency supply...");
-        mintCurrency(10000000);
-    }
+    uint256 numAthletes = 3;
+    uint256 NFTPerAthlete = 10;
 
-    //Minting a new athelete, specify amount of them you want to mint
-    //Minting a pack will just call this 3 times
-    //Also need to figure out how to set URI (metadata) properly
-    function mintAthlete(uint256 amount) public onlyOwner {
-        uint256 newPlayerId = _tokenIds.current();
-        _mint(msg.sender, newPlayerId, amount, "");
-        //Also going to add to a mapping for the metadata
-        _tokenIds.increment();
+    constructor()
+        public
+        ERC1155(
+            "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/{id}.json"
+        )
+    {
+        console.log("Making contract, minting initial currency supply...");
+        //Minting our initial currency
+        mintCurrency(10000000);
+        //Minting our athletes
+        for (uint256 i = 0; i < numAthletes; i++) {
+            uint256 newPlayerId = _tokenIds.current();
+            _mint(msg.sender, newPlayerId, NFTPerAthlete, "");
+            _tokenIds.increment();
+        }
+        //Then mint all of our players here
     }
 
     //Dynamically setting new URI for a minted token
@@ -55,6 +59,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     //Transfer in game currency
+    //Then use safeTransferFrom with ID of NFT to transfer NFTs
     function transferCurrency(
         address from,
         address to,
@@ -63,5 +68,4 @@ contract GameItems is ERC1155, Ownable {
     ) public {
         safeTransferFrom(from, to, 0, amount, data);
     }
-    //Then use safeTransferFrom with ID of NFT to transfer NFTs
 }
