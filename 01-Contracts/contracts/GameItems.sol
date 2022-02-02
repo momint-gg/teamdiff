@@ -10,7 +10,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "./Structs.sol";
 
 //To do:
-//Implement ERC1155 Receiever -- transfering NFTs (possibly)
 //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
 
 // import "./ERC155Mintable.sol";
