@@ -5,8 +5,13 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./Structs.sol";
+
+//To do:
+//Implement ERC1155 Receiever -- transfering NFTs (possibly)
+//Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
 
 // import "./ERC155Mintable.sol";
 // We can read in the total list of players from API or whatever
@@ -17,28 +22,44 @@ contract GameItems is ERC1155, Ownable {
     Counters.Counter private _tokenIds;
 
     mapping(uint256 => string) private _uris;
-    string playerApiUrl =
+    string private playerApiUrl =
         "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/";
 
-    uint256 numAthletes = 3;
-    uint256 NFTPerAthlete = 10;
+    uint256 private numAthletes = 3;
+    uint256 private NFTPerAthlete = 10;
 
     constructor()
         public
         ERC1155(
-            "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/{id}.json"
+            "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/player{id}.json"
         )
     {
         console.log("Making contract, minting initial currency supply...");
         //Minting our initial currency
-        mintCurrency(10000000);
+        // mintCurrency(10000000);
+
         //Minting our athletes
-        for (uint256 i = 0; i < numAthletes; i++) {
+        mintAthletes();
+    }
+
+    //Minting NFTs to this contract
+    function mintAthletes() public onlyOwner {
+        for (uint256 i = 1; i < numAthletes + 1; i++) {
             uint256 newPlayerId = _tokenIds.current();
-            _mint(msg.sender, newPlayerId, NFTPerAthlete, "");
+            _mint(address(this), newPlayerId, NFTPerAthlete, "");
+            setTokenUri(
+                newPlayerId,
+                string(
+                    abi.encodePacked(
+                        playerApiUrl,
+                        "player",
+                        Strings.toString(_tokenIds.current() + 1),
+                        ".json"
+                    )
+                )
+            );
             _tokenIds.increment();
         }
-        //Then mint all of our players here
     }
 
     //Dynamically setting new URI for a minted token
