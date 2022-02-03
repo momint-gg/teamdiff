@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
+import "./RandomNumber.sol";
+
 //To do:
 //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
 

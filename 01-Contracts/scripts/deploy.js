@@ -20,4 +20,4 @@ const runMain = async () => {
 
 runMain();
 
-//Latest contract address (rinkeby) -- 0x640E8429c3700Fb1Ca8d65cf60b1b9b579BCe19B
+//Latest contract address (rinkeby) -- 0x714133F77fB15F34e50503DAE63544EeFC5e7817
