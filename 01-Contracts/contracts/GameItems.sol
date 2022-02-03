@@ -26,12 +26,12 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
         "https://ipfs.io/ipfs/QmVwNeMaU8AdB7E3UKwKD9FYpXD4vLimv2kQ1fFBMKDFNt/";
 
     //We will later pass these 2 variables into constructor when calling
-    uint256 internal numAthletes = 3;
-    uint256 internal startingNum = 0; //First collection, so 0 in this case
-    uint256 internal NFTPerAthlete = 10;
+    uint256 private numAthletes = 3;
+    uint256 private startingNum = 0; //First collection, so 0 in this case
+    uint256 private NFTPerAthlete = 10;
 
-    constructor() public ERC1155("") RandomNumber() {
-        console.log("Making contract, minting initial currency supply...");
+    constructor() ERC1155("") RandomNumber(numAthletes, startingNum) {
+        console.log("Making contract...");
 
         //Minting our athletes -- check "fakeApi" folder for athlete format
         mintAthletes();
@@ -65,6 +65,9 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
         uint256 randy = RandomNumber.randomResult;
         uint256 randy2 = RandomNumber.randomResult;
         uint256 randy3 = RandomNumber.randomResult;
+        console.log(randy);
+        console.log(randy2);
+        console.log(randy3);
 
         //Require balance of NFTs to be high enough
         // require(balanceOf(address(this), randy) > 0 &&)

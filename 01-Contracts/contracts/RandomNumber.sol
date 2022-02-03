@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 //Generating random number for when users mint a pack
+//NOTE: Contract needs to be funded with link, or link transferred to the contract
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
@@ -10,12 +11,11 @@ contract RandomNumber is VRFConsumerBase {
     uint256 internal fee;
 
     uint256 public randomResult;
-
-    uint256 numAthletes;
-    uint256 startingNum;
+    uint256 private numAthletes;
+    uint256 private startingNum;
 
     //Chainlink VRF Contract addresses: https://docs.chain.link/docs/vrf-contracts/
-    constructor(uint256 numOfAthletes, uint256 startingNum)
+    constructor(uint256 _numOfAthletes, uint256 _startingNum)
         VRFConsumerBase(
             0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B, // VRF Coordinator
             0x01BE23585060835E02B77ef475b0Cc51aA1e0709 // LINK Token
@@ -23,6 +23,8 @@ contract RandomNumber is VRFConsumerBase {
     {
         keyHash = 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
         fee = 0.1 * 10**18; // 0.1 LINK (Fee varies by network)
+        numAthletes = _numOfAthletes;
+        startingNum = _startingNum;
     }
 
     //Requesting randomness
@@ -34,13 +36,17 @@ contract RandomNumber is VRFConsumerBase {
         return requestRandomness(keyHash, fee);
     }
 
-    //Callback function
+    //Callback function -- formatting random number to be in correct range of NFT IDs
     function fulfillRandomness(bytes32 requestId, uint256 randomness)
         internal
         override
     {
         randomResult = (randomness % numAthletes) + startingNum;
+        // randomResult = randomness;
     }
 
-    // function withdrawLink() external {} - Implement a withdraw function to avoid locking your LINK in the contract
+    //To do: Implement a withdraw function to avoid locking your LINK in the contract
+    // function withdrawLink() external {
+    //
+    // }
 }

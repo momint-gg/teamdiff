@@ -1,8 +1,10 @@
 const hre = require("hardhat");
 
 const main = async () => {
+  // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
-  const gameContract = await gameContractFactory.deploy();
+
+  const gameContract = await gameContractFactory.deploy(3, 0);
   await gameContract.deployed();
 
   console.log("Contract deployed to:", gameContract.address);

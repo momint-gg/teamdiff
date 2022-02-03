@@ -23,6 +23,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  // solidity: {
+  //   compilers: [{version: "0.8.0"},{version: "0.8."}]
+  // }
   solidity: "0.8.0",
   // paths: {
   //   //Need to add path so contract can verify correctly on etherscan
@@ -34,6 +37,7 @@ module.exports = {
       runs: 2000,
     },
   },
+  defaultNetwork: "rinkeby", //NEED to have for testing so it knows where to deploy
   networks: {
     //Config for Rinkeby
     rinkeby: {
