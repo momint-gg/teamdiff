@@ -5,13 +5,17 @@ pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
-contract RandomNumberConsumer is VRFConsumerBase {
+contract RandomNumber is VRFConsumerBase {
     bytes32 internal keyHash;
     uint256 internal fee;
 
     uint256 public randomResult;
 
-    constructor()
+    uint256 numAthletes;
+    uint256 startingNum;
+
+    //Chainlink VRF Contract addresses: https://docs.chain.link/docs/vrf-contracts/
+    constructor(uint256 numOfAthletes, uint256 startingNum)
         VRFConsumerBase(
             0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B, // VRF Coordinator
             0x01BE23585060835E02B77ef475b0Cc51aA1e0709 // LINK Token
@@ -35,7 +39,7 @@ contract RandomNumberConsumer is VRFConsumerBase {
         internal
         override
     {
-        randomResult = randomness;
+        randomResult = (randomness % numAthletes) + startingNum;
     }
 
     // function withdrawLink() external {} - Implement a withdraw function to avoid locking your LINK in the contract

@@ -17,7 +17,7 @@ import "./RandomNumber.sol";
 // We can read in the total list of players from API or whatever
 // How to do after the contract is deployed?
 
-contract GameItems is ERC1155, Ownable {
+contract GameItems is ERC1155, Ownable, RandomNumber {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -26,15 +26,14 @@ contract GameItems is ERC1155, Ownable {
         "https://ipfs.io/ipfs/QmVwNeMaU8AdB7E3UKwKD9FYpXD4vLimv2kQ1fFBMKDFNt/";
 
     //We will later pass these 2 variables into constructor when calling
-    uint256 private numAthletes = 3;
-    uint256 private NFTPerAthlete = 10;
+    uint256 internal numAthletes = 3;
+    uint256 internal startingNum = 0; //First collection, so 0 in this case
+    uint256 internal NFTPerAthlete = 10;
 
-    constructor() public ERC1155("") {
+    constructor() public ERC1155("") RandomNumber() {
         console.log("Making contract, minting initial currency supply...");
-        //Minting our initial currency
-        // mintCurrency(10000000);
 
-        //Minting our athletes
+        //Minting our athletes -- check "fakeApi" folder for athlete format
         mintAthletes();
     }
 
@@ -60,8 +59,21 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    //When a user "mints" a pack -- really transferring 3 RANDOM NFTs to them
-    function mintPack() public {}
+    //Choosing 3 random IDs in range of starting num to num of athletes then transfer those
+    //As long as we have the number of athletes passed in, and starting number, we should be fine
+    function mintPack() public {
+        uint256 randy = RandomNumber.randomResult;
+        uint256 randy2 = RandomNumber.randomResult;
+        uint256 randy3 = RandomNumber.randomResult;
+
+        //Require balance of NFTs to be high enough
+        // require(balanceOf(address(this), randy) > 0 &&)
+
+        //Transfer the NFTs to function caller
+        safeTransferFrom(address(this), msg.sender, randy, 1, "0x00");
+        safeTransferFrom(address(this), msg.sender, randy2, 1, "0x00");
+        safeTransferFrom(address(this), msg.sender, randy3, 1, "0x00");
+    }
 
     //Dynamically setting new URI for a minted token
     function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
