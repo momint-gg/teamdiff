@@ -1,0 +1,9 @@
+{
+  "name": "Esports Athlete 2",
+  "description": "This is the second Esports athlete in our collection :D",
+  "image": "",
+  "attributes": [
+    { "trait_type": "Team", "value": "Random LOL team" },
+    { "trait_type": "Position", "value": "Defense" }
+  ]
+}

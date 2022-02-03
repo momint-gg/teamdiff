@@ -27,12 +27,7 @@ contract GameItems is ERC1155, Ownable {
     uint256 private numAthletes = 3;
     uint256 private NFTPerAthlete = 10;
 
-    constructor()
-        public
-        ERC1155(
-            "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/player{id}.json"
-        )
-    {
+    constructor() public ERC1155("") {
         console.log("Making contract, minting initial currency supply...");
         //Minting our initial currency
         // mintCurrency(10000000);

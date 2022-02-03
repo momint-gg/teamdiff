@@ -1,0 +1,9 @@
+{
+  "name": "Esports Athlete 1",
+  "description": "This is the first Esports athlete in our collection!",
+  "image": "",
+  "attributes": [
+    { "trait_type": "Team", "value": "100Thieves" },
+    { "trait_type": "Position", "value": "Striker" }
+  ]
+}

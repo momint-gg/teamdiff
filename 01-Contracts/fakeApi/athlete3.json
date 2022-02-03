@@ -1,0 +1,9 @@
+{
+  "name": "Esports Athlete 3",
+  "description": "This is the THIRD Esports athlete in our collection!",
+  "image": "",
+  "attributes": [
+    { "trait_type": "Team", "value": "LoL official team" },
+    { "trait_type": "Position", "value": "Healer" }
+  ]
+}
