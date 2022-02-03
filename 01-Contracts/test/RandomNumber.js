@@ -31,8 +31,8 @@ describe("Random Number Test", () => {
     let txn = await contract.getRandomNumber();
     await txn.wait();
 
-    //Wait for a min
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    //Wait for a min or two -- enough time for contract to receieve the random result
+    await new Promise((resolve) => setTimeout(resolve, 120000));
 
     const res = await contract.randomResult();
     console.log("random number result: " + res);
@@ -41,8 +41,8 @@ describe("Random Number Test", () => {
         new hre.ethers.BigNumber.from(res._hex).toString()
     );
 
-    // expect((1).to.equal(1));
-    // expect(res.to.not.equal(undefined));
+    expect((1).to.equal(1));
+    expect(res.to.not.equal(undefined));
   });
 });
 

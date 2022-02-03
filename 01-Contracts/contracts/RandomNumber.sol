@@ -14,6 +14,8 @@ contract RandomNumber is VRFConsumerBase {
     uint256 private numAthletes;
     uint256 private startingNum;
 
+    uint256 private constant PACK_SIZE = 3;
+
     //Chainlink VRF Contract addresses: https://docs.chain.link/docs/vrf-contracts/
     constructor(uint256 _numOfAthletes, uint256 _startingNum)
         VRFConsumerBase(
@@ -43,6 +45,19 @@ contract RandomNumber is VRFConsumerBase {
     {
         randomResult = (randomness % numAthletes) + startingNum;
         // randomResult = randomness;
+    }
+
+    //Expand to 3 random values -- much faster this way
+    function expand(uint256 randomValue)
+        public
+        pure
+        returns (uint256[] memory expandedValues)
+    {
+        expandedValues = new uint256[](PACK_SIZE);
+        for (uint256 i = 0; i < PACK_SIZE; i++) {
+            expandedValues[i] = uint256(keccak256(abi.encode(randomValue, i)));
+        }
+        return expandedValues;
     }
 
     //To do: Implement a withdraw function to avoid locking your LINK in the contract

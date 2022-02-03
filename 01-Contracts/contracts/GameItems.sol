@@ -29,6 +29,7 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
     uint256 private numAthletes = 3;
     uint256 private startingNum = 0; //First collection, so 0 in this case
     uint256 private NFTPerAthlete = 10;
+    uint256 private constant PACK_SIZE = 3;
 
     constructor() ERC1155("") RandomNumber(numAthletes, startingNum) {
         console.log("Making contract...");
@@ -62,20 +63,31 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
     //Choosing 3 random IDs in range of starting num to num of athletes then transfer those
     //As long as we have the number of athletes passed in, and starting number, we should be fine
     function mintPack() public {
-        uint256 randy = RandomNumber.randomResult;
-        uint256 randy2 = RandomNumber.randomResult;
-        uint256 randy3 = RandomNumber.randomResult;
-        console.log(randy);
-        console.log(randy2);
-        console.log(randy3);
+        uint256[] memory randomVals = RandomNumber.expand(
+            RandomNumber.randomResult
+        );
 
-        //Require balance of NFTs to be high enough
-        // require(balanceOf(address(this), randy) > 0 &&)
+        //Require balance of NFTs in the contract that the pack has selected to be high enough
+        require(
+            balanceOf(address(this), randomVals[0]) > 0 &&
+                balanceOf(address(this), randomVals[1]) > 0 &&
+                balanceOf(address(this), randomVals[2]) > 0
+        );
 
-        //Transfer the NFTs to function caller
-        safeTransferFrom(address(this), msg.sender, randy, 1, "0x00");
-        safeTransferFrom(address(this), msg.sender, randy2, 1, "0x00");
-        safeTransferFrom(address(this), msg.sender, randy3, 1, "0x00");
+        uint256[] memory amounts = new uint256[](PACK_SIZE);
+        amounts[0] = 1;
+        amounts[1] = 1;
+        amounts[2] = 1;
+
+        // [randomVals[0], randomVals[1], randomVals[2]];
+        //Transferring NFTs from current contract to the user
+        safeBatchTransferFrom(
+            address(this),
+            msg.sender,
+            randomVals,
+            amounts,
+            "0x00"
+        );
     }
 
     //Dynamically setting new URI for a minted token
