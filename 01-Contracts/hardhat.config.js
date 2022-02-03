@@ -24,7 +24,8 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: "0.8.0",
-  // paths: { //Need to add path so contract can verify correctly on etherscan
+  // paths: {
+  //   //Need to add path so contract can verify correctly on etherscan
   //   artifacts: "./build/contracts",
   // },
   settings: {

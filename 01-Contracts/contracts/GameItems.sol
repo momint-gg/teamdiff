@@ -6,8 +6,7 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-
-import "./Structs.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 //To do:
 //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
@@ -22,8 +21,9 @@ contract GameItems is ERC1155, Ownable {
 
     mapping(uint256 => string) private _uris;
     string private playerApiUrl =
-        "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/";
+        "https://ipfs.io/ipfs/QmVwNeMaU8AdB7E3UKwKD9FYpXD4vLimv2kQ1fFBMKDFNt/";
 
+    //We will later pass these 2 variables into constructor when calling
     uint256 private numAthletes = 3;
     uint256 private NFTPerAthlete = 10;
 
@@ -37,6 +37,8 @@ contract GameItems is ERC1155, Ownable {
     }
 
     //Minting NFTs to this contract
+    //Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards
+    //Check the "fake API" folder for details
     function mintAthletes() public onlyOwner {
         for (uint256 i = 1; i < numAthletes + 1; i++) {
             uint256 newPlayerId = _tokenIds.current();
@@ -46,7 +48,7 @@ contract GameItems is ERC1155, Ownable {
                 string(
                     abi.encodePacked(
                         playerApiUrl,
-                        "player",
+                        "athlete",
                         Strings.toString(_tokenIds.current() + 1),
                         ".json"
                     )
@@ -55,6 +57,9 @@ contract GameItems is ERC1155, Ownable {
             _tokenIds.increment();
         }
     }
+
+    //When a user "mints" a pack -- really transferring 3 RANDOM NFTs to them
+    function mintPack() public {}
 
     //Dynamically setting new URI for a minted token
     function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
