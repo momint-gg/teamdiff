@@ -22,5 +22,8 @@
     "hardhat-gas-reporter": "^1.0.7",
     "mocha": "^9.2.0",
     "solidity-coverage": "^0.7.18"
-  }
+  },
+  "scripts": {
+      "test-all": "mocha --exit --recursive"
+    }
 }

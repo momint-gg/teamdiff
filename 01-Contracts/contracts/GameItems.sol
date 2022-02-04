@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -25,7 +26,9 @@ contract GameItems is ERC1155, Ownable {
     string private playerApiUrl =
         "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/";
 
-    uint256 private numAthletes = 3;
+    uint256 public numAthletes = 3;
+    //Can we create a getter for this? Would make testing easier
+    //Also can we rename this to QuantityPerAthlete
     uint256 private NFTPerAthlete = 10;
 
     constructor()
@@ -34,7 +37,7 @@ contract GameItems is ERC1155, Ownable {
             "https://ipfs.io/ipfs/QmWYaTeeZiZDmT7j4xrNsuQJGFEgbS2bpkeA2uMZPmA4Rw/player{id}.json"
         )
     {
-        console.log("Making contract, minting initial currency supply...");
+        //console.log("Making contract, minting initial currency supply...");
         //Minting our initial currency
         // mintCurrency(10000000);
 
@@ -46,7 +49,9 @@ contract GameItems is ERC1155, Ownable {
     function mintAthletes() public onlyOwner {
         for (uint256 i = 1; i < numAthletes + 1; i++) {
             uint256 newPlayerId = _tokenIds.current();
-            _mint(address(this), newPlayerId, NFTPerAthlete, "");
+            //_mint(address(this), newPlayerId, NFTPerAthlete, "");
+            _mint(msg.sender, newPlayerId, NFTPerAthlete, "");
+
             setTokenUri(
                 newPlayerId,
                 string(
@@ -70,6 +75,15 @@ contract GameItems is ERC1155, Ownable {
     //Just getting the URI for a token
     function uri(uint256 tokenId) public view override returns (string memory) {
         return (_uris[tokenId]);
+    }
+
+    // function getNumAthletes() public onlyOwner returns(uint memory) {
+    //     return this.numAthletes;
+    // }
+
+    function getNFTPerAthlete() public view onlyOwner returns (uint) {
+        return NFTPerAthlete;
+        //return uint(10);
     }
 
     //Minting our "SLP", in game currency

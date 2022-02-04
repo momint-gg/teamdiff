@@ -34,11 +34,20 @@ module.exports = {
     },
   },
   networks: {
-    //Config for Rinkeby
-    rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
-      accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+    //defaultNetwork: "hardhat",
+    hardhat: {
+      //url: "http://127.0.0.1:8545"
     },
+    //Config for Rinkeby
+    
+    // rinkeby: {
+    //   url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
+    //   accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+    // },
+
+    // localhost: {
+    //   url: "http://127.0.0.1:8545"
+    // },
   },
   mocha: {
     //for testing
