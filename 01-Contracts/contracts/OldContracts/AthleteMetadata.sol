@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+//NOTE: WE ARE NOT USING THIS CONTRACT AS OF NOW
+
 //Contract for if we need to pull athlete data from API
 contract AthleteMetadata is ChainlinkClient, Ownable {
     using Chainlink for Chainlink.Request;
