@@ -13,7 +13,6 @@ import "./RandomNumber.sol";
 //To do:
 //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
 
-// import "./ERC155Mintable.sol";
 // We can read in the total list of players from API or whatever
 // How to do after the contract is deployed?
 
@@ -62,32 +61,31 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
 
     //Choosing 3 random IDs in range of starting num to num of athletes then transfer those
     //As long as we have the number of athletes passed in, and starting number, we should be fine
+    //We may just change this to a provenance hash...
     function mintPack() public {
+        // RandomNumber.getRandomNumber();
+        // uint256[] memory randomVals = RandomNumber.expand(
+        //     RandomNumber.randomResult
+        // );
+
+        //Require balance of NFTs in the contract that the pack has selected to be high enough
+        // require(
+        //     balanceOf(address(this), randomVals[0]) > 0 &&
+        //         balanceOf(address(this), randomVals[1]) > 0 &&
+        //         balanceOf(address(this), randomVals[2]) > 0
+        // );
+
+        safeTransferFrom(address(this), msg.sender, 0, 1, "0x00");
+        safeTransferFrom(address(this), msg.sender, 1, 1, "0x00");
+        safeTransferFrom(address(this), msg.sender, 2, 1, "0x00");
+    }
+
+    function getRandomNumInRange() public onlyOwner returns (uint256[] memory) {
+        RandomNumber.getRandomNumber();
         uint256[] memory randomVals = RandomNumber.expand(
             RandomNumber.randomResult
         );
-
-        //Require balance of NFTs in the contract that the pack has selected to be high enough
-        require(
-            balanceOf(address(this), randomVals[0]) > 0 &&
-                balanceOf(address(this), randomVals[1]) > 0 &&
-                balanceOf(address(this), randomVals[2]) > 0
-        );
-
-        uint256[] memory amounts = new uint256[](PACK_SIZE);
-        amounts[0] = 1;
-        amounts[1] = 1;
-        amounts[2] = 1;
-
-        // [randomVals[0], randomVals[1], randomVals[2]];
-        //Transferring NFTs from current contract to the user
-        safeBatchTransferFrom(
-            address(this),
-            msg.sender,
-            randomVals,
-            amounts,
-            "0x00"
-        );
+        return randomVals;
     }
 
     //Dynamically setting new URI for a minted token
