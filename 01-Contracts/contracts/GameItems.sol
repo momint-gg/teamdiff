@@ -9,52 +9,55 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
-import "./RandomNumber.sol";
-
 //To do:
 //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
 
 // We can read in the total list of players from API or whatever
 // How to do after the contract is deployed?
 
-contract GameItems is ERC1155, Ownable, RandomNumber {
+contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    mapping(uint256 => string) private _uris;
-    string private playerApiUrl =
-        "https://ipfs.io/ipfs/QmVwNeMaU8AdB7E3UKwKD9FYpXD4vLimv2kQ1fFBMKDFNt/";
+    //Going to be our provenance hash for the collection
+    string provenance = "";
 
-<<<<<<< HEAD
-    uint256 public numAthletes = 3;
-    //Can we create a getter for this? Would make testing easier
-    //Also can we rename this to QuantityPerAthlete
-=======
-    //We will later pass these 2 variables into constructor when calling
+    //Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards
+    //Check the "fake API" folder for details
+    string private playerApiUrl = //athlete
+        "https://ipfs.io/ipfs/QmVwNeMaU8AdB7E3UKwKD9FYpXD4vLimv2kQ1fFBMKDFNt/";
     uint256 private numAthletes = 3;
     uint256 private startingNum = 0; //First collection, so 0 in this case
->>>>>>> mint_pack_and_metadata_working
     uint256 private NFTPerAthlete = 10;
     uint256 private constant PACK_SIZE = 3;
 
-    constructor() ERC1155("") RandomNumber(numAthletes, startingNum) {
-        console.log("Making contract...");
+    //For the pack NFT
+    string private packURI =
+        "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json";
+    uint256 private constant maxPacks = 10; //Some set number of packs we decide
+    uint256 private packsMinted = 0; 
 
-        //Minting our athletes -- check "fakeApi" folder for athlete format
+    //Mappings
+    mapping(uint256 => string) private _uris;
+    mapping(uint256 => address) private ownerOfNFT;
+
+    //Events
+    event packMinted(address user, uint256 id);
+
+    constructor() ERC1155("") {
+        console.log("Making contract...");
+        //Minting our athletes
         mintAthletes();
     }
 
-    //Minting NFTs to this contract
-    //Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards
-    //Check the "fake API" folder for details
     function mintAthletes() public onlyOwner {
-        for (uint256 i = 1; i < numAthletes + 1; i++) {
-            uint256 newPlayerId = _tokenIds.current();
+        for (uint256 i = 0; i < numAthletes; i++) {
+            uint256 newAthleteId = _tokenIds.current();
             //_mint(address(this), newPlayerId, NFTPerAthlete, "");
-            _mint(address(this), newPlayerId, NFTPerAthlete, "");
-
+            _mint(address(this), newAthleteId, NFTPerAthlete, "");
+            ownerOfNFT[newAthleteId] = address(this);
             setTokenUri(
-                newPlayerId,
+                newAthleteId,
                 string(
                     abi.encodePacked(
                         playerApiUrl,
@@ -68,41 +71,37 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
         }
     }
 
-    //Choosing 3 random IDs in range of starting num to num of athletes then transfer those
-    //As long as we have the number of athletes passed in, and starting number, we should be fine
-    //We may just change this to a provenance hash...
-    function mintPack() public {
-        // RandomNumber.getRandomNumber();
-        // uint256[] memory randomVals = RandomNumber.expand(
-        //     RandomNumber.randomResult
-        // );
+    //Minting a pack to the current user -- later going to be burned and given 3 random NFTs
+    function mintPack() public onlyOwner {
+        require(packsMinted < maxPacks);
 
-        //Require balance of NFTs in the contract that the pack has selected to be high enough
-        // require(
-        //     balanceOf(address(this), randomVals[0]) > 0 &&
-        //         balanceOf(address(this), randomVals[1]) > 0 &&
-        //         balanceOf(address(this), randomVals[2]) > 0
-        // );
+        uint256 newPackId = _tokenIds.current();
+        _mint(address(msg.sender), newPackId, 1, "");
+        ownerOfNFT[newPackId] = address(msg.sender);
+        
+        setTokenUri(newPackId, string(abi.encodePacked(packURI)));
 
-        safeTransferFrom(address(this), msg.sender, 0, 1, "0x00");
-        safeTransferFrom(address(this), msg.sender, 1, 1, "0x00");
-        safeTransferFrom(address(this), msg.sender, 2, 1, "0x00");
+        packsMinted += 1;
+        emit packMinted(msg.sender, _tokenIds.current());
+        _tokenIds.increment();
     }
 
-    function getRandomNumInRange() public onlyOwner returns (uint256[] memory) {
-        RandomNumber.getRandomNumber();
-        uint256[] memory randomVals = RandomNumber.expand(
-            RandomNumber.randomResult
-        );
-        return randomVals;
+    // Burning a pack and giving 3 random athlete NFTs to sender
+    function burnPack(uint256 packId) public {
+        require(balanceOf(msg.sender, packId) > 0); //make sure pack hasn't been burned yet
     }
 
-    //Dynamically setting new URI for a minted token
+    // Setting provenance once it is calculated
+    function setProvenanceHash(string memory provenanceHash) public onlyOwner {
+        provenance = provenanceHash;
+    }
+
+    // Dynamically setting new URI for a minted token
     function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
         _uris[tokenId] = uri;
     }
 
-    //Just getting the URI for a token
+    // Just getting the URI for a token
     function uri(uint256 tokenId) public view override returns (string memory) {
         return (_uris[tokenId]);
     }
@@ -111,7 +110,7 @@ contract GameItems is ERC1155, Ownable, RandomNumber {
     //     return this.numAthletes;
     // }
 
-    function getNFTPerAthlete() public view onlyOwner returns (uint) {
+    function getNFTPerAthlete() public view onlyOwner returns (uint256) {
         return NFTPerAthlete;
         //return uint(10);
     }
