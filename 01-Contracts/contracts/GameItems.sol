@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 //To do:
@@ -34,15 +35,17 @@ contract GameItems is ERC1155, Ownable {
     uint256 private NFT_PER_ATHLETE = 10; // how much of each athlete
     uint256 private constant PACK_SIZE = 3;
 
-    bool public packsReadyToOpen = false;
-
-    uint256 public REVEAL_TIMESTAMP; //can set this later 
-
     // For the pack NFT
     string private packURI =
         "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json";
     uint256 private constant maxPacks = 10; //Some set number of packs we decide
     uint256 private packsMinted = 0; 
+
+    bool public packsReadyToOpen = false;
+
+    uint256 public REVEAL_TIMESTAMP = 10000; //can set this later 
+
+    uint256 private totalSupply = 0; //tracks the total supply of tokens we've minted (not a function for ERC1155 built in)
 
     // Provenance
     uint256 public startingIndexBlock;
@@ -52,10 +55,10 @@ contract GameItems is ERC1155, Ownable {
     // Mappings
     mapping(uint256 => string) private _uris;
     // mapping(uint256 => address) private ownerOfNFT;
-    mapping()
 
     // Events
     event packMinted(address user, uint256 id);
+
 
     constructor() ERC1155("") {
         console.log("Making contract...");
@@ -63,53 +66,48 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Athletes can only be minted once our "switch" has been flipped
-    function packsReadyToOpen() public onlyOwner {
+    function setPacksReady() public onlyOwner {
         packsReadyToOpen = !packsReadyToOpen;
     }
 
-    // //Earlier mint athlete function -- will change
-    // function mintAthletes() public onlyOwner {
-    //     for (uint256 i = 0; i < MAX_ATHLETES; i++) {
-    //         uint256 newAthleteId = _tokenIds.current();
-    //         _mint(address(this), newAthleteId, NFTPerAthlete, "");
-    //         ownerOfNFT[newAthleteId] = address(this);
-    //         setTokenUri(
-    //             newAthleteId,
-    //             string(
-    //                 abi.encodePacked(
-    //                     playerApiUrl,
-    //                     "athlete",
-    //                     Strings.toString(_tokenIds.current() + 1),
-    //                     ".json"
-    //                 )
-    //             )
-    //         );
-    //         _tokenIds.increment();
-    //     }
-    // }
-
     // Mints an athlete -- called when someone "burns" a pack
-    function mintAthleteNew() public payable {
-        // Index of what to mint -- we need to % by num athletes since 
-        uint mintIndex = totalSupply() % NUM_ATHLETES;
-        if (totalSupply() < NUM_ATHLETES * NFT_PER_ATHLETE) {
-            _mint(msg.sender, mintIndex);
+    function mintAthlete() public payable {
+        // Index of what to mint -- we need to % by num of NFTs per athlete 
+        uint256 mintIndex = totalSupply % NUM_ATHLETES; 
+
+        if (totalSupply < NUM_ATHLETES * NFT_PER_ATHLETE) {
+            // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
+            _mint(address(msg.sender), mintIndex, 1, "0x00");
+
+            // Setting the URI for the athlete 
+            setTokenUri(
+                totalSupply,
+                string(
+                    abi.encodePacked(
+                        playerApiUrl,
+                        "athlete",
+                        Strings.toString(_tokenIds.current() + 1),
+                        ".json"
+                    )
+                )
+            );
+            totalSupply += 1;
         }
 
         // If we haven't set the starting index and this is either 1) the last saleable token or 2) the first token to be sold after
         // the end of pre-sale, set the starting index block
-        if (startingIndexBlock == 0 && (totalSupply() == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
+        if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
             startingIndexBlock = block.number;
         } 
     }
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintPack() public onlyOwner {
-        require(packsMinted < maxPacks, "All packs have alreayd been minted!");
+        require(packsMinted < maxPacks, "All packs have already been minted!");
 
         uint256 newPackId = _tokenIds.current();
         _mint(address(msg.sender), newPackId, 1, "");
-        ownerOfNFT[newPackId] = address(msg.sender);
+        // ownerOfNFT[newPackId] = address(msg.sender);
         
         setTokenUri(newPackId, string(abi.encodePacked(packURI)));
 
@@ -118,13 +116,16 @@ contract GameItems is ERC1155, Ownable {
         _tokenIds.increment();
     }
 
-    // // Burning a pack and giving 3 random athlete NFTs to sender
-    // function burnPack(uint256 packId) public {
-    //     require(balanceOf(msg.sender, packId) > 0); //make sure pack hasn't been burned yet
-
-    //     // Burning the pack and assigning user 3 NFTs.
-    //     // Still need to do this once I get provenance done.
-    // }
+    // Burning a pack and giving 3 random athlete NFTs to sender
+    function burnPack(uint256 packId) public {
+        require(balanceOf(msg.sender, packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
+        // Burning the pack
+        _burn(msg.sender, packId, 1);
+        // Assigning the user 3 NFTs
+        for (uint i = 0; i < PACK_SIZE; i++) {
+            mintAthlete();
+        }
+    }
 
     // Setting starting Index for the collection
     function setStartingIndex() public {
@@ -136,7 +137,7 @@ contract GameItems is ERC1155, Ownable {
 
         // Just a sanity case in the worst case if this function is called late (EVM only stores last 256 block hashes)
         // if (block.number.sub(startingIndexBlock) > 255) {
-        if (block.number - startingIndexBlock) > 255) {
+        if (block.number.sub(startingIndexBlock) > 255) {
             startingIndex = uint(blockhash(block.number - 1)) % (NUM_ATHLETES * NFT_PER_ATHLETE * PACK_SIZE);
         }
         // Prevent default sequence
@@ -153,7 +154,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Setting provenance once it is calculated
-    // How to calculate initial provenance hash? https://medium.com/coinmonks/the-elegance-of-the-nft-provenance-hash-solution-823b39f99473
+    // Set with: (tokenId + startingIndex) % # of tokens
     function setProvenanceHash(string memory provenanceHash) public onlyOwner {
         provenance = provenanceHash;
     }
