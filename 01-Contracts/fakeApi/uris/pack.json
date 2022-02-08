@@ -1,0 +1,6 @@
+{
+  "name": "Pack",
+  "description": "Open the pack on xx/yy/zz to see which players you get!",
+  "image": "https://ale8one.com/wp-content/uploads/2020/11/Ale-8-Mystery-Box.jpg",
+  "attributes": [{ "trait_type": "Mystery box number", "value": 0 }]
+}

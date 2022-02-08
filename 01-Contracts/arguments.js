@@ -1,2 +1,2 @@
-//Where out constructor arguments are going to go
-//To verify on etherscan: npx hardhat verify --constructor-args arguments.js DEPLOYED_CONTRACT_ADDRESS
+//Where out constructor arguments are going to go for verification
+module.exports = [3, 0];

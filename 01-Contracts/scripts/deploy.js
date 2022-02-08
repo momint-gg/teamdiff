@@ -19,3 +19,5 @@ const runMain = async () => {
 };
 
 runMain();
+
+//Latest contract address (rinkeby) -- 0x714133F77fB15F34e50503DAE63544EeFC5e7817

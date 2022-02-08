@@ -1,0 +1,9 @@
+{
+  "name": "Esports Athlete 3",
+  "description": "This is the THIRD Esports athlete in our collection!",
+  "image": "https://as.nyu.edu/content/dam/nyu-as/faculty/images/Guy.jpg",
+  "attributes": [
+    { "trait_type": "Team", "value": "LoL official team" },
+    { "trait_type": "Position", "value": "Healer" }
+  ]
+}
