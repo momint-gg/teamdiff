@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+// import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 //To do:
 //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
@@ -24,7 +24,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards, Check the "fake API" folder for details
         // Note: I think the Image needs to be in its own IPFS (can't just link in IPFS)
-    string private playerApiUrl = //athlete
+    string private athleteURI = //athlete
         "https://ipfs.io/ipfs/QmZTS9tkkueLvRKdteRzXYHrh84YAB2TFC3ApQSDtGy1PB/";
 
     // Later pass these constants into the constructor! (don't want constants in our code)
@@ -43,7 +43,7 @@ contract GameItems is ERC1155, Ownable {
 
     bool public packsReadyToOpen = false;
 
-    uint256 public REVEAL_TIMESTAMP = 10000; //can set this later 
+    // uint256 public REVEAL_TIMESTAMP = 10000; //can set this later 
 
     uint256 private totalSupply = 0; //tracks the total supply of tokens we've minted (not a function for ERC1155 built in)
 
@@ -62,7 +62,7 @@ contract GameItems is ERC1155, Ownable {
 
     constructor() ERC1155("") {
         console.log("Making contract...");
-        REVEAL_TIMESTAMP = 0; // For testing
+        // REVEAL_TIMESTAMP = 0; // For testing
     }
 
     // Athletes can only be minted once our "switch" has been flipped
@@ -84,19 +84,21 @@ contract GameItems is ERC1155, Ownable {
                 totalSupply,
                 string(
                     abi.encodePacked(
-                        playerApiUrl,
+                        athleteURI,
                         "athlete",
-                        Strings.toString(_tokenIds.current() + 1),
+                        Strings.toString(mintIndex + 1),
                         ".json"
                     )
                 )
             );
-            totalSupply += 1;
+            totalSupply += 1; // BAYC had a func for total supply. Just incrementing a state variable here
         }
 
         // If we haven't set the starting index and this is either 1) the last saleable token or 2) the first token to be sold after
         // the end of pre-sale, set the starting index block
-        if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
+        if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE)) {
+        // if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
+
             startingIndexBlock = block.number;
         } 
     }
