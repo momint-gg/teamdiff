@@ -29,7 +29,7 @@ describe("GameItems.test", async () => {
     // Mint athlete
     //only works when _mint calls with msg.sender, not address(this)
     //ERROR'ERC1155: transfer to non ERC1155Receiver implementer'
-    const numAthletes = await GameItem.numAthletes();
+    const numAthletes = await GameItem.NUM_ATHLETES;
     const firstUri = await GameItem.uri(0);
     const lastUri = await GameItem.uri(numAthletes - 2);
 
@@ -73,7 +73,7 @@ describe("GameItems.test", async () => {
 
   // Test Case
   it("Contract Owner owns NFTPerAthlete quantity of each Athlete after Contract Deployment", async function () {
-    for (i = 0; i < GameItem.numAthletes - 1; i++)
+    for (i = 0; i < GameItem.NUM_ATHLETES - 1; i++)
       expect(await GameItem.balanceOf(owner.address, i)).to.equal(
         await GameItem.getNFTPerAthlete()
       );
@@ -134,12 +134,40 @@ describe("GameItems.test", async () => {
     ).to.be.reverted;
   });
 
-  // -------------- // New test cases (after changing contract) // -------------- //
+  // -------------- // New test cases (after changing contract for provenance) // -------------- //
 
-  // Test Case -- testing new mint pack functionality
-  it("Contract should mint a new pack and give to address", async () => {
-    GameItem.mintPack();
-    const balance = GameItem.balanceOf(addr1, 0);
+  // Testing new mint pack functionality with new IDs
+  it("Mints a new pack and gives to address", async () => {
+    await GameItem.mintPack();
+    const balance = await GameItem.balanceOf(owner.address, 30); //since packs would be from (30-39)
     expect(balance).to.equal(1);
   });
+
+  // Testing burn pack functionality and minting with 3 random athletes
+  it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
+    await GameItem.burnPack(30);
+    expect(GameItem.balanceOf(owner.address, 30)).to.be.reverted; //should throw an error
+
+    //Making sure new athletes were minted with indexes ranging from 0-2 (random order bc of block #)
+    const athlete1 = await GameItem.balanceOf(owner.address, 0);
+    const athlete2 = await GameItem.balanceOf(owner.address, 1);
+    const athlete3 = await GameItem.balanceOf(owner.address, 2);
+
+    const uri1 = await GameItem.uri(0);
+    const uri2 = await GameItem.uri(1);
+    const uri3 = await GameItem.uri(2);
+
+    expect(athlete1).to.equal(1) &&
+      expect(athlete2).to.equal(1) &&
+      expect(athlete3).to.equal(1);
+
+    //Check URI #s a couple times to make sure ordering was randomized
+    console.log("URI of first minted athlete: ", uri1);
+    console.log("URI of first minted athlete: ", uri2);
+    console.log("URI of first minted athlete: ", uri3);
+  });
+
+  // it("Contract should burn a pack and mint 3 athletes", async () => {
+  //   await GameItem.burnPack(0);
+  // });
 });

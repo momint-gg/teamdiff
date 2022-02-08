@@ -41,11 +41,17 @@ contract GameItems is ERC1155, Ownable {
     uint256 private constant maxPacks = 10; //Some set number of packs we decide
     uint256 private packsMinted = 0; 
 
+    //When we flip the switch and let everyone open packs
     bool public packsReadyToOpen = false;
 
-    // uint256 public REVEAL_TIMESTAMP = 10000; //can set this later 
+    uint256 public REVEAL_TIMESTAMP = 10000; //can set this later 
 
-    uint256 private totalSupply = 0; //tracks the total supply of tokens we've minted (not a function for ERC1155 built in)
+    //should athlete pack IDs after athletes to avoid confusion
+    //For example: 1-1500 IDs are athletes, 1500-2000 are packs
+        //Maybe not the best way? There's a function total Supply we may want to use, but it could complicate things if we are opening packs and also minting them
+    uint256 private currentPackId = NUM_ATHLETES * NFT_PER_ATHLETE; 
+    //The total amount of tokens so far we've minted
+    uint256 private currentAthleteId = 0;
 
     // Provenance
     uint256 public startingIndexBlock;
@@ -73,15 +79,15 @@ contract GameItems is ERC1155, Ownable {
     // Mints an athlete -- called when someone "burns" a pack
     function mintAthlete() public payable {
         // Index of what to mint -- we need to % by num of NFTs per athlete 
-        uint256 mintIndex = totalSupply % NUM_ATHLETES; 
+        uint256 mintIndex = currentAthleteId % NUM_ATHLETES; 
 
-        if (totalSupply < NUM_ATHLETES * NFT_PER_ATHLETE) {
+        if (currentAthleteId < NUM_ATHLETES * NFT_PER_ATHLETE) {
             // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
             _mint(address(msg.sender), mintIndex, 1, "0x00");
 
             // Setting the URI for the athlete 
             setTokenUri(
-                totalSupply,
+                currentAthleteId,
                 string(
                     abi.encodePacked(
                         athleteURI,
@@ -91,42 +97,41 @@ contract GameItems is ERC1155, Ownable {
                     )
                 )
             );
-            totalSupply += 1; // BAYC had a func for total supply. Just incrementing a state variable here
+            currentAthleteId += 1; // BAYC had a func for total supply. Just incrementing a state variable here
         }
 
-        // If we haven't set the starting index and this is either 1) the last saleable token or 2) the first token to be sold after
-        // the end of pre-sale, set the starting index block
-        if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE)) {
-        // if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
+        // // If we haven't set the starting index and this is either 1) the last saleable token or 2) the first token to be sold after
+        // // the end of pre-sale, set the starting index block
+        // if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE)) {
+        // // if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
 
-            startingIndexBlock = block.number;
-        } 
+        //     startingIndexBlock = block.number;
+        // } 
     }
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintPack() public onlyOwner {
         require(packsMinted < maxPacks, "All packs have already been minted!");
 
-        uint256 newPackId = _tokenIds.current();
-        _mint(address(msg.sender), newPackId, 1, "");
+        _mint(address(msg.sender), currentPackId, 1, "");
         // ownerOfNFT[newPackId] = address(msg.sender);
         
-        setTokenUri(newPackId, string(abi.encodePacked(packURI)));
+        setTokenUri(currentPackId, string(abi.encodePacked(packURI)));
 
-        packsMinted += 1;
-        emit packMinted(msg.sender, _tokenIds.current());
+        currentPackId += 1;
+        emit packMinted(msg.sender, currentPackId); 
         _tokenIds.increment();
     }
 
     // Burning a pack and giving 3 random athlete NFTs to sender
     function burnPack(uint256 packId) public {
-        require(balanceOf(msg.sender, packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
+        require(balanceOf(address(msg.sender), packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
         // Assigning the user 3 NFTs
         for (uint i = 0; i < PACK_SIZE; i++) {
             mintAthlete();
         }
         // Burning the pack
-        _burn(msg.sender, packId, 1);
+        _burn(address(msg.sender), packId, 1);
     }
 
     // Setting starting Index for the collection

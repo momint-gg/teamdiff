@@ -1,7 +1,9 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "test-all": "mocha --exit --recursive"
+    "test-all": "mocha --exit --recursive",
+    "deploy-rinkeby": "hardhat run scripts/deploy.js --network rinkeby",
+    "verify-rinkeby": "hardhat verify --network rinkeby"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
