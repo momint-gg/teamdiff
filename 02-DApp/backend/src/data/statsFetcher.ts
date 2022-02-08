@@ -133,7 +133,7 @@ export default class StatsFetcher {
       const matchInfo: any = it[1];
 
       if (typeof matchInfo === "undefined" || matchInfo.length === 0) {
-        return this._completedStats;
+        return;
       }
 
       Object.entries(matchInfo).forEach((it: any) => {
