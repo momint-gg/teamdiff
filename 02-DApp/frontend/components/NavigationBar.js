@@ -9,6 +9,7 @@ import {
   } from "react-router-dom";
 import About from '../pages/About';
 import Home from '../pages';
+import Collection from '../pages/Collection';
 import ConnectWallet from '../pages/ConnectWallet';
 
 export default function NavigationBar() {
@@ -18,7 +19,7 @@ export default function NavigationBar() {
                 <div className="container-fluid">
                     <Link to="/">
                         <a className="navbar-brand" >
-                            Momint
+                            Team Diff
                         </a>
                     </Link>
 
@@ -32,7 +33,7 @@ export default function NavigationBar() {
                             <Link to="/">
                                 <a className="nav-link active" aria-current="page" href="#">Home</a>
                             </Link>
-                            <Link to="/">
+                            <Link to="/collection">
                                 <a className="nav-link" href="#">Collection</a>
                             </Link>
                             <Link to="/about">
@@ -48,6 +49,7 @@ export default function NavigationBar() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="about" element={<About />} />
+                <Route path="collection" element={<Collection />} />
                 <Route path="connect" element={<ConnectWallet />} />
             </Routes>
         </Router>   
