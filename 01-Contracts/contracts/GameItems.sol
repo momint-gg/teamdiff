@@ -25,7 +25,7 @@ contract GameItems is ERC1155, Ownable {
     // Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards, Check the "fake API" folder for details
         // Note: I think the Image needs to be in its own IPFS (can't just link in IPFS)
     string private playerApiUrl = //athlete
-        "https://ipfs.io/ipfs/QmVwNeMaU8AdB7E3UKwKD9FYpXD4vLimv2kQ1fFBMKDFNt/";
+        "https://ipfs.io/ipfs/QmZTS9tkkueLvRKdteRzXYHrh84YAB2TFC3ApQSDtGy1PB/";
 
     // Later pass these constants into the constructor! (don't want constants in our code)
     // For my strategy to work (adapted BAYC but for 1155) the following must be true:
@@ -119,12 +119,12 @@ contract GameItems is ERC1155, Ownable {
     // Burning a pack and giving 3 random athlete NFTs to sender
     function burnPack(uint256 packId) public {
         require(balanceOf(msg.sender, packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
-        // Burning the pack
-        _burn(msg.sender, packId, 1);
         // Assigning the user 3 NFTs
         for (uint i = 0; i < PACK_SIZE; i++) {
             mintAthlete();
         }
+        // Burning the pack
+        _burn(msg.sender, packId, 1);
     }
 
     // Setting starting Index for the collection
