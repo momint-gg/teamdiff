@@ -6,11 +6,13 @@
   "scripts": {
     "start": "tsc && node dist/index.js",
     "build": "tsc --project ./",
+    "gg": "tsc --project ./ && node dist/test.js",
     "lint": "eslint .",
     "dev": "nodemon --config nodemon.json src/index.ts",
     "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts"
   },
   "dependencies": {
+    "axios": "^0.25.0",
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "mysql": "^2.18.1"
