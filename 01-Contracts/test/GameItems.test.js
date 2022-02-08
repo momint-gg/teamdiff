@@ -1,21 +1,25 @@
 // test/GameItems.test.js
 // Load dependencies
 const { expect } = require("chai");
+const hre = require("hardhat");
 
 const GameItems = artifacts.require("GameItems.sol");
 
 // Start test block
 describe("GameItems.test", async () => {
+  var owner;
+  var addr1;
+
   //Ran before first unit test
   before(async function () {
-    GameItemFactory = await ethers.getContractFactory("GameItems");
+    GameItemFactory = await hre.ethers.getContractFactory("GameItems");
   });
 
   //Ran before every unit test
   //used to reset state or prepare test
   beforeEach(async function () {
     GameItem = await GameItemFactory.deploy();
-    [owner, addr1] = await ethers.getSigners();
+    [owner, addr1] = await hre.ethers.getSigners();
     await GameItem.deployed();
     GameItem.connect(owner);
   });
