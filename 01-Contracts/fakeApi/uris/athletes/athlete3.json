@@ -1,0 +1,10 @@
+{
+  "name": "Esports Athlete 3",
+  "description": "This is the THIRD Esports athlete in our collection!",
+  "image": "https://ipfs.io/ipfs/QmVWVJ3VQ7BvD2ch5C3gQ4BMn8ZhmwkmVLhmVVhjdxt9cV/3.png",
+  "attributes": [
+    { "trait_type": "Team", "value": "LoL official team" },
+    { "trait_type": "Position", "value": "Healer" },
+    { "trait_type": "Season", "value": 1 }
+  ]
+}
