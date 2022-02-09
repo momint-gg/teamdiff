@@ -145,8 +145,8 @@ describe("GameItems.test", async () => {
 
   // Testing burn pack functionality and minting with 3 random athletes
   it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
+    await GameItem.setStartingIndex();
     await GameItem.mintPack();
-    await GameItem.setStartingIndex(); //this won't work on local hardhat network (only rinkeby / real network)
     await GameItem.burnPack(30);
     expect(GameItem.balanceOf(owner.address, 30)).to.be.reverted; //should throw an error
 
@@ -166,21 +166,17 @@ describe("GameItems.test", async () => {
     //Check URI #s a couple times to make sure ordering was randomized
     console.log("\n");
     console.log("URI of first minted athlete: ", uri1);
-    console.log("URI of first minted athlete: ", uri2);
-    console.log("URI of first minted athlete: ", uri3);
+    console.log("URI of second minted athlete: ", uri2);
+    console.log("URI of third minted athlete: ", uri3);
     console.log("\n");
   });
 
   // Testing set starting index functionality
   it("Sets the starting index", async () => {
+    await GameItem.setStartingIndex();
     await GameItem.mintPack();
     await GameItem.burnPack(30);
-    await GameItem.setStartingIndex();
-    const index = Number(GameItem.startingIndex);
-    console.log("\n");
-    console.log("Starting index: ");
-    console.log(index);
-    console.log("\n");
+    const index = await GameItem.startingIndex();
     expect(index).to.not.equal(0);
   });
 });

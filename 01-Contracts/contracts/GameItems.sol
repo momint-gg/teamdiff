@@ -32,7 +32,7 @@ contract GameItems is ERC1155, Ownable {
         // Max num athletes (i.e. 50) * NFTs per athlete (i.e. 30) = Max packs (i.e. 500) * 3
         // This is for random indexing
     uint256 private constant NUM_ATHLETES = 3; // Max size of the collection
-    uint256 private NFT_PER_ATHLETE = 10; // how much of each athlete
+    uint256 private constant NFT_PER_ATHLETE = 10; // how much of each athlete
     uint256 private constant PACK_SIZE = 3;
 
     // For the pack NFT
@@ -79,22 +79,24 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    function mintAthlete() public payable {
+    function mintAthlete() public onlyOwner {
         // Index of what to mint -- we need to % by num of NFTs per athlete 
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES; 
+        console.log("Starting index", startingIndex);
+        console.log("Mint index", mintIndex);
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
-            _mint(address(msg.sender), mintIndex, 1, "0x00");
+            _mint(address(msg.sender), numAthletes, 1, "0x00");
 
             // Setting the URI for the athlete 
             setTokenUri(
-                mintIndex,
+                numAthletes,
                 string(
                     abi.encodePacked(
                         athleteURI,
                         "athlete",
-                        Strings.toString(mintIndex + 1),
+                        Strings.toString(mintIndex + 1), // B/c it starts at athlete 1 on IPFS for now
                         ".json"
                     )
                 )
@@ -129,21 +131,11 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Setting starting Index for the collection
-    function setStartingIndex() public onlyOwner {
-        
-        startingIndexBlock = block.number;
-
-        require(startingIndex == 0, "Starting index is already set");
-        require(startingIndexBlock != 0, "Starting index block must be set");
-        
+    function setStartingIndex() public onlyOwner {        
         // Setting the starting index
-        startingIndex = uint(blockhash(startingIndexBlock)) % (NUM_ATHLETES * NFT_PER_ATHLETE * PACK_SIZE);
+        startingIndex = uint(blockhash(block.number - 1)) % (NUM_ATHLETES * NFT_PER_ATHLETE);
+        console.log("Starting index ", startingIndex);
 
-        // Just a sanity case in the worst case if this function is called late (EVM only stores last 256 block hashes)
-        // if (block.number.sub(startingIndexBlock) > 255) {
-        if (block.number.sub(startingIndexBlock) > 255) {
-            startingIndex = uint(blockhash(block.number - 1)) % (NUM_ATHLETES * NFT_PER_ATHLETE * PACK_SIZE);
-        }
         // Prevent default sequence
         if (startingIndex == 0) {
             startingIndex = startingIndex.add(1);
