@@ -31,7 +31,7 @@ contract GameItems is ERC1155, Ownable {
     // For my strategy to work (adapted BAYC but for 1155) the following must be true:
         // Max num athletes (i.e. 50) * NFTs per athlete (i.e. 30) = Max packs (i.e. 500) * 3
         // This is for random indexing
-    uint256 private NUM_ATHLETES = 3; // Max size of the collection
+    uint256 private constant NUM_ATHLETES = 3; // Max size of the collection
     uint256 private NFT_PER_ATHLETE = 10; // how much of each athlete
     uint256 private constant PACK_SIZE = 3;
 
@@ -50,8 +50,10 @@ contract GameItems is ERC1155, Ownable {
     //For example: 1-1500 IDs are athletes, 1500-2000 are packs
         //Maybe not the best way? There's a function total Supply we may want to use, but it could complicate things if we are opening packs and also minting them
     uint256 private currentPackId = NUM_ATHLETES * NFT_PER_ATHLETE; 
-    //The total amount of tokens so far we've minted
-    uint256 private currentAthleteId = 0;
+
+    //The total amount of athletes so far we've minted
+    //different from NUM_ATHLETES bc this will change
+    uint256 private numAthletes = 0; 
 
     // Provenance
     uint256 public startingIndexBlock;
@@ -79,15 +81,15 @@ contract GameItems is ERC1155, Ownable {
     // Mints an athlete -- called when someone "burns" a pack
     function mintAthlete() public payable {
         // Index of what to mint -- we need to % by num of NFTs per athlete 
-        uint256 mintIndex = currentAthleteId % NUM_ATHLETES; 
+        uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES; 
 
-        if (currentAthleteId < NUM_ATHLETES * NFT_PER_ATHLETE) {
+        if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
             _mint(address(msg.sender), mintIndex, 1, "0x00");
 
             // Setting the URI for the athlete 
             setTokenUri(
-                currentAthleteId,
+                mintIndex,
                 string(
                     abi.encodePacked(
                         athleteURI,
@@ -97,16 +99,8 @@ contract GameItems is ERC1155, Ownable {
                     )
                 )
             );
-            currentAthleteId += 1; // BAYC had a func for total supply. Just incrementing a state variable here
+            numAthletes += 1; // BAYC had a func for total supply. Just incrementing a state variable here
         }
-
-        // // If we haven't set the starting index and this is either 1) the last saleable token or 2) the first token to be sold after
-        // // the end of pre-sale, set the starting index block
-        // if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE)) {
-        // // if (startingIndexBlock == 0 && (totalSupply == NUM_ATHLETES * NFT_PER_ATHLETE || block.timestamp >= REVEAL_TIMESTAMP)) {
-
-        //     startingIndexBlock = block.number;
-        // } 
     }
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
@@ -124,8 +118,8 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Burning a pack and giving 3 random athlete NFTs to sender
-    function burnPack(uint256 packId) public {
-        require(balanceOf(address(msg.sender), packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
+    function burnPack(uint packId) public {
+        // require(balanceOf(address(msg.sender), packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
         // Assigning the user 3 NFTs
         for (uint i = 0; i < PACK_SIZE; i++) {
             mintAthlete();
@@ -135,7 +129,10 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Setting starting Index for the collection
-    function setStartingIndex() public {
+    function setStartingIndex() public onlyOwner {
+        
+        startingIndexBlock = block.number;
+
         require(startingIndex == 0, "Starting index is already set");
         require(startingIndexBlock != 0, "Starting index block must be set");
         
