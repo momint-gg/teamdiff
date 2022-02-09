@@ -13,6 +13,7 @@ const calculateProvenance = async () => {
   }
 
   const provenance = crypto.SHA256(concatenatedHashes);
+  console.log(`Concatenated Hashes: ${concatenatedHashes}`);
   console.log(`Provenance hash: ${provenance}`);
 
   return provenance;

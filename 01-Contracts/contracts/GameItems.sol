@@ -34,11 +34,11 @@ contract GameItems is ERC1155, Ownable {
     uint256 private constant NUM_ATHLETES = 3; // Max size of the collection
     uint256 private constant NFT_PER_ATHLETE = 10; // how much of each athlete
     uint256 private constant PACK_SIZE = 3;
+    uint256 private constant maxPacks = 10; //Some set number of packs we decide
 
     // For the pack NFT
     string private packURI =
         "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json";
-    uint256 private constant maxPacks = 10; //Some set number of packs we decide
     uint256 private packsMinted = 0; 
 
     //When we flip the switch and let everyone open packs
@@ -106,7 +106,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
-    function mintPack() public onlyOwner {
+    function mintPack() public {
         require(packsMinted < maxPacks, "All packs have already been minted!");
 
         _mint(address(msg.sender), currentPackId, 1, "");
@@ -121,7 +121,9 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a pack and giving 3 random athlete NFTs to sender
     function burnPack(uint packId) public {
-        // require(balanceOf(address(msg.sender), packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
+        require(balanceOf(address(msg.sender), packId) > 0, "Pack has already been burned or does not exist."); //make sure pack hasn't been burned yet
+        // require(packsReadyToOpen, "Packs aren't ready to open yet!");
+
         // Assigning the user 3 NFTs
         for (uint i = 0; i < PACK_SIZE; i++) {
             mintAthlete();
