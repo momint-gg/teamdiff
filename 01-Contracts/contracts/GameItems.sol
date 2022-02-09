@@ -77,6 +77,7 @@ contract GameItems is ERC1155, Ownable {
 
         if (totalSupply < NUM_ATHLETES * NFT_PER_ATHLETE) {
             // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
+            
             _mint(address(msg.sender), mintIndex, 1, "0x00");
 
             // Setting the URI for the athlete 
@@ -102,6 +103,8 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
+    //@henry why is the onlyOwner? 
+    //What happens when all NFTs are minted, and someone has a pack they haven't burned?
     function mintPack() public onlyOwner {
         require(packsMinted < maxPacks, "All packs have already been minted!");
 
@@ -123,6 +126,9 @@ contract GameItems is ERC1155, Ownable {
         _burn(msg.sender, packId, 1);
         // Assigning the user 3 NFTs
         for (uint i = 0; i < PACK_SIZE; i++) {
+            // @henry
+            //I thought we minted all the athletes to the game contract address?
+            //then we would  transfer three NFTs to the msg.sender from the contract address via safeBatchTransfer?
             mintAthlete();
         }
     }
@@ -138,6 +144,7 @@ contract GameItems is ERC1155, Ownable {
         // Just a sanity case in the worst case if this function is called late (EVM only stores last 256 block hashes)
         // if (block.number.sub(startingIndexBlock) > 255) {
         if (block.number.sub(startingIndexBlock) > 255) {
+            //@henry shouldn't this starting index be less than 
             startingIndex = uint(blockhash(block.number - 1)) % (NUM_ATHLETES * NFT_PER_ATHLETE * PACK_SIZE);
         }
         // Prevent default sequence
