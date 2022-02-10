@@ -22,4 +22,4 @@ const runMain = async () => {
 
 runMain();
 
-//Latest contract address (rinkeby) 2/8/22 -- 0x7B891dca5fb2947B4C5bb70D1a60e1cA0895943C
+//Latest contract address (rinkeby) -- --
