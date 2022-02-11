@@ -6,6 +6,8 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 //import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
+    //contract GameLogic is Initializable {
+//or (will we need ownership of this contract, o)
 contract GameLogic is OwnableUpgradeable {
 
     uint256 public version;
@@ -18,7 +20,14 @@ contract GameLogic is OwnableUpgradeable {
         incrementVersion();
     }
 
-    // function decrement(uint256 x) public returns (uint256) {
+    // function decrement(uint256 x) public returns 
+     
+     
+     
+      
+      
+      
+     // (uint256) {
     //     return dec = x.sub(1);
     // }
     function incrementVersion() public returns (uint256) {

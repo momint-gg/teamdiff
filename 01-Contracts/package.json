@@ -1,7 +1,9 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "test-all": "mocha --exit --recursive"
+    "test-all": "mocha --exit --recursive",
+    "deploy-rinkeby": "hardhat run scripts/deploy.js --network rinkeby",
+    "verify-rinkeby": "hardhat verify --network rinkeby"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
@@ -22,6 +24,7 @@
     "@openzeppelin/contracts": "^4.4.2",
     "@openzeppelin/contracts-upgradeable": "^4.4.2",
     "axios": "^0.25.0",
+    "crypto-js": "^4.1.1",
     "dotenv": "^14.3.2",
     "hardhat-contract-sizer": "^2.4.0",
     "hardhat-gas-reporter": "^1.0.7",

@@ -40,9 +40,14 @@ module.exports = {
   },
   defaultNetwork: "hardhat", // NEED to have for testing so it knows where to deploy
   networks: {
-    hardhat: {
-      //url: "http://127.0.0.1:8545"
-    },
+    // hardhat: {
+    //   blockNumber: 14173470,
+    //   //url: "http://127.0.0.1:8545" //<-- don't need to set this (just do npx hardhat node)
+    // },
+    // rinkeby: {
+    //   url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy HTTP key
+    //   accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+    // },
     //Config for Rinkeby
     // rinkeby: {
     //   url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this

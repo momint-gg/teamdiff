@@ -1,0 +1,93 @@
+{
+  "id": "af609ba253ad6a1ac792f232bdedfd10",
+  "_format": "hh-sol-build-info-1",
+  "solcVersion": "0.8.2",
+  "solcLongVersion": "0.8.2+commit.661d1103",
+  "input": {
+    "language": "Solidity",
+    "sources": {
+      "contracts/GameItems.sol": {
+        "content": "// //SPDX-License-Identifier: Unlicense\r\n// pragma solidity ^0.8.0;\r\n\r\n// import \"hardhat/console.sol\";\r\n// import \"@openzeppelin/contracts/token/ERC1155/ERC1155.sol\";\r\n// import \"@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol\";\r\n// import \"@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol\";\r\n// import \"@openzeppelin/contracts/access/Ownable.sol\";\r\n// import \"@openzeppelin/contracts/utils/Counters.sol\";\r\n// import \"@openzeppelin/contracts/utils/Strings.sol\";\r\n// import \"@openzeppelin/contracts/utils/math/SafeMath.sol\";\r\n// // import \"@chainlink/contracts/src/v0.8/VRFConsumerBase.sol\";\r\n\r\n// //To do:\r\n// //Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.\r\n\r\n// // We can read in the total list of players from API or whatever\r\n// // How to do after the contract is deployed?\r\n\r\n// contract GameItems is ERC1155, Ownable {\r\n//     using Counters for Counters.Counter;\r\n//     Counters.Counter private _tokenIds;\r\n//     using SafeMath for uint256;\r\n\r\n//     // Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards, Check the \"fake API\" folder for details\r\n//         // Note: I think the Image needs to be in its own IPFS (can't just link in IPFS)\r\n//     string private athleteURI = //athlete\r\n//         \"https://ipfs.io/ipfs/QmZTS9tkkueLvRKdteRzXYHrh84YAB2TFC3ApQSDtGy1PB/\";\r\n\r\n//     // Later pass these constants into the constructor! (don't want constants in our code)\r\n//     // For my strategy to work (adapted BAYC but for 1155) the following must be true:\r\n//         // Max num athletes (i.e. 50) * NFTs per athlete (i.e. 30) = Max packs (i.e. 500) * 3\r\n//         // This is for random indexing\r\n//     uint256 private constant NUM_ATHLETES = 3; // Max size of the collection\r\n//     uint256 private constant NFT_PER_ATHLETE = 10; // how much of each athlete\r\n//     uint256 private constant PACK_SIZE = 3;\r\n//     uint256 private constant maxPacks = 10; //Some set number of packs we decide\r\n\r\n//     // For the pack NFT\r\n//     string private packURI =\r\n//         \"https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json\";\r\n//     uint256 private packsMinted = 0; \r\n\r\n//     //When we flip the switch and let everyone open packs\r\n//     bool public packsReadyToOpen = false;\r\n\r\n//     uint256 public REVEAL_TIMESTAMP = 10000; //can set this later \r\n\r\n//     //should athlete pack IDs after athletes to avoid confusion\r\n//     //For example: 1-1500 IDs are athletes, 1500-2000 are packs\r\n//         //Maybe not the best way? There's a function total Supply we may want to use, but it could complicate things if we are opening packs and also minting them\r\n//     uint256 private currentPackId = NUM_ATHLETES * NFT_PER_ATHLETE; \r\n\r\n//     //The total amount of athletes so far we've minted\r\n//     //different from NUM_ATHLETES bc this will change\r\n//     uint256 private numAthletes = 0; \r\n\r\n//     // Provenance\r\n//     uint256 public startingIndexBlock;\r\n//     uint256 public startingIndex;\r\n//     string provenance = \"\";\r\n\r\n//     // Mappings\r\n//     mapping(uint256 => string) private _uris;\r\n//     // mapping(uint256 => address) private ownerOfNFT;\r\n\r\n//     // Events\r\n//     event packMinted(address user, uint256 id);\r\n\r\n\r\n//     constructor() ERC1155(\"\") {\r\n//         console.log(\"Making contract...\");\r\n//         // REVEAL_TIMESTAMP = 0; // For testing\r\n//     }\r\n\r\n//     // Athletes can only be minted once our \"switch\" has been flipped\r\n//     function setPacksReady() public onlyOwner {\r\n//         packsReadyToOpen = !packsReadyToOpen;\r\n//     }\r\n\r\n//     // Mints an athlete -- called when someone \"burns\" a pack\r\n//     function mintAthlete() public onlyOwner {\r\n//         // Index of what to mint -- we need to % by num of NFTs per athlete \r\n//         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES; \r\n//         console.log(\"Starting index\", startingIndex);\r\n//         console.log(\"Mint index\", mintIndex);\r\n\r\n//         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {\r\n//             // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, \"Purchase would exceed max supply of this token.\");\r\n//             _mint(address(msg.sender), numAthletes, 1, \"0x00\");\r\n\r\n//             // Setting the URI for the athlete \r\n//             setTokenUri(\r\n//                 numAthletes,\r\n//                 string(\r\n//                     abi.encodePacked(\r\n//                         athleteURI,\r\n//                         \"athlete\",\r\n//                         Strings.toString(mintIndex + 1), // B/c it starts at athlete 1 on IPFS for now\r\n//                         \".json\"\r\n//                     )\r\n//                 )\r\n//             );\r\n//             numAthletes += 1; // BAYC had a func for total supply. Just incrementing a state variable here\r\n//         }\r\n//     }\r\n\r\n//     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs\r\n//     function mintPack() public {\r\n//         require(packsMinted < maxPacks, \"All packs have already been minted!\");\r\n\r\n//         _mint(address(msg.sender), currentPackId, 1, \"\");\r\n//         // ownerOfNFT[newPackId] = address(msg.sender);\r\n        \r\n//         setTokenUri(currentPackId, string(abi.encodePacked(packURI)));\r\n\r\n//         currentPackId += 1;\r\n//         emit packMinted(msg.sender, currentPackId); \r\n//         _tokenIds.increment();\r\n//     }\r\n\r\n//     // Burning a pack and giving 3 random athlete NFTs to sender\r\n//     function burnPack(uint packId) public {\r\n//         require(balanceOf(address(msg.sender), packId) > 0, \"Pack has already been burned or does not exist.\"); //make sure pack hasn't been burned yet\r\n//         // require(packsReadyToOpen, \"Packs aren't ready to open yet!\");\r\n\r\n//         // Assigning the user 3 NFTs\r\n//         for (uint i = 0; i < PACK_SIZE; i++) {\r\n//             // @henry\r\n//             //I thought we minted all the athletes to the game contract address?\r\n//             //then we would  transfer three NFTs to the msg.sender from the contract address via safeBatchTransfer?\r\n//             mintAthlete();\r\n//         }\r\n//         // Burning the pack\r\n//         _burn(address(msg.sender), packId, 1);\r\n//     }\r\n\r\n//     // Setting starting Index for the collection\r\n//     function setStartingIndex() public onlyOwner {        \r\n//         // Setting the starting index\r\n//         startingIndex = uint(blockhash(block.number - 1)) % (NUM_ATHLETES * NFT_PER_ATHLETE);\r\n//         console.log(\"Starting index \", startingIndex);\r\n\r\n//         // Prevent default sequence\r\n//         if (startingIndex == 0) {\r\n//             startingIndex = startingIndex.add(1);\r\n//         }\r\n//     }\r\n\r\n//     // Setting starting index block\r\n//      function emergencySetStartingIndexBlock() public onlyOwner {\r\n//         require(startingIndex == 0, \"Starting index is already set\");\r\n        \r\n//         startingIndexBlock = block.number;\r\n//     }\r\n\r\n//     // Setting provenance once it is calculated\r\n//     // Set with: (tokenId + startingIndex) % # of tokens\r\n//     function setProvenanceHash(string memory provenanceHash) public onlyOwner {\r\n//         provenance = provenanceHash;\r\n//     }\r\n\r\n//     // Dynamically setting new URI for a minted token\r\n//     function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {\r\n//         _uris[tokenId] = uri;\r\n//     }\r\n\r\n//     // Just getting the URI for a token\r\n//     function uri(uint256 tokenId) public view override returns (string memory) {\r\n//         return (_uris[tokenId]);\r\n//     }\r\n\r\n//     // function getNumAthletes() public onlyOwner returns(uint memory) {\r\n//     //     return this.numAthletes;\r\n//     // }\r\n\r\n//     function getNFTPerAthlete() public view onlyOwner returns (uint256) {\r\n//         return NFT_PER_ATHLETE;\r\n//         //return uint(10);\r\n//     }\r\n\r\n//     // Minting our \"SLP\", in game currency\r\n//     function mintCurrency(uint256 initialSupply) public {\r\n//         uint256 id = _tokenIds.current(); //should be 0\r\n//         _mint(msg.sender, id, initialSupply, \"\");\r\n//         _tokenIds.increment();\r\n//     }\r\n\r\n//     // Transfer in game currency\r\n//     // Then use safeTransferFrom with ID of NFT to transfer NFTs\r\n//     function transferCurrency(\r\n//         address from,\r\n//         address to,\r\n//         uint256 amount,\r\n//         bytes memory data\r\n//     ) public {\r\n//         safeTransferFrom(from, to, 0, amount, data);\r\n//     }\r\n// }\r\n"
+      },
+      "contracts/LeagueProxy.sol": {
+        "content": "// // //SPDX-License-Identifier: Unlicense\r\n// // pragma solidity ^0.8.0;\r\n// // //Use upgradeable open-zeppelin packages for easier testing with hardhat and truffle\r\n// import \"@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol\";\r\n// //import \"@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol\";\r\n\r\n// // contract LeagueProxy is ERC1967UpgradeUpgradeable/*, UUPSUpgradeable, OwnableUpgradeable*/ {\r\n// contract LeagueProxy is ERC1967UpgradeUpgradeable {\r\n    \r\n\r\n// }"
+      }
+    },
+    "settings": {
+      "optimizer": {
+        "enabled": false,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ],
+          "": [
+            "ast"
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "errors": [
+      {
+        "component": "general",
+        "errorCode": "3420",
+        "formattedMessage": "Warning: Source file does not specify required compiler version! Consider adding \"pragma solidity ^0.8.2;\"\n--> contracts/GameItems.sol\n\n",
+        "message": "Source file does not specify required compiler version! Consider adding \"pragma solidity ^0.8.2;\"",
+        "severity": "warning",
+        "sourceLocation": {
+          "end": -1,
+          "file": "contracts/GameItems.sol",
+          "start": -1
+        },
+        "type": "Warning"
+      },
+      {
+        "component": "general",
+        "errorCode": "3420",
+        "formattedMessage": "Warning: Source file does not specify required compiler version! Consider adding \"pragma solidity ^0.8.2;\"\n--> contracts/LeagueProxy.sol\n\n",
+        "message": "Source file does not specify required compiler version! Consider adding \"pragma solidity ^0.8.2;\"",
+        "severity": "warning",
+        "sourceLocation": {
+          "end": -1,
+          "file": "contracts/LeagueProxy.sol",
+          "start": -1
+        },
+        "type": "Warning"
+      }
+    ],
+    "sources": {
+      "contracts/GameItems.sol": {
+        "ast": {
+          "absolutePath": "contracts/GameItems.sol",
+          "exportedSymbols": {},
+          "id": 1,
+          "license": "Unlicense",
+          "nodeType": "SourceUnit",
+          "nodes": [],
+          "src": "8541:0:0"
+        },
+        "id": 0
+      },
+      "contracts/LeagueProxy.sol": {
+        "ast": {
+          "absolutePath": "contracts/LeagueProxy.sol",
+          "exportedSymbols": {},
+          "id": 2,
+          "license": "Unlicense",
+          "nodeType": "SourceUnit",
+          "nodes": [],
+          "src": "503:0:1"
+        },
+        "id": 1
+      }
+    }
+  }
+}

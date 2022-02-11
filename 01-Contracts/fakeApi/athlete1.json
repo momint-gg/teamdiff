@@ -1,9 +1,0 @@
-{
-  "name": "Esports Athlete 1",
-  "description": "This is the first Esports athlete in our collection!",
-  "image": "https://www.cdc.gov/injury/images/pressroom/sme/GeryGuy_285x360.png",
-  "attributes": [
-    { "trait_type": "Team", "value": "100Thieves" },
-    { "trait_type": "Position", "value": "Striker" }
-  ]
-}
