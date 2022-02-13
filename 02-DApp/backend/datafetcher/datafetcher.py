@@ -286,9 +286,16 @@ class DataFetcher():
             self.nft_metadata[player]["name"] = info["Name"]
             self.nft_metadata[player]["description"] = "This is a professional eSports athelete!"
             self.nft_metadata[player]["image"] = self.ipfsMap[player]["Hash"]
-            self.nft_metadata[player]["attributes"] = {}
-            self.nft_metadata[player]["attributes"]["team"] = info["Team"]
-            self.nft_metadata[player]["attributes"]["position"] = info["Role"]
+            self.nft_metadata[player]["attributes"] = [
+                {
+                    "trait_type": "team",
+                    "value": info["Team"]
+                },
+                {
+                    "trait_type": "position",
+                    "value": info["Role"]
+                },
+            ]
 
     def convert_to_json(self, data, file_name):
         with open(file_name, "w") as outfile:
