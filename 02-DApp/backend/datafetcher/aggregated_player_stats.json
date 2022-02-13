@@ -1,0 +1,402 @@
+{
+  "Abbedagge": {
+    "Kills": 5,
+    "Deaths": 8,
+    "Assists": 18,
+    "Gold": 42232,
+    "DamageToChampions": 41184,
+    "Wins": 2
+  },
+  "Closer (Can \u00c7elik)": {
+    "Kills": 14,
+    "Deaths": 3,
+    "Assists": 19,
+    "Gold": 39717,
+    "DamageToChampions": 35891,
+    "Wins": 2
+  },
+  "Contractz": {
+    "Kills": 3,
+    "Deaths": 15,
+    "Assists": 8,
+    "Gold": 20759,
+    "DamageToChampions": 25833,
+    "Wins": 0
+  },
+  "Destiny (Mitchell Shaw)": {
+    "Kills": 0,
+    "Deaths": 11,
+    "Assists": 19,
+    "Gold": 19993,
+    "DamageToChampions": 15671,
+    "Wins": 1
+  },
+  "FBI": {
+    "Kills": 17,
+    "Deaths": 4,
+    "Assists": 22,
+    "Gold": 51122,
+    "DamageToChampions": 61815,
+    "Wins": 2
+  },
+  "huhi": {
+    "Kills": 6,
+    "Deaths": 6,
+    "Assists": 21,
+    "Gold": 26214,
+    "DamageToChampions": 17342,
+    "Wins": 2
+  },
+  "Jenkins": {
+    "Kills": 3,
+    "Deaths": 7,
+    "Assists": 8,
+    "Gold": 23261,
+    "DamageToChampions": 36110,
+    "Wins": 0
+  },
+  "Luger": {
+    "Kills": 3,
+    "Deaths": 5,
+    "Assists": 4,
+    "Gold": 27411,
+    "DamageToChampions": 50336,
+    "Wins": 0
+  },
+  "Palafox": {
+    "Kills": 7,
+    "Deaths": 7,
+    "Assists": 6,
+    "Gold": 26321,
+    "DamageToChampions": 37511,
+    "Wins": 0
+  },
+  "Poome": {
+    "Kills": 1,
+    "Deaths": 8,
+    "Assists": 8,
+    "Gold": 13911,
+    "DamageToChampions": 8310,
+    "Wins": 0
+  },
+  "PowerOfEvil": {
+    "Kills": 4,
+    "Deaths": 10,
+    "Assists": 9,
+    "Gold": 34392,
+    "DamageToChampions": 48716,
+    "Wins": 1
+  },
+  "Revenge (Mohamed Kaddoura)": {
+    "Kills": 7,
+    "Deaths": 9,
+    "Assists": 8,
+    "Gold": 36053,
+    "DamageToChampions": 60684,
+    "Wins": 1
+  },
+  "Ssumday": {
+    "Kills": 8,
+    "Deaths": 2,
+    "Assists": 20,
+    "Gold": 43182,
+    "DamageToChampions": 39273,
+    "Wins": 2
+  },
+  "WildTurtle": {
+    "Kills": 9,
+    "Deaths": 10,
+    "Assists": 9,
+    "Gold": 36799,
+    "DamageToChampions": 50990,
+    "Wins": 1
+  },
+  "Xerxe": {
+    "Kills": 3,
+    "Deaths": 9,
+    "Assists": 15,
+    "Gold": 28944,
+    "DamageToChampions": 27249,
+    "Wins": 1
+  },
+  "Ablazeolive": {
+    "Kills": 4,
+    "Deaths": 8,
+    "Assists": 11,
+    "Gold": 36574,
+    "DamageToChampions": 68905,
+    "Wins": 1
+  },
+  "Berserker (Kim Min-cheol)": {
+    "Kills": 14,
+    "Deaths": 4,
+    "Assists": 13,
+    "Gold": 46906,
+    "DamageToChampions": 60723,
+    "Wins": 2
+  },
+  "Blaber": {
+    "Kills": 10,
+    "Deaths": 6,
+    "Assists": 16,
+    "Gold": 43227,
+    "DamageToChampions": 54280,
+    "Wins": 2
+  },
+  "Fudge": {
+    "Kills": 4,
+    "Deaths": 6,
+    "Assists": 19,
+    "Gold": 37019,
+    "DamageToChampions": 29173,
+    "Wins": 2
+  },
+  "Licorice": {
+    "Kills": 6,
+    "Deaths": 8,
+    "Assists": 9,
+    "Gold": 39422,
+    "DamageToChampions": 40999,
+    "Wins": 1
+  },
+  "Lost": {
+    "Kills": 9,
+    "Deaths": 4,
+    "Assists": 13,
+    "Gold": 39927,
+    "DamageToChampions": 40389,
+    "Wins": 1
+  },
+  "Olleh": {
+    "Kills": 1,
+    "Deaths": 7,
+    "Assists": 15,
+    "Gold": 22788,
+    "DamageToChampions": 13215,
+    "Wins": 1
+  },
+  "Pridestalkr": {
+    "Kills": 9,
+    "Deaths": 8,
+    "Assists": 9,
+    "Gold": 38901,
+    "DamageToChampions": 47777,
+    "Wins": 1
+  },
+  "Summit": {
+    "Kills": 8,
+    "Deaths": 11,
+    "Assists": 10,
+    "Gold": 41746,
+    "DamageToChampions": 52536,
+    "Wins": 2
+  },
+  "Winsome": {
+    "Kills": 2,
+    "Deaths": 5,
+    "Assists": 26,
+    "Gold": 23879,
+    "DamageToChampions": 10972,
+    "Wins": 2
+  },
+  "aphromoo": {
+    "Kills": 3,
+    "Deaths": 3,
+    "Assists": 26,
+    "Gold": 15261,
+    "DamageToChampions": 8189,
+    "Wins": 2
+  },
+  "Johnsun": {
+    "Kills": 15,
+    "Deaths": 2,
+    "Assists": 14,
+    "Gold": 31459,
+    "DamageToChampions": 40229,
+    "Wins": 2
+  },
+  "Josedeodo": {
+    "Kills": 5,
+    "Deaths": 4,
+    "Assists": 22,
+    "Gold": 21959,
+    "DamageToChampions": 20128,
+    "Wins": 2
+  },
+  "Kumo": {
+    "Kills": 1,
+    "Deaths": 2,
+    "Assists": 28,
+    "Gold": 18036,
+    "DamageToChampions": 14063,
+    "Wins": 2
+  },
+  "toucouille": {
+    "Kills": 12,
+    "Deaths": 2,
+    "Assists": 15,
+    "Gold": 25102,
+    "DamageToChampions": 41084,
+    "Wins": 2
+  },
+  "Danny (Kyle Sakamaki)": {
+    "Kills": 5,
+    "Deaths": 2,
+    "Assists": 6,
+    "Gold": 38961,
+    "DamageToChampions": 50362,
+    "Wins": 1
+  },
+  "Impact": {
+    "Kills": 8,
+    "Deaths": 5,
+    "Assists": 8,
+    "Gold": 28501,
+    "DamageToChampions": 23682,
+    "Wins": 1
+  },
+  "Inspired": {
+    "Kills": 5,
+    "Deaths": 4,
+    "Assists": 8,
+    "Gold": 29323,
+    "DamageToChampions": 16882,
+    "Wins": 1
+  },
+  "jojopyun": {
+    "Kills": 1,
+    "Deaths": 5,
+    "Assists": 5,
+    "Gold": 33096,
+    "DamageToChampions": 36604,
+    "Wins": 1
+  },
+  "Vulcan (Philippe Laflamme)": {
+    "Kills": 0,
+    "Deaths": 4,
+    "Assists": 11,
+    "Gold": 17868,
+    "DamageToChampions": 4845,
+    "Wins": 1
+  },
+  "Biofrost": {
+    "Kills": 2,
+    "Deaths": 3,
+    "Assists": 27,
+    "Gold": 26313,
+    "DamageToChampions": 20617,
+    "Wins": 2
+  },
+  "Blue (Ersin G\u00f6ren)": {
+    "Kills": 11,
+    "Deaths": 1,
+    "Assists": 13,
+    "Gold": 48410,
+    "DamageToChampions": 44992,
+    "Wins": 2
+  },
+  "FakeGod": {
+    "Kills": 4,
+    "Deaths": 3,
+    "Assists": 16,
+    "Gold": 44463,
+    "DamageToChampions": 46081,
+    "Wins": 2
+  },
+  "Neo (To\u00e0n Tr\u1ea7n)": {
+    "Kills": 15,
+    "Deaths": 3,
+    "Assists": 10,
+    "Gold": 52719,
+    "DamageToChampions": 46963,
+    "Wins": 2
+  },
+  "River (Kim Dong-woo)": {
+    "Kills": 3,
+    "Deaths": 7,
+    "Assists": 27,
+    "Gold": 35508,
+    "DamageToChampions": 21179,
+    "Wins": 2
+  },
+  "Bjergsen": {
+    "Kills": 5,
+    "Deaths": 3,
+    "Assists": 24,
+    "Gold": 44055,
+    "DamageToChampions": 54388,
+    "Wins": 2
+  },
+  "Bwipo": {
+    "Kills": 7,
+    "Deaths": 5,
+    "Assists": 13,
+    "Gold": 46964,
+    "DamageToChampions": 39637,
+    "Wins": 2
+  },
+  "Eyla": {
+    "Kills": 2,
+    "Deaths": 9,
+    "Assists": 24,
+    "Gold": 23703,
+    "DamageToChampions": 11061,
+    "Wins": 2
+  },
+  "Hans sama": {
+    "Kills": 15,
+    "Deaths": 5,
+    "Assists": 15,
+    "Gold": 50940,
+    "DamageToChampions": 56547,
+    "Wins": 2
+  },
+  "Santorin": {
+    "Kills": 11,
+    "Deaths": 8,
+    "Assists": 18,
+    "Gold": 35301,
+    "DamageToChampions": 31541,
+    "Wins": 2
+  },
+  "Huni": {
+    "Kills": 4,
+    "Deaths": 8,
+    "Assists": 3,
+    "Gold": 25500,
+    "DamageToChampions": 27915,
+    "Wins": 0
+  },
+  "Keaiduo": {
+    "Kills": 3,
+    "Deaths": 4,
+    "Assists": 6,
+    "Gold": 25276,
+    "DamageToChampions": 33815,
+    "Wins": 0
+  },
+  "Shenyi": {
+    "Kills": 0,
+    "Deaths": 8,
+    "Assists": 8,
+    "Gold": 12628,
+    "DamageToChampions": 13834,
+    "Wins": 0
+  },
+  "Spica": {
+    "Kills": 1,
+    "Deaths": 8,
+    "Assists": 5,
+    "Gold": 17791,
+    "DamageToChampions": 9948,
+    "Wins": 0
+  },
+  "Tactical": {
+    "Kills": 3,
+    "Deaths": 9,
+    "Assists": 7,
+    "Gold": 24314,
+    "DamageToChampions": 28210,
+    "Wins": 0
+  }
+}
