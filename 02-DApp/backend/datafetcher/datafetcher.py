@@ -253,8 +253,7 @@ class DataFetcher():
     def download_player_headshots(self):
         for player in self.players.keys():
             pprint(player)
-            site = mwclient.Site('lol.fandom.com', path='/')
-            response = site.api('cargoquery',
+            response = self.site.api('cargoquery',
                                 limit=1,
                                 tables="PlayerImages",
                                 fields="FileName",
@@ -266,7 +265,7 @@ class DataFetcher():
 
             try:
                 url = str(decoded['cargoquery'][0]['title']['FileName'])
-                self.get_filename_url_to_open(site, url, player)
+                self.get_filename_url_to_open(self.site, url, player)
                 self.ipfsMap[player] = self.ipfs.add("./" + player + ".png")
             except:
                 self.ipfsMap[player] = {
