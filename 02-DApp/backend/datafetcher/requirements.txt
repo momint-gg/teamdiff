@@ -2,6 +2,7 @@ autopep8==1.6.0
 certifi==2021.10.8
 charset-normalizer==2.0.12
 idna==3.3
+ipfs-api==0.2.3
 leaguepedia-parser==2.0.0
 lol-dto==2.0.0
 lol-id-tools==1.7.1

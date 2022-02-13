@@ -1,13 +1,17 @@
 import datetime as dt
+import ipfsApi
 import json
 import mwclient
 from pprint import pprint
+import os
 import re
-import shutil
 import ssl
+import time
 import urllib.request
 
+
 ssl._create_default_https_context = ssl._create_unverified_context
+
 
 class DataFetcher():
     def __init__(self,
@@ -26,9 +30,11 @@ class DataFetcher():
         self.time_interval = time_interval
         self.teams = []
         self.players = {}
-        self.player_stats = {}
-        self.aggregated_player_stats = {}
-        self.metadata = {}
+        self.player_game_stats = {}
+        self.aggregated_player_game_stats = {}
+        self.nft_metadata = {}
+        self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
+        self.ipfsMap = {}
 
     scoreboard_player_fields = [
         "SP.OverviewPage",
@@ -113,14 +119,14 @@ class DataFetcher():
         "P.IsLowContent",
     ]
 
-    def get_players(self):
+    def get_players_and_teams(self):
         response = self.site.api(
             "cargoquery",
             limit="max",
             tables="Tournaments=T, TournamentPlayers=TP",
             join_on="T.OverviewPage=TP.OverviewPage",
             fields="TP.Player",
-            where="T.Name = '" + self.tournament2 + "'"
+            where="T.Name = '" + self.tournament2 + "'",
         ).get("cargoquery")
 
         parsed = json.dumps(response)
@@ -129,10 +135,7 @@ class DataFetcher():
         names = [player["title"]["Player"] for player in decoded]
 
         fields = ", ".join(self.player_fields)
-        where = []
-
-        for name in names:
-            where.append("P.Player = '" + name + "'")
+        where = ' OR '.join(["P.Player = '" + name + "'" for name in names])
 
         response = self.site.api(
             "cargoquery",
@@ -140,27 +143,19 @@ class DataFetcher():
             tables="PlayerRedirects=PR, Players=P",
             join_on="PR.OverviewPage=P.OverviewPage",
             fields=fields,
-            where=' OR '.join(where),
+            where=where,
         ).get("cargoquery")
 
         parsed = json.dumps(response)
         decoded = json.loads(parsed)
 
-        ret = {}
-
         for player in decoded:
             player_name = player["title"]["Player"]
-            ret[player_name] = player["title"]
+            self.players[player_name] = player["title"]
 
-        self.players = ret
+        self.teams = [info["Team"] for _, info in self.players.items()]
 
-        teams = [info["Team"] for _, info in self.players.items()]
-
-        self.teams = teams
-
-        return ret
-
-    def get_game_data(self, team, start_date, time_interval):
+    def _get_game_data(self, team, start_date, time_interval):
         fields = ", ".join(self.scoreboard_player_fields)
         past_date = str(start_date-dt.timedelta(time_interval))
 
@@ -195,59 +190,51 @@ class DataFetcher():
             case _:
                 return str
 
-    def get_player_games(self):
-        teams = self.teams
-        ret = {}
-
-        for team in teams:
-            game_data = self.get_game_data(
+    def get_player_game_stats(self):
+        for team in self.teams:
+            game_data = self._get_game_data(
                 team, self.start_date, self.time_interval)['cargoquery']
 
             for current_player in game_data:
                 current_player_data = current_player['title']
                 current_player_name = current_player_data['Link']
 
-                if current_player_name not in ret:
-                    ret[current_player_name] = {}
+                if current_player_name not in self.player_game_stats:
+                    self.player_game_stats[current_player_name] = {}
 
                 game_id = current_player_data["GameId"]
 
-                if game_id in ret[current_player_name]:
+                if game_id in self.player_game_stats[current_player_name]:
                     continue
 
-                ret[current_player_name][game_id] = {}
+                self.player_game_stats[current_player_name][game_id] = {}
 
                 for stat, value in current_player_data.items():
                     if self.determine_stat_type(stat) == int:
-                        ret[current_player_name][game_id][stat] = int(value)
+                        self.player_game_stats[current_player_name][game_id][stat] = int(
+                            value)
                     else:
-                        ret[current_player_name][game_id][stat] = value
+                        self.player_game_stats[current_player_name][game_id][stat] = value
 
-        return ret
-
-    def aggregate_player_stats(self, raw_player_stats):
-        ret = {}
-
-        for current_player_name, games in raw_player_stats.items():
-            if current_player_name not in ret:
-                ret[current_player_name] = {}
+    def aggregate_player_game_stats(self):
+        for current_player_name, games in self.player_game_stats.items():
+            if current_player_name not in self.aggregated_player_game_stats:
+                self.aggregated_player_game_stats[current_player_name] = {}
 
             for _, current_game in games.items():
                 for stat, value in current_game.items():
                     if stat == "PlayerWin":
-                        if "Wins" not in ret[current_player_name]:
-                            ret[current_player_name]["Wins"] = 0
+                        if "Wins" not in self.aggregated_player_game_stats[current_player_name]:
+                            self.aggregated_player_game_stats[current_player_name]["Wins"] = 0
 
                         if value == "Yes":
-                            ret[current_player_name]["Wins"] += 1
+                            self.aggregated_player_game_stats[current_player_name]["Wins"] += 1
 
                     elif self.determine_stat_type(stat) == int:
-                        if stat not in ret[current_player_name]:
-                            ret[current_player_name][stat] = value
+                        if stat not in self.aggregated_player_game_stats[current_player_name]:
+                            self.aggregated_player_game_stats[current_player_name][stat] = value
                         else:
-                            ret[current_player_name][stat] += value
-
-        return ret
+                            self.aggregated_player_game_stats[current_player_name][stat] += value
 
     def get_filename_url_to_open(self, site, filename, player, size=None):
         pattern = r'.*src\=\"(.+?)\".*'
@@ -261,9 +248,9 @@ class DataFetcher():
 
         urllib.request.urlretrieve(url, player + ".png")
 
-    def download_player_images(self):
+    def download_player_headshots(self):
         for player in self.players.keys():
-            print(player)
+            pprint(player)
             site = mwclient.Site('lol.fandom.com', path='/')
             response = site.api('cargoquery',
                                 limit=1,
@@ -276,43 +263,48 @@ class DataFetcher():
             decoded = json.loads(parsed)
 
             try:
-              url = str(decoded['cargoquery'][0]['title']['FileName'])
-              self.get_filename_url_to_open(site, url, player)
-              shutil.move("./" + player + ".png",
-                          "./headshots/" + player + ".png")
+                url = str(decoded['cargoquery'][0]['title']['FileName'])
+                self.get_filename_url_to_open(site, url, player)
+                self.ipfsMap[player] = self.ipfs.add("./" + player + ".png")
             except:
-              pass
+                self.ipfsMap[player] = {
+                    "Name": "",
+                    "Hash": "",
+                    "Size": ""
+                }
+            finally:
+                pprint(self.ipfsMap[player])
+                os.remove("./" + player +
+                          ".png") if self.ipfsMap[player]["Hash"] else None
+                time.sleep(10)
 
     def create_nft_metadata(self):
-      ret = {}
-      for player, info in self.players.items():
-        ret[player] = {}
-        ret[player]["name"] = info["Name"]
-        ret[player]["description"] = "This is a professional eSports athelete!"
-        ret[player]["image"] = ""
-        ret[player]["attributes"] = {}
-        ret[player]["attributes"]["team"] = info["Team"]
-        ret[player]["attributes"]["position"] = info["Role"]
+        for player, info in self.players.items():
+            self.nft_metadata[player] = {}
+            self.nft_metadata[player]["name"] = info["Name"]
+            self.nft_metadata[player]["description"] = "This is a professional eSports athelete!"
+            self.nft_metadata[player]["image"] = self.ipfsMap[player]["Hash"]
+            self.nft_metadata[player]["attributes"] = {}
+            self.nft_metadata[player]["attributes"]["team"] = info["Team"]
+            self.nft_metadata[player]["attributes"]["position"] = info["Role"]
 
-      self.metadata = ret
-      return ret
-
-
-    def convert_to_json(self, data, file_name="stats.json"):
+    def convert_to_json(self, data, file_name):
         with open(file_name, "w") as outfile:
             json.dump(data, outfile)
 
 
 df = DataFetcher()
 
-df.get_players()
-player_games = df.get_player_games()
-aggregated_player_stats = df.aggregate_player_stats(player_games)
+df.get_players_and_teams()
+df.get_player_game_stats()
+df.aggregate_player_game_stats()
+df.download_player_headshots()
 df.create_nft_metadata()
 
-# df.download_player_images()
 
 df.convert_to_json(df.players, "player_info.json")
-df.convert_to_json(player_games, "player_stats.json")
-df.convert_to_json(aggregated_player_stats, "aggregated_player_stats.json")
-df.convert_to_json(df.metadata, "nft_metadata.json")
+df.convert_to_json(df.player_game_stats, "player_game_stats.json")
+df.convert_to_json(df.aggregated_player_game_stats,
+                   "aggregated_player_game_stats.json")
+df.convert_to_json(df.ipfsMap, "headshot_ipfs_hashes.json")
+df.convert_to_json(df.nft_metadata, "nft_metadata.json")
