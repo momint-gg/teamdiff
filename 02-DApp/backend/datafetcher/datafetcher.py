@@ -28,6 +28,7 @@ class DataFetcher():
         self.players = {}
         self.player_stats = {}
         self.aggregated_player_stats = {}
+        self.metadata = {}
 
     scoreboard_player_fields = [
         "SP.OverviewPage",
@@ -282,6 +283,21 @@ class DataFetcher():
             except:
               pass
 
+    def create_nft_metadata(self):
+      ret = {}
+      for player, info in self.players.items():
+        ret[player] = {}
+        ret[player]["name"] = info["Name"]
+        ret[player]["description"] = "This is a professional eSports athelete!"
+        ret[player]["image"] = ""
+        ret[player]["attributes"] = {}
+        ret[player]["attributes"]["team"] = info["Team"]
+        ret[player]["attributes"]["position"] = info["Role"]
+
+      self.metadata = ret
+      return ret
+
+
     def convert_to_json(self, data, file_name="stats.json"):
         with open(file_name, "w") as outfile:
             json.dump(data, outfile)
@@ -292,9 +308,11 @@ df = DataFetcher()
 df.get_players()
 player_games = df.get_player_games()
 aggregated_player_stats = df.aggregate_player_stats(player_games)
+df.create_nft_metadata()
 
 # df.download_player_images()
 
 df.convert_to_json(df.players, "player_info.json")
 df.convert_to_json(player_games, "player_stats.json")
 df.convert_to_json(aggregated_player_stats, "aggregated_player_stats.json")
+df.convert_to_json(df.metadata, "nft_metadata.json")

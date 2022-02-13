@@ -1,0 +1,596 @@
+{
+  "Abbedagge": {
+    "name": "Felix Braun",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "100 Thieves",
+      "position": "Mid"
+    }
+  },
+  "Ablazeolive": {
+    "name": "Nicholas&amp;nbsp;Antonio Abbott",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Golden Guardians",
+      "position": "Mid"
+    }
+  },
+  "aphromoo": {
+    "name": "Zaqueri Black",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "FlyQuest",
+      "position": "Support"
+    }
+  },
+  "Berserker (Kim Min-cheol)": {
+    "name": "Kim Min-cheol",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Bot"
+    }
+  },
+  "Biofrost": {
+    "name": "Vincent Wang",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Support"
+    }
+  },
+  "Bjergsen": {
+    "name": "S\u00f8ren Bjerg",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Team Liquid",
+      "position": "Mid"
+    }
+  },
+  "Blaber": {
+    "name": "Robert Huang",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Jungle"
+    }
+  },
+  "Blue (Ersin G\u00f6ren)": {
+    "name": "Ersin G\u00f6ren",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Mid"
+    }
+  },
+  "Bwipo": {
+    "name": "Gabri\u00ebl Rau",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Team Liquid",
+      "position": "Top"
+    }
+  },
+  "Chawy": {
+    "name": "Wong Xing Lei",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Coach"
+    }
+  },
+  "Closer (Can \u00c7elik)": {
+    "name": "Can \u00c7elik",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "100 Thieves",
+      "position": "Jungle"
+    }
+  },
+  "Contractz": {
+    "name": "Juan&amp;nbsp;Arturo Garcia",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Jungle"
+    }
+  },
+  "Croissant": {
+    "name": "Chris Sun",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Coach"
+    }
+  },
+  "Danny (Kyle Sakamaki)": {
+    "name": "Kyle Sakamaki",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Bot"
+    }
+  },
+  "Dardoch": {
+    "name": "Joshua Hartnett",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Coach"
+    }
+  },
+  "Destiny (Mitchell Shaw)": {
+    "name": "Mitchell Shaw",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Support"
+    }
+  },
+  "Enatron": {
+    "name": "Ilias Theodorou",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Coach"
+    }
+  },
+  "Eyla": {
+    "name": "Bill Nguyen",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Team Liquid Academy",
+      "position": "Support"
+    }
+  },
+  "FakeGod": {
+    "name": "Aaron Lee",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Top"
+    }
+  },
+  "FBI": {
+    "name": "Ian&amp;nbsp;Victor Huang",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "100 Thieves",
+      "position": "Bot"
+    }
+  },
+  "Fudge": {
+    "name": "Ibrahim Allami",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Mid"
+    }
+  },
+  "Guilhoto": {
+    "name": "Andr\u00e9 Pereira Guilhoto",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Team Liquid",
+      "position": "Coach"
+    }
+  },
+  "Hans sama": {
+    "name": "Steven Liv",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Team Liquid",
+      "position": "Bot"
+    }
+  },
+  "huhi": {
+    "name": "Choi Jae-hyun",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "100 Thieves",
+      "position": "Support"
+    }
+  },
+  "Huni": {
+    "name": "Heo Seung-hoon",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Top"
+    }
+  },
+  "Impact": {
+    "name": "Jeong Eon-young",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Top"
+    }
+  },
+  "Inero": {
+    "name": "Nicholas Smith",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Golden Guardians",
+      "position": "Coach"
+    }
+  },
+  "Inspired": {
+    "name": "Kacper S\u0142oma",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Jungle"
+    }
+  },
+  "Invert": {
+    "name": "Gabriel Zoltan-Johan",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Coach"
+    }
+  },
+  "Jenkins": {
+    "name": "Thomas Tran",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Top"
+    }
+  },
+  "Johnsun": {
+    "name": "Johnson Nguyen",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "FlyQuest",
+      "position": "Bot"
+    }
+  },
+  "jojopyun": {
+    "name": "Joseph Joon Pyun",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Mid"
+    }
+  },
+  "Josedeodo": {
+    "name": "Brandon&amp;nbsp;Joel Villegas",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "FlyQuest",
+      "position": "Jungle"
+    }
+  },
+  "Keaiduo": {
+    "name": "Zhu Xiong",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Mid"
+    }
+  },
+  "Kumo": {
+    "name": "Colin Zhao",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "FlyQuest",
+      "position": "Top"
+    }
+  },
+  "Licorice": {
+    "name": "Eric Ritchie",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Golden Guardians",
+      "position": "Top"
+    }
+  },
+  "Lost": {
+    "name": "Lawrence Sze Yuy Hui",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Golden Guardians",
+      "position": "Bot"
+    }
+  },
+  "LS": {
+    "name": "Nick De Cesare",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Coach"
+    }
+  },
+  "Luger": {
+    "name": "Fatih G\u00fcven",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Bot"
+    }
+  },
+  "Mabrey": {
+    "name": "Joshua&amp;nbsp;Alan Mabrey",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Coach"
+    }
+  },
+  "Neo (To\u00e0n Tr\u1ea7n)": {
+    "name": "To\u00e0n Tr\u1ea7n",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Bot"
+    }
+  },
+  "Olleh": {
+    "name": "Kim Joo-sung",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Golden Guardians",
+      "position": "Support"
+    }
+  },
+  "Palafox": {
+    "name": "Cristian Palafox",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Mid"
+    }
+  },
+  "Peter Dun": {
+    "name": "Peter Dun",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Coach"
+    }
+  },
+  "Poome": {
+    "name": "Philippe Lavoie-Giguere",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Support"
+    }
+  },
+  "PowerOfEvil": {
+    "name": "Tristan Schrage",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Mid"
+    }
+  },
+  "Reapered": {
+    "name": "Bok Han-gyu",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "100 Thieves",
+      "position": "Coach"
+    }
+  },
+  "Reven (Seong Sang-hyeon)": {
+    "name": "Seong Sang-hyeon",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Coach"
+    }
+  },
+  "Revenge (Mohamed Kaddoura)": {
+    "name": "Mohamed Kaddoura",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Top"
+    }
+  },
+  "River (Kim Dong-woo)": {
+    "name": "Kim Dong-woo",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Dignitas",
+      "position": "Jungle"
+    }
+  },
+  "Santorin": {
+    "name": "Lucas Tao Kilmer Larsen",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Team Liquid",
+      "position": "Jungle"
+    }
+  },
+  "Sharkz": {
+    "name": "Alexey Taranda",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "FlyQuest",
+      "position": "Coach"
+    }
+  },
+  "Shenyi": {
+    "name": "Wei Zi-Jie",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Support"
+    }
+  },
+  "Spica": {
+    "name": "Mingyi Lu",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Jungle"
+    }
+  },
+  "Spookz": {
+    "name": "Samuel Broadley",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Golden Guardians",
+      "position": "Coach"
+    }
+  },
+  "Ssumday": {
+    "name": "Kim Chan-ho",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "100 Thieves",
+      "position": "Top"
+    }
+  },
+  "Summit": {
+    "name": "Park Woo-tae",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Top"
+    }
+  },
+  "Tactical": {
+    "name": "Edward Ra",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Bot"
+    }
+  },
+  "Thinkcard": {
+    "name": "Thomas Slotkin",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Counter Logic Gaming",
+      "position": "Coach"
+    }
+  },
+  "Tonington": {
+    "name": "James Kandel",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "TSM",
+      "position": "Coach"
+    }
+  },
+  "toucouille": {
+    "name": "Lo\u00efc Dubois",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "FlyQuest",
+      "position": "Mid"
+    }
+  },
+  "Turtle": {
+    "name": "Gabriel Peixoto",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Coach"
+    }
+  },
+  "Vulcan (Philippe Laflamme)": {
+    "name": "Philippe Laflamme",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Evil Geniuses.NA",
+      "position": "Support"
+    }
+  },
+  "WildTurtle": {
+    "name": "Jason Tran",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Bot"
+    }
+  },
+  "Winsome": {
+    "name": "Kim Dong-keon",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Cloud9",
+      "position": "Support"
+    }
+  },
+  "Xerxe": {
+    "name": "Andrei Dragomir",
+    "description": "This is a professional eSports athelete!",
+    "image": "",
+    "attributes": {
+      "team": "Immortals",
+      "position": "Jungle"
+    }
+  }
+}
