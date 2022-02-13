@@ -35,6 +35,8 @@ class DataFetcher():
         self.nft_metadata = {}
         self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
         self.ipfsMap = {}
+        self.file_names = []
+        self.ipfsJsonMap = {}
 
     scoreboard_player_fields = [
         "SP.OverviewPage",
@@ -276,7 +278,7 @@ class DataFetcher():
                 pprint(self.ipfsMap[player])
                 os.remove("./" + player +
                           ".png") if self.ipfsMap[player]["Hash"] else None
-                time.sleep(10)
+                time.sleep(5)
 
     def create_nft_metadata(self):
         for player, info in self.players.items():
@@ -291,6 +293,23 @@ class DataFetcher():
     def convert_to_json(self, data, file_name):
         with open(file_name, "w") as outfile:
             json.dump(data, outfile)
+        print("Created", file_name)
+        self.file_names.append(file_name)
+
+    def upload_jsons_to_ipfs(self):
+        for file_name in self.file_names:
+            print(file_name)
+            self.ipfsJsonMap[file_name] = {
+                "Name": "",
+                "Hash": "",
+                "Size": ""
+            }
+            try:
+                self.ipfsJsonMap[file_name] = self.ipfs.add(file_name)
+            except:
+                pass
+            finally:
+                print(self.ipfsJsonMap[file_name])
 
 
 df = DataFetcher()
@@ -301,10 +320,19 @@ df.aggregate_player_game_stats()
 df.download_player_headshots()
 df.create_nft_metadata()
 
-
-df.convert_to_json(df.players, "player_info.json")
-df.convert_to_json(df.player_game_stats, "player_game_stats.json")
+df.convert_to_json(df.players, f'player_info_'"%s"'.json' % df.start_date)
+df.convert_to_json(df.player_game_stats,
+                   f'player_game_stats_'"%s"'.json' % df.start_date)
 df.convert_to_json(df.aggregated_player_game_stats,
-                   "aggregated_player_game_stats.json")
-df.convert_to_json(df.ipfsMap, "headshot_ipfs_hashes.json")
-df.convert_to_json(df.nft_metadata, "nft_metadata.json")
+                   f'aggregated_player_game_stats_'"%s"'.json' % df.start_date)
+df.convert_to_json(
+    df.ipfsMap, f'headshot_ipfs_hashes_'"%s"'.json' % df.start_date)
+df.convert_to_json(
+    df.nft_metadata, f'nft_metadata_'"%s"'.json' % df.start_date)
+
+df.upload_jsons_to_ipfs()
+
+df.convert_to_json(
+    df.ipfsJsonMap, f'player_data_ipfs_hashes_'"%s"'.json' % df.start_date)
+
+print("Done!")
