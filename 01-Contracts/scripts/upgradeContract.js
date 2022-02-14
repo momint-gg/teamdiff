@@ -19,43 +19,53 @@ async function main() {
 
 
   //Create LEague Proxy
-  const LeagueProxyFactory = await ethers.getContractFactory("LeagueProxy");
-  // const LeagueProxyInstance = await upgrades.deployProxy(LeagueProxyFactory, [GameLogicInstance.address,  ["0x00","0xaa", "0xff"]]);
-  const LeagueProxyInstance = await LeagueProxyFactory.deploy(GameLogicInstance.address, "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", "0x00");
+  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
+  // const LeagueMakerInstance = await upgrades.deployProxy(LeagueMakerFactory, [GameLogicInstance.address,  ["0x00","0xaa", "0xff"]]);
+  const LeagueMakerInstance = await LeagueMakerFactory.deploy(GameLogicInstance.address);
 
-  await LeagueProxyInstance.deployed();
+  await LeagueMakerInstance.deployed();
   //await box.deployed();
-  console.log("LeageProxy deployed to:", LeagueProxyInstance.address);
-  //console.log("Leage contract info " + JSON.stringify(LeagueProxyInstance.interface.functions, null, 2));
+  console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
+  //console.log("Leage contract info " + JSON.stringify(LeagueMakerInstance.interface.functions, null, 2));
 
 
   // //Get data on address, impl address, state, and admin of league proxy
-  // console.log("LeageProxy impl address: " + await LeagueProxyInstance.getImplementation());
-  // console.log("LeageProxy admin: " + await LeagueProxyInstance.getAdmin());
-  // console.log("LeagueProxy state: " + await LeagueProxyInstance.version());
+  //console.log("LeageMaker impl address: " + await LeagueMakerInstance.setBeacon());
+  console.log("LeagueMaker beacon: " + await LeagueMakerInstance.beaconAddress());
+  //console.log("LeagueMaker impl address: " + await LeagueMakerInstance.getImplementation());
+
+  console.log("LeagueMaker state: " + await LeagueMakerInstance.version());
 
   //call incrementVersion on league proxy as non-admin
   const admin = "0x0000000000000000000000000000000000000000";
   const act2 = "0x70997970c51812dc3a010c7d01b50e0d17dc79c8";
   [owner, addr1] = await hre.ethers.getSigners();
   //await GameItem.deployed();
-  await LeagueProxyInstance.connect(addr1);
-  const txn = await LeagueProxyInstance.fallback();
+  await LeagueMakerInstance.connect(addr1);
+
+  //Set league maker beacon
+  //const txn = await LeagueMakerInstance.setBeacon();
+  //const txn = await LeagueMakerInstance.setAdmin(act2);
+  //console.log("txn result: " + JSON.stringify(txn, null, 2));
+
+  //Create league that points to beacon
+  const txn = await LeagueMakerInstance.createLeague("test");
+  //const txn = await LeagueMakerInstance.setAdmin(act2);
   console.log("txn result: " + JSON.stringify(txn, null, 2));
-  console.log("LeagueProxy state: " + await LeagueProxyInstance.version());
+  //console.log("LeagueMaker state: " + await LeagueMakerInstance.version());
 
   // //Change admin
-  // txn = await LeagueProxyInstance.connect(addr1).setAdmin(act2);
-  // console.log("LeageProxy admin: " + await LeagueProxyInstance.getAdmin(1));
+  // txn = await LeagueMakerInstance.connect(addr1).setAdmin(act2);
+  // console.log("LeageProxy admin: " + await LeagueMakerInstance.getAdmin(1));
   // console.log("txn result: " + JSON.stringify(txn, null, 2));
-  //console.log("LeagueProxy state: " + await LeagueProxyInstance.version());
+  //console.log("LeagueMaker state: " + await LeagueMakerInstance.version());
 
 
   //check the state of league proxy as admin
 
   //call incrementVersion on league proxy as non- admin //must implement incrementVersion in proxy
 
-  //Upgrade leagueProxy to new contract // must implement new logiclayer
+  //Upgrade LeagueMaker to new contract // must implement new logiclayer
 
 
 
