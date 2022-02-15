@@ -10,14 +10,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-// import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
-
-//To do:
-//Make function for minting packs -- basically going to just transfer NFTs. Use chainlink VRF for randomization.
-
-// We can read in the total list of players from API or whatever
-// How to do after the contract is deployed?
-
 contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -66,7 +58,7 @@ contract GameItems is ERC1155, Ownable {
     // Mappings
     mapping(uint256 => string) private _uris;
 
-    // Events
+    // Events -- later add more for the frontend
     event packMinted(address user, uint256 id);
 
     constructor() ERC1155("") {
@@ -80,11 +72,11 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    function mintAthlete() public onlyOwner {
+    function mintAthlete() private {
         // Index of what to mint -- we need to % by num of NFTs per athlete
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
-        //For debugging
+        // For debugging
         console.log("Starting index", startingIndex);
         console.log("Mint index", mintIndex);
 
@@ -202,7 +194,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Dynamically setting new URI for a minted token
-    function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
+    function setTokenUri(uint256 tokenId, string memory uri) private {
         _uris[tokenId] = uri;
     }
 
