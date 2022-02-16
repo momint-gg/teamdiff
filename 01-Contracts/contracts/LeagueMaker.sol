@@ -10,6 +10,7 @@ import "hardhat/console.sol";
 // import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "./LeagueBeaconProxy.sol";
 
 
 //import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
@@ -45,14 +46,16 @@ import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 // contract LeagueProxy is ERC1967UpgradeUpgradeable/*, UUPSUpgradeable, OwnableUpgradeable*/ {
 //TODO must add owner 
 contract LeagueMaker {
-//contract LeagueProxy is ERC1967Proxy {
-// contract LeagueProxy is BeaconProxy {  
-// contract LeagueProxy is Proxy {
-        // ======== Structs ========
+
+    // ======== Structs ========
     struct Parameters {
         string name;
-        //string symbol;
+        uint256 version;
     }
+
+    // ======= Events ==========
+    event LeagueCreated(string name, address a);
+
 
 
     // ======== Immutable storage ========
@@ -64,11 +67,10 @@ contract LeagueMaker {
     // ======== Mutable storage ========
     Parameters public parameters;
     address public beaconAddress;
-    //State
     uint256 public version = 1;
     uint256 public secretNumber = 42;
-    // ======== Constructor ========
-    // the constructor deploys an initial version that will act as a template
+
+
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
@@ -81,18 +83,33 @@ contract LeagueMaker {
 
 
     // ======== Deploy contract ========
-    function createLeague(string calldata _name)
+    function createLeague(string calldata _name, uint256 _version)
+    ///function createLeague(string _name, uint256 _version)
         external
+        ///payable
         returns (address)
     {
-        parameters = Parameters({name: _name});
-        BeaconProxy proxy = new BeaconProxy(
+        parameters = Parameters({
+            name: _name,
+            version: _version
+        });
+        //bytes memory delegateCallData = abi.encodeWithSignature("initialize(string calldata, uint256)", parameters.name, parameters.version);
+        //bytes memory delegateCallData = abi.encodeWithSignature("initialize(string calldata)", "test name");
+        //TODO memory clean-up should be done
+        bytes memory delegateCallData = abi.encodeWithSignature("initialize(uint256)", parameters.version);
+        LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
-            "0x00"
+            delegateCallData
         );
+        
+        emit LeagueCreated(parameters.name, address(proxy));
         delete parameters;
+        //proxy.version();
+
+        //console.log(address(proxy));
         return address(proxy);
     }
+
 
     // function setBeacon()
     //     external
@@ -115,109 +132,22 @@ contract LeagueMaker {
     }
 
 
-    /**
-     * @dev Initializes the upgradeable proxy with an initial implementation specified by `_logic`.
-     *
-     * If `_data` is nonempty, it's used as data in a delegate call to `_logic`. This will typically be an encoded
-     * function call, and allows initializating the storage of the proxy like a Solidity constructor.
-    // //  */
-    // constructor(address _logic, bytes memory _data) payable {
-    //     //Deploy a new GameLogic.sol contract
-    //     //And then set this contracts _logic to be the address of the newly deployed logic
-    //         //This need would be removed with beacon just FYI
-    //     assert(_IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
-    //     //_upgradeToAndCall(_logic, _data, false);
-    //     //_upgradeToAndCall(IMPL_ADDRESS, _data, false);
-    //     //_upgradeTo(IMPL_ADDRESS);
-    //     _upgradeTo(_logic);
-    // } 
-        /**
-     * @dev Initializes the proxy with `beacon`.
-     *
-     * If `data` is nonempty, it's used as data in a delegate call to the implementation returned by the beacon. This
-     * will typically be an encoded function call, and allows initializating the storage of the proxy like a Solidity
-     * constructor.
-     *
-     * Requirements:
-     *
-     * - `beacon` must be a contract with the interface {IBeacon}.
-     */
-    // constructor(address beacon, bytes memory data) payable {
-    //     assert(_BEACON_SLOT == bytes32(uint256(keccak256("eip1967.proxy.beacon")) - 1));
-    //     _upgradeBeaconToAndCall(beacon, data, false);
-    // }
+    event Response(bool success, bytes data);    
+    // Calling a function that does not exist triggers the fallback function.
+    function testCallDoesNotExist(address _addr) public {
+        //This calls the game logic incrementVersion which is great
+        //but how do we call it in js?
+        (bool success, bytes memory data) = _addr.call(
+            abi.encodeWithSignature("incrementVersion()")
+        );
+        //console.log("called test call");
 
-    // /**
-    //  * @dev Returns the current implementation address.
-    //  */
-    // function _implementation() internal view virtual override returns (address impl) {
-    //     return ERC1967Upgrade._getImplementation();
-    //     //return "0x70997970c51812dc3a010c7d01b50e0d17dc79c8";
-    // }
+        emit Response(success, data);
+    }
 
-    // //Public getters for testing purposes
-    // function getImplementation() public view returns (address) {
-    //     return _getImplementation();
-    // }
 
-    // function getAdmin() public view returns (address) {
-    //     return _getAdmin();
-    // }
-
-    
-    // function setAdmin(address addy) public {
-    //     console.log(msg.sender);
-    //     _changeAdmin(addy);
-    // }
-
-    // /**
-    //  * @dev Fallback function.
-    //  * Implemented entirely in `_fallback`.
-    //      //TODO, my fallback function is not working at all, it doesn't delegate calls or anything 
-    //  */
-    // fallback ()  override  payable external {
-    //     //_fallback();
-    //     //_delegate();
-    //     console.log("fallback");
-    // }
-
-    // receive()  override payable external {
-    //     //_fallback();
-    //     //_delegate();
-    //     console.log("fallback");
-    // }
+   
 }
 
 
-// OpenZeppelin Contracts v4.4.1 (proxy/ERC1967/ERC1967Proxy.sol)
 
-// pragma solidity ^0.8.0;
-
-// import "@openzeppelin/contracts/proxy/Proxy.sol";
-// import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
-// import "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol";
-// /**
-//  * @dev This contract implements an upgradeable proxy. It is upgradeable because calls are delegated to an
-//  * implementation address that can be changed. This address is stored in storage in the location specified by
-//  * https://eips.ethereum.org/EIPS/eip-1967[EIP1967], so that it doesn't conflict with the storage layout of the
-//  * implementation behind the proxy.
-//  */
-// contract LeagueProxy is Proxy, ERC1967Upgrade {
-//     /**
-//      * @dev Initializes the upgradeable proxy with an initial implementation specified by `_logic`.
-//      *
-//      * If `_data` is nonempty, it's used as data in a delegate call to `_logic`. This will typically be an encoded
-//      * function call, and allows initializating the storage of the proxy like a Solidity constructor.
-//      */
-//     constructor(address _logic, bytes memory _data) payable {
-//         assert(_IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
-//         _upgradeTo(_logic);
-//     }
-
-//     /**
-//      * @dev Returns the current implementation address.
-//      */
-//     function _implementation() internal view virtual override returns (address impl) {
-//         return ERC1967Upgrade._getImplementation();
-//     }
-// }

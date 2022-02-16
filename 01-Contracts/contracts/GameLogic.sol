@@ -9,29 +9,35 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 contract GameLogic is Initializable {
 //or (will we need ownership of this contract, o)
 // contract GameLogic is OwnableUpgradeable {
-
-
-    //I should list the expected proxy data package 
+    uint256 public version;
+    string public name;
     //event 
 
-    function initialize() public initializer {
+    // function initialize(string calldata _name, uint256 _version) public initializer {
+        //Delegate call fails when string is passed
+    function initialize(uint256 _version) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
-        // version = 1;
-        // secretNumber = _secretNumber;
-        //incrementVersion();
+        version = _version;
+        name = "League Name";
         console.log("GameLogic initialized!");
     }
 
-    // function decrement(uint256 x) public returns 
      
      
-    function incrementVersion(uint256 version) public returns (uint256) {
-        return version + 1;
+    function incrementVersion() external returns (uint256) {
+        console.log("incrementing version:\n");
+        console.log(version);
+        version = version + 1;
+        //        return 3;
     }
 
-    // fallback() override payable external {
-    //     //_fallback();
-    //     //_delegate();
-    //     console.log("fallback");
-    // }
+    /**
+     * @dev Fallback function.
+     * Implemented entirely in `_fallback`.
+     */
+    fallback()  payable external {
+        //_fallback();
+        //_delegate();
+        console.log("fallback in the logic");
+    }
 }
