@@ -48,6 +48,8 @@ contract GameItems is ERC1155, Ownable {
     //The total amount of athletes so far we've minted
     uint256 private numAthletes = 0;
 
+    string ipfsBaseUrl = "https://ipfs.io/ipfs/";
+
     // Starting block for randomized index
     uint256 public startingIndexBlock;
     uint256 public startingIndex;
