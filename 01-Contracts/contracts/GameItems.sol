@@ -149,7 +149,9 @@ contract GameItems is ERC1155, Ownable {
         );
 
         // Assigning the user 3 NFTs
+
         for (uint256 i = 0; i < STARTER_PACK_SIZE; i++) {
+
             mintAthlete();
         }
         // Burning the pack
