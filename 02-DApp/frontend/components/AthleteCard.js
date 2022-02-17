@@ -15,7 +15,7 @@ export default function AthleteCard(athleteData) {
             </Typography>
           </CardContent>
           <CardActions>
-            <Button size="small" color="primary">View Details</Button>
+            <Button size="small" color="secondary">View Details</Button>
           </CardActions>
         </Fragment>
       );

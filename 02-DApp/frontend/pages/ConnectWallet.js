@@ -18,7 +18,7 @@ export default function ConnectWallet() {
             ? `${accountData.ens?.name} (${accountData.address})`
             : accountData.address}</div>
          <div>Connected to {accountData.connector.name}</div>
-         <Button variant="outlined" onClick={disconnect}>Disconnect</Button>
+         <Button variant="outlined" color="secondary" onClick={disconnect}>Disconnect</Button>
       </Box>
     )
   }
@@ -26,7 +26,7 @@ export default function ConnectWallet() {
   return (
     <Box>
       {connectData.connectors.map((x) => (
-        <Button variant="outlined" disabled={!x.ready} key={x.id} onClick={() => connect(x)}>
+        <Button variant="outlined" color="secondary" disabled={!x.ready} key={x.id} onClick={() => connect(x)}>
           {x.name}
           {!x.ready && ' (unsupported)'}
         </Button>          

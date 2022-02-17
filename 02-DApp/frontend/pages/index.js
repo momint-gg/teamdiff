@@ -58,7 +58,11 @@ export default function Index(props) {
         <Box>
           <TabContext value={value}>
             <Box>
-              <TabList onChange={handleChange}>
+              <TabList 
+                onChange={handleChange} 
+                indicatorColor="secondary"
+                textColor="white"
+              >
                 <Tab label="CONNECT" value="0" />
                 <Tab label="PLAY" value="1" />
                 <Tab label="COLLECTIONS" value="2" />
