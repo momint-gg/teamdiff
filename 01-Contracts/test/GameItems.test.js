@@ -6,6 +6,7 @@ const hre = require("hardhat");
 const GameItems = artifacts.require("GameItems.sol");
 
 // Start test block
+//TODO: use openzeppeling Test scripts
 describe("GameItems.test", async () => {
   var owner;
   var addr1;
