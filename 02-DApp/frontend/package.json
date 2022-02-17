@@ -8,6 +8,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@alch/alchemy-web3": "^1.2.3",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@material-ui/core": "^4.12.3",
+    "@mui/lab": "^5.0.0-alpha.69",
+    "@mui/material": "^5.4.2",
+    "@mui/styled-engine-sc": "^5.4.2",
     "bootstrap": "^5.1.3",
     "ethers": "^5.5.4",
     "next": "12.0.8",
@@ -15,6 +22,7 @@
     "react-bootstrap": "^2.1.1",
     "react-dom": "17.0.2",
     "react-router-dom": "^6.2.1",
+    "styled-components": "^5.3.3",
     "wagmi": "^0.2.6"
   },
   "devDependencies": {

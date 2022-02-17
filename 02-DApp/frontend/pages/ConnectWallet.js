@@ -1,6 +1,8 @@
-import { useAccount, useConnect } from 'wagmi'
-import styles from "../styles/Home.module.css";
+import { useAccount, useConnect, useContractRead, useContract, useEnsLookup } from 'wagmi'
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import { Box, Typography, Button } from "@mui/material";
 
 export default function ConnectWallet() {
   const [{ data: connectData, error: connectError }, connect] = useConnect()
@@ -10,29 +12,26 @@ export default function ConnectWallet() {
 
   if (accountData) {
     return (
-      <main className={styles.main}>
+      <Box>
         <img src={accountData.ens?.avatar} alt="ENS Avatar" />
-        <div>
-          {accountData.ens?.name
+         <div>{accountData.ens?.name
             ? `${accountData.ens?.name} (${accountData.address})`
-            : accountData.address}
-        </div>
-        <div>Connected to {accountData.connector.name}</div>
-        <button className="btn btn-outline-success me-2" style={{ margin: 20 }} onClick={disconnect}>Disconnect</button>
-      </main>
+            : accountData.address}</div>
+         <div>Connected to {accountData.connector.name}</div>
+         <Button variant="outlined" onClick={disconnect}>Disconnect</Button>
+      </Box>
     )
   }
 
   return (
-    <main className={styles.main}>
+    <Box>
       {connectData.connectors.map((x) => (
-        <button className="btn btn-outline-success me-2" style={{ margin: 20 }} disabled={!x.ready} key={x.id} onClick={() => connect(x)}>
+        <Button variant="outlined" disabled={!x.ready} key={x.id} onClick={() => connect(x)}>
           {x.name}
           {!x.ready && ' (unsupported)'}
-        </button>
+        </Button>          
       ))}
-
       {connectError && <div>{connectError?.message ?? 'Failed to connect'}</div>}
-    </main>
+    </Box>
   )
 }
