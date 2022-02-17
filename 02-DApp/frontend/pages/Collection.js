@@ -19,7 +19,7 @@ export default function Collection() {
                 constants.ALCHEMY_LINK,
             );
 
-            const nfts = await web3.alchemy.getNfts({owner: constants.WALLET_ADDR,
+            const nfts = await web3.alchemy.getNfts({owner: accountData.address,
                                                     contractAddresses: [constants.CONTRACT_ADDR]});
           
             setNFTResp(nfts);
