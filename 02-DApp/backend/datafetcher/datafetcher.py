@@ -296,7 +296,7 @@ class DataFetcher():
                     "value": info["Role"]
                 },
             ]
-            self.convert_to_json(self.nft_metadata[player], "nft_metadata/" + str(count) + ".png", )
+            self.convert_to_json(self.nft_metadata[player], "nft_metadata/" + str(count) + ".json", )
             count += 1
 
     def convert_to_json(self, data, file_name):
