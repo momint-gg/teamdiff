@@ -10,9 +10,19 @@ import TabPanel from '@mui/lab/TabPanel'
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext'
 import Typography from '@mui/material/Typography';
+
+//************* */
+// Custom Page Imports
+//********************** */
 import About from './about';
 import Collection from './collection';
+import MintHome from './mintHome';
+
+//******************* */
+//  Component Imports */
+//******************* */
 import ConnectWallet from './connectWallet';
+
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID
@@ -58,6 +68,8 @@ export default function Index(props) {
         <Box>
           <TabContext value={value}>
             <Box>
+              {/* //Do we want to have this be a SPA with all tabs?
+              This might be an issue when certain tabs are fetching data, but maybe not */}
               <TabList 
                 onChange={handleChange} 
                 indicatorColor="secondary"
@@ -82,9 +94,7 @@ export default function Index(props) {
               <Collection />
             </TabPanel>
             <TabPanel value="3">
-              <Typography variant="h2" color="secondary" component="div">
-                ~Mint Page~
-              </Typography>
+                <MintHome />
             </TabPanel>
             <TabPanel value="4">
               <About />
