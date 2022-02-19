@@ -28,7 +28,7 @@ contract GameItems is ERC1155, Ownable {
     // Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards, Check the "fake API" folder for details
     // Note: I think the Image needs to be in its own IPFS (can't just link in IPFS)
     string private athleteURI =
-        "https://ipfs.io/ipfs/QmZTS9tkkueLvRKdteRzXYHrh84YAB2TFC3ApQSDtGy1PB/";
+        "https://gateway.pinata.cloud/ipfs/QmV6Bt7xVz468sD7pgAYXHJqSDpPuymMVnpb2Tuk58zXVU/";
     string private starterPackURI =
         "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json";
     string private boosterPackURI = "Insert booster pack URI here :)";
@@ -76,11 +76,11 @@ contract GameItems is ERC1155, Ownable {
     // Mints an athlete -- called when someone "burns" a pack
 
     // Steps for the new mint athlete function
-        // Parse JSON so we can access the object
-        // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
-        // If it does, increment the counter variable
-        // If not, mint an athlete with that URI and the proper index
-        // ^ this way, we are still using IPFS for randomization, 
+    // Parse JSON so we can access the object
+    // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
+    // If it does, increment the counter variable
+    // If not, mint an athlete with that URI and the proper index
+    // ^ this way, we are still using IPFS for randomization,
     function mintAthlete() private {
         // Index of what to mint -- we need to % by num of NFTs per athlete
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
@@ -97,10 +97,8 @@ contract GameItems is ERC1155, Ownable {
                 setTokenUri(
                     mintIndex,
                     string(
-                        abi.encodePacked(
-                            //Athlete1.json, ...
+                        abi.encodePacked( // 0.json, 1.json, ...
                             athleteURI,
-                            "athlete",
                             Strings.toString(mintIndex + 1),
                             ".json"
                         )
@@ -158,7 +156,6 @@ contract GameItems is ERC1155, Ownable {
         // Assigning the user 3 NFTs
 
         for (uint256 i = 0; i < STARTER_PACK_SIZE; i++) {
-
             mintAthlete();
         }
         // Burning the pack
