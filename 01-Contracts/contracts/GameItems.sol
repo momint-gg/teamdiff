@@ -75,12 +75,6 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    // Steps for the new mint athlete function
-    // Parse JSON so we can access the object
-    // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
-    // If it does, increment the counter variable
-    // If not, mint an athlete with that URI and the proper index
-    // ^ this way, we are still using IPFS for randomization,
     function mintAthlete() private {
         // Index of what to mint -- we need to % by num of NFTs per athlete
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
@@ -138,6 +132,12 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Burning a starter pack and giving random athlete NFTs to sender
+    // Steps for the new function
+    // Parse JSON so we can access the object
+    // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
+    // If it does, increment the counter variable
+    // If not, mint an athlete with that URI and the proper index
+    // ^ this way, we are still using IPFS for randomization,
     function burnStarterPack() public {
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
@@ -146,7 +146,6 @@ contract GameItems is ERC1155, Ownable {
         );
 
         // Assigning the user 3 NFTs
-
         for (uint256 i = 0; i < STARTER_PACK_SIZE; i++) {
             mintAthlete();
         }
