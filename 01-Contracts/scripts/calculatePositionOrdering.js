@@ -3,7 +3,7 @@ const metadataJSON = require("../metadata/nft_metadata");
 
 const calculateOrder = async () => {
   //Object with the athlete index and position
-  var athleteIndexToPosition = [];
+  let athleteIndexToPosition = [];
   var count = 0;
   for (var property in metadataJSON) {
     //making a list with the indices
@@ -36,18 +36,25 @@ const calculateOrder = async () => {
       jungles.push(athleteIndexToPosition[i]);
   }
 
-  var newAthleteOrdering = [];
-  for (let i = 0; i < count / 5; i++) {
-    if (athleteIndexToPosition[i].index === 63) return; //where the positions start repeating
-
-    if (jungles[i]) newAthleteOrdering.push(jungles[i]);
-    if (bots[i]) newAthleteOrdering.push(bots[i]);
-    if (supports[i]) newAthleteOrdering.push(supports[i]);
-    if (mids[i]) newAthleteOrdering.push(mids[i]);
-    if (coaches[i]) newAthleteOrdering.push(coaches[i]);
+  let newAthleteOrdering = [];
+  for (let i = 0; i < 50; i++) {
+    if (athleteIndexToPosition[i].index === 63) return;
+    //where repeat pos starts
+    else {
+      if (jungles[i]) newAthleteOrdering.push(jungles[i]);
+      if (bots[i]) newAthleteOrdering.push(bots[i]);
+      if (supports[i]) newAthleteOrdering.push(supports[i]);
+      if (mids[i]) newAthleteOrdering.push(mids[i]);
+      if (coaches[i]) newAthleteOrdering.push(coaches[i]);
+    }
   }
 
   console.log(newAthleteOrdering);
+  console.log("Length of new athlete ordering ", newAthleteOrdering.length);
+
+  //This is the final deliverable isayah can use
+  var indices = newAthleteOrdering.map((entry) => entry.index);
+  console.log(indices);
 };
 
 const runMain = async () => {
