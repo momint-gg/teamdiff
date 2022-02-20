@@ -58,7 +58,8 @@ contract GameItems is ERC1155, Ownable {
     string provenance = "";
 
     // Mappings
-    mapping(uint256 => string) private _uris;
+    mapping(uint256 => string) private _uris; // token URIs
+    mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
 
     // Events -- later add more for the frontend
     event packMinted(address user, uint256 id);
@@ -74,7 +75,6 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-
     // Steps for the new mint athlete function
     // Parse JSON so we can access the object
     // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
@@ -85,28 +85,20 @@ contract GameItems is ERC1155, Ownable {
         // Index of what to mint -- we need to % by num of NFTs per athlete
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
-        // For debugging
+        // Log for debugging
         console.log("Starting index", startingIndex);
         console.log("Mint index", mintIndex);
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
-            // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
+            require(
+                supplyOfToken[mintIndex] < NFT_PER_ATHLETE,
+                "All of this athlete have already been minted!"
+            );
+
             _mint(address(msg.sender), mintIndex, 1, "0x00");
 
-            if (bytes(_uris[mintIndex]).length == 0) {
-                setTokenUri(
-                    mintIndex,
-                    string(
-                        abi.encodePacked( // 0.json, 1.json, ...
-                            athleteURI,
-                            Strings.toString(mintIndex + 1),
-                            ".json"
-                        )
-                    )
-                );
-            }
-
-            numAthletes += 1; // BAYC had a func for total supply. Just incrementing a state variable here
+            supplyOfToken[mintIndex] += 1;
+            numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
         }
     }
 
@@ -188,6 +180,44 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
+    // Dynamically setting new URI for a minted token
+    function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
+        require(bytes(_uris[tokenId]).length == 0, "Cannot set uri twice");
+        _uris[tokenId] = uri;
+    }
+
+    // Just getting the URI for a token
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        return (_uris[tokenId]);
+    }
+
+    // Setting base URIs for the Athletes
+    function setURIs() public onlyOwner {
+        // Way to check if starting index has been set?
+        // require(startingIndex, "Starting index must be set");
+
+        for (uint256 i = 0; i < NUM_ATHLETES; i++) {
+            console.log("Starting index is ", startingIndex);
+            console.log("num athletes", NUM_ATHLETES);
+
+            uint256 mintIndex = (startingIndex + i) % NUM_ATHLETES;
+            console.log("mint index ", mintIndex);
+
+            setTokenUri(
+                mintIndex,
+                string(
+                    abi.encodePacked( // 0.json, 1.json, ...
+                        athleteURI,
+                        Strings.toString(mintIndex),
+                        ".json"
+                    )
+                )
+            );
+
+            console.log("New URI ", _uris[mintIndex]);
+        }
+    }
+
     // Setting starting index block
     function emergencySetStartingIndexBlock() public onlyOwner {
         require(startingIndex == 0, "Starting index is already set");
@@ -199,16 +229,6 @@ contract GameItems is ERC1155, Ownable {
     // Set with: (tokenId + startingIndex) % # of tokens
     function setProvenanceHash(string memory provenanceHash) public onlyOwner {
         provenance = provenanceHash;
-    }
-
-    // Dynamically setting new URI for a minted token
-    function setTokenUri(uint256 tokenId, string memory uri) private {
-        _uris[tokenId] = uri;
-    }
-
-    // Just getting the URI for a token
-    function uri(uint256 tokenId) public view override returns (string memory) {
-        return (_uris[tokenId]);
     }
 
     // function getNumAthletes() public onlyOwner returns(uint memory) {

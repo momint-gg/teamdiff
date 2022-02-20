@@ -26,19 +26,19 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 module.exports = {
   solidity: {
     compilers: [{ version: "^0.8.0" }, { version: "0.8.2" }],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 2000,
+      },
+    },
   },
   //solidity: "^0.8.0",
   paths: {
     //Need to add path so contract can verify correctly on etherscan
     artifacts: "./build/contracts",
   },
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 2000,
-    },
-  },
-  defaultNetwork: "hardhat", // NEED to have for testing so it knows where to deploy
+  defaultNetwork: "rinkeby", // NEED to have for testing so it knows where to deploy
   networks: {
     // hardhat: {
     //   blockNumber: 14173470,
