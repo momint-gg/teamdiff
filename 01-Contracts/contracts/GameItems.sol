@@ -125,7 +125,6 @@ contract GameItems is ERC1155, Ownable {
         _mint(address(msg.sender), starterPackId, 1, "");
 
         starterPacksMinted += 1;
-        starterPackId += 1;
         emit packMinted(msg.sender, starterPacksMinted);
     }
 
@@ -142,7 +141,6 @@ contract GameItems is ERC1155, Ownable {
         _mint(address(msg.sender), boosterPackId, 1, "");
 
         boosterPacksMinted += 1;
-        boosterPackId += 1;
         emit packMinted(msg.sender, boosterPacksMinted);
     }
 
