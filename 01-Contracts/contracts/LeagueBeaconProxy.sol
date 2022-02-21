@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
 
-
 /**
  * @dev This contract implements a proxy that gets the implementation address for each call from a {UpgradeableBeacon}.
  *
@@ -21,10 +20,9 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
-
-
     uint256 public version;
     string public name;
+
     /**
      * @dev Initializes the proxy with `beacon`.
      *
@@ -37,7 +35,10 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
      * - `beacon` must be a contract with the interface {IBeacon}.
      */
     constructor(address beacon, bytes memory data) payable {
-        assert(_BEACON_SLOT == bytes32(uint256(keccak256("eip1967.proxy.beacon")) - 1));
+        assert(
+            _BEACON_SLOT ==
+                bytes32(uint256(keccak256("eip1967.proxy.beacon")) - 1)
+        );
         _upgradeBeaconToAndCall(beacon, data, false);
     }
 
@@ -51,7 +52,13 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
     /**
      * @dev Returns the current implementation address of the associated beacon.
      */
-    function _implementation() internal view virtual override returns (address) {
+    function _implementation()
+        internal
+        view
+        virtual
+        override
+        returns (address)
+    {
         return IBeacon(_getBeacon()).implementation();
     }
 
@@ -68,5 +75,4 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
     function _setBeacon(address beacon, bytes memory data) internal virtual {
         _upgradeBeaconToAndCall(beacon, data, false);
     }
-
 }

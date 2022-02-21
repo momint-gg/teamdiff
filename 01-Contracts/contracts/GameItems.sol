@@ -28,7 +28,7 @@ contract GameItems is ERC1155, Ownable {
     // Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards, Check the "fake API" folder for details
     // Note: I think the Image needs to be in its own IPFS (can't just link in IPFS)
     string private athleteURI =
-        "https://ipfs.io/ipfs/QmZTS9tkkueLvRKdteRzXYHrh84YAB2TFC3ApQSDtGy1PB/";
+        "https://gateway.pinata.cloud/ipfs/QmV6Bt7xVz468sD7pgAYXHJqSDpPuymMVnpb2Tuk58zXVU/";
     string private starterPackURI =
         "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json";
     string private boosterPackURI = "Insert booster pack URI here :)";
@@ -58,7 +58,8 @@ contract GameItems is ERC1155, Ownable {
     string provenance = "";
 
     // Mappings
-    mapping(uint256 => string) private _uris;
+    mapping(uint256 => string) private _uris; // token URIs
+    mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
 
     // Events -- later add more for the frontend
     event packMinted(address user, uint256 id);
@@ -78,30 +79,20 @@ contract GameItems is ERC1155, Ownable {
         // Index of what to mint -- we need to % by num of NFTs per athlete
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
-        // For debugging
+        // Log for debugging
         console.log("Starting index", startingIndex);
         console.log("Mint index", mintIndex);
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
-            // require(totalSupply(mintIndex) < NUM_ATHLETES * NFT_PER_ATHLETE, "Purchase would exceed max supply of this token.");
+            require(
+                supplyOfToken[mintIndex] < NFT_PER_ATHLETE,
+                "All of this athlete have already been minted!"
+            );
+
             _mint(address(msg.sender), mintIndex, 1, "0x00");
 
-            if (bytes(_uris[mintIndex]).length == 0) {
-                setTokenUri(
-                    mintIndex,
-                    string(
-                        abi.encodePacked(
-                            //Athlete1.json, ...
-                            athleteURI,
-                            "athlete",
-                            Strings.toString(mintIndex + 1),
-                            ".json"
-                        )
-                    )
-                );
-            }
-
-            numAthletes += 1; // BAYC had a func for total supply. Just incrementing a state variable here
+            supplyOfToken[mintIndex] += 1;
+            numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
         }
     }
 
@@ -141,6 +132,12 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Burning a starter pack and giving random athlete NFTs to sender
+    // Steps for the new function
+    // Parse JSON so we can access the object
+    // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
+    // If it does, increment the counter variable
+    // If not, mint an athlete with that URI and the proper index
+    // ^ this way, we are still using IPFS for randomization,
     function burnStarterPack() public {
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
@@ -149,9 +146,7 @@ contract GameItems is ERC1155, Ownable {
         );
 
         // Assigning the user 3 NFTs
-
         for (uint256 i = 0; i < STARTER_PACK_SIZE; i++) {
-
             mintAthlete();
         }
         // Burning the pack
@@ -184,6 +179,44 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
+    // Dynamically setting new URI for a minted token
+    function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
+        require(bytes(_uris[tokenId]).length == 0, "Cannot set uri twice");
+        _uris[tokenId] = uri;
+    }
+
+    // Just getting the URI for a token
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        return (_uris[tokenId]);
+    }
+
+    // Setting base URIs for the Athletes
+    function setURIs() public onlyOwner {
+        // Way to check if starting index has been set?
+        // require(startingIndex, "Starting index must be set");
+
+        for (uint256 i = 0; i < NUM_ATHLETES; i++) {
+            console.log("Starting index is ", startingIndex);
+            console.log("num athletes", NUM_ATHLETES);
+
+            uint256 mintIndex = (startingIndex + i) % NUM_ATHLETES;
+            console.log("mint index ", mintIndex);
+
+            setTokenUri(
+                mintIndex,
+                string(
+                    abi.encodePacked( // 0.json, 1.json, ...
+                        athleteURI,
+                        Strings.toString(mintIndex),
+                        ".json"
+                    )
+                )
+            );
+
+            console.log("New URI ", _uris[mintIndex]);
+        }
+    }
+
     // Setting starting index block
     function emergencySetStartingIndexBlock() public onlyOwner {
         require(startingIndex == 0, "Starting index is already set");
@@ -195,16 +228,6 @@ contract GameItems is ERC1155, Ownable {
     // Set with: (tokenId + startingIndex) % # of tokens
     function setProvenanceHash(string memory provenanceHash) public onlyOwner {
         provenance = provenanceHash;
-    }
-
-    // Dynamically setting new URI for a minted token
-    function setTokenUri(uint256 tokenId, string memory uri) private {
-        _uris[tokenId] = uri;
-    }
-
-    // Just getting the URI for a token
-    function uri(uint256 tokenId) public view override returns (string memory) {
-        return (_uris[tokenId]);
     }
 
     // function getNumAthletes() public onlyOwner returns(uint memory) {

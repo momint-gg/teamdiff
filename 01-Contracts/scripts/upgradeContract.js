@@ -1,20 +1,21 @@
 const { ethers, upgrades } = require("hardhat");
-var Web3 = require('web3'); 
+var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
 
 async function main() {
   // Deploying
 
-  //Create GAme Logicr 
+  //Create GAme Logicr
   const GameLogicFactory = await ethers.getContractFactory("GameLogic");
   const GameLogicInstance = await GameLogicFactory.deploy();
   await GameLogicInstance.deployed();
   console.log("GameLogic deployed to:", GameLogicInstance.address);
 
-
-  //Create League Maker 
+  //Create League Maker
   const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
-  const LeagueMakerInstance = await LeagueMakerFactory.deploy(GameLogicInstance.address);
+  const LeagueMakerInstance = await LeagueMakerFactory.deploy(
+    GameLogicInstance.address
+  );
   await LeagueMakerInstance.deployed();
   console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
 
@@ -24,31 +25,40 @@ async function main() {
   await BeaconInstance.deployed();
   console.log("Beacon deployed to:", BeaconInstance.address);
 
-
   //Create Proxy
-  const LeagueProxyFactory = await ethers.getContractFactory("LeagueBeaconProxy");
+  const LeagueProxyFactory = await ethers.getContractFactory(
+    "LeagueBeaconProxy"
+  );
   // bytes memory delegateCallData = abi.encodeWithSignature("initialize(uint256)", parameters.version);
   // LeagueBeaconProxy proxy = new LeagueBeaconProxy(
   //     address(upgradeableBeacon),
   //     delegateCallData
   // );
-  
-  let func = web3.eth.abi.encodeFunctionCall({
-    name: 'initialize',
-    type: 'function',
-    inputs: [{
-        type: 'uint256',
-        name: '_version'
-    }]
-  }, [1]);
-  const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, func);
+
+  let func = web3.eth.abi.encodeFunctionCall(
+    {
+      name: "initialize",
+      type: "function",
+      inputs: [
+        {
+          type: "uint256",
+          name: "_version",
+        },
+      ],
+    },
+    [1]
+  );
+  const LeagueProxyInstance = await LeagueProxyFactory.deploy(
+    BeaconInstance.address,
+    func
+  );
   //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
   await LeagueProxyInstance.deployed();
   console.log("LEague Proxy deployed to:", LeagueProxyInstance.address);
   // console.log("League Proxy details: " + JSON.stringify(LeagueProxyInstance, null, 2));
-  console.log("LeagueProxy init state: " + await LeagueProxyInstance.version());
-
-
+  console.log(
+    "LeagueProxy init state: " + (await LeagueProxyInstance.version())
+  );
 
   //*******************//
   //*******************//
@@ -91,12 +101,18 @@ async function main() {
   //txn = await BeaconInstance.version();
 
   //You can view hardhat node console to see console.log messages from contracts, and verify version state is changing in correct memory
-  txn = await LeagueMakerInstance.testCallDoesNotExist(LeagueProxyInstance.address);
-  txn = await LeagueMakerInstance.testCallDoesNotExist(LeagueProxyInstance.address);
-  txn = await LeagueMakerInstance.testCallDoesNotExist(GameLogicInstance.address);
+  txn = await LeagueMakerInstance.testCallDoesNotExist(
+    LeagueProxyInstance.address
+  );
+  txn = await LeagueMakerInstance.testCallDoesNotExist(
+    LeagueProxyInstance.address
+  );
+  txn = await LeagueMakerInstance.testCallDoesNotExist(
+    GameLogicInstance.address
+  );
   receipt = await txn.wait();
   for (const event of receipt.events) {
-    if(event.event != null) {
+    if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
     }
   }
@@ -112,8 +128,12 @@ async function main() {
   //console.log("txn: " + JSON.stringify(txn, null, 2));
 
   //txn = await LeagueProxyInstance.incrementVersion();
-  console.log("League Proxy updated state: " + await LeagueProxyInstance.version());
-  console.log("Game Logic updated state: " + await GameLogicInstance.version());
+  console.log(
+    "League Proxy updated state: " + (await LeagueProxyInstance.version())
+  );
+  console.log(
+    "Game Logic updated state: " + (await GameLogicInstance.version())
+  );
 
   //check the state of league proxy as admin
 
