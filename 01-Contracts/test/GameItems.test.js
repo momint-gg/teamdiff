@@ -173,27 +173,27 @@ describe("GameItems.test", async () => {
     txn = await GameItem.burnStarterPack();
     await txn.wait();
 
-    //Making sure new athletes were minted with indexes ranging from 0-2 (random order bc of block #)
-    const athlete1 = await GameItem.balanceOf(owner.address, 0);
-    const athlete2 = await GameItem.balanceOf(owner.address, 1);
-    const athlete3 = await GameItem.balanceOf(owner.address, 2);
+    // //Making sure new athletes were minted with indexes ranging from 0-2 (random order bc of block #)
+    // const athlete1 = await GameItem.balanceOf(owner.address, 0);
+    // const athlete2 = await GameItem.balanceOf(owner.address, 1);
+    // const athlete3 = await GameItem.balanceOf(owner.address, 2);
 
-    //Check balances of each athlete minted (should range 1-2 since starter pack size is 5)
-    console.log("\n");
-    console.log("Balance of first minted athlete: ", athlete1);
-    console.log("Balance of second minted athlete: ", athlete2);
-    console.log("Balance of third minted athlete: ", athlete3);
-    console.log("\n");
+    // //Check balances of each athlete minted (should range 1-2 since starter pack size is 5)
+    // console.log("\n");
+    // console.log("Balance of first minted athlete: ", athlete1);
+    // console.log("Balance of second minted athlete: ", athlete2);
+    // console.log("Balance of third minted athlete: ", athlete3);
+    // console.log("\n");
 
-    const uri1 = await GameItem.uri(0);
-    const uri2 = await GameItem.uri(1);
-    const uri3 = await GameItem.uri(2);
+    // const uri1 = await GameItem.uri(0);
+    // const uri2 = await GameItem.uri(1);
+    // const uri3 = await GameItem.uri(2);
 
-    //Check URI #s a couple times to make sure ordering was randomized
-    console.log("\n");
-    console.log("URI of first minted athlete: ", uri1);
-    console.log("URI of second minted athlete: ", uri2);
-    console.log("URI of third minted athlete: ", uri3);
-    console.log("\n");
+    // //Check URI #s a couple times to make sure ordering was randomized
+    // console.log("\n");
+    // console.log("URI of first minted athlete: ", uri1);
+    // console.log("URI of second minted athlete: ", uri2);
+    // console.log("URI of third minted athlete: ", uri3);
+    // console.log("\n");
   });
 });
