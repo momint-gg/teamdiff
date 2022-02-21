@@ -10,7 +10,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext'
 import Typography from '@mui/material/Typography';
-import About from './about';
+import Mint from './mint';
 import Collection from './collection';
 import ConnectWallet from './connectWallet';
 
@@ -63,31 +63,27 @@ export default function Index(props) {
                 indicatorColor="secondary"
                 textColor="white"
               >
-                <Tab label="CONNECT" value="0" />
-                <Tab label="PLAY" value="1" />
-                <Tab label="COLLECTIONS" value="2" />
-                <Tab label="MINT" value="3" />
-                <Tab label="ABOUT" value="4" />
+                <Tab label="PLAY" value="0" />
+                <Tab label="COLLECTION" value="1" />
+                <Tab label="MINT" value="2" />
+                {/* <Tab label="CONNECT" value="0" /> */}
               </TabList>
             </Box>
-            <TabPanel value="0">
+            {/* <TabPanel value="0">
               <ConnectWallet />
-            </TabPanel>
-            <TabPanel value="1">
+            </TabPanel> */}
+            <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 Home
               </Typography>
             </TabPanel>
-            <TabPanel value="2">
+            <TabPanel value="1">
               <Collection />
             </TabPanel>
-            <TabPanel value="3">
+            <TabPanel value="2">
               <Typography variant="h2" color="secondary" component="div">
-                ~Mint Page~
+                <Mint />
               </Typography>
-            </TabPanel>
-            <TabPanel value="4">
-              <About />
             </TabPanel>
           </TabContext>
           <Footer/>

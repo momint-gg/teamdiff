@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Card, CardContent, Typography, CardActions, Button } from "@mui/material"
+import { Card, CardContent, CardMedia, Typography, CardActions, Button } from "@mui/material"
   
 
 export default function AthleteCard(athleteData) {
@@ -9,8 +9,16 @@ export default function AthleteCard(athleteData) {
             <Typography variant="h5" color="secondary" component="div">
                 {athleteData?.athleteData.title}
             </Typography>
-            <img src={athleteData?.athleteData.metadata.image} alt="NFT" />
-            <Typography variant="body2">
+            <CardMedia
+                component="img"
+                height="400"
+                image={athleteData?.athleteData.metadata.image}
+                alt="NFT Image"
+            />
+            <Typography variant="title" color="inherit" noWrap>
+                &nbsp;
+            </Typography>
+            <Typography variant="body1" color="inherit">
                 {athleteData?.athleteData.description}
             </Typography>
           </CardContent>
