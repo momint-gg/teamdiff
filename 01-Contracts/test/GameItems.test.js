@@ -4,6 +4,7 @@ const { expect } = require("chai");
 const hre = require("hardhat");
 
 const GameItems = artifacts.require("GameItems.sol");
+const constructorArgs = require("../constructorArgs");
 
 // Start test block
 //TODO: use openzeppeling Test scripts
@@ -19,7 +20,7 @@ describe("GameItems.test", async () => {
   //Ran before every unit test
   //used to reset state or prepare test
   beforeEach(async function () {
-    GameItem = await GameItemFactory.deploy();
+    GameItem = await GameItemFactory.deploy(...constructorArgs);
     [owner, addr1] = await hre.ethers.getSigners();
     await GameItem.deployed();
     GameItem.connect(owner);

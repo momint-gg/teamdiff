@@ -15,38 +15,31 @@ contract GameItems is ERC1155, Ownable {
     Counters.Counter private _tokenIds;
     using SafeMath for uint256;
 
-    // Later pass these constants into the constructor
-    uint256 private constant NUM_ATHLETES = 4; // Max size of the collection
-    uint256 private constant NFT_PER_ATHLETE = 10; // how much of each athlete
-    uint256 private constant STARTER_PACK_SIZE = 5;
-    uint256 private constant BOOSTER_PACK_SIZE = 3;
-    uint256 private constant MAX_STARTER_PACK_BALANCE = 1;
-    uint256 private constant MAX_BOOSTER_PACK_BALANCE = 1;
-    uint256 private constant MAX_PACKS = 10; //Some set number of packs we decide
-
-    // URIs
-    // Following the OpenSea metadata standards: https://docs.opensea.io/docs/metadata-standards, Check the "fake API" folder for details
-    // Note: I think the Image needs to be in its own IPFS (can't just link in IPFS)
-    string private athleteURI =
-        "https://gateway.pinata.cloud/ipfs/QmV6Bt7xVz468sD7pgAYXHJqSDpPuymMVnpb2Tuk58zXVU/";
-    string private starterPackURI =
-        "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json";
-    string private boosterPackURI = "Insert booster pack URI here :)";
+    // Constructor args
+    uint256 private NUM_ATHLETES; // Max size of the collection
+    uint256 private NFT_PER_ATHLETE; // how much of each athlete
+    uint256 private STARTER_PACK_SIZE;
+    uint256 private BOOSTER_PACK_SIZE;
+    uint256 private MAX_STARTER_PACK_BALANCE;
+    uint256 private MAX_BOOSTER_PACK_BALANCE;
+    uint256 private MAX_PACKS;
+    string private athleteURI;
+    string private starterPackURI;
+    string private boosterPackURI;
+    uint256 public REVEAL_TIMESTAMP = 10000;
 
     // When we flip the switch and let everyone open packs
     // (Setting to true for now for easy testing)
     bool public packsReadyToOpen = true;
 
-    uint256 public REVEAL_TIMESTAMP = 10000; //can set this later, if we have presale stuff
-
-    //Should mint pack IDs after athletes to avoid confusion
+    // Where to start pack IDs
     uint256 private starterPackId = NUM_ATHLETES;
     uint256 private boosterPackId = starterPackId;
-    //Total amount of packs minted so far
-    uint256 private starterPacksMinted = 0;
-    uint256 private boosterPacksMinted = 0;
-    //The total amount of athletes so far we've minted
-    uint256 private numAthletes = 0;
+    // Total amount of packs minted so far
+    uint256 private starterPacksMinted;
+    uint256 private boosterPacksMinted;
+    // The total amount of athletes so far we've minted
+    uint256 private numAthletes;
 
     string ipfsBaseUrl = "https://ipfs.io/ipfs/";
 
@@ -64,9 +57,31 @@ contract GameItems is ERC1155, Ownable {
     // Events -- later add more for the frontend
     event packMinted(address user, uint256 id);
 
-    constructor() ERC1155("") {
+    constructor(
+        uint256 _numAthletes,
+        uint256 _nftPerAthlete,
+        uint256 _starterPackSize,
+        uint256 _boosterPackSize,
+        uint256 _maxStarterPackBalance,
+        uint256 _maxBoosterPackBalance,
+        uint256 _maxPacks,
+        string memory _athleteURI,
+        string memory _starterPackURI,
+        string memory _boosterPackURI,
+        uint256 _revealTimestamp
+    ) ERC1155("") {
         console.log("Making contract...");
-        // REVEAL_TIMESTAMP = 0; // For testing
+        NUM_ATHLETES = _numAthletes;
+        NFT_PER_ATHLETE = _nftPerAthlete;
+        STARTER_PACK_SIZE = _starterPackSize;
+        BOOSTER_PACK_SIZE = _boosterPackSize;
+        MAX_STARTER_PACK_BALANCE = _maxStarterPackBalance;
+        MAX_BOOSTER_PACK_BALANCE = _maxBoosterPackBalance;
+        MAX_PACKS = _maxPacks;
+        athleteURI = _athleteURI;
+        starterPackURI = _starterPackURI;
+        boosterPackURI = _boosterPackURI;
+        REVEAL_TIMESTAMP = _revealTimestamp;
     }
 
     // Athletes can only be minted once our "switch" has been flipped
@@ -108,9 +123,9 @@ contract GameItems is ERC1155, Ownable {
         );
 
         _mint(address(msg.sender), starterPackId, 1, "");
-        setTokenUri(starterPackId, string(abi.encodePacked(starterPackURI)));
 
         starterPacksMinted += 1;
+        starterPackId += 1;
         emit packMinted(msg.sender, starterPacksMinted);
     }
 
@@ -125,9 +140,9 @@ contract GameItems is ERC1155, Ownable {
         );
 
         _mint(address(msg.sender), boosterPackId, 1, "");
-        setTokenUri(boosterPackId, string(abi.encodePacked(boosterPackURI)));
 
         boosterPacksMinted += 1;
+        boosterPackId += 1;
         emit packMinted(msg.sender, boosterPacksMinted);
     }
 
@@ -160,7 +175,7 @@ contract GameItems is ERC1155, Ownable {
         );
 
         //  Insert logic to mint athletes in a booster pack
-
+        //for x in booster pack size, ......
         _burn(address(msg.sender), boosterPackId, 1);
     }
 
@@ -191,9 +206,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Setting base URIs for the Athletes
     function setURIs() public onlyOwner {
-        // Way to check if starting index has been set?
-        // require(startingIndex, "Starting index must be set");
-
+        //Setting athlete URIs
         for (uint256 i = 0; i < NUM_ATHLETES; i++) {
             console.log("Starting index is ", startingIndex);
             console.log("num athletes", NUM_ATHLETES);
@@ -214,6 +227,10 @@ contract GameItems is ERC1155, Ownable {
 
             console.log("New URI ", _uris[mintIndex]);
         }
+
+        //Setting pack URIs
+        setTokenUri(NUM_ATHLETES + 1, string(abi.encodePacked(starterPackURI)));
+        setTokenUri(NUM_ATHLETES + 2, string(abi.encodePacked(boosterPackURI)));
     }
 
     // Setting starting index block
