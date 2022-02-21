@@ -16,7 +16,7 @@ contract GameItems is ERC1155, Ownable {
     using SafeMath for uint256;
 
     // Later pass these constants into the constructor
-    uint256 private constant NUM_ATHLETES = 3; // Max size of the collection
+    uint256 private constant NUM_ATHLETES = 4; // Max size of the collection
     uint256 private constant NFT_PER_ATHLETE = 10; // how much of each athlete
     uint256 private constant STARTER_PACK_SIZE = 5;
     uint256 private constant BOOSTER_PACK_SIZE = 3;
@@ -131,19 +131,18 @@ contract GameItems is ERC1155, Ownable {
         emit packMinted(msg.sender, boosterPacksMinted);
     }
 
-    // Burning a starter pack and giving random athlete NFTs to sender
-    // Steps for the new function
-    // Parse JSON so we can access the object
-    // Instead of a for loop, use a while loop with a counter, see if the property "position" exists in some array we make
-    // If it does, increment the counter variable
-    // If not, mint an athlete with that URI and the proper index
-    // ^ this way, we are still using IPFS for randomization,
+    // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
+    // If uploaded in correct order we should be good (@Isayah)
     function burnStarterPack() public {
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), starterPackId) == 1,
             "Pack has already been burned or does not exist."
         );
+
+        // Change starting index every time for randomization -- people may be able to game this though...
+        // Should we use chainlink instead? Maybe put Trey on figuring this out
+        setStartingIndex();
 
         // Assigning the user 3 NFTs
         for (uint256 i = 0; i < STARTER_PACK_SIZE; i++) {
@@ -165,7 +164,7 @@ contract GameItems is ERC1155, Ownable {
         _burn(address(msg.sender), boosterPackId, 1);
     }
 
-    // Setting starting Index for the collection
+    // Setting starting Index -- will do every time?
     function setStartingIndex() public onlyOwner {
         // Setting the starting index
         startingIndex =
@@ -229,10 +228,6 @@ contract GameItems is ERC1155, Ownable {
     function setProvenanceHash(string memory provenanceHash) public onlyOwner {
         provenance = provenanceHash;
     }
-
-    // function getNumAthletes() public onlyOwner returns(uint memory) {
-    //     return this.numAthletes;
-    // }
 
     function getNFTPerAthlete() public view onlyOwner returns (uint256) {
         return NFT_PER_ATHLETE;

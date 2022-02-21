@@ -172,7 +172,6 @@ describe("GameItems.test", async () => {
     await txn.wait();
     txn = await GameItem.burnStarterPack();
     await txn.wait();
-    expect(GameItem.balanceOf(owner.address, 3)).to.be.reverted; //should throw an error
 
     //Making sure new athletes were minted with indexes ranging from 0-2 (random order bc of block #)
     const athlete1 = await GameItem.balanceOf(owner.address, 0);
