@@ -26,7 +26,7 @@ export default function Collection() {
             for (const nft of nfts?.ownedNfts) {
                 let token = nft?.id?.tokenId;
                 const response = await web3.alchemy.getNftMetadata({
-                    contractAddress: "0x94b90ca07014f8b67a6bca8b1b7313d5fd8d2160",
+                    contractAddress: constants.CONTRACT_ADDR,
                     tokenId: token
                 })
                 setNFTData(nftData => [...nftData, response]);
@@ -41,6 +41,7 @@ export default function Collection() {
     }, [])
 
     if (accountData && nftResp && nftData.length>0) {
+        console.log(nftData);
         return (
             <Box>
             <Typography variant="h2" color="secondary" component="div">
