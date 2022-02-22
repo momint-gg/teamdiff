@@ -159,6 +159,7 @@ contract GameItems is ERC1155, Ownable {
             "Pack has already been burned or does not exist."
         );
 
+        // Generating new indices for the athletes minted when the pack is burned
         generateStarterPackIndices();
 
         // Assigning the user 3 NFTs
@@ -169,13 +170,17 @@ contract GameItems is ERC1155, Ownable {
         _burn(address(msg.sender), starterPackId, 1);
     }
 
-    // Generates array of indices (e.g. [0, 5, 22, 13, 9])
+    // Generates array of indices (e.g. sets starterPackIndices to [0, 5, 22, 13, 9])
     // We assume one position is 0-9 on IPFS, other is 10-19, etc...
     // Note: starting index must be set first
     // ALSO need to eliminate possibility of duplicates
     function generateStarterPackIndices() public onlyOwner {
-        uint256 index1 = startingIndex % NUM_ATHLETES; // random # in range 0-(# athletes)
-        starterPackIndices[0] = index1;
+        for (uint256 i = 1; i <= starterPackIndices.length; i++) {
+            uint256 magicNum = generateMagicNum();
+            //We want to only get a random index that's in the correct range each loop (i.e. 0-9, 10-19, 20-29, etc..)
+            console.log("New index is", ((magicNum) % (i * 10 - 1)));
+            starterPackIndices[i - 1] = (magicNum) % (i * 10 - 1); // % by 9, 19, 29, etc...
+        }
     }
 
     // Generates our "magic number" based on the array indices of current athlete indices
@@ -193,8 +198,14 @@ contract GameItems is ERC1155, Ownable {
             uint256 magicNum;
             for (uint256 i = 0; i < starterPackIndices.length; i++) {
                 magicNum += starterPackIndices[i]**2;
+
+                if (magicNum == 0) generateMagicNum();
+
                 // If at the end, also divide by last index
-                if (i == starterPackIndices.length - 1) {
+                if (
+                    i == starterPackIndices.length - 1 &&
+                    starterPackIndices[i] != 0
+                ) {
                     magicNum = magicNum / starterPackIndices[i];
                 }
             }
@@ -220,7 +231,6 @@ contract GameItems is ERC1155, Ownable {
         startingIndex =
             uint256(blockhash(block.number - 1)) %
             (NUM_ATHLETES * NFT_PER_ATHLETE);
-        console.log("Starting index ", startingIndex);
 
         // Prevent default sequence
         if (startingIndex == 0) {
@@ -284,6 +294,15 @@ contract GameItems is ERC1155, Ownable {
     function getNFTPerAthlete() public view onlyOwner returns (uint256) {
         return NFT_PER_ATHLETE;
         //return uint(10);
+    }
+
+    function getStarterPackIndices()
+        public
+        view
+        onlyOwner
+        returns (uint256[5] memory)
+    {
+        return starterPackIndices;
     }
 
     // Minting our "SLP", in game currency

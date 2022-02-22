@@ -183,10 +183,11 @@ describe("GameItems.test", async () => {
     // await txn.wait();
     txn = await GameItem.generateStarterPackIndices();
     // await txn.wait();
-    const indices = GameItem.starterPackIndices();
+
+    const indices = await GameItem.getStarterPackIndices();
     console.log("Indices:");
     console.log(indices);
-    expect(indices.length).toEqual(5);
+    expect(indices.length).to.equal(5);
   });
 
   // Testing burn pack functionality and minting with 3 random athletes
