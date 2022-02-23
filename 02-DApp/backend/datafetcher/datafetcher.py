@@ -4,6 +4,7 @@ import json
 import mwclient
 from pprint import pprint
 import os
+import random
 import re
 import ssl
 import time
@@ -39,7 +40,7 @@ class DataFetcher():
         self.file_names = []
         self.ipfsJsonMap = {}
         self.true_athletes = []
-        self.positions = []
+        self.positions = ["Top", "Mid", "Bot", "Support", "Jungle"]
 
     overwrite_player_name_map = {
           "hans" : "Hans sama",
@@ -318,7 +319,7 @@ class DataFetcher():
                           ".png") if self.ipfsMap[player]["Hash"] else None
                 time.sleep(5)
 
-    def create_nft_metadata(self):
+    def create_nft_metadata_ordered(self):
         count = 0
         for position in self.positions:
           for player, info in self.players.items():
@@ -339,8 +340,35 @@ class DataFetcher():
                     },
                 ]
                 self.convert_to_json(
-                    self.nft_metadata[p], "nft_metadata/" + str(count) + ".json")
+                    self.nft_metadata[p], "nft_metadata_ordered/" + str(count) + ".json")
                 count += 1
+
+    def create_nft_metadata_random(self):
+        count = 0
+        target_players = []
+        for player, info in self.players.items():
+            p = player.split("(")[0].strip()
+            if p in self.true_athletes or player in self.true_athletes:
+              self.nft_metadata[p] = {}
+              self.nft_metadata[p]["name"] = info["Name"]
+              self.nft_metadata[p]["description"] = "This is a professional eSports athelete!"
+              self.nft_metadata[p]["image"] = "https://ipfs.io/ipfs/"+ self.ipfsMap[player]["Hash"]
+              self.nft_metadata[p]["attributes"] = [
+                  {
+                      "trait_type": "team",
+                      "value": info["Team"]
+                  },
+                  {
+                      "trait_type": "position",
+                      "value": info["Role"]
+                  },
+              ]
+              target_players.append(p)
+        random.shuffle(target_players)
+        for p in target_players:
+          self.convert_to_json(
+              self.nft_metadata[p], "nft_metadata_random/" + str(count) + ".json")
+          count += 1
 
     def convert_to_json(self, data, file_name):
         with open(file_name, "w") as outfile:
@@ -391,12 +419,13 @@ df = DataFetcher()
 df.set_true_athletes("athletes.csv")
 df.get_players_and_teams()
 df.get_players_csv()
-# df.print_missing_players()
+df.print_missing_players()
 
 df.get_player_game_stats()
 df.aggregate_player_game_stats()
 df.download_player_headshots()
-df.create_nft_metadata()
+df.create_nft_metadata_ordered()
+df.create_nft_metadata_random()
 
 # df.convert_to_json(df.players, f'player_info_'"%s"'.json' % df.start_date)
 # df.convert_to_json(df.player_game_stats,
