@@ -44,11 +44,16 @@ contract GameItems is ERC1155, Ownable {
     string ipfsBaseUrl = "https://ipfs.io/ipfs/";
 
     // Starting block for randomized index
-    uint256 public startingIndexBlock;
-    uint256 public startingIndex;
+    uint256 private startingIndexBlock;
+    uint256 private startingIndex;
 
     //Provenance hash
     string provenance = "";
+
+    // Random indices for minting packs
+    uint256[5] private starterPackIndices;
+    uint256[3] private boosterPackIndices;
+    uint256 private magicNumber; // "Magic #" for randomizing indices when minting athletes
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -90,23 +95,24 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    function mintAthlete() private {
+    function mintAthlete(uint256 index) private {
         // Index of what to mint -- we need to % by num of NFTs per athlete
         uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
         // Log for debugging
         console.log("Starting index", startingIndex);
-        console.log("Mint index", mintIndex);
+        console.log("Old mint index", mintIndex);
+        console.log("New mint index", index);
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
-                supplyOfToken[mintIndex] < NFT_PER_ATHLETE,
+                supplyOfToken[index] < NFT_PER_ATHLETE,
                 "All of this athlete have already been minted!"
             );
 
-            _mint(address(msg.sender), mintIndex, 1, "0x00");
+            _mint(address(msg.sender), index, 1, "0x00");
 
-            supplyOfToken[mintIndex] += 1;
+            supplyOfToken[index] += 1;
             numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
         }
     }
@@ -145,7 +151,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
-    // If uploaded in correct order we should be good (@Isayah)
+    // We also will determine which indices to mint
     function burnStarterPack() public {
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
@@ -153,16 +159,58 @@ contract GameItems is ERC1155, Ownable {
             "Pack has already been burned or does not exist."
         );
 
-        // Change starting index every time for randomization -- people may be able to game this though...
-        // Should we use chainlink instead? Maybe put Trey on figuring this out
-        setStartingIndex();
+        // Generating new indices for the athletes minted when the pack is burned
+        generateStarterPackIndices();
 
         // Assigning the user 3 NFTs
-        for (uint256 i = 0; i < STARTER_PACK_SIZE; i++) {
-            mintAthlete();
+        for (uint256 i = 0; i < starterPackIndices.length; i++) {
+            mintAthlete(starterPackIndices[i]);
         }
         // Burning the pack
         _burn(address(msg.sender), starterPackId, 1);
+    }
+
+    // Generates array of indices (e.g. sets starterPackIndices to [0, 5, 22, 13, 9])
+    // We assume one position is 0-9 on IPFS, other is 10-19, etc...
+    // Note: starting index must be set first
+    // ALSO need to eliminate possibility of duplicates
+    function generateStarterPackIndices() public onlyOwner {
+        for (uint256 i = 1; i <= starterPackIndices.length; i++) {
+            uint256 magicNum = generateMagicNum();
+            //We want to only get a random index that's in the correct range each loop (i.e. 0-9, 10-19, 20-29, etc..)
+            console.log("New index is", ((magicNum) % (i * 10 - 1)));
+            starterPackIndices[i - 1] = (magicNum) % (i * 10 - 1); // % by 9, 19, 29, etc...
+        }
+    }
+
+    // Generates our "magic number" based on the array indices of current athlete indices
+    function generateMagicNum() public view onlyOwner returns (uint256) {
+        // If first time generating the magic number -- sum of exponents (^2)
+        if (
+            starterPackIndices[0] == 0 &&
+            starterPackIndices[1] == 0 &&
+            starterPackIndices[2] == 0 &&
+            starterPackIndices[3] == 0 &&
+            starterPackIndices[4] == 0
+        ) {
+            return startingIndex;
+        } else {
+            uint256 magicNum;
+            for (uint256 i = 0; i < starterPackIndices.length; i++) {
+                magicNum += starterPackIndices[i]**2;
+
+                if (magicNum == 0) generateMagicNum();
+
+                // If at the end, also divide by last index
+                if (
+                    i == starterPackIndices.length - 1 &&
+                    starterPackIndices[i] != 0
+                ) {
+                    magicNum = magicNum / starterPackIndices[i];
+                }
+            }
+            return magicNum;
+        }
     }
 
     function burnBoosterPack() public {
@@ -183,7 +231,6 @@ contract GameItems is ERC1155, Ownable {
         startingIndex =
             uint256(blockhash(block.number - 1)) %
             (NUM_ATHLETES * NFT_PER_ATHLETE);
-        console.log("Starting index ", startingIndex);
 
         // Prevent default sequence
         if (startingIndex == 0) {
@@ -247,6 +294,15 @@ contract GameItems is ERC1155, Ownable {
     function getNFTPerAthlete() public view onlyOwner returns (uint256) {
         return NFT_PER_ATHLETE;
         //return uint(10);
+    }
+
+    function getStarterPackIndices()
+        public
+        view
+        onlyOwner
+        returns (uint256[5] memory)
+    {
+        return starterPackIndices;
     }
 
     // Minting our "SLP", in game currency
