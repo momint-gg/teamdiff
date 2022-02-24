@@ -89,6 +89,18 @@ contract GameItems is ERC1155, Ownable {
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = _revealTimestamp;
     }
+    
+    event Response(bool success, bytes data);   
+    function grabRandomWord(address _addr) public {
+        //This calls the game logic incrementVersion which is great
+        //but how do we call it in js?
+        (bool success, bytes memory data) = _addr.call(
+            abi.encodeWithSignature("s_randomWords(1)")
+        );
+        //console.log("called test call");
+
+        emit Response(success, data);
+    }
 
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {

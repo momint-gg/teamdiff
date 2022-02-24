@@ -25,7 +25,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: {
-    compilers: [{ version: "^0.8.0" }, { version: "0.8.2" }],
+    compilers: [{ version: "^0.8.0" }, { version: "0.8.2" }, { version: "0.8.7" }],
     settings: {
       optimizer: {
         enabled: true,
@@ -47,7 +47,8 @@ module.exports = {
     //Config for Rinkeby
     rinkeby: {
       url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
-      accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+      //accounts: [process.env.PRIVATE_KEY.toString()], //Insert your metamask private key
+      accounts: ["0x150da01ee0b21ee8843a7df46ac630c9b8a91ef370b36c197aced4179d023859"], //Insert your metamask private key
     },
     // localhost: {
     //   url: "http://127.0.0.1:8545"
