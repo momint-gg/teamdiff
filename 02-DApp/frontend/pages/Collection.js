@@ -11,7 +11,6 @@ export default function Collection() {
       })
     const [nftResp, setNFTResp] = useState(null);
     const [nftData, setNFTData] = useState([]);
-
     useEffect(() => {
         // declare the async data fetching function
         const getNFTData = async () => {
