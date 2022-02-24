@@ -63,11 +63,37 @@ async function main() {
 //   console.log("txn: " + JSON.stringify(txn, null, 2));
 
 //   console.log("random words: " + await VRFv2ConsumerInstance.s_randomWords());
-//   const contractAddress = "0xB69b679a88442A154cd92f6CCbBB19bc07bAfc1d";
+  const contractAddress = "0xB69b679a88442A154cd92f6CCbBB19bc07bAfc1d";
   const myContract = await hre.ethers.getContractAt("VRFv2Consumer", contractAddress);
-  txn = await myContract.s_randomWords();
+  txn = await myContract.s_randomWords(0);
+  //await txn.wait();
+  //console.log("txn: " + JSON.stringify(txn, null, 2));
+  console.log("random: " + txn);
+
+  txn = await myContract.requestRandomWords({
+    gasPrice: 10000000000,
+    //gasLimit: 30091486
+  });
+    //const txn = await VRFv2ConsumerInstance.requestRandomWords();
+  //const result =   
   await txn.wait();
   console.log("txn: " + JSON.stringify(txn, null, 2));
+
+
+//   txn = await myContract.fufillRandomWords({
+//     gasPrice: 10000000000,
+//     //gasLimit: 30091486
+//   });
+//     //const txn = await VRFv2ConsumerInstance.requestRandomWords();
+//   //const result =   
+//   await txn.wait();
+//   console.log("txn: " + JSON.stringify(txn, null, 2));
+
+  txn = await myContract.s_randomWords(0);
+  //await txn.wait();
+  //console.log("txn: " + JSON.stringify(txn, null, 2));
+  console.log("random #1: " + txn);
+  
   //Generate random words again
 //   txn = await VRFv2ConsumerInstance.requestRandomWords({
 //     //overriding gas bc transaction was stuck
