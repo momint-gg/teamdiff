@@ -101,8 +101,11 @@ contract GameItems is ERC1155, Ownable {
 
         // Log for debugging
         console.log("Starting index", startingIndex);
+        //TODO set img size to be fixed 
+
         console.log("Old mint index", mintIndex);
         console.log("New mint index", index);
+
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
