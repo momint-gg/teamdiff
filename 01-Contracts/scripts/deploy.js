@@ -1,8 +1,9 @@
 const hre = require("hardhat");
+const constructorArgs = require("../constructorArgs");
 
 const main = async () => {
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
-  const gameContract = await gameContractFactory.deploy({
+  const gameContract = await gameContractFactory.deploy(...constructorArgs, {
     //overriding gas bc transaction was stuck
     // gasPrice: 203000000000,
   });
