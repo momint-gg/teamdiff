@@ -16,6 +16,9 @@ contract GameItems is ERC1155, Ownable {
     using SafeMath for uint256;
 
     // Constructor args
+    string private athleteURI;
+    string private starterPackURI;
+    string private boosterPackURI;
     uint256 private NUM_ATHLETES; // Max size of the collection
     uint256 private NFT_PER_ATHLETE; // how much of each athlete
     uint256 private STARTER_PACK_SIZE;
@@ -23,9 +26,6 @@ contract GameItems is ERC1155, Ownable {
     uint256 private MAX_STARTER_PACK_BALANCE;
     uint256 private MAX_BOOSTER_PACK_BALANCE;
     uint256 private MAX_PACKS;
-    string private athleteURI;
-    string private starterPackURI;
-    string private boosterPackURI;
     uint256 public REVEAL_TIMESTAMP = 10000;
 
     // When we flip the switch and let everyone open packs
@@ -51,10 +51,10 @@ contract GameItems is ERC1155, Ownable {
     string provenance = "";
 
     // Random indices for minting packs
-    uint256[5] private starterPackIndices;
-    uint256[3] private boosterPackIndices;
     uint256 private magicNumber; // "Magic #" for randomizing indices when minting athletes
     uint256 public pseudoRandomNumber;
+    uint256[5] private starterPackIndices;
+    uint256[3] private boosterPackIndices;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -101,17 +101,8 @@ contract GameItems is ERC1155, Ownable {
         // uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
         // Log for debugging
-<<<<<<< HEAD
         console.log("Starting index ", startingIndex);
         console.log("New mint index ", index);
-=======
-        console.log("Starting index", startingIndex);
-        //TODO set img size to be fixed 
-
-        console.log("Old mint index", mintIndex);
-        console.log("New mint index", index);
->>>>>>> c2066a7453ec1ac1e99810419220244586690eeb
-
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
@@ -217,14 +208,6 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    // Use this until we figure out randomness
-    function randomPlaceholder() public onlyOwner returns (uint256) {
-        uint256 randomnumber = uint256(
-            keccak256(abi.encodePacked(block.timestamp, msg.sender))
-        ) % 900;
-        pseudoRandomNumber = randomnumber + 1;
-    }
-
     // Dynamically setting new URI for a minted token
     function setTokenUri(uint256 tokenId, string memory uri) public onlyOwner {
         require(bytes(_uris[tokenId]).length == 0, "Cannot set uri twice");
@@ -260,7 +243,7 @@ contract GameItems is ERC1155, Ownable {
             console.log("New URI ", _uris[mintIndex]);
         }
 
-        //Setting pack URIs
+        //Setting pack URIs after the athletes (i.e. 50.json, 51.json)
         setTokenUri(NUM_ATHLETES + 1, string(abi.encodePacked(starterPackURI)));
         setTokenUri(NUM_ATHLETES + 2, string(abi.encodePacked(boosterPackURI)));
     }
@@ -274,6 +257,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Setting provenance once it is calculated
     // Set with: (tokenId + startingIndex) % # of tokens
+    // Probably won't need this anymore
     function setProvenanceHash(string memory provenanceHash) public onlyOwner {
         provenance = provenanceHash;
     }
@@ -290,23 +274,5 @@ contract GameItems is ERC1155, Ownable {
         returns (uint256[5] memory)
     {
         return starterPackIndices;
-    }
-
-    // Minting our "SLP", in game currency
-    function mintCurrency(uint256 initialSupply) public {
-        uint256 id = _tokenIds.current(); //should be 0
-        _mint(msg.sender, id, initialSupply, "");
-        _tokenIds.increment();
-    }
-
-    // Transfer in game currency
-    // Then use safeTransferFrom with ID of NFT to transfer NFTs
-    function transferCurrency(
-        address from,
-        address to,
-        uint256 amount,
-        bytes memory data
-    ) public {
-        safeTransferFrom(from, to, 0, amount, data);
     }
 }
