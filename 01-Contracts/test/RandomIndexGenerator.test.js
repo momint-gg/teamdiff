@@ -9,16 +9,20 @@ const constructorArgs = require("../constructorArgs");
 describe("RandomNumberGenerator.test", async () => {
   //Ran before first unit test
   before(async function () {
-    GameItemFactory = await hre.ethers.getContractFactory("GameItems");
+    ContractFactory = await hre.ethers.getContractFactory("RandomIndexGen");
   });
 
   //Ran before every unit test
   //used to reset state or prepare test
   beforeEach(async function () {
-    GameItem = await GameItemFactory.deploy(...constructorArgs);
+    Contract = await ContractFactory.deploy(...constructorArgs);
     [owner, addr1] = await hre.ethers.getSigners();
-    await GameItem.deployed();
-    GameItem.connect(owner);
+    await Contract.deployed();
+    Contract.connect(owner);
     console.log("Deployed to: " + GameItem.address);
+  });
+
+  it("Generates random words", async () => {
+    const num = await GameItem;
   });
 });
