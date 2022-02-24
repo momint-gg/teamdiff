@@ -17,6 +17,7 @@ export default function StarterPackContents() {
     const [nftData, setNFTData] = useState([]);
 
     //TODO how do we show collection of unminted nfts?
+    //Look at contract data to see how much of what has been minted, and calculate probabilities that way too
     useEffect(() => {
         // declare the async data fetching function
         const getNFTData = async () => {

@@ -14,29 +14,34 @@ export default function MintHome() {
         sx={{
             backgroundColor: 'primary.dark',
             display: 'flex',
-            flexDirection: 'row'
+            flexDirection: 'row',
+            alignContent: "center"
           }}
         >
             <Container 
                 maxWidth="sm"
                 sx={{
-                    border: 1,
+                    display: 'flex',
+                    alignItems: "center"
                 }}
                 >
-                <Paper elevation={3}>
-                    <Typography>
-                        Title
-                    </Typography>
-                    <Typography>
-                        Mint your pack today
-                    </Typography>
-                    <Fab variant="extended" size="small" color="secondary" aria-label="add">
+                <Box>
+                    <h2
+                    >
+                        Starter Pack
+                    </h2>
+                    <h5
+                    >
+                        The starter pack is the perfect pack for a beginner. Minting this pack will provide 6 unique NFT cards, which will allow you
+                        to get right into the action.
+                    </h5>
+                    <Fab variant="extended" size="small" color="primary" aria-label="add">
                         Mint
                     </Fab>
                     <Fab variant="extended" size="small" color="white" aria-label="add">
                     View Collection
                     </Fab>
-                </Paper> 
+                </Box>
                 
             </Container>
             <Container  maxWidth="sm">
