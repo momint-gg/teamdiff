@@ -3,7 +3,7 @@ import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from 'next/image';
 import profilePic from '../assets/images/example.png';
 import StarterPackContents from '../components/starterPackContents';
-
+import Mint from './mint.js';
 
 export default function MintHome() {
 
@@ -38,7 +38,7 @@ export default function MintHome() {
                     <Fab variant="extended" size="small" color="primary" aria-label="add">
                         Mint
                     </Fab>
-                    <Fab variant="extended" size="small" color="white" aria-label="add">
+                    <Fab variant="extended" size="small" color="white" aria-label="add" href={"#"}>
                     View Collection
                     </Fab>
                 </Box>
@@ -48,8 +48,8 @@ export default function MintHome() {
                 <Image
                     src={profilePic}
                     alt="Picture of the author"
-                    width={500}
-                    height={500}
+                    // width={60%
+                    //height=
                 />
                 
             </Container>
@@ -57,6 +57,12 @@ export default function MintHome() {
         <Box>
          <StarterPackContents/>
         </Box>
+            {/*TODO: how do we want to navigate to Mint page? mount a new component or navigate to a new page? I think we should */}
+            <Box>
+                <Mint>
+
+                </Mint>
+            </Box>
         </Box>
 
     );
