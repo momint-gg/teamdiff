@@ -47,7 +47,8 @@ module.exports = {
     //Config for Rinkeby
     rinkeby: {
       url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
-      accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+      //accounts: [process.env.PRIVATE_KEY.toString()], //Insert your metamask private key
+      accounts: ["0x150da01ee0b21ee8843a7df46ac630c9b8a91ef370b36c197aced4179d023859"], //Insert your metamask private key
     },
     // localhost: {
     //   url: "http://127.0.0.1:8545"
