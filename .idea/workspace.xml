@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e4855673-89ad-4e95-a689-1b86b0aa0f49" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/02-DApp/frontend/pages/Collection.js" beforeDir="false" afterPath="$PROJECT_DIR$/02-DApp/frontend/pages/Collection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02-DApp/frontend/pages/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/02-DApp/frontend/pages/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02-DApp/frontend/pages/mintHome.js" beforeDir="false" afterPath="$PROJECT_DIR$/02-DApp/frontend/pages/mintHome.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01-Contracts/contracts/GameItems.sol" beforeDir="false" afterPath="$PROJECT_DIR$/01-Contracts/contracts/GameItems.sol" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +41,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645664320530</updated>
-      <workItem from="1645664322134" duration="8148000" />
+      <workItem from="1645664322134" duration="8797000" />
     </task>
     <servers />
   </component>

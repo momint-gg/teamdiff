@@ -21,46 +21,53 @@ async function main() {
 
 
   //Deploy a vrf consumer contract
-  const subscription_id = 601;  
-  const VRFv2ConsumerFactory = await ethers.getContractFactory("VRFv2Consumer");
-  const VRFv2ConsumerInstance = await VRFv2ConsumerFactory.deploy(subscription_id,  {
-    //overriding gas bc transaction was stuck
-    gasLimit: 20029295,
-  });
-  await VRFv2ConsumerInstance.deployed();
-  console.log("VRFv2Consumer deployed to:", VRFv2ConsumerInstance.address);
-  //console.log("VRF details: " + JSON.stringify(VRFv2ConsumerInstance, null, 2))
-  const owner = "0x14D8DF624769E6075769a59490319625F50B2B17";
-  const vrfConsumerAddy = "0x84560ae7cD67Cf18F78A63282a6De50c2Fdc7b41";
+//   const subscription_id = 601;  
+//   const VRFv2ConsumerFactory = await ethers.getContractFactory("VRFv2Consumer");
+//   const VRFv2ConsumerInstance = await VRFv2ConsumerFactory.deploy(subscription_id);
+//   console.log("deploy run");
+//   await VRFv2ConsumerInstance.deployed();
+//   console.log("VRFv2Consumer deployed to:", VRFv2ConsumerInstance.address);
+//   //console.log("VRF details: " + JSON.stringify(VRFv2ConsumerInstance, null, 2))
+//   const owner = "0x14D8DF624769E6075769a59490319625F50B2B17";
+//   //const vrfConsumerAddy = "0x84560ae7cD67Cf18F78A63282a6De50c2Fdc7b41";
   
   
-  //const msgData = web3.eth.abi.encodeFunctionSignature("s_randomWords()");
-//   const txn = await web3.eth.sendTransaction({
-//     from: owner,
-//     to: vrfConsumerAddy,
-//     value: 0,     // If you want to send ether with the call.
-//     // gas: ???,       // If you want to specify the gas.
-//     // gasPrice: ???,  // If you want to specify the gas price.
-//     //data: msgData},
-//   });
+//   //const msgData = web3.eth.abi.encodeFunctionSignature("s_randomWords()");
 // //   const txn = await web3.eth.sendTransaction({
-// //     from: owner, 
-// //     to: vrfConsumerAddy, 
-// //     value: 0, 
-// //     gas: 20030000,
-// //     //data: msgData
+// //     from: owner,
+// //     to: vrfConsumerAddy,
+// //     value: 0,     // If you want to send ether with the call.
+// //     // gas: ???,       // If you want to specify the gas.
+// //     // gasPrice: ???,  // If you want to specify the gas price.
+// //     //data: msgData},
 // //   });
-  //Generate random words
-  
-  VRFv2ConsumerInstance.connect(addr1);
-  const txn = await VRFv2ConsumerInstance.requestRandomWords(    {
-    gasPrice: 10000000000,
-    gasLimit: 900000000
-    });
+// // //   const txn = await web3.eth.sendTransaction({
+// // //     from: owner, 
+// // //     to: vrfConsumerAddy, 
+// // //     value: 0, 
+// // //     gas: 20030000,
+// // //     //data: msgData
+// // //   });
+//   //Generate random words
+//   await new Promise(resolve => setTimeout(resolve, 1000*45));
+
+
+//   VRFv2ConsumerInstance.connect(owner);
+//   const txn = await VRFv2ConsumerInstance.requestRandomWords(    {
+//     gasPrice: 10000000000,
+//     //gasLimit: 30091486
+//     });
+//     //const txn = await VRFv2ConsumerInstance.requestRandomWords();
+//   //const result =   
+//   await txn.wait();
+//   console.log("txn: " + JSON.stringify(txn, null, 2));
+
+//   console.log("random words: " + await VRFv2ConsumerInstance.s_randomWords());
+//   const contractAddress = "0xB69b679a88442A154cd92f6CCbBB19bc07bAfc1d";
+  const myContract = await hre.ethers.getContractAt("VRFv2Consumer", contractAddress);
+  txn = await myContract.s_randomWords();
+  await txn.wait();
   console.log("txn: " + JSON.stringify(txn, null, 2));
-  //console.log("random words: " + await VRFv2ConsumerInstance.s_randomWords());
-
-
   //Generate random words again
 //   txn = await VRFv2ConsumerInstance.requestRandomWords({
 //     //overriding gas bc transaction was stuck
