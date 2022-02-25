@@ -10,11 +10,12 @@ import re
 import ssl
 import time
 import urllib.request
-# import mysql.connector
-
+import mysql.connector
+import yaml
+from dotenv import load_dotenv
 
 ssl._create_default_https_context = ssl._create_unverified_context
-
+load_dotenv()
 
 class DataFetcher():
     def __init__(self,
@@ -27,12 +28,12 @@ class DataFetcher():
                  ):
         self.site = mwclient.Site(site, path)
         self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
-        # self.db = mysql.connector.connect(
-        #     host="localhost",
-        #     user="isaiah",
-        #     password="4410",
-        #     database="teamdiff"
-        # )
+        self.db = mysql.connector.connect(
+             host=os.getenv("DB_HOST"),
+             user=os.getenv("DB_USER"),
+             password=os.getenv("DB_PASSWORD"),
+             database=os.getenv("DB_DATABASE")
+         )
         self.tournament = tournament
         self.start_date = start_date
         self.time_interval = time_interval
@@ -220,7 +221,7 @@ class DataFetcher():
         ).get("cargoquery")
 
         parsed = json.dumps(response)
-        decoded = json.loads(parsed)
+        decoded = yaml.safe_load(parsed)
 
         names = [player["title"]["Player"] for player in decoded]
 
@@ -264,7 +265,7 @@ class DataFetcher():
         ).get("cargoquery")
 
         parsed = json.dumps(response)
-        decoded = json.loads(parsed)
+        decoded = yaml.safe_load(parsed)
 
         for player in decoded:
             player_name = player["title"]["Player"]
@@ -374,8 +375,8 @@ class DataFetcher():
                     self.nft_metadata[player] = {}
                     self.nft_metadata[player]["name"] = info["Name"]
                     self.nft_metadata[player]["description"] = "This is a professional eSports athelete!"
-                    self.nft_metadata[player]["image"] = "https://ipfs.io/ipfs/" + \
-                        self.players[player]["ipfs"]["Hash"]
+                    self.nft_metadata[player]["image"] = "https://ipfs.io/ipfs/" # + \
+#                        self.players[player]["ipfs"]["Hash"]
                     self.nft_metadata[player]["attributes"] = [
                         {
                             "trait_type": "team",
@@ -396,8 +397,8 @@ class DataFetcher():
             self.nft_metadata[player] = {}
             self.nft_metadata[player]["name"] = info["Name"]
             self.nft_metadata[player]["description"] = "This is a professional eSports athelete!"
-            self.nft_metadata[player]["image"] = "https://ipfs.io/ipfs/" + \
-                self.players[player]["ipfs"]["Hash"]
+            self.nft_metadata[player]["image"] = "https://ipfs.io/ipfs/" # + \
+                # self.players[player]["ipfs"]["Hash"]
             self.nft_metadata[player]["attributes"] = [
                 {
                     "trait_type": "team",
@@ -434,27 +435,23 @@ class DataFetcher():
         print("ERROR: self.athletes has size", len(self.athletes), "and self.players has a size of", len(self.players))
         return
 
-    # def upload_player_data_to_db(self):
-    #     cursor = self.db.cursor()
+    def upload_player_data_to_db(self):
+        cursor = self.db.cursor()
 
-    #     query = "INSERT INTO players (summoner_id, name, team, position) VALUES (%(summoner_id)s, %(name)s, %(team)s, %(position)s)"
+        query = "INSERT IGNORE INTO players (summoner_id, name, team, position) VALUES (%s, %s, %s, %s)"
 
-    #     query_args = []
+        for _, info in self.players.items():
+            args = (  
+                self._clean_player_name(info["Player"], False),
+                info["Name"].encode("ascii", "ignore").decode("ascii"),
+                info["Team"],
+                info["Role"]
+                )
+            cursor.execute(query, args)
 
-    #     for _, info in self.players.items():
-    #         d = {
-    #             "summoner_id": self._clean_player_name(info["Player"], False),
-    #             "name": info["Name"],
-    #             "team": info["Team"],
-    #             "position": info["Role"]
-    #         }
-    #         query_args.append(d)
-
-    #     for args in query_args:
-    #         cursor.execute(query, args)
-
-    #     cursor.close()
-
+        self.db.commit()
+        cursor.close()
+        
 
 def main():
     df = DataFetcher()
@@ -468,11 +465,11 @@ def main():
 
     df.get_player_game_stats()
     df.aggregate_player_game_stats()
+    df.upload_player_data_to_db()
+    # df.download_player_headshots()
 
-    df.download_player_headshots()
-
-    df.create_nft_metadata_ordered()
-    df.create_nft_metadata_random()
+#    df.create_nft_metadata_ordered()
+ #   df.create_nft_metadata_random()
 
     print("Done!")
 
