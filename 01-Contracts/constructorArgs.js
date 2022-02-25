@@ -1,6 +1,6 @@
 //Where out constructor arguments are going to go for verification
 module.exports = [
-  4, //NUM_ATHLETES
+  50, //NUM_ATHLETES
   10, // NFT_PER_ATHLETE
   5, // STARTER_PACK_SIZE
   3, // BOOSTER_PACK_SIZE

@@ -173,9 +173,10 @@ describe("GameItems.test", async () => {
   it("Generates the 'magic number' correctly when starting indices array hasn't been set", async () => {
     let txn = await GameItem.setStartingIndex();
     // await txn.wait();
-    let num = await GameItem.generateMagicNum();
+    let num = await GameItem.randomPlaceholder();
     // await txn.wait();
-    console.log(num);
+    const randy = await GameItem.pseudoRandomNumber();
+    console.log(randy);
   });
 
   it("Generates 5 random indices for the starter pack", async () => {
@@ -191,37 +192,33 @@ describe("GameItems.test", async () => {
   });
 
   // Testing burn pack functionality and minting with 3 random athletes
-  // it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
-  //   let txn = await GameItem.setStartingIndex();
-  //   await txn.wait();
-  //   txn = await GameItem.setURIs();
-  //   await txn.wait();
-  //   txn = await GameItem.mintStarterPack();
-  //   await txn.wait();
-  //   txn = await GameItem.burnStarterPack();
-  //   await txn.wait();
+  it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
+    let txn = await GameItem.setStartingIndex();
+    await txn.wait();
+    txn = await GameItem.setURIs();
+    await txn.wait();
+    txn = await GameItem.mintStarterPack();
+    await txn.wait();
+    txn = await GameItem.burnStarterPack();
+    await txn.wait();
 
-  //   // //Making sure new athletes were minted with indexes ranging from 0-2 (random order bc of block #)
-  //   // const athlete1 = await GameItem.balanceOf(owner.address, 0);
-  //   // const athlete2 = await GameItem.balanceOf(owner.address, 1);
-  //   // const athlete3 = await GameItem.balanceOf(owner.address, 2);
+    const indices = await GameItem.getStarterPackIndices();
+    console.log("Indices are ", indices);
 
-  //   // //Check balances of each athlete minted (should range 1-2 since starter pack size is 5)
-  //   // console.log("\n");
-  //   // console.log("Balance of first minted athlete: ", athlete1);
-  //   // console.log("Balance of second minted athlete: ", athlete2);
-  //   // console.log("Balance of third minted athlete: ", athlete3);
-  //   // console.log("\n");
+    const uri1 = await GameItem.uri(Number(indices[0]));
+    const uri2 = await GameItem.uri(Number(indices[1]));
+    const uri3 = await GameItem.uri(Number(indices[2]));
+    const uri4 = await GameItem.uri(Number(indices[3]));
+    const uri5 = await GameItem.uri(Number(indices[4]));
 
-  //   // const uri1 = await GameItem.uri(0);
-  //   // const uri2 = await GameItem.uri(1);
-  //   // const uri3 = await GameItem.uri(2);
+    //Check URI #s a couple times to make sure ordering was randomized
+    console.log("\n");
+    console.log("URI of first minted athlete: ", uri1);
+    console.log("URI of second minted athlete: ", uri2);
+    console.log("URI of third minted athlete: ", uri3);
+    console.log("URI of fourth minted athlete: ", uri4);
+    console.log("URI of fifth minted athlete: ", uri5);
 
-  //   // //Check URI #s a couple times to make sure ordering was randomized
-  //   // console.log("\n");
-  //   // console.log("URI of first minted athlete: ", uri1);
-  //   // console.log("URI of second minted athlete: ", uri2);
-  //   // console.log("URI of third minted athlete: ", uri3);
-  //   // console.log("\n");
-  // });
+    console.log("\n");
+  });
 });
