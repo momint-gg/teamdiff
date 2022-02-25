@@ -10,7 +10,7 @@ import re
 import ssl
 import time
 import urllib.request
-import mysql.connector
+# import mysql.connector
 
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -27,12 +27,12 @@ class DataFetcher():
                  ):
         self.site = mwclient.Site(site, path)
         self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
-        self.db = mysql.connector.connect(
-            host="localhost",
-            user="isaiah",
-            password="4410",
-            database="teamdiff"
-        )
+        # self.db = mysql.connector.connect(
+        #     host="localhost",
+        #     user="isaiah",
+        #     password="4410",
+        #     database="teamdiff"
+        # )
         self.tournament = tournament
         self.start_date = start_date
         self.time_interval = time_interval
@@ -138,21 +138,20 @@ class DataFetcher():
                     self._clean_player_name(row[0].split(",")[0]))
 
     def _determine_stat_type(self, stat):
-        match stat:
-            case "Kills":
-                return int
-            case "Deaths":
-                return int
-            case "Assists":
-                return int
-            case "CS":
-                return int
-            case "Gold":
-                return int
-            case "DamageToChampions":
-                return int
-            case _:
-                return str
+        if stat == "Kills":
+            return int
+        elif stat == "Deaths":
+            return int
+        elif stat == "Assists":
+            return int
+        elif stat == "CS":
+            return int
+        elif stat == "Gold":
+            return int
+        elif stat == "DamageToChampions":
+            return int
+        else:
+            return str
 
     def _is_relevant_stat(self, stat):
         s = set([
@@ -169,11 +168,7 @@ class DataFetcher():
         fields = ", ".join(self.scoreboard_player_fields)
         past_date = str(start_date-dt.timedelta(time_interval))
 
-        where = f"""
-        SG.Tournament = '{self.tournament}' 
-        AND SG.DateTime_UTC >= '{past_date}' 
-        AND (SG.Team1 = '{team}' OR SG.Team1 = '{team}')
-        """
+        where = "SG.Tournament = '" + self.tournament + "' AND SG.DateTime_UTC >= '" + past_date + "'AND (SG.Team1 = '" + team + "' OR SG.Team1 = '" + team + "')"
 
         response = self.site.api('cargoquery',
                                  limit="max",
@@ -221,7 +216,7 @@ class DataFetcher():
             tables="Tournaments=T, TournamentPlayers=TP",
             join_on="T.OverviewPage=TP.OverviewPage",
             fields="TP.Player",
-            where=f"T.Name = '{self.tournament}'",
+            where="T.Name = '" + self.tournament + "'",
         ).get("cargoquery")
 
         parsed = json.dumps(response)
@@ -257,8 +252,7 @@ class DataFetcher():
         self._set_athletes(file_name)
 
         fields = ", ".join(self.player_fields)
-        where = ' OR '.join(
-            [f"P.Player = '{name}'" for name in self.athletes if name not in self.players])
+        where = ' OR '.join(["P.Player = '" + name + "'" for name in self.athletes if name not in self.players])
 
         response = self.site.api(
             "cargoquery",
@@ -343,7 +337,7 @@ class DataFetcher():
     def download_player_headshots(self):
         print("Downloading player headshots...")
         for i, player in enumerate(sorted(self.players.keys())):
-            print(f"({i+1}/{len(self.athletes)})", player)
+            print(i+1,"/",len(self.athletes), ")", sep="")
 
             response = self.site.api('cargoquery',
                                      limit=1,
@@ -357,11 +351,10 @@ class DataFetcher():
 
             try:
                 url = str(decoded['cargoquery'][0]['title']['FileName'])
-                # self._download_photo(self.site, url, player)
-                self.players[player]["ipfs"] = self.ipfs.add(f"./{player}.png")
+                self._download_photo(self.site, url, player)
+                self.players[player]["ipfs"] = self.ipfs.add("./" + player + ".png")
             except:
-                print(
-                    f"ERROR: Headshot of player {player} failed to upload to IPFS")
+                print("ERROR: Headshot of player", player, "failed to upload to IPFS")
                 self.players[player]["ipfs"] = {
                     "Name": "",
                     "Hash": "",
@@ -370,8 +363,8 @@ class DataFetcher():
             finally:
                 pprint(self.players[player]["ipfs"])
                 os.remove(
-                    f"./{player}.png") if os.path.exists(f"./{player}.png") else None
-                # time.sleep(5)
+                    "./" + player + ".png") if os.path.exists("./" + player + ".png") else None
+                time.sleep(5)
 
     def create_nft_metadata_ordered(self):
         file_name = 0
@@ -394,7 +387,7 @@ class DataFetcher():
                         },
                     ]
                     self.convert_to_json(
-                        self.nft_metadata[player], f"nft_metadata_ordered/{file_name}.json")
+                        self.nft_metadata[player], "nft_metadata_ordered/" + str(file_name) + ".json")
                     file_name += 1
 
     def create_nft_metadata_random(self):
@@ -422,7 +415,7 @@ class DataFetcher():
         file_name = 0
         for player in random_players:
             self.convert_to_json(
-                self.nft_metadata[player], f"nft_metadata_random/{file_name}.json")
+                self.nft_metadata[player], "nft_metadata_random/" + str(file_name) + ".json")
             file_name += 1
 
     def convert_to_json(self, data, file_name):
@@ -432,39 +425,35 @@ class DataFetcher():
 
     def is_correct_player_count(self, target_count):
         if not len(self.athletes) == target_count:
-            print(
-                f"ERROR: self.athletes has size {len(self.athletes)} instead of {target_count}")
+            print("ERROR: self.athletes has size", len(self.athletes),"instead of", target_count)
             return False
 
         if len(self.athletes) == len(self.players):
             return True
 
-        print(
-            f"ERROR: self.athletes has size {len(self.athletes)} and self.players has a size of {len(self.players)}")
+        print("ERROR: self.athletes has size", len(self.athletes), "and self.players has a size of", len(self.players))
         return
 
-    def upload_player_data_to_db(self):
-        cursor = self.db.cursor()
+    # def upload_player_data_to_db(self):
+    #     cursor = self.db.cursor()
 
-        query = """
-        INSERT INTO players (summoner_id, name, team, position) VALUES (%(summoner_id)s, %(name)s, %(team)s, %(position)s)
-        """
+    #     query = "INSERT INTO players (summoner_id, name, team, position) VALUES (%(summoner_id)s, %(name)s, %(team)s, %(position)s)"
 
-        query_args = []
+    #     query_args = []
 
-        for _, info in self.players.items():
-            d = {
-                "summoner_id": self._clean_player_name(info["Player"], False),
-                "name": info["Name"],
-                "team": info["Team"],
-                "position": info["Role"]
-            }
-            query_args.append(d)
+    #     for _, info in self.players.items():
+    #         d = {
+    #             "summoner_id": self._clean_player_name(info["Player"], False),
+    #             "name": info["Name"],
+    #             "team": info["Team"],
+    #             "position": info["Role"]
+    #         }
+    #         query_args.append(d)
 
-        for args in query_args:
-            cursor.execute(query, args)
+    #     for args in query_args:
+    #         cursor.execute(query, args)
 
-        cursor.close()
+    #     cursor.close()
 
 
 def main():
