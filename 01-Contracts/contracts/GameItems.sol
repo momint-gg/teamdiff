@@ -89,8 +89,9 @@ contract GameItems is ERC1155, Ownable {
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = _revealTimestamp;
     }
-    
-    event Response(bool success, bytes data);   
+
+    event Response(bool success, bytes data);
+
     function grabRandomWord(address _addr) public {
         //This calls the game logic incrementVersion which is great
         //but how do we call it in js?
@@ -113,8 +114,16 @@ contract GameItems is ERC1155, Ownable {
         // uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
         // Log for debugging
+<<<<<<< HEAD
         console.log("Starting index ", startingIndex);
         console.log("New mint index ", index);
+=======
+        console.log("Starting index", startingIndex);
+        //TODO set img size to be fixed
+
+        console.log("Old mint index", mintIndex);
+        console.log("New mint index", index);
+>>>>>>> chainlink-vrf
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
