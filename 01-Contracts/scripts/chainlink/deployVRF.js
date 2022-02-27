@@ -19,7 +19,7 @@ const main = async () => {
   // await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
 
   // Testing out our deployed contract ---------------------------------------
-  const contractAddress = "0x613314B67165013054fA0497b7074189b411fee1";
+  const contractAddress = "0x613314B67165013054fA0497b7074189b411fee1"; //current contract address
   const VRFv2ConsumerInstance = await hre.ethers.getContractAt(
     "VRFv2Consumer",
     contractAddress

@@ -58,8 +58,10 @@ contract GameItems is ERC1155, Ownable {
     uint256[5] private starterPackIndices;
     uint256[3] private boosterPackIndices;
 
-    //VRFConsumerBase contract instance
-    //TODO: create public VRFInstance
+    // VRF:
+    VRFv2Consumer private vrf =
+        VRFv2Consumer(0x613314B67165013054fA0497b7074189b411fee1);
+
     // ======= Events ==========
     event VRFConsumerCreated(address a);
     event packMinted(address user, uint256 id);
@@ -74,13 +76,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _maxBoosterPackBalance;
         uint256 _maxPacks;
         uint256 _revealTimestamp;
-        uint64 chainlinkSubId;
     }
-
-    // ======== Immutable storage ========
-    // upgradeable beacon
-    VRFv2Consumer /*immutable*/
-        public rngGenerator;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -93,12 +89,7 @@ contract GameItems is ERC1155, Ownable {
         string memory _starterPackURI,
         string memory _boosterPackURI
     ) ERC1155("") {
-        //TODO: Pass in subscription ID to cnstructor
-        /*TODO: create a VRFConsumerBaseV2 instance, and initialize in constructor*/
-        rngGenerator = new VRFv2Consumer(params.chainlinkSubId);
-        //emit VRFConsumerCreated(address(rngGenerator));
         console.log("Making contract...");
-        //NUM_ATHLETES = _numAthletes;
         NUM_ATHLETES = params._numAthletes;
         NFT_PER_ATHLETE = params._nftPerAthlete;
         STARTER_PACK_SIZE = params._starterPackSize;
@@ -114,15 +105,19 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Note: the contract needs to be added as a consumer before we can call this
-    function getRandomNum() public onlyOwner returns (uint256) {
+    function getRandomNum() public onlyOwner {
         //TODO bit shift the random num by the number of bits of the max value of random number that we want
         //Does this need to be async? --> Henry: No, solidity is async by default
         console.log("Requesting random words...");
-        rngGenerator.requestRandomWords();
+        vrf.requestRandomWords();
         console.log("Got random words...");
         //Will take about 2 minutes before s_randomWords gets updated
-        return (rngGenerator.s_randomWords(0));
+        // return (vrf.s_randomWords(0));
     }
+
+    // function returnRandomNum() public onlyOwner returns (uint256) {
+
+    // }
 
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {
@@ -298,7 +293,6 @@ contract GameItems is ERC1155, Ownable {
 
     function getNFTPerAthlete() public view onlyOwner returns (uint256) {
         return NFT_PER_ATHLETE;
-        //return uint(10);
     }
 
     function getStarterPackIndices()

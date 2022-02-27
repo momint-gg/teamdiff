@@ -146,25 +146,29 @@ describe("GameItems.test", async () => {
   // NOTE FOR TREY: TXN.WAIT() IS ONLY FOR TESTING ON RINKEBY (WAITING FOR TRANSACTION TO BE MINED). DO NOT DELETE!!
   // ^ IF TESTING ON HARDHAT JUST COMMENT OUT
 
-  // Baseline
-  it("Receives constructor arguments properly", async () => {
-    const starterPackSize = await GameItem.STARTER_PACK_SIZE();
-    console.log("Starter pack size is ", starterPackSize);
-  });
+  // Baseline working
+  // it("Receives constructor arguments properly", async () => {
+  //   const starterPackSize = await GameItem.getNFTPerAthlete();
+  //   console.log("Starter pack size is ", starterPackSize);
+  //   expect(Number(starterPackSize)).to.equal(10);
+  // });
 
   // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
   it("Returns a random number", async () => {
     // We just need current contract address in consumers so we can wait 45 secs ish
-    console.log(
-      "Waiting 2 mins for you to add this contract to consumer list for VRF..."
-    );
-    await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
+    // console.log(
+    //   "Waiting 2 mins for you to add this contract to consumer list for VRF..."
+    // );
+    // await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
 
+    console.log("Getting the random num now...");
     let txn = await GameItem.getRandomNum();
     await txn.wait();
     console.log("Random num: ");
     console.log(txn);
   });
+
+  // Note: Need to do all testing with random number in one function bc Rinkeby test address resets each time
 
   // Testing new mint pack functionality with new IDs
   // it("Mints a new pack and gives to address", async () => {
