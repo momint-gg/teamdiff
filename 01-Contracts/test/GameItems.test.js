@@ -23,7 +23,7 @@ describe("GameItems.test", async () => {
 
   //Ran before every unit test
   //used to reset state or prepare test
-  beforeEach(async function () {
+  before(async function () {
     GameItem = await GameItemFactory.deploy(...constructorArgs);
     [owner, addr1] = await hre.ethers.getSigners();
     await GameItem.deployed();
@@ -155,20 +155,21 @@ describe("GameItems.test", async () => {
 
   // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
   it("Returns a random number", async () => {
-    // We just need current contract address in consumers so we can wait 45 secs ish
-    // console.log(
-    //   "Waiting 2 mins for you to add this contract to consumer list for VRF..."
-    // );
-    // await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
+    // We need current contract address in consumers so time to wait and do it
+    console.log(
+      "Waiting a min for you to add this contract to consumer list for VRF..."
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
 
     console.log("Getting the random num now...");
-    let txn = await GameItem.getRandomNum();
+    let txn = await GameItem.generateRandomNum();
     await txn.wait();
-    console.log("Random num: ");
-    console.log(txn);
-  });
+    // console.log("Random num: ");
+    // console.log(txn);
 
-  // Note: Need to do all testing with random number in one function bc Rinkeby test address resets each time
+    // Waiting 60 secs for chainlink to get the random number
+    // await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
+  });
 
   // Testing new mint pack functionality with new IDs
   // it("Mints a new pack and gives to address", async () => {

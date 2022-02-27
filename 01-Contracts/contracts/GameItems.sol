@@ -59,8 +59,7 @@ contract GameItems is ERC1155, Ownable {
     uint256[3] private boosterPackIndices;
 
     // VRF:
-    VRFv2Consumer private vrf =
-        VRFv2Consumer(0x613314B67165013054fA0497b7074189b411fee1);
+    VRFv2Consumer public vrf;
 
     // ======= Events ==========
     event VRFConsumerCreated(address a);
@@ -76,6 +75,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _maxBoosterPackBalance;
         uint256 _maxPacks;
         uint256 _revealTimestamp;
+        uint64 chainlinkSubId;
     }
 
     // Mappings
@@ -101,23 +101,22 @@ contract GameItems is ERC1155, Ownable {
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
-        //magicNumber = getRandomNum();
+        vrf = new VRFv2Consumer(params.chainlinkSubId); //chainlink
     }
 
     // Note: the contract needs to be added as a consumer before we can call this
-    function getRandomNum() public onlyOwner {
+    function generateRandomNum() public onlyOwner {
         //TODO bit shift the random num by the number of bits of the max value of random number that we want
         //Does this need to be async? --> Henry: No, solidity is async by default
         console.log("Requesting random words...");
         vrf.requestRandomWords();
         console.log("Got random words...");
-        //Will take about 2 minutes before s_randomWords gets updated
-        // return (vrf.s_randomWords(0));
     }
 
-    // function returnRandomNum() public onlyOwner returns (uint256) {
-
-    // }
+    // Note: can only call this if contract has already called generateRandomNum()
+    function returnRandomNum() public onlyOwner returns (uint256) {
+        return (vrf.s_randomWords(0));
+    }
 
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {
