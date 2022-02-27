@@ -53,9 +53,9 @@ describe("GameItems.test", async () => {
   // });
 
   // Test case
-  it("GameItem contract owner is set to Signer of constructor call", async function () {
-    expect(await GameItem.owner()).to.equal(owner.address);
-  });
+  // it("GameItem contract owner is set to Signer of constructor call", async function () {
+  //   expect(await GameItem.owner()).to.equal(owner.address);
+  // });
 
   // // Test Case
   // it("Non-Owner address cannot call mintAthletes()", async function () {
@@ -146,6 +146,26 @@ describe("GameItems.test", async () => {
   // NOTE FOR TREY: TXN.WAIT() IS ONLY FOR TESTING ON RINKEBY (WAITING FOR TRANSACTION TO BE MINED). DO NOT DELETE!!
   // ^ IF TESTING ON HARDHAT JUST COMMENT OUT
 
+  // Baseline
+  it("Receives constructor arguments properly", async () => {
+    const starterPackSize = await GameItem.STARTER_PACK_SIZE();
+    console.log("Starter pack size is ", starterPackSize);
+  });
+
+  // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
+  it("Returns a random number", async () => {
+    // We just need current contract address in consumers so we can wait 45 secs ish
+    console.log(
+      "Waiting 2 mins for you to add this contract to consumer list for VRF..."
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
+
+    let txn = await GameItem.getRandomNum();
+    await txn.wait();
+    console.log("Random num: ");
+    console.log(txn);
+  });
+
   // Testing new mint pack functionality with new IDs
   // it("Mints a new pack and gives to address", async () => {
   //   let txn = await GameItem.mintStarterPack();
@@ -170,55 +190,55 @@ describe("GameItems.test", async () => {
   //   await txn.wait();
   // });
 
-  it("Generates the 'magic number' correctly when starting indices array hasn't been set", async () => {
-    let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
-    let num = await GameItem.randomPlaceholder();
-    // await txn.wait();
-    const randy = await GameItem.pseudoRandomNumber();
-    console.log(randy);
-  });
+  // it("Generates the 'magic number' correctly when starting indices array hasn't been set", async () => {
+  //   let txn = await GameItem.setStartingIndex();
+  //   // await txn.wait();
+  //   let num = await GameItem.randomPlaceholder();
+  //   // await txn.wait();
+  //   const randy = await GameItem.pseudoRandomNumber();
+  //   console.log(randy);
+  // });
 
-  it("Generates 5 random indices for the starter pack", async () => {
-    let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
-    txn = await GameItem.generateStarterPackIndices();
-    // await txn.wait();
+  // it("Generates 5 random indices for the starter pack", async () => {
+  //   let txn = await GameItem.setStartingIndex();
+  //   // await txn.wait();
+  //   txn = await GameItem.generateStarterPackIndices();
+  //   // await txn.wait();
 
-    const indices = await GameItem.getStarterPackIndices();
-    console.log("Indices:");
-    console.log(indices);
-    expect(indices.length).to.equal(5);
-  });
+  //   const indices = await GameItem.getStarterPackIndices();
+  //   console.log("Indices:");
+  //   console.log(indices);
+  //   expect(indices.length).to.equal(5);
+  // });
 
   // Testing burn pack functionality and minting with 3 random athletes
-  it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
-    let txn = await GameItem.setStartingIndex();
-    await txn.wait();
-    txn = await GameItem.setURIs();
-    await txn.wait();
-    txn = await GameItem.mintStarterPack();
-    await txn.wait();
-    txn = await GameItem.burnStarterPack();
-    await txn.wait();
+  // it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
+  //   let txn = await GameItem.setStartingIndex();
+  //   await txn.wait();
+  //   txn = await GameItem.setURIs();
+  //   await txn.wait();
+  //   txn = await GameItem.mintStarterPack();
+  //   await txn.wait();
+  //   txn = await GameItem.burnStarterPack();
+  //   await txn.wait();
 
-    const indices = await GameItem.getStarterPackIndices();
-    console.log("Indices are ", indices);
+  //   const indices = await GameItem.getStarterPackIndices();
+  //   console.log("Indices are ", indices);
 
-    const uri1 = await GameItem.uri(Number(indices[0]));
-    const uri2 = await GameItem.uri(Number(indices[1]));
-    const uri3 = await GameItem.uri(Number(indices[2]));
-    const uri4 = await GameItem.uri(Number(indices[3]));
-    const uri5 = await GameItem.uri(Number(indices[4]));
+  //   const uri1 = await GameItem.uri(Number(indices[0]));
+  //   const uri2 = await GameItem.uri(Number(indices[1]));
+  //   const uri3 = await GameItem.uri(Number(indices[2]));
+  //   const uri4 = await GameItem.uri(Number(indices[3]));
+  //   const uri5 = await GameItem.uri(Number(indices[4]));
 
-    //Check URI #s a couple times to make sure ordering was randomized
-    console.log("\n");
-    console.log("URI of first minted athlete: ", uri1);
-    console.log("URI of second minted athlete: ", uri2);
-    console.log("URI of third minted athlete: ", uri3);
-    console.log("URI of fourth minted athlete: ", uri4);
-    console.log("URI of fifth minted athlete: ", uri5);
+  //   //Check URI #s a couple times to make sure ordering was randomized
+  //   console.log("\n");
+  //   console.log("URI of first minted athlete: ", uri1);
+  //   console.log("URI of second minted athlete: ", uri2);
+  //   console.log("URI of third minted athlete: ", uri3);
+  //   console.log("URI of fourth minted athlete: ", uri4);
+  //   console.log("URI of fifth minted athlete: ", uri5);
 
-    console.log("\n");
-  });
+  //   console.log("\n");
+  // });
 });

@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./VRFv2Consumer.sol";
 
 contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
@@ -27,6 +28,7 @@ contract GameItems is ERC1155, Ownable {
     uint256 private MAX_BOOSTER_PACK_BALANCE;
     uint256 private MAX_PACKS;
     uint256 public REVEAL_TIMESTAMP = 10000;
+    uint64 chainlinkSubId;
 
     // When we flip the switch and let everyone open packs
     // (Setting to true for now for easy testing)
@@ -56,51 +58,70 @@ contract GameItems is ERC1155, Ownable {
     uint256[5] private starterPackIndices;
     uint256[3] private boosterPackIndices;
 
+    //VRFConsumerBase contract instance
+    //TODO: create public VRFInstance
+    // ======= Events ==========
+    event VRFConsumerCreated(address a);
+    event packMinted(address user, uint256 id);
+    event Response(bool success, bytes data);
+
+    struct Parameters {
+        uint256 _numAthletes;
+        uint256 _nftPerAthlete;
+        uint256 _starterPackSize;
+        uint256 _boosterPackSize;
+        uint256 _maxStarterPackBalance;
+        uint256 _maxBoosterPackBalance;
+        uint256 _maxPacks;
+        uint256 _revealTimestamp;
+        uint64 chainlinkSubId;
+    }
+
+    // ======== Immutable storage ========
+    // upgradeable beacon
+    VRFv2Consumer /*immutable*/
+        public rngGenerator;
+
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
 
-    // Events -- later add more for the frontend
-    event packMinted(address user, uint256 id);
-
+    //NOTE we ran into an error if we have more than 16 params passed in constructor
     constructor(
-        uint256 _numAthletes,
-        uint256 _nftPerAthlete,
-        uint256 _starterPackSize,
-        uint256 _boosterPackSize,
-        uint256 _maxStarterPackBalance,
-        uint256 _maxBoosterPackBalance,
-        uint256 _maxPacks,
+        Parameters memory params,
         string memory _athleteURI,
         string memory _starterPackURI,
-        string memory _boosterPackURI,
-        uint256 _revealTimestamp
+        string memory _boosterPackURI
     ) ERC1155("") {
+        //TODO: Pass in subscription ID to cnstructor
+        /*TODO: create a VRFConsumerBaseV2 instance, and initialize in constructor*/
+        rngGenerator = new VRFv2Consumer(params.chainlinkSubId);
+        //emit VRFConsumerCreated(address(rngGenerator));
         console.log("Making contract...");
-        NUM_ATHLETES = _numAthletes;
-        NFT_PER_ATHLETE = _nftPerAthlete;
-        STARTER_PACK_SIZE = _starterPackSize;
-        BOOSTER_PACK_SIZE = _boosterPackSize;
-        MAX_STARTER_PACK_BALANCE = _maxStarterPackBalance;
-        MAX_BOOSTER_PACK_BALANCE = _maxBoosterPackBalance;
-        MAX_PACKS = _maxPacks;
+        //NUM_ATHLETES = _numAthletes;
+        NUM_ATHLETES = params._numAthletes;
+        NFT_PER_ATHLETE = params._nftPerAthlete;
+        STARTER_PACK_SIZE = params._starterPackSize;
+        BOOSTER_PACK_SIZE = params._boosterPackSize;
+        MAX_STARTER_PACK_BALANCE = params._maxStarterPackBalance;
+        MAX_BOOSTER_PACK_BALANCE = params._maxBoosterPackBalance;
+        MAX_PACKS = params._maxPacks;
         athleteURI = _athleteURI;
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
-        REVEAL_TIMESTAMP = _revealTimestamp;
+        REVEAL_TIMESTAMP = params._revealTimestamp;
+        //magicNumber = getRandomNum();
     }
 
-    event Response(bool success, bytes data);
-
-    function grabRandomWord(address _addr) public {
-        //This calls the game logic incrementVersion which is great
-        //but how do we call it in js?
-        (bool success, bytes memory data) = _addr.call(
-            abi.encodeWithSignature("s_randomWords(1)")
-        );
-        //console.log("called test call");
-
-        emit Response(success, data);
+    // Note: the contract needs to be added as a consumer before we can call this
+    function getRandomNum() public onlyOwner returns (uint256) {
+        //TODO bit shift the random num by the number of bits of the max value of random number that we want
+        //Does this need to be async? --> Henry: No, solidity is async by default
+        console.log("Requesting random words...");
+        rngGenerator.requestRandomWords();
+        console.log("Got random words...");
+        //Will take about 2 minutes before s_randomWords gets updated
+        return (rngGenerator.s_randomWords(0));
     }
 
     // Athletes can only be minted once our "switch" has been flipped
@@ -114,16 +135,8 @@ contract GameItems is ERC1155, Ownable {
         // uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
 
         // Log for debugging
-<<<<<<< HEAD
         console.log("Starting index ", startingIndex);
         console.log("New mint index ", index);
-=======
-        console.log("Starting index", startingIndex);
-        //TODO set img size to be fixed
-
-        console.log("Old mint index", mintIndex);
-        console.log("New mint index", index);
->>>>>>> chainlink-vrf
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
