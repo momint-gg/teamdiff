@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from 'next/image';
 import profilePic from '../assets/images/example.png';
-import StarterPackContents from '../components/starterPackContents';
+import StarterPackContents from '../components/StarterPackContents';
 import Mint from './mint.js';
 
 export default function MintHome() {
