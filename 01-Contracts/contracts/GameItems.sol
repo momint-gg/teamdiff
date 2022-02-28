@@ -53,19 +53,20 @@ contract GameItems is ERC1155, Ownable {
     string provenance = "";
 
     // Random indices for minting packs
-    uint256 private magicNumber; // "Magic #" for randomizing indices when minting athletes
-    uint256 public pseudoRandomNumber;
-    uint256[5] private starterPackIndices;
-    uint256[3] private boosterPackIndices;
+    // uint256 private magicNumber; // "Magic #" for randomizing indices when minting athletes
+    // uint256 public pseudoRandomNumber;
+    // uint256[5] private starterPackIndices;
+    // uint256[3] private boosterPackIndices;
 
-    // VRF: current contract address
-    VRFv2Consumer public vrf =
-        VRFv2Consumer(0xce33C9b8d69Fb99a715279503980Cf54f9A57218);
+    // VRF:
+    // VRFv2Consumer public vrf =
+    //     VRFv2Consumer(0xce33C9b8d69Fb99a715279503980Cf54f9A57218);
+    // address vrfAddress = 0xce33C9b8d69Fb99a715279503980Cf54f9A57218;
 
     // ======= Events ==========
-    event VRFConsumerCreated(address a);
     event packMinted(address user, uint256 id);
-    event Response(bool success, bytes data);
+    // event VRFConsumerCreated(address a);
+    // event Response(bool success, bytes data);
 
     struct Parameters {
         uint256 _numAthletes;
@@ -106,18 +107,21 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Note: the contract needs to be added as a consumer before we can call this
-    function generateRandomNum() public onlyOwner {
-        //TODO bit shift the random num by the number of bits of the max value of random number that we want
-        //Does this need to be async? --> Henry: No, solidity is async by default
-        console.log("Requesting random words...");
-        vrf.requestRandomWords();
-        console.log("Got random words...");
-    }
+    // New contract flow for random #:
+    //1. We deploy a VRFv2Consumer contract
+    //2. When opening on the frontend, we call this function and extract 5 random #s from it
+    //3. We then pass these into the
+    // function generateRandomNum() public onlyOwner {
+    //     //TODO bit shift the random num by the number of bits of the max value of random number that we want
+    //     //Does this need to be async? --> Henry: No, solidity is async by default
+    //     console.log("Requesting random words...");
+    //     vrf.requestRandomWords();
+    // }
 
-    // Note: can only call this if contract has already called generateRandomNum()
-    function returnRandomNum() public onlyOwner returns (uint256) {
-        return (vrf.s_randomWords(0));
-    }
+    // // Note: can only call this if contract has already called generateRandomNum()
+    // function returnRandomNum() public onlyOwner returns (uint256) {
+    //     return (vrf.s_randomWords(0));
+    // }
 
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {
@@ -126,12 +130,8 @@ contract GameItems is ERC1155, Ownable {
 
     // Mints an athlete -- called when someone "burns" a pack
     function mintAthlete(uint256 index) private {
-        // Index of what to mint -- we need to % by num of NFTs per athlete
-        // uint256 mintIndex = (startingIndex + numAthletes) % NUM_ATHLETES;
-
         // Log for debugging
-        console.log("Starting index ", startingIndex);
-        console.log("New mint index ", index);
+        // console.log("Mint index ", index);
 
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
@@ -180,36 +180,20 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
-    // We also will determine which indices to mint
-    function burnStarterPack() public {
+    // Passing in random indices here!
+    function burnStarterPack(uint256[5] memory indices) public {
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), starterPackId) == 1,
             "Pack has already been burned or does not exist."
         );
 
-        // Generating new indices for the athletes minted when the pack is burned
-        generateStarterPackIndices();
-
         // Assigning the user 3 NFTs
-        for (uint8 i = 0; i < starterPackIndices.length; i++) {
-            mintAthlete(starterPackIndices[i]);
+        for (uint8 i = 0; i < indices.length; i++) {
+            mintAthlete(indices[i]);
         }
         // Burning the pack
         _burn(address(msg.sender), starterPackId, 1);
-    }
-
-    // Generates array of indices (e.g. sets starterPackIndices to [0, 5, 22, 13, 9])
-    // We assume one position is 0-9 on IPFS, other is 10-19, etc...
-    // Note: starting index must be set first
-    // ALSO need to eliminate possibility of duplicates
-    function generateStarterPackIndices() public onlyOwner {
-        // Where we're going to be requesting randomness from chainlink
-        uint8[5] memory randomIndices = [2, 12, 27, 36, 49];
-
-        for (uint256 i = 0; i < starterPackIndices.length; i++) {
-            starterPackIndices[i] = randomIndices[i];
-        }
     }
 
     function burnBoosterPack() public {
@@ -252,11 +236,7 @@ contract GameItems is ERC1155, Ownable {
     function setURIs() public onlyOwner {
         //Setting athlete URIs
         for (uint256 i = 0; i < NUM_ATHLETES; i++) {
-            console.log("Starting index is ", startingIndex);
-            console.log("num athletes", NUM_ATHLETES);
-
             uint256 mintIndex = (startingIndex + i) % NUM_ATHLETES;
-            console.log("mint index ", mintIndex);
 
             setTokenUri(
                 mintIndex,
@@ -268,8 +248,6 @@ contract GameItems is ERC1155, Ownable {
                     )
                 )
             );
-
-            console.log("New URI ", _uris[mintIndex]);
         }
 
         //Setting pack URIs after the athletes (i.e. 50.json, 51.json)
@@ -293,14 +271,5 @@ contract GameItems is ERC1155, Ownable {
 
     function getNFTPerAthlete() public view onlyOwner returns (uint256) {
         return NFT_PER_ATHLETE;
-    }
-
-    function getStarterPackIndices()
-        public
-        view
-        onlyOwner
-        returns (uint256[5] memory)
-    {
-        return starterPackIndices;
     }
 }

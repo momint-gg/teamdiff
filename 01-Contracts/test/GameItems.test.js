@@ -17,13 +17,13 @@ describe("GameItems.test", async () => {
   var addr1;
 
   //Ran before first unit test
-  before(async function () {
+  before(async () => {
     GameItemFactory = await hre.ethers.getContractFactory("GameItems");
   });
 
   //Ran before every unit test
   //used to reset state or prepare test
-  before(async function () {
+  beforeEach(async () => {
     GameItem = await GameItemFactory.deploy(...constructorArgs);
     [owner, addr1] = await hre.ethers.getSigners();
     await GameItem.deployed();
@@ -153,98 +153,73 @@ describe("GameItems.test", async () => {
     expect(Number(starterPackSize)).to.equal(10);
   });
 
-  // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
-  it("Returns a random number", async () => {
-    // We need current contract address in consumers so time to wait and do it
-    console.log(
-      "Waiting a min for you to set this contract address as owner ^^^"
-    );
-    //Waiting 20 mins (need time for testing)
-    await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
+  // // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
+  // it("Returns a random number", async () => {
+  //   // We need current contract address in consumers so time to wait and do it
+  //   console.log(
+  //     "Waiting a min for you to set this contract address as owner ^^^"
+  //   );
+  //   //Waiting 20 mins (need time for testing)
+  //   await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
 
-    console.log("Getting the random num now...");
-    let txn = await GameItem.generateRandomNum();
-    await txn.wait();
-    console.log("Random num: ");
-    console.log(txn);
+  //   console.log("Getting the random num now...");
+  //   let txn = await GameItem.generateRandomNum();
+  //   await txn.wait();
+  //   console.log("Random num: ");
+  //   console.log(txn);
 
-    // Waiting 60 secs for chainlink to get the random number
-    // await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
-  });
-
-  // Testing new mint pack functionality with new IDs
-  // it("Mints a new pack and gives to address", async () => {
-  //   let txn = await GameItem.mintStarterPack();
-  //   await txn.wait(); // waiting for txn to mine... we need to do this if testing on rinkeby!
-  //   const balance = await GameItem.balanceOf(owner.address, 2); //since athletes would be from (0-2)
-  //   expect(balance).to.equal(1);
+  //   // Waiting 60 secs for chainlink to get the random number
+  //   // await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
   // });
 
   // Testing set starting index functionality
-  // it("Sets the starting index", async () => {
-  //   let txn = await GameItem.setStartingIndex();
-  //   await txn.wait();
-  //   const index = await GameItem.startingIndex();
-  //   expect(index).to.not.equal(0);
-  // });
+  it("Sets the starting index", async () => {
+    let txn = await GameItem.setStartingIndex();
+    // await txn.wait();
+  });
 
   // Testing (new) base URI function
-  // it("Sets the base URIs for athletes", async () => {
-  //   let txn = await GameItem.setStartingIndex();
-  //   await txn.wait();
-  //   txn = await GameItem.setURIs();
-  //   await txn.wait();
-  // });
+  it("Sets the base URIs for athletes", async () => {
+    let txn = await GameItem.setStartingIndex();
+    // await txn.wait();
+    txn = await GameItem.setURIs();
+    // await txn.wait();
+  });
 
-  // it("Generates the 'magic number' correctly when starting indices array hasn't been set", async () => {
-  //   let txn = await GameItem.setStartingIndex();
-  //   // await txn.wait();
-  //   let num = await GameItem.randomPlaceholder();
-  //   // await txn.wait();
-  //   const randy = await GameItem.pseudoRandomNumber();
-  //   console.log(randy);
-  // });
+  // Testing burn pack functionality and minting with 5 random athletes
+  it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
+    // What we could do on front end (5 random indices)
+    const randomIndices = [];
+    randomIndices[0] = Math.floor(Math.random() * (9 - 0 + 1));
+    randomIndices[1] = Math.floor(Math.random() * (19 - 10 + 1)) + 10;
+    randomIndices[2] = Math.floor(Math.random() * (29 - 20 + 1)) + 20;
+    randomIndices[3] = Math.floor(Math.random() * (39 - 30 + 1)) + 30;
+    randomIndices[4] = Math.floor(Math.random() * (49 - 40 + 1)) + 40;
 
-  // it("Generates 5 random indices for the starter pack", async () => {
-  //   let txn = await GameItem.setStartingIndex();
-  //   // await txn.wait();
-  //   txn = await GameItem.generateStarterPackIndices();
-  //   // await txn.wait();
+    // Testing contract
+    let txn = await GameItem.setStartingIndex();
+    await txn.wait();
+    txn = await GameItem.setURIs();
+    await txn.wait();
+    txn = await GameItem.mintStarterPack();
+    await txn.wait();
+    txn = await GameItem.burnStarterPack(randomIndices);
+    await txn.wait();
 
-  //   const indices = await GameItem.getStarterPackIndices();
-  //   console.log("Indices:");
-  //   console.log(indices);
-  //   expect(indices.length).to.equal(5);
-  // });
+    const uri1 = await GameItem.uri(Number(randomIndices[0]));
+    const uri2 = await GameItem.uri(Number(randomIndices[1]));
+    const uri3 = await GameItem.uri(Number(randomIndices[2]));
+    const uri4 = await GameItem.uri(Number(randomIndices[3]));
+    const uri5 = await GameItem.uri(Number(randomIndices[4]));
 
-  // Testing burn pack functionality and minting with 3 random athletes
-  // it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
-  //   let txn = await GameItem.setStartingIndex();
-  //   await txn.wait();
-  //   txn = await GameItem.setURIs();
-  //   await txn.wait();
-  //   txn = await GameItem.mintStarterPack();
-  //   await txn.wait();
-  //   txn = await GameItem.burnStarterPack();
-  //   await txn.wait();
+    //Check URI #s a couple times to make sure ordering was randomized
+    console.log("\n");
+    console.log("URI of first minted athlete: ", uri1);
+    console.log("URI of second minted athlete: ", uri2);
+    console.log("URI of third minted athlete: ", uri3);
+    console.log("URI of fourth minted athlete: ", uri4);
+    console.log("URI of fifth minted athlete: ", uri5);
 
-  //   const indices = await GameItem.getStarterPackIndices();
-  //   console.log("Indices are ", indices);
-
-  //   const uri1 = await GameItem.uri(Number(indices[0]));
-  //   const uri2 = await GameItem.uri(Number(indices[1]));
-  //   const uri3 = await GameItem.uri(Number(indices[2]));
-  //   const uri4 = await GameItem.uri(Number(indices[3]));
-  //   const uri5 = await GameItem.uri(Number(indices[4]));
-
-  //   //Check URI #s a couple times to make sure ordering was randomized
-  //   console.log("\n");
-  //   console.log("URI of first minted athlete: ", uri1);
-  //   console.log("URI of second minted athlete: ", uri2);
-  //   console.log("URI of third minted athlete: ", uri3);
-  //   console.log("URI of fourth minted athlete: ", uri4);
-  //   console.log("URI of fifth minted athlete: ", uri5);
-
-  //   console.log("\n");
-  // });
+    console.log("\n");
+  });
 });
