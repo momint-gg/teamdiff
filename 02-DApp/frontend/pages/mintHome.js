@@ -1,14 +1,17 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from 'next/image';
+import { useState } from 'react';
 import profilePic from '../assets/images/example.png';
+import starterPack from '../public/starterPack.png';
 import StarterPackContents from '../components/starterPackContents';
 import Mint from './mint.js';
 
 export default function MintHome() {
-
+    const [displayMint, setDisplayMint] = useState(false);
     return(
         <Box>
+        {!displayMint && 
         <Box
         /*this should be in constants style sheet as the wrapper box for all pages*/
         sx={{
@@ -35,7 +38,7 @@ export default function MintHome() {
                         The starter pack is the perfect pack for a beginner. Minting this pack will provide 6 unique NFT cards, which will allow you
                         to get right into the action.
                     </h5>
-                    <Fab variant="extended" size="small" color="primary" aria-label="add">
+                    <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplayMint(true)}>
                         Mint
                     </Fab>
                     <Fab variant="extended" size="small" color="white" aria-label="add" href={"#"}>
@@ -46,7 +49,7 @@ export default function MintHome() {
             </Container>
             <Container  maxWidth="sm">
                 <Image
-                    src={profilePic}
+                    src={starterPack}
                     alt="Picture of the author"
                     // width={60%
                     //height=
@@ -54,15 +57,16 @@ export default function MintHome() {
                 
             </Container>
         </Box>
+        }
+         {/* <StarterPackContents/> */}
+        {displayMint && 
         <Box>
-         <StarterPackContents/>
-        </Box>
             {/*TODO: how do we want to navigate to Mint page? mount a new component or navigate to a new page? I think we should */}
             <Box>
-                <Mint>
-
-                </Mint>
+                <Mint setDisplay={setDisplayMint} />
             </Box>
+        </Box>
+        }
         </Box>
 
     );
