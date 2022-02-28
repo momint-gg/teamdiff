@@ -5,8 +5,9 @@ pragma solidity ^0.8.7;
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "./Whitelist.sol";
 
-contract VRFv2Consumer is VRFConsumerBaseV2 {
+contract VRFv2Consumer is VRFConsumerBaseV2, Whitelist {
     VRFCoordinatorV2Interface COORDINATOR;
     LinkTokenInterface LINKTOKEN;
 
@@ -54,7 +55,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords() external onlyOwner {
+    function requestRandomWords() external onlyWhitelisted {
         // Will revert if subscription is not set and funded.
         s_requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -70,10 +71,5 @@ contract VRFv2Consumer is VRFConsumerBaseV2 {
         uint256[] memory randomWords
     ) internal override {
         s_randomWords = randomWords;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == s_owner);
-        _;
     }
 }

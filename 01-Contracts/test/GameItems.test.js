@@ -147,25 +147,26 @@ describe("GameItems.test", async () => {
   // ^ IF TESTING ON HARDHAT JUST COMMENT OUT
 
   // Baseline working
-  // it("Receives constructor arguments properly", async () => {
-  //   const starterPackSize = await GameItem.getNFTPerAthlete();
-  //   console.log("Starter pack size is ", starterPackSize);
-  //   expect(Number(starterPackSize)).to.equal(10);
-  // });
+  it("Receives constructor arguments properly", async () => {
+    const starterPackSize = await GameItem.getNFTPerAthlete();
+    console.log("Starter pack size is ", starterPackSize);
+    expect(Number(starterPackSize)).to.equal(10);
+  });
 
   // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
   it("Returns a random number", async () => {
     // We need current contract address in consumers so time to wait and do it
     console.log(
-      "Waiting a min for you to add this contract to consumer list for VRF..."
+      "Waiting a min for you to set this contract address as owner ^^^"
     );
-    await new Promise((resolve) => setTimeout(resolve, 1000 * 45));
+    //Waiting 20 mins (need time for testing)
+    await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
 
     console.log("Getting the random num now...");
     let txn = await GameItem.generateRandomNum();
     await txn.wait();
-    // console.log("Random num: ");
-    // console.log(txn);
+    console.log("Random num: ");
+    console.log(txn);
 
     // Waiting 60 secs for chainlink to get the random number
     // await new Promise((resolve) => setTimeout(resolve, 1000 * 60));

@@ -58,8 +58,9 @@ contract GameItems is ERC1155, Ownable {
     uint256[5] private starterPackIndices;
     uint256[3] private boosterPackIndices;
 
-    // VRF:
-    VRFv2Consumer public vrf;
+    // VRF: current contract address
+    VRFv2Consumer public vrf =
+        VRFv2Consumer(0xce33C9b8d69Fb99a715279503980Cf54f9A57218);
 
     // ======= Events ==========
     event VRFConsumerCreated(address a);
@@ -75,7 +76,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _maxBoosterPackBalance;
         uint256 _maxPacks;
         uint256 _revealTimestamp;
-        uint64 chainlinkSubId;
+        // uint64 chainlinkSubId;
     }
 
     // Mappings
@@ -101,7 +102,7 @@ contract GameItems is ERC1155, Ownable {
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
-        vrf = new VRFv2Consumer(params.chainlinkSubId); //chainlink
+        // vrf = new VRFv2Consumer(params.chainlinkSubId); //chainlink
     }
 
     // Note: the contract needs to be added as a consumer before we can call this
