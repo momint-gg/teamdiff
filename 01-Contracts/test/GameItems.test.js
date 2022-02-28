@@ -186,40 +186,22 @@ describe("GameItems.test", async () => {
     // await txn.wait();
   });
 
+  it("Generates pseudo random indices", async () => {
+    let txn = await GameItem.generateStarterPackIndices();
+    // await txn.wait();
+  });
+
   // Testing burn pack functionality and minting with 5 random athletes
   it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
     // What we could do on front end (5 random indices)
-    const randomIndices = [];
-    randomIndices[0] = Math.floor(Math.random() * (9 - 0 + 1));
-    randomIndices[1] = Math.floor(Math.random() * (19 - 10 + 1)) + 10;
-    randomIndices[2] = Math.floor(Math.random() * (29 - 20 + 1)) + 20;
-    randomIndices[3] = Math.floor(Math.random() * (39 - 30 + 1)) + 30;
-    randomIndices[4] = Math.floor(Math.random() * (49 - 40 + 1)) + 40;
-
     // Testing contract
     let txn = await GameItem.setStartingIndex();
-    await txn.wait();
+    // await txn.wait();
     txn = await GameItem.setURIs();
-    await txn.wait();
+    // await txn.wait();
     txn = await GameItem.mintStarterPack();
-    await txn.wait();
-    txn = await GameItem.burnStarterPack(randomIndices);
-    await txn.wait();
-
-    const uri1 = await GameItem.uri(Number(randomIndices[0]));
-    const uri2 = await GameItem.uri(Number(randomIndices[1]));
-    const uri3 = await GameItem.uri(Number(randomIndices[2]));
-    const uri4 = await GameItem.uri(Number(randomIndices[3]));
-    const uri5 = await GameItem.uri(Number(randomIndices[4]));
-
-    //Check URI #s a couple times to make sure ordering was randomized
-    console.log("\n");
-    console.log("URI of first minted athlete: ", uri1);
-    console.log("URI of second minted athlete: ", uri2);
-    console.log("URI of third minted athlete: ", uri3);
-    console.log("URI of fourth minted athlete: ", uri4);
-    console.log("URI of fifth minted athlete: ", uri5);
-
-    console.log("\n");
+    // await txn.wait();
+    txn = await GameItem.burnStarterPack();
+    // await txn.wait();
   });
 });

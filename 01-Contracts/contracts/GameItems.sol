@@ -43,8 +43,6 @@ contract GameItems is ERC1155, Ownable {
     // The total amount of athletes so far we've minted
     uint256 private numAthletes;
 
-    string ipfsBaseUrl = "https://ipfs.io/ipfs/";
-
     // Starting block for randomized index
     uint256 private startingIndexBlock;
     uint256 private startingIndex;
@@ -53,10 +51,8 @@ contract GameItems is ERC1155, Ownable {
     string provenance = "";
 
     // Random indices for minting packs
-    // uint256 private magicNumber; // "Magic #" for randomizing indices when minting athletes
-    // uint256 public pseudoRandomNumber;
-    // uint256[5] private starterPackIndices;
-    // uint256[3] private boosterPackIndices;
+    uint256[5] private starterPackIndices;
+    uint256[3] private boosterPackIndices;
 
     // VRF:
     // VRFv2Consumer public vrf =
@@ -181,18 +177,21 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
-    function burnStarterPack(uint256[5] memory indices) public {
+    function burnStarterPack() public {
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), starterPackId) == 1,
             "Pack has already been burned or does not exist."
         );
 
-        // Assigning the user 3 NFTs
+        // Indices for players in the pack, 1 of each position
+        uint256[5] memory indices = generateStarterPackIndices();
+
+        // Assigning the user their athletes
         for (uint8 i = 0; i < indices.length; i++) {
             mintAthlete(indices[i]);
         }
-        // Burning the pack
+        // Burning the starter pack
         _burn(address(msg.sender), starterPackId, 1);
     }
 
@@ -253,6 +252,32 @@ contract GameItems is ERC1155, Ownable {
         //Setting pack URIs after the athletes (i.e. 50.json, 51.json)
         setTokenUri(NUM_ATHLETES + 1, string(abi.encodePacked(starterPackURI)));
         setTokenUri(NUM_ATHLETES + 2, string(abi.encodePacked(boosterPackURI)));
+    }
+
+    //Generate pseudo random starter pack indices
+    function generateStarterPackIndices()
+        public
+        view
+        returns (uint256[5] memory)
+    {
+        uint256[5] memory indices;
+        for (uint256 i = 0; i < indices.length; i++) {
+            uint256 start = i * 10;
+            uint256 end = i * 10 + 9;
+            indices[i] = ((uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp,
+                        msg.sender,
+                        block.difficulty,
+                        i
+                    )
+                )
+            ) % (end - start + 1)) + start);
+            console.log("index is ", indices[i]);
+        }
+
+        return indices;
     }
 
     // Setting starting index block
