@@ -1,7 +1,7 @@
 const { ethers, upgrades } = require("hardhat");
 var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
-const constructorArgs = require("../constructorArgs");
+const constructorArgs = require("../../constructorArgs");
 
 async function main() {
   // Deploying

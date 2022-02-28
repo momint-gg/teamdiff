@@ -202,8 +202,12 @@ contract GameItems is ERC1155, Ownable {
             "No remaining booster packs!"
         );
 
-        //  Insert logic to mint athletes in a booster pack
-        //for x in booster pack size, ......
+        uint256[3] memory indices = generateBoosterPackIndices();
+
+        for (uint8 i = 0; i < indices.length; i++) {
+            mintAthlete(indices[i]);
+        }
+
         _burn(address(msg.sender), boosterPackId, 1);
     }
 
@@ -274,9 +278,39 @@ contract GameItems is ERC1155, Ownable {
                     )
                 )
             ) % (end - start + 1)) + start);
-            console.log("index is ", indices[i]);
         }
 
+        return indices;
+    }
+
+    //Generate pseudo random booster pack indices
+    function generateBoosterPackIndices()
+        public
+        view
+        returns (uint256[3] memory)
+    {
+        uint256[3] memory indices;
+        uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
+
+        for (uint256 i = 0; i < 3; i++) {
+            startI = startI % 5;
+            uint256 start = startI * 10;
+            uint256 end = startI * 10 + 9;
+
+            indices[i] = ((uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp,
+                        msg.sender,
+                        block.difficulty,
+                        i
+                    )
+                )
+            ) % (end - start + 1)) + start);
+
+            startI += 1;
+            console.log("Booster index is ", indices[i]);
+        }
         return indices;
     }
 

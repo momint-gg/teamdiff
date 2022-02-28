@@ -189,6 +189,7 @@ describe("GameItems.test", async () => {
   it("Generates pseudo random indices", async () => {
     let txn = await GameItem.generateStarterPackIndices();
     // await txn.wait();
+    txn = await GameItem.generateBoosterPackIndices();
   });
 
   // Testing burn pack functionality and minting with 5 random athletes
