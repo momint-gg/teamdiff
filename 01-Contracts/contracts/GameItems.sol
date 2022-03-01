@@ -128,7 +128,6 @@ contract GameItems is ERC1155, Ownable {
     function mintAthlete(uint256 index) private {
         // Log for debugging
         // console.log("Mint index ", index);
-
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
                 supplyOfToken[index] < NFT_PER_ATHLETE,
@@ -274,12 +273,12 @@ contract GameItems is ERC1155, Ownable {
                         block.timestamp,
                         msg.sender,
                         block.difficulty,
-                        i
+                        i,
+                        starterPacksMinted
                     )
                 )
             ) % (end - start + 1)) + start);
         }
-
         return indices;
     }
 
@@ -303,13 +302,13 @@ contract GameItems is ERC1155, Ownable {
                         block.timestamp,
                         msg.sender,
                         block.difficulty,
-                        i
+                        i,
+                        boosterPacksMinted
                     )
                 )
             ) % (end - start + 1)) + start);
 
             startI += 1;
-            console.log("Booster index is ", indices[i]);
         }
         return indices;
     }
