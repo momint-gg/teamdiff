@@ -3,8 +3,7 @@ import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from 'next/image';
 import { useState } from 'react';
 import profilePic from '../assets/images/example.png';
-import starterPack from '../public/starterPack.png';
-import StarterPackContents from '../components/starterPackContents';
+import StarterPackContents from '../components/StarterPackContents';
 import Mint from './mint.js';
 
 export default function MintHome() {
