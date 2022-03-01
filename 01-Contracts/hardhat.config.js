@@ -1,11 +1,11 @@
+require("dotenv").config();
+require("hardhat-gas-reporter");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-truffle5");
 require("@openzeppelin/hardhat-upgrades");
 require("hardhat-contract-sizer");
-require("hardhat-gas-reporter");
-require("solidity-coverage");
-require("dotenv").config();
+// require("solidity-coverage");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -25,7 +25,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: {
-    compilers: [{ version: "^0.8.0" }, { version: "0.8.2" }],
+    compilers: [
+      { version: "^0.8.0" },
+      { version: "0.8.2" },
+      { version: "0.8.7" },
+    ],
     settings: {
       optimizer: {
         enabled: true,
@@ -38,7 +42,7 @@ module.exports = {
     //Need to add path so contract can verify correctly on etherscan
     artifacts: "./build/contracts",
   },
-  defaultNetwork: "rinkeby", // NEED to have for testing so it knows where to deploy
+  defaultNetwork: "rinkeby",
   networks: {
     // hardhat: {
     //   blockNumber: 14173470,
@@ -59,8 +63,8 @@ module.exports = {
   },
   gasReporter: {
     //getting gas for testing
-    enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
+    gasPrice: 21,
   },
   contractSizer: {
     alphaSort: true,
