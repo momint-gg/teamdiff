@@ -143,7 +143,7 @@ describe("GameItems.test", async () => {
 
   // -------------- // New test cases (after changing contract for provenance) // -------------- //
 
-  // NOTE FOR TREY: TXN.WAIT() IS ONLY FOR TESTING ON RINKEBY (WAITING FOR TRANSACTION TO BE MINED). DO NOT DELETE!!
+  // NOTE: TXN.WAIT() IS ONLY FOR TESTING ON RINKEBY (WAITING FOR TRANSACTION TO BE MINED). DO NOT DELETE!!
   // ^ IF TESTING ON HARDHAT JUST COMMENT OUT
 
   // Baseline working
@@ -173,36 +173,36 @@ describe("GameItems.test", async () => {
   // });
 
   // Testing set starting index functionality
-  it("Sets the starting index", async () => {
-    let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
-  });
+  // it("Sets the starting index", async () => {
+  //   let txn = await GameItem.setStartingIndex();
+  //   await txn.wait();
+  // });
 
-  // Testing (new) base URI function
-  it("Sets the base URIs for athletes", async () => {
-    let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
-    txn = await GameItem.setURIs();
-    // await txn.wait();
-  });
+  // // Testing (new) base URI function
+  // it("Sets the base URIs for athletes", async () => {
+  //   let txn = await GameItem.setStartingIndex();
+  //   await txn.wait();
+  //   txn = await GameItem.setURIs();
+  //   await txn.wait();
+  // });
 
-  it("Generates pseudo random indices", async () => {
-    let txn = await GameItem.generateStarterPackIndices();
-    // await txn.wait();
-    txn = await GameItem.generateBoosterPackIndices();
-  });
+  // it("Generates pseudo random indices", async () => {
+  //   let txn = await GameItem.generateStarterPackIndices();
+  //   await txn.wait();
+  //   txn = await GameItem.generateBoosterPackIndices();
+  // });
 
   // Testing burn pack functionality and minting with 5 random athletes
   it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
     // What we could do on front end (5 random indices)
     // Testing contract
     let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
+    await txn.wait();
     txn = await GameItem.setURIs();
-    // await txn.wait();
+    await txn.wait();
     txn = await GameItem.mintStarterPack();
-    // await txn.wait();
-    txn = await GameItem.burnStarterPack();
-    // await txn.wait();
+    await txn.wait();
+    txn = await GameItem.burnStarterPack(); //if we check wallet, should have athlete NFTs now
+    await txn.wait();
   });
 });
