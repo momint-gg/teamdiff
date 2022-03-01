@@ -3,15 +3,16 @@ import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from 'next/image';
 import { useState } from 'react';
 import profilePic from '../assets/images/example.png';
-import starterPack from '../public/starterPack.png';
-import StarterPackContents from '../components/starterPackContents';
+import StarterPackContents from '../components/StarterPackContents';
 import Mint from './mint.js';
 
 export default function MintHome() {
     const [displayMint, setDisplayMint] = useState(false);
+    const [displayCollection, setDisplayCollection] = useState(false);
+
     return(
         <Box>
-        {!displayMint && 
+        {!(displayMint || displayCollection) && 
         <Box
         /*this should be in constants style sheet as the wrapper box for all pages*/
         sx={{
@@ -41,7 +42,7 @@ export default function MintHome() {
                     <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplayMint(true)}>
                         Mint
                     </Fab>
-                    <Fab variant="extended" size="small" color="white" aria-label="add" href={"#"}>
+                    <Fab variant="extended" size="small" color="white" aria-label="add" onClick={() => setDisplayCollection(true)}>
                     View Collection
                     </Fab>
                 </Box>
@@ -49,7 +50,7 @@ export default function MintHome() {
             </Container>
             <Container  maxWidth="sm">
                 <Image
-                    src={starterPack}
+                    src={profilePic}
                     alt="Picture of the author"
                     // width={60%
                     //height=
@@ -58,10 +59,13 @@ export default function MintHome() {
             </Container>
         </Box>
         }
-         {/* <StarterPackContents/> */}
+        {displayCollection &&
+            <Box>
+                <StarterPackContents setDisplay={setDisplayCollection}/>
+            </Box>
+        }
         {displayMint && 
         <Box>
-            {/*TODO: how do we want to navigate to Mint page? mount a new component or navigate to a new page? I think we should */}
             <Box>
                 <Mint setDisplay={setDisplayMint} />
             </Box>
