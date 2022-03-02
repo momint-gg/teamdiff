@@ -1,0 +1,8 @@
+// Import functions to override
+@import "../node_modules/bootstrap/scss/functions";
+
+// Insert Custom Variables
+$primary: #1d314d;
+$secondary: #ae3639;
+
+@import "./imports.scss";
