@@ -17,13 +17,13 @@ describe("GameItems.test", async () => {
   var addr1;
 
   //Ran before first unit test
-  before(async function () {
+  before(async () => {
     GameItemFactory = await hre.ethers.getContractFactory("GameItems");
   });
 
   //Ran before every unit test
   //used to reset state or prepare test
-  beforeEach(async function () {
+  beforeEach(async () => {
     GameItem = await GameItemFactory.deploy(...constructorArgs);
     [owner, addr1] = await hre.ethers.getSigners();
     await GameItem.deployed();
@@ -53,9 +53,9 @@ describe("GameItems.test", async () => {
   // });
 
   // Test case
-  it("GameItem contract owner is set to Signer of constructor call", async function () {
-    expect(await GameItem.owner()).to.equal(owner.address);
-  });
+  // it("GameItem contract owner is set to Signer of constructor call", async function () {
+  //   expect(await GameItem.owner()).to.equal(owner.address);
+  // });
 
   // // Test Case
   // it("Non-Owner address cannot call mintAthletes()", async function () {
@@ -143,26 +143,42 @@ describe("GameItems.test", async () => {
 
   // -------------- // New test cases (after changing contract for provenance) // -------------- //
 
-  // NOTE FOR TREY: TXN.WAIT() IS ONLY FOR TESTING ON RINKEBY (WAITING FOR TRANSACTION TO BE MINED). DO NOT DELETE!!
+  // NOTE: TXN.WAIT() IS ONLY FOR TESTING ON RINKEBY (WAITING FOR TRANSACTION TO BE MINED). DO NOT DELETE!!
   // ^ IF TESTING ON HARDHAT JUST COMMENT OUT
 
-  // Testing new mint pack functionality with new IDs
-  // it("Mints a new pack and gives to address", async () => {
-  //   let txn = await GameItem.mintStarterPack();
-  //   await txn.wait(); // waiting for txn to mine... we need to do this if testing on rinkeby!
-  //   const balance = await GameItem.balanceOf(owner.address, 2); //since athletes would be from (0-2)
-  //   expect(balance).to.equal(1);
+  // Baseline working
+  it("Receives constructor arguments properly", async () => {
+    const starterPackSize = await GameItem.getNFTPerAthlete();
+    console.log("Starter pack size is ", starterPackSize);
+    expect(Number(starterPackSize)).to.equal(10);
+  });
+
+  // // Testing chainlink functionality -- calling generateRandomWords() from GameItems contract
+  // it("Returns a random number", async () => {
+  //   // We need current contract address in consumers so time to wait and do it
+  //   console.log(
+  //     "Waiting a min for you to set this contract address as owner ^^^"
+  //   );
+  //   //Waiting 20 mins (need time for testing)
+  //   await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
+
+  //   console.log("Getting the random num now...");
+  //   let txn = await GameItem.generateRandomNum();
+  //   await txn.wait();
+  //   console.log("Random num: ");
+  //   console.log(txn);
+
+  //   // Waiting 60 secs for chainlink to get the random number
+  //   // await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
   // });
 
   // Testing set starting index functionality
   // it("Sets the starting index", async () => {
   //   let txn = await GameItem.setStartingIndex();
   //   await txn.wait();
-  //   const index = await GameItem.startingIndex();
-  //   expect(index).to.not.equal(0);
   // });
 
-  // Testing (new) base URI function
+  // // Testing (new) base URI function
   // it("Sets the base URIs for athletes", async () => {
   //   let txn = await GameItem.setStartingIndex();
   //   await txn.wait();
@@ -170,55 +186,23 @@ describe("GameItems.test", async () => {
   //   await txn.wait();
   // });
 
-  it("Generates the 'magic number' correctly when starting indices array hasn't been set", async () => {
-    let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
-    let num = await GameItem.randomPlaceholder();
-    // await txn.wait();
-    const randy = await GameItem.pseudoRandomNumber();
-    console.log(randy);
-  });
+  // it("Generates pseudo random indices", async () => {
+  //   let txn = await GameItem.generateStarterPackIndices();
+  //   await txn.wait();
+  //   txn = await GameItem.generateBoosterPackIndices();
+  // });
 
-  it("Generates 5 random indices for the starter pack", async () => {
-    let txn = await GameItem.setStartingIndex();
-    // await txn.wait();
-    txn = await GameItem.generateStarterPackIndices();
-    // await txn.wait();
-
-    const indices = await GameItem.getStarterPackIndices();
-    console.log("Indices:");
-    console.log(indices);
-    expect(indices.length).to.equal(5);
-  });
-
-  // Testing burn pack functionality and minting with 3 random athletes
-  it("Burns a pack successfully and mints 3 athletes in a random order", async () => {
+  // Testing burn pack functionality and minting with 5 random athletes
+  it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
+    // What we could do on front end (5 random indices)
+    // Testing contract
     let txn = await GameItem.setStartingIndex();
     await txn.wait();
     txn = await GameItem.setURIs();
     await txn.wait();
     txn = await GameItem.mintStarterPack();
     await txn.wait();
-    txn = await GameItem.burnStarterPack();
+    txn = await GameItem.burnStarterPack(); //if we check wallet, should have athlete NFTs now
     await txn.wait();
-
-    const indices = await GameItem.getStarterPackIndices();
-    console.log("Indices are ", indices);
-
-    const uri1 = await GameItem.uri(Number(indices[0]));
-    const uri2 = await GameItem.uri(Number(indices[1]));
-    const uri3 = await GameItem.uri(Number(indices[2]));
-    const uri4 = await GameItem.uri(Number(indices[3]));
-    const uri5 = await GameItem.uri(Number(indices[4]));
-
-    //Check URI #s a couple times to make sure ordering was randomized
-    console.log("\n");
-    console.log("URI of first minted athlete: ", uri1);
-    console.log("URI of second minted athlete: ", uri2);
-    console.log("URI of third minted athlete: ", uri3);
-    console.log("URI of fourth minted athlete: ", uri4);
-    console.log("URI of fifth minted athlete: ", uri5);
-
-    console.log("\n");
   });
 });

@@ -1,14 +1,18 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from 'next/image';
+import { useState } from 'react';
 import profilePic from '../assets/images/example.png';
-import StarterPackContents from '../components/starterPackContents';
+import StarterPackContents from '../components/StarterPackContents';
 import Mint from './mint.js';
 
 export default function MintHome() {
+    const [displayMint, setDisplayMint] = useState(false);
+    const [displayCollection, setDisplayCollection] = useState(false);
 
     return(
         <Box>
+        {!(displayMint || displayCollection) && 
         <Box
         /*this should be in constants style sheet as the wrapper box for all pages*/
         sx={{
@@ -35,10 +39,10 @@ export default function MintHome() {
                         The starter pack is the perfect pack for a beginner. Minting this pack will provide 6 unique NFT cards, which will allow you
                         to get right into the action.
                     </h5>
-                    <Fab variant="extended" size="small" color="primary" aria-label="add">
+                    <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplayMint(true)}>
                         Mint
                     </Fab>
-                    <Fab variant="extended" size="small" color="white" aria-label="add" href={"#"}>
+                    <Fab variant="extended" size="small" color="white" aria-label="add" onClick={() => setDisplayCollection(true)}>
                     View Collection
                     </Fab>
                 </Box>
@@ -54,15 +58,19 @@ export default function MintHome() {
                 
             </Container>
         </Box>
-        <Box>
-         <StarterPackContents/>
-        </Box>
-            {/*TODO: how do we want to navigate to Mint page? mount a new component or navigate to a new page? I think we should */}
+        }
+        {displayCollection &&
             <Box>
-                <Mint>
-
-                </Mint>
+                <StarterPackContents setDisplay={setDisplayCollection}/>
             </Box>
+        }
+        {displayMint && 
+        <Box>
+            <Box>
+                <Mint setDisplay={setDisplayMint} />
+            </Box>
+        </Box>
+        }
         </Box>
 
     );
