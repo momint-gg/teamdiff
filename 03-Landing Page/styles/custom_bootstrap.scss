@@ -2,7 +2,24 @@
 @import "../node_modules/bootstrap/scss/functions";
 
 // Insert Custom Variables
-$primary: #AA10AD;
-$secondary: #ae3639;
+$primary: #aa10ad;
+
+button {
+  &.btn-primary {
+    background: linear-gradient(95.66deg, #5a165b 0%, #aa10ad 100%);
+  }
+  &.btn-secondary {
+    border: 2px solid #ffffff;
+    background: #ffffff;
+    color: $primary;
+  }
+  &.btn-outline-primary {
+    background: none;
+    border: 2px solid $primary;
+    color: white;
+  }
+  border-radius: 40px !important;
+  padding: 0.5rem 2rem !important;
+}
 
 @import "./imports.scss";

@@ -10,16 +10,15 @@ body {
   font-weight: normal;
 }
 
-button.btn-primary {
-  background: linear-gradient(95.66deg, #5a165b 0%, #aa10ad 100%);
-  border-radius: 40px;
-  padding: 0.5rem 2rem;
-}
-
-button.btn-secondary {
-  border: 2px solid #ffffff;
-  box-sizing: border-box;
-  border-radius: 40px;
-  padding: 0.5rem 2rem;
-  background: none;
+span.early-access {
+  color: black;
+  font-weight: 700;
+  background-color: white;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  font-size: smaller;
 }
