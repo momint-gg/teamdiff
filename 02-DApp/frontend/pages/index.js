@@ -79,12 +79,10 @@ export default function Index(props) {
                 <Tab label="PLAY" value="0" />
                 <Tab label="COLLECTION" value="1" />
                 <Tab label="MINT" value="2" />
-                 {/*<Tab label="" value="0" />*/}
+                 <Tab label="CONNECT" value="3" />
               </TabList>
             </Box>
-            {/* <TabPanel value="0">
-              <ConnectWallet />
-            </TabPanel> */}
+
             <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 Home
@@ -100,6 +98,9 @@ export default function Index(props) {
             {/*  <Typography variant="h2" color="secondary" component="div">*/}
             {/*    <Mint />*/}
             {/*  </Typography>*/}
+            </TabPanel>
+            <TabPanel value="3">
+              <ConnectWallet />
             </TabPanel>
           </TabContext>
           <Footer/>

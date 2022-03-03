@@ -39,6 +39,7 @@ export default function MintHome() {
                         The starter pack is the perfect pack for a beginner. Minting this pack will provide 6 unique NFT cards, which will allow you
                         to get right into the action.
                     </h5>
+                    {/*TODO: Only show this mint button if user is logged in*/}
                     <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplayMint(true)}>
                         Mint
                     </Fab>
