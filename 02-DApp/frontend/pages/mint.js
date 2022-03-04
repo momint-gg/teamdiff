@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import 'bootstrap/dist/css/bootstrap.css'
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab } from "@mui/material";
-import CONTRACT_ADDR from "../Constants.js";
+import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
 
 export default function Mint({setDisplay}) {
@@ -24,7 +24,7 @@ export default function Mint({setDisplay}) {
         if (accountData) {
             //console.log("signer: " + JSON.stringify(signerData, null, 2));
             const GameItemsContract = new ethers.Contract(
-                "0x2adc91EB2f08F953D660623783D2b2092b9196d4",
+                CONSTANTS.CONTRACT_ADDR,
                 GameItemsJSON.abi,
                 provider
             );

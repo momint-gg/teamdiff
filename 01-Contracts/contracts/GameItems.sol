@@ -61,6 +61,8 @@ contract GameItems is ERC1155, Ownable {
 
     // ======= Events ==========
     event packMinted(address user, uint256 id);
+    event packBurned(uint256[5]);
+
     // event VRFConsumerCreated(address a);
     // event Response(bool success, bytes data);
 
@@ -184,6 +186,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
+
     function burnStarterPack() public {
 //        require(packsReadyToOpen, "Packs aren't ready to open yet!");
 //        require(
@@ -199,6 +202,7 @@ contract GameItems is ERC1155, Ownable {
             mintAthlete(indices[i]);
         }
         //TODO add event to get indexes of the athletes minted, for displaying on the frontend
+        emit packBurned(indices);
         // Burning the starter pack
         _burn(address(msg.sender), starterPackId, 1);
     }

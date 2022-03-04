@@ -3,9 +3,10 @@ import {useEffect, useState} from 'react';
 import { ethers } from 'ethers';
 import 'bootstrap/dist/css/bootstrap.css'
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab } from "@mui/material";
-import CONTRACT_ADDR from "../Constants.js";
+import {Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, Grid} from "@mui/material";
+import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
+import AthleteCard from "../components/AthleteCard";
 
 export default function BurnPack({setDisplay}) {
     const [{data: connectData, error: connectError}, connect] = useConnect()
@@ -18,13 +19,13 @@ export default function BurnPack({setDisplay}) {
     const [gameItemsContract, setGameItemsContract] = useState(null);
     const [isMinting, setIsMinting] = useState(false);
     const [hasMinted, setHasMinted] = useState(false);
-    const [packsAvailable, setPacksAvailable] = useState(null);
+    const [mintedIndices, setMintedIndices] = useState(null);
     //Use Effect for component mount
-    useEffect(async () => {
+    useEffect(() => {
         if (accountData) {
             //console.log("signer: " + JSON.stringify(signerData, null, 2));
             const GameItemsContract = new ethers.Contract(
-                "0x2adc91EB2f08F953D660623783D2b2092b9196d4",
+                CONSTANTS.CONTRACT_ADDR,
                 GameItemsJSON.abi,
                 provider
             );
@@ -32,11 +33,14 @@ export default function BurnPack({setDisplay}) {
             // const packsAvail = await GameItemsContract.packsAvailable();
             // setPacksAvailable(packsAvail);
 
-            const packMintedCallback = (address, packID) => {
+            const packBurnedCallback = (athleteIndices) => {
                 //setMintedPackId(packID);
                 //Since all packs are like an ERC-20, there will only ever be one index on opensea,
+                console.log("callbacked called with data: " + athleteIndices);
                 setIsMinting(false);
                 setHasMinted(true);
+                console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
+                setMintedIndices(athleteIndices);
                 //alert(`Your Team Diff Starter Pack is all done minting -- see it here: https://testnets.opensea.io/assets/${GameItemsContract.address}/0`)
 
                 //alert(`Your Team Diff Starter Pack is all done minting -- see it here: https://testnets.opensea.io/assets/${address}/0`)
@@ -59,7 +63,7 @@ export default function BurnPack({setDisplay}) {
 
             //TODO filter this listener to only trigger when pack Minted is called by signerAddress
             //Listen to event for when pack mint function is called
-            //GameItemsContract.once('packMinted', packMintedCallback);
+            GameItemsContract.once('packBurned', packBurnedCallback);
         } else {
             console.log("no account data found!");
         }
@@ -74,12 +78,12 @@ export default function BurnPack({setDisplay}) {
             let gameItemsContractWithSigner = gameItemsContract.connect(signerData);
 
             const burnTxn = await gameItemsContractWithSigner.burnStarterPack({
-                gasLimit: 100000,
+                gasLimit: 10000000,
                 //nonce: nonce || undefined,
             })
                 .then((res) => {
                     console.log("txn result: " + JSON.stringify(res, null, 2))
-                    //setIsMinting(true)
+                    setIsMinting(true)
                     console.log('Minting pack in progress...')
 
                 }).catch((error) => {
@@ -90,9 +94,6 @@ export default function BurnPack({setDisplay}) {
 
     return (
         <Box>
-            <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
-                &#60; BACK
-            </Fab>
             {(accountData && !(isMinting || hasMinted)) &&
             <Container
                 maxWidth='lg'
@@ -156,14 +157,25 @@ export default function BurnPack({setDisplay}) {
                 </Container>
             )}
             {(hasMinted) &&
-            <Box>
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
                 <Typography>
                     Your Starter Pack has been burned
                 </Typography>
                 {/*TODO: show a collection of their newly minted athlete cards on the screen*/}
-                <a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/0'}>
-                    View on OpenSea.
-                </a>
+                {/*<a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/' + mintedIndices[0]}>*/}
+                {/*    View on OpenSea.*/}
+                {/*</a>*/}
+                {mintedIndices?.map(index => (
+                    <a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/' + index}>
+                        {"View Athlete #" + index + " on OpenSea."}
+                    </a>
+                ))}
+                {console.log("mintIndices: " + mintedIndices)}
             </Box>
             }
             {(!accountData && !hasMinted && !isMinting) &&
