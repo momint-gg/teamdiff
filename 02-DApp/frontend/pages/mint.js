@@ -24,7 +24,7 @@ export default function Mint({setDisplay}) {
         if (accountData) {
             //console.log("signer: " + JSON.stringify(signerData, null, 2));
             const GameItemsContract = new ethers.Contract(
-                "0x3C3092066b1F506B6be5b388F8456d6E3874B90e",
+                "0x2adc91EB2f08F953D660623783D2b2092b9196d4",
                 GameItemsJSON.abi,
                 provider
             );

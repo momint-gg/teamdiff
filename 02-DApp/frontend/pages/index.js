@@ -23,6 +23,7 @@ import MintHome from './mintHome';
 //  Component Imports */
 //******************* */
 import ConnectWallet from './connectWallet';
+import BurnPack from "./burnPack";
 
 
 // API key for Ethereum node
@@ -79,7 +80,10 @@ export default function Index(props) {
                 <Tab label="PLAY" value="0" />
                 <Tab label="COLLECTION" value="1" />
                 <Tab label="MINT" value="2" />
-                 <Tab label="CONNECT" value="3" />
+                <Tab label="BURN" value="3" />
+
+                <Tab label="CONNECT" value="4" />
+
               </TabList>
             </Box>
 
@@ -94,12 +98,11 @@ export default function Index(props) {
 
             <TabPanel value="2">
               <MintHome />
-            {/*<TabPanel value="2">*/}
-            {/*  <Typography variant="h2" color="secondary" component="div">*/}
-            {/*    <Mint />*/}
-            {/*  </Typography>*/}
             </TabPanel>
             <TabPanel value="3">
+              <BurnPack />
+            </TabPanel>
+            <TabPanel value="4">
               <ConnectWallet />
             </TabPanel>
           </TabContext>

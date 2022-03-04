@@ -141,7 +141,8 @@ contract GameItems is ERC1155, Ownable {
             );
 
             _mint(address(msg.sender), index, 1, "0x00");
-
+            //TODO add callback to hook onto frontend
+            //
             supplyOfToken[index] += 1;
             numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
         }
@@ -184,11 +185,11 @@ contract GameItems is ERC1155, Ownable {
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
     function burnStarterPack() public {
-        require(packsReadyToOpen, "Packs aren't ready to open yet!");
-        require(
-            balanceOf(address(msg.sender), starterPackId) == 1,
-            "Pack has already been burned or does not exist."
-        );
+//        require(packsReadyToOpen, "Packs aren't ready to open yet!");
+//        require(
+//            balanceOf(address(msg.sender), starterPackId) == 1,
+//            "Pack has already been burned or does not exist."
+//        );
 
         // Indices for players in the pack, 1 of each position
         uint256[5] memory indices = generateStarterPackIndices();
@@ -197,6 +198,7 @@ contract GameItems is ERC1155, Ownable {
         for (uint8 i = 0; i < indices.length; i++) {
             mintAthlete(indices[i]);
         }
+        //TODO add event to get indexes of the athletes minted, for displaying on the frontend
         // Burning the starter pack
         _burn(address(msg.sender), starterPackId, 1);
     }
