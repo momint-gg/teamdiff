@@ -16,8 +16,8 @@ span.early-access {
   background-color: white;
   padding-left: 1rem;
   padding-right: 1rem;
-  padding-top: 0.2rem;
-  padding-bottom: 0.2rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
   border-radius: 0.5rem;
   margin-top: 1rem;
   font-size: smaller;
@@ -25,4 +25,19 @@ span.early-access {
 
 .fw-900 {
   font-weight: 900;
+}
+
+.mb-7 {
+  margin-bottom: 7rem;
+}
+
+h3 {
+  font-weight: 600;
+}
+
+.second-cta {
+  text-align: center;
+  padding-top: 4rem;
+  margin-left: 5rem;
+  margin-right: 5rem;
 }
