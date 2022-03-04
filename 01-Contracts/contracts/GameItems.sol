@@ -76,6 +76,10 @@ contract GameItems is ERC1155, Ownable {
         // uint64 chainlinkSubId;
     }
 
+    //TODO show how many packs are still available
+    //TODO add boolean to show if packs are available.
+    uint256 public packsAvailable;
+
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
@@ -99,6 +103,7 @@ contract GameItems is ERC1155, Ownable {
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
+        packsAvailable = MAX_PACKS;
         // vrf = new VRFv2Consumer(params.chainlinkSubId); //chainlink
     }
 
@@ -144,10 +149,10 @@ contract GameItems is ERC1155, Ownable {
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public {
-        require(
-            starterPacksMinted < MAX_PACKS,
-            "All packs have already been minted!"
-        );
+//        require(
+//            starterPacksMinted < MAX_PACKS,
+//            "All packs have already been minted!"
+//        );
 //        require(
 //            balanceOf(msg.sender, starterPackId) < 1,
 //            "Can only mint one starter pack per account"
@@ -156,6 +161,7 @@ contract GameItems is ERC1155, Ownable {
         _mint(address(msg.sender), starterPackId, 1, "");
 
         starterPacksMinted += 1;
+        packsAvailable -= 1;
         emit packMinted(msg.sender, starterPacksMinted);
     }
 
