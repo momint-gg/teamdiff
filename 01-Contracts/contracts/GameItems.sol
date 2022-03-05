@@ -31,7 +31,6 @@ contract GameItems is ERC1155, Ownable {
     uint256 public REVEAL_TIMESTAMP = 10000;
 
     // When we flip the switch and let everyone open packs
-    // (Setting to true for now for easy testing)
     bool public packsReadyToOpen = true;
 
     // Where to start pack IDs
@@ -164,8 +163,8 @@ contract GameItems is ERC1155, Ownable {
             "All packs have already been minted!"
         );
         require(
-            balanceOf(msg.sender, starterPackId) < 1,
-            "Can only mint one starter pack per account"
+            balanceOf(msg.sender, boosterPackId) < 2,
+            "Can only mint two booster packs per account"
         );
 
         _mint(address(msg.sender), boosterPackId, 1, "");

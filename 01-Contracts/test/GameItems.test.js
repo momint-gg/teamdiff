@@ -198,11 +198,11 @@ describe("GameItems.test", async () => {
     // Testing contract
     let txn = await GameItem.setStartingIndex();
     await txn.wait();
-    txn = await GameItem.setURIs();
+    txn = await GameItem.setURIs(); // This takes awhile
     await txn.wait();
     txn = await GameItem.mintStarterPack();
     await txn.wait();
-    txn = await GameItem.burnStarterPack(); //if we check wallet, should have athlete NFTs now
+    txn = await GameItem.burnStarterPack(); // If we check wallet, should have athlete NFTs now
     await txn.wait();
   });
 });
