@@ -6,8 +6,10 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab } from "@mui/material";
 import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
+import * as utils from "@ethersproject/hash";
+import {hexZeroPad} from "@ethersproject/bytes";
 
-export default function Mint({setDisplay}) {
+export default function MintPack({setDisplay}) {
     const [{data: connectData, error: connectError}, connect] = useConnect()
     const [mintedPackId, setMintedPackId] = useState(null);
     const [{data: accountData}, disconnect] = useAccount({
@@ -33,33 +35,30 @@ export default function Mint({setDisplay}) {
             setPacksAvailable(packsAvail);
 
             const packMintedCallback = (address, packID) => {
-                //setMintedPackId(packID);
-                //Since all packs are like an ERC-20, there will only ever be one index on opensea,
                 setIsMinting(false);
                 setHasMinted(true);
-                //alert(`Your Team Diff Starter Pack is all done minting -- see it here: https://testnets.opensea.io/assets/${GameItemsContract.address}/0`)
-
-                //alert(`Your Team Diff Starter Pack is all done minting -- see it here: https://testnets.opensea.io/assets/${address}/0`)
             }
             // A filter that matches my Signer as the author
-            //let filter = GameItemsContract.filters.mintStarterPack(signerData);
-            // List all token transfers  *from*  myAddress
+            //TODO this signerData won't always be intilized immediately
             // const signerAddress = await signerData.getAddress();
-            // let filter = {
-            //     address: signerAddress,
-            //     // topics: [
-            //     //     utils.id("Transfer(address,address,uint256)"),
-            //     //     hexZeroPad(myAddress, 32)
-            //     // ]
-            // };
-            //console.log("signeraddy: " + signerAddress)
-            // List all token transfers *from* myAddress
-            //GameItemsContract.filters.packMinted(signerData)
-            //GameItemsContract.on(filter, packMintedCallback);
+            const signerAddress = "0x14D8DF624769E6075769a59490319625F50B2B17";
+
+            console.log(hexZeroPad(signerAddress, 32));
+            let filter = {
+                address: GameItemsContract.address,
+                topics: [
+                    utils.id("packMinted(address,uint256)"),
+                    //"0x00000000000000000000000014d8df624769e6075769a59490319625f50b2b17"
+                    //TODO something wrong with this line
+                    //hexZeroPad(signerAddress, 32)
+                ]
+            };
 
             //TODO filter this listener to only trigger when pack Minted is called by signerAddress
             //Listen to event for when pack mint function is called
-            GameItemsContract.once('packMinted', packMintedCallback);
+            // GameItemsContract.once('packMinted', packMintedCallback);
+            GameItemsContract.on(filter, packMintedCallback);
+
         } else {
             console.log("no account data found!");
         }
@@ -133,7 +132,7 @@ export default function Mint({setDisplay}) {
                             </h3>
                         }
                         {/*<Fab >*/}
-                        {/*    Mint Start Pack*/}
+                        {/*    MintPack Start Pack*/}
                         {/*</Fab>*/}
                     </Box>
                     <Box

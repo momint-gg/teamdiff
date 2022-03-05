@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 // Custom Page Imports
 //********************** */
 import About from './about';
-import Mint from './mint';
+import MintPack from './mintPack';
 import Collection from './collection';
 import MintHome from './mintHome';
 

@@ -33,7 +33,7 @@ describe("GameItems.test", async () => {
 
   //Test case
   // it("newly minted GameItem NFTs have a correctly set uri", async function () {
-  //   // Mint athlete
+  //   // MintPack athlete
   //   //only works when _mint calls with msg.sender, not address(this)
   //   //ERROR'ERC1155: transfer to non ERC1155Receiver implementer'
   //   const numAthletes = await GameItem.NUM_ATHLETES;

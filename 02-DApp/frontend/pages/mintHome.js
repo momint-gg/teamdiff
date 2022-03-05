@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import profilePic from '../assets/images/example.png';
 import StarterPackContents from '../components/StarterPackContents';
-import Mint from './mint.js';
+import MintPack from './mintPack.js';
 
 export default function MintHome() {
     const [displayMint, setDisplayMint] = useState(false);
@@ -68,7 +68,7 @@ export default function MintHome() {
         {displayMint && 
         <Box>
             <Box>
-                <Mint setDisplay={setDisplayMint} />
+                <MintPack setDisplay={setDisplayMint} />
             </Box>
         </Box>
         }
