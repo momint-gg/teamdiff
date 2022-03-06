@@ -13,25 +13,24 @@ import "./VRFv2Consumer.sol";
 
 contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
     using SafeMath for uint256;
 
     // Constructor args
     string private athleteURI;
     string private starterPackURI;
     string private boosterPackURI;
-    uint256 private NUM_ATHLETES; // Max size of the collection
-    uint256 private NFT_PER_ATHLETE; // how much of each athlete
+    // Constants
     uint256 private STARTER_PACK_SIZE;
     uint256 private BOOSTER_PACK_SIZE;
     uint256 private MAX_STARTER_PACK_BALANCE;
     uint256 private MAX_BOOSTER_PACK_BALANCE;
     uint256 private MAX_PACKS;
+    uint256 private NUM_ATHLETES;
+    uint256 private NFT_PER_ATHLETE;
+    uint256 chainlinkSubId;
     uint256 public REVEAL_TIMESTAMP = 10000;
-    uint64 chainlinkSubId;
 
     // When we flip the switch and let everyone open packs
-    // (Setting to true for now for easy testing)
     bool public packsReadyToOpen = true;
 
     // Where to start pack IDs
@@ -134,8 +133,7 @@ contract GameItems is ERC1155, Ownable {
     // Mints an athlete -- called when someone "burns" a pack
     function mintAthlete(uint256 index) private {
         // Log for debugging
-        // console.log("MintPack index ", index);
-
+        // console.log("Mint index ", index);
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
                 supplyOfToken[index] < NFT_PER_ATHLETE,
@@ -174,8 +172,8 @@ contract GameItems is ERC1155, Ownable {
             "All packs have already been minted!"
         );
         require(
-            balanceOf(msg.sender, starterPackId) < 1,
-            "Can only mint one starter pack per account"
+            balanceOf(msg.sender, boosterPackId) < 2,
+            "Can only mint two booster packs per account"
         );
 
         _mint(address(msg.sender), boosterPackId, 1, "");
@@ -286,12 +284,12 @@ contract GameItems is ERC1155, Ownable {
                         block.timestamp,
                         msg.sender,
                         block.difficulty,
-                        i
+                        i,
+                        starterPacksMinted
                     )
                 )
             ) % (end - start + 1)) + start);
         }
-
         return indices;
     }
 
@@ -315,13 +313,13 @@ contract GameItems is ERC1155, Ownable {
                         block.timestamp,
                         msg.sender,
                         block.difficulty,
-                        i
+                        i,
+                        boosterPacksMinted
                     )
                 )
             ) % (end - start + 1)) + start);
 
             startI += 1;
-            console.log("Booster index is ", indices[i]);
         }
         return indices;
     }

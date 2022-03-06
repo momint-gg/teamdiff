@@ -12,7 +12,7 @@ module.exports = [
     10000, // REVEAL_TIMESTAMP,
     697, // Chainlink sub ID
   ],
-  "https://gateway.pinata.cloud/ipfs/QmV6Bt7xVz468sD7pgAYXHJqSDpPuymMVnpb2Tuk58zXVU/", // athleteURI (pinata url)
-  "https://ipfs.io/ipfs/QmW4HEz39zdzFDigDa18SzwSzUejCf2i4dN3Letfzar6gH?filename=pack.json", // starterPackURI (pinata url)
+  "https://gateway.pinata.cloud/ipfs/QmdHMLC2Q5RNBcrnH3YREn3xNBAg3ovaXNB1rFCS36H3Ux/", // athleteURI (pinata url)
+  "https://gateway.pinata.cloud/ipfs/QmVaHk5vQJnbZNmcrdh66G6zaB9WSTLX8ZXeVd8WbyPKKW/", // starterPackURI (pinata url)
   "Insert booster pack URI here :)", // boosterPackURI (pinata url)
 ];

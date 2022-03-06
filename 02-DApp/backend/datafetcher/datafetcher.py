@@ -5,17 +5,19 @@ import json
 import mwclient
 from pprint import pprint
 import os
+from os.path import join, dirname
 import random
 import re
 import ssl
 import time
 import urllib.request
-import mysql.connector
 import yaml
 from dotenv import load_dotenv
 
 ssl._create_default_https_context = ssl._create_unverified_context
+dotenv_path = join(dirname(__file__), '.env')
 load_dotenv()
+
 
 class DataFetcher():
     def __init__(self,
@@ -28,23 +30,15 @@ class DataFetcher():
                  ):
         self.site = mwclient.Site(site, path)
         self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
-        self.db = mysql.connector.connect(
-             host=os.getenv("DB_HOST"),
-             user=os.getenv("DB_USER"),
-             password=os.getenv("DB_PASSWORD"),
-             database=os.getenv("DB_DATABASE")
-         )
         self.tournament = tournament
         self.start_date = start_date
         self.time_interval = time_interval
+        self.athletes = {}
         self.teams = []
-        self.players = {}
-        self.player_game_stats = {}
-        self.aggregated_player_game_stats = {}
+        self.clean_to_raw_summoner_ids = {}
+        self.athlete_game_stats = {}
+        self.aggregated_athlete_game_stats = []
         self.nft_metadata = {}
-
-        self.athletes = []
-        self.positions = ["Top", "Mid", "Bot", "Support", "Jungle"]
 
     scoreboard_player_fields = [
         "SP.OverviewPage",
@@ -129,27 +123,31 @@ class DataFetcher():
         "P.IsLowContent",
     ]
 
+    positions = ["Top", "Mid", "ADC", "Support", "Jungle"]
+
     def _set_athletes(self, csv_name):
         with open(csv_name, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(reader):
                 if i < 2:
                     continue
-                self.athletes.append(
-                    self._clean_player_name(row[0].split(",")[0]))
+                raw_summoner_id = row[0].split(",")[0]
+                clean_summoner_id = self._clean_summoner_id(raw_summoner_id)
+                self.clean_to_raw_summoner_ids[clean_summoner_id] = raw_summoner_id
+                self.athletes[clean_summoner_id] = {}
 
     def _determine_stat_type(self, stat):
-        if stat == "Kills":
+        if stat == "kills":
             return int
-        elif stat == "Deaths":
+        elif stat == "deaths":
             return int
-        elif stat == "Assists":
+        elif stat == "assists":
             return int
-        elif stat == "CS":
+        elif stat == "cs":
             return int
-        elif stat == "Gold":
+        elif stat == "gold":
             return int
-        elif stat == "DamageToChampions":
+        elif stat == "damage_to_champions":
             return int
         else:
             return str
@@ -165,11 +163,13 @@ class DataFetcher():
             "PlayerWin"])
         return stat in s
 
-    def _get_game_data(self, team, start_date, time_interval):
+    def _fetch_game_data(self, team, start_date, time_interval):
         fields = ", ".join(self.scoreboard_player_fields)
         past_date = str(start_date-dt.timedelta(time_interval))
 
-        where = "SG.Tournament = '" + self.tournament + "' AND SG.DateTime_UTC >= '" + past_date + "'AND (SG.Team1 = '" + team + "' OR SG.Team1 = '" + team + "')"
+        where = "SG.Tournament = '" + self.tournament + "' AND SG.DateTime_UTC >= '" + \
+            past_date + "'AND (SG.Team1 = '" + team + \
+            "' OR SG.Team1 = '" + team + "')"
 
         response = self.site.api('cargoquery',
                                  limit="max",
@@ -193,67 +193,21 @@ class DataFetcher():
         url = re.match(pattern, parse_result_text)[1]
         urllib.request.urlretrieve(url, player + ".png")
 
-    def _clean_player_name(self, name, lower=True):
-        cleaned_name = name.split("(")[0].strip()
-        if lower:
-            return cleaned_name.lower()
-        return cleaned_name
+    def _convert_to_json(self, data, file_name):
+        with open(file_name, "w") as outfile:
+            json.dump(data, outfile)
+        print("Created file:", file_name)
 
-    def _remove_irrelevant_players(self):
-        source = set(self.athletes)
-        irrelevant_players = []
+    def _clean_summoner_id(self, name, lower=True):
+        return name.split("(")[0].strip().lower()
 
-        for player in self.players:
-            if self._clean_player_name(player) not in source:
-                irrelevant_players.append(player)
-
-        for player in irrelevant_players:
-            del self.players[player]
-
-    def get_players_and_teams_from_api(self):
-        response = self.site.api(
-            "cargoquery",
-            limit="max",
-            tables="Tournaments=T, TournamentPlayers=TP",
-            join_on="T.OverviewPage=TP.OverviewPage",
-            fields="TP.Player",
-            where="T.Name = '" + self.tournament + "'",
-        ).get("cargoquery")
-
-        parsed = json.dumps(response)
-        decoded = yaml.safe_load(parsed)
-
-        names = [player["title"]["Player"] for player in decoded]
-
-        fields = ", ".join(self.player_fields)
-        where = ' OR '.join(["P.Player = '" + name + "'" for name in names])
-
-        response = self.site.api(
-            "cargoquery",
-            limit="max",
-            tables="PlayerRedirects=PR, Players=P",
-            join_on="PR.OverviewPage=P.OverviewPage",
-            fields=fields,
-            where=where,
-        ).get("cargoquery")
-
-        parsed = json.dumps(response)
-        decoded = json.loads(parsed)
-
-        for player in decoded:
-            player_name = player["title"]["Player"]
-            self.players[player_name] = player["title"]
-            position = player["title"]["Role"]
-            self.positions.append(
-                position) if position not in self.positions else None
-            self.teams.append(
-                player["title"]["Team"]) if player["title"]["Team"] not in self.teams else None
-
-    def get_players_and_teams_from_csv(self, file_name):
+    def set_athletes_and_teams_from_csv(self, file_name):
+        print("Setting athletes and teams from " + str(file_name) + "...")
         self._set_athletes(file_name)
 
         fields = ", ".join(self.player_fields)
-        where = ' OR '.join(["P.Player = '" + name + "'" for name in self.athletes if name not in self.players])
+        where = ' OR '.join(
+            ["P.Player = '" + self.clean_to_raw_summoner_ids[summoner_id] + "'" for summoner_id in self.athletes])
 
         response = self.site.api(
             "cargoquery",
@@ -267,84 +221,103 @@ class DataFetcher():
         parsed = json.dumps(response)
         decoded = yaml.safe_load(parsed)
 
-        for player in decoded:
-            player_name = player["title"]["Player"]
-            self.players[player_name] = player["title"]
-            position = player["title"]["Role"]
-            self.positions.append(
-                position) if position not in self.positions else None
+        for athlete in decoded:
+            summoner_id = self._clean_summoner_id(athlete["title"]["Player"])
+            self.athletes[summoner_id] = athlete["title"]
             self.teams.append(
-                player["title"]["Team"]) if player["title"]["Team"] not in self.teams else None
+                athlete["title"]["Team"]) if athlete["title"]["Team"] not in self.teams else None
+        print()
+        print("These athletes were successfully pulled from the file:")
+        for summoner_id in sorted(self.athletes.keys(), key=lambda athelete: athelete.lower()):
+            print(summoner_id)
+        print()
+        print("Done!")
 
-        self._remove_irrelevant_players()
-
-    def get_player_game_stats(self):
+    def fetch_athlete_game_stats(self):
+        print("Fetching athlete game stats...")
         for team in self.teams:
-            game_data = self._get_game_data(
+            game_data = self._fetch_game_data(
                 team, self.start_date, self.time_interval)['cargoquery']
 
-            for current_player in game_data:
-                current_player_data = current_player["title"]
-                current_player_name = self._clean_player_name(
-                    current_player_data["Link"])
+            for current_athlete in game_data:
+                current_athlete_data = current_athlete["title"]
+                raw_current_summoner_id = current_athlete_data[
+                    "Link"] if current_athlete_data["Link"] != "Pridestalkr" else "Pridestalker"
+                current_summoner_id = self._clean_summoner_id(
+                    raw_current_summoner_id)
 
-                if current_player_name not in self.player_game_stats:
-                    self.player_game_stats[current_player_name] = {}
-
-                game_id = current_player_data["GameId"]
-
-                if game_id in self.player_game_stats[current_player_name]:
+                if current_summoner_id not in self.clean_to_raw_summoner_ids:
                     continue
 
-                self.player_game_stats[current_player_name][game_id] = {}
+                if current_summoner_id not in self.athlete_game_stats:
+                    self.athlete_game_stats[current_summoner_id] = {}
 
-                for stat, value in current_player_data.items():
+                game_id = current_athlete_data["GameId"]
+
+                if game_id in self.athlete_game_stats[current_summoner_id]:
+                    continue
+
+                self.athlete_game_stats[current_summoner_id][game_id] = {}
+
+                for stat, value in current_athlete_data.items():
                     if not self._is_relevant_stat(stat):
                         continue
-                    self.player_game_stats[current_player_name][game_id][stat] = int(
-                        value) if self._determine_stat_type(stat) == int else value
 
-    def aggregate_player_game_stats(self):
-        game_stats = {}
-        for current_player_name, games in self.player_game_stats.items():
-            if current_player_name not in game_stats:
-                game_stats[current_player_name] = {}
+                    stat = stat.lower()
 
-            for _, current_game in games.items():
-                for stat, value in current_game.items():
-                    if stat == "PlayerWin":
-                        if "Wins" not in game_stats[current_player_name]:
-                            game_stats[current_player_name]["Wins"] = 0
-                        game_stats[current_player_name]["Wins"] += 1 if value == "Yes" else 0
+                    if stat == "damagetochampions":
+                        stat = "damage_to_champions"
 
-                    elif self._determine_stat_type(stat) == int:
-                        if stat not in game_stats[current_player_name]:
-                            game_stats[current_player_name][stat] = value
-                            if stat == "Kills":
-                                game_stats[current_player_name]["Kills10"] = 0
-                            if stat == "Assists":
-                                game_stats[current_player_name]["Assists10"] = 0
-                        else:
-                            game_stats[current_player_name][stat] += value
-                            if stat == "Kills" and game_stats[current_player_name]["Kills"] >= 10:
-                                game_stats[current_player_name]["Kills10"] = True
-                            if stat == "Assists" and game_stats[current_player_name]["Assists"] >= 10:
-                                game_stats[current_player_name]["Assists10"] = True
+                    if stat == "playerwin":
+                        stat = "player_win"
+                        value = 1 if value == "Yes" else 0
 
-        self.aggregated_player_game_stats = [
-            {"summonerId": self._clean_player_name(player), "games": games} for player, games in game_stats.items()
-        ]
+                    self.athlete_game_stats[current_summoner_id][game_id][stat] = int(
+                        value)
+        print("Done!")
 
-    def download_player_headshots(self):
-        print("Downloading player headshots...")
-        for i, player in enumerate(sorted(self.players.keys())):
-            print(i+1,"/",len(self.athletes), ")", sep="")
+    def aggregate_athlete_game_stats(self):
+        print("Aggregating athlete game stats...")
+        agg_game_stats = {}
+        for current_summoner_id, games in self.athlete_game_stats.items():
+            if current_summoner_id not in agg_game_stats:
+                agg_game_stats[current_summoner_id] = {
+                    "summoner_id": current_summoner_id
+                }
+            for _, game in games.items():
+                for stat, value in game.items():
+                    if stat == "player_win":
+                        if "wins" not in agg_game_stats[current_summoner_id]:
+                            agg_game_stats[current_summoner_id]["wins"] = 0
+                        agg_game_stats[current_summoner_id]["wins"] += value
+
+                    if stat not in agg_game_stats[current_summoner_id]:
+                        agg_game_stats[current_summoner_id][stat] = value
+                        if stat == "kills":
+                            agg_game_stats[current_summoner_id]["kills10"] = 0
+                        if stat == "assists":
+                            agg_game_stats[current_summoner_id]["assists10"] = 0
+                    else:
+                        agg_game_stats[current_summoner_id][stat] += value
+                        if stat == "kills" and agg_game_stats[current_summoner_id]["kills"] >= 10:
+                            agg_game_stats[current_summoner_id]["kills10"] = 1
+                        if stat == "assists" and agg_game_stats[current_summoner_id]["assists"] >= 10:
+                            agg_game_stats[current_summoner_id]["assists10"] = 1
+
+        self.aggregated_athlete_game_stats = [
+            stats for _, stats in agg_game_stats.items()]
+        print("Done!")
+
+    def fetch_athlete_headshots(self):
+        print("Fetching athlete headshots...")
+        for i, athlete in enumerate(sorted(self.athletes.keys())):
+            print("(", i+1, "/", len(self.athletes), ")", sep="")
 
             response = self.site.api('cargoquery',
                                      limit=1,
                                      tables="PlayerImages",
                                      fields="FileName",
-                                     where='Link="%s"' % player,
+                                     where='Link="%s"' % self.clean_to_raw_summoner_ids[athlete],
                                      format="json"
                                      )
             parsed = json.dumps(response)
@@ -352,126 +325,111 @@ class DataFetcher():
 
             try:
                 url = str(decoded['cargoquery'][0]['title']['FileName'])
-                self._download_photo(self.site, url, player)
-                self.players[player]["ipfs"] = self.ipfs.add("./" + player + ".png")
+                self._download_photo(self.site, url, athlete)
+                self.athletes[athlete]["ipfs"] = self.ipfs.add(
+                    "./" + athlete + ".png")
             except:
-                print("ERROR: Headshot of player", player, "failed to upload to IPFS")
-                self.players[player]["ipfs"] = {
+                print("ERROR: Headshot of athlete",
+                      athlete, "failed to upload to IPFS")
+                self.athletes[athlete]["ipfs"] = {
                     "Name": "",
                     "Hash": "",
                     "Size": ""
                 }
             finally:
-                pprint(self.players[player]["ipfs"])
+                pprint(self.athletes[athlete]["ipfs"])
                 os.remove(
-                    "./" + player + ".png") if os.path.exists("./" + player + ".png") else None
+                    "./" + athlete + ".png") if os.path.exists("./" + athlete + ".png") else None
                 time.sleep(5)
+        print("Done!")
 
     def create_nft_metadata_ordered(self):
         file_name = 0
-        for position in self.positions:
-            for player, info in self.players.items():
-                if info["Role"] == position:
-                    self.nft_metadata[player] = {}
-                    self.nft_metadata[player]["name"] = info["Name"]
-                    self.nft_metadata[player]["description"] = "This is a professional eSports athelete!"
-                    self.nft_metadata[player]["image"] = "https://ipfs.io/ipfs/" # + \
-#                        self.players[player]["ipfs"]["Hash"]
-                    self.nft_metadata[player]["attributes"] = [
+        for target_position in self.positions:
+            for athlete, info in self.athletes.items():
+                current_athlete_position = info["Role"] if info["Role"] != "Bot" else "ADC"
+                if current_athlete_position == target_position:
+                    self.nft_metadata[athlete] = {}
+                    self.nft_metadata[athlete]["name"] = info["Name"]
+                    self.nft_metadata[athlete]["description"] = "This is a professional eSports athelete!"
+                    self.nft_metadata[athlete]["image"] = "https://ipfs.io/ipfs/" + \
+                        self.athletes[athlete]["ipfs"]["Hash"]
+                    self.nft_metadata[athlete]["attributes"] = [
                         {
                             "trait_type": "team",
                             "value": info["Team"]
                         },
                         {
                             "trait_type": "position",
-                            "value": info["Role"]
+                            "value": current_athlete_position
                         },
                     ]
-                    self.convert_to_json(
-                        self.nft_metadata[player], "nft_metadata_ordered/" + str(file_name) + ".json")
+                    self._convert_to_json(
+                        self.nft_metadata[athlete], "nft_metadata_ordered/" + str(file_name) + ".json")
                     file_name += 1
 
     def create_nft_metadata_random(self):
-        random_players = []
-        for player, info in self.players.items():
-            self.nft_metadata[player] = {}
-            self.nft_metadata[player]["name"] = info["Name"]
-            self.nft_metadata[player]["description"] = "This is a professional eSports athelete!"
-            self.nft_metadata[player]["image"] = "https://ipfs.io/ipfs/" # + \
-                # self.players[player]["ipfs"]["Hash"]
-            self.nft_metadata[player]["attributes"] = [
+        random_athletes = []
+        for athlete, info in self.athletes.items():
+            self.nft_metadata[athlete] = {}
+            self.nft_metadata[athlete]["name"] = info["Name"]
+            self.nft_metadata[athlete]["description"] = "This is a professional eSports athelete!"
+            self.nft_metadata[athlete]["image"] = "https://ipfs.io/ipfs/" + \
+                self.athletes[athlete]["ipfs"]["Hash"]
+            self.nft_metadata[athlete]["attributes"] = [
                 {
                     "trait_type": "team",
                     "value": info["Team"]
                 },
                 {
                     "trait_type": "position",
-                    "value": info["Role"]
+                    "value": info["Role"] if info["Role"] != "Bot" else "ADC"
                 },
             ]
-            random_players.append(player)
+            random_athletes.append(athlete)
 
-        random.shuffle(random_players)
+        random.shuffle(random_athletes)
 
         file_name = 0
-        for player in random_players:
-            self.convert_to_json(
-                self.nft_metadata[player], "nft_metadata_random/" + str(file_name) + ".json")
+        for athlete in random_athletes:
+            self._convert_to_json(
+                self.nft_metadata[athlete], "nft_metadata_random/" + str(file_name) + ".json")
             file_name += 1
 
-    def convert_to_json(self, data, file_name):
-        with open(file_name, "w") as outfile:
-            json.dump(data, outfile)
-        print("Created file:", file_name)
-
-    def is_correct_player_count(self, target_count):
-        if not len(self.athletes) == target_count:
-            print("ERROR: self.athletes has size", len(self.athletes),"instead of", target_count)
+    def is_correct_athlete_count(self, target_count):
+        if len(self.athletes.keys()) != target_count:
+            print("ERROR: self.athletes has size", len(
+                self.athletes), "instead of", target_count)
             return False
 
-        if len(self.athletes) == len(self.players):
-            return True
+        return True
 
-        print("ERROR: self.athletes has size", len(self.athletes), "and self.players has a size of", len(self.players))
-        return
-
-    def upload_player_data_to_db(self):
-        cursor = self.db.cursor()
-
-        query = "INSERT IGNORE INTO players (summoner_id, name, team, position) VALUES (%s, %s, %s, %s)"
-
-        for _, info in self.players.items():
-            args = (  
-                self._clean_player_name(info["Player"], False),
-                info["Name"].encode("ascii", "ignore").decode("ascii"),
-                info["Team"],
-                info["Role"]
-                )
-            cursor.execute(query, args)
-
-        self.db.commit()
-        cursor.close()
-        
 
 def main():
     df = DataFetcher()
+    print("Starting datafetch...")
+    print()
 
-    df.get_players_and_teams_from_api()
-    df.get_players_and_teams_from_csv("athletes.csv")
+    df.set_athletes_and_teams_from_csv("athletes.csv")
+    print()
 
-    target_player_counter = 50
-    if not df.is_correct_player_count(target_player_counter):
+    target_athlete_count = 50
+    if not df.is_correct_athlete_count(target_athlete_count):
         return
 
-    df.get_player_game_stats()
-    df.aggregate_player_game_stats()
-    df.upload_player_data_to_db()
-    # df.download_player_headshots()
+    df.fetch_athlete_game_stats()
+    print()
+    df.aggregate_athlete_game_stats()
+    print()
 
-#    df.create_nft_metadata_ordered()
- #   df.create_nft_metadata_random()
+    df.fetch_athlete_headshots()
 
-    print("Done!")
+    df.create_nft_metadata_ordered()
+    print()
+    df.create_nft_metadata_random()
+    print()
+
+    print("Datafetch complete!")
 
 
 main()
