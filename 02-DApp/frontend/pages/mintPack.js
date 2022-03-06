@@ -21,6 +21,8 @@ export default function MintPack({setDisplay}) {
     const [isMinting, setIsMinting] = useState(false);
     const [hasMinted, setHasMinted] = useState(false);
     const [packsAvailable, setPacksAvailable] = useState(null);
+    const [eventAddress, setEventAddress] = useState(null);
+
     //Use Effect for component mount
     useEffect(async () => {
         if (accountData) {
@@ -33,15 +35,21 @@ export default function MintPack({setDisplay}) {
             setGameItemsContract(GameItemsContract);
             const packsAvail = await GameItemsContract.packsAvailable();
             setPacksAvailable(packsAvail);
+            //const signerAddress = await signerData.getAddress();
+            const signerAddress = "0x14D8DF624769E6075769a59490319625F50B2B17";
 
             const packMintedCallback = (address, packID) => {
-                setIsMinting(false);
-                setHasMinted(true);
+                console.log("Event address " + address);
+
+                if(address == signerAddress) {
+
+                    setIsMinting(false);
+                    // setEventAddress(address);
+                    setHasMinted(true);
+                }
             }
             // A filter that matches my Signer as the author
             //TODO this signerData won't always be intilized immediately
-            // const signerAddress = await signerData.getAddress();
-            const signerAddress = "0x14D8DF624769E6075769a59490319625F50B2B17";
 
             console.log(hexZeroPad(signerAddress, 32));
             let filter = {
@@ -50,7 +58,7 @@ export default function MintPack({setDisplay}) {
                     utils.id("packMinted(address,uint256)"),
                     //"0x00000000000000000000000014d8df624769e6075769a59490319625f50b2b17"
                     //TODO something wrong with this line
-                    //hexZeroPad(signerAddress, 32)
+                    hexZeroPad(signerAddress, 32)
                 ]
             };
 
