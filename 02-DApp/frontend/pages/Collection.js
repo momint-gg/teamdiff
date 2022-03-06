@@ -3,7 +3,8 @@ import { useAccount } from 'wagmi'
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
-import constants from "../Constants"
+import constants from "../Constants";
+import ConnectWallet from "./ConnectWallet";
 
 export default function Collection() {
     const [{ data: accountData }, disconnect] = useAccount({
@@ -70,6 +71,7 @@ export default function Collection() {
             <Typography variant="h2" color="secondary" component="div">
                 Please connect your wallet to get started.
             </Typography>
+            {/* <ConnectWallet></ConnectWallet> */}
         </Box>
     );
 }
