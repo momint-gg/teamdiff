@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 // Custom Page Imports
 //********************** */
 import About from './about';
-import Mint from './mint';
+import MintPack from './mintPack';
 import Collection from './collection';
 import MintHome from './mintHome';
 
@@ -23,6 +23,7 @@ import MintHome from './mintHome';
 //  Component Imports */
 //******************* */
 import ConnectWallet from './connectWallet';
+import BurnPack from "./burnPack";
 
 
 // API key for Ethereum node
@@ -79,12 +80,13 @@ export default function Index(props) {
                 <Tab label="PLAY" value="0" />
                 <Tab label="COLLECTION" value="1" />
                 <Tab label="MINT" value="2" />
-                 {/*<Tab label="" value="0" />*/}
+                <Tab label="BURN" value="3" />
+
+                <Tab label="CONNECT" value="4" />
+
               </TabList>
             </Box>
-            {/* <TabPanel value="0">
-              <ConnectWallet />
-            </TabPanel> */}
+
             <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 Home
@@ -96,10 +98,12 @@ export default function Index(props) {
 
             <TabPanel value="2">
               <MintHome />
-            {/*<TabPanel value="2">*/}
-            {/*  <Typography variant="h2" color="secondary" component="div">*/}
-            {/*    <Mint />*/}
-            {/*  </Typography>*/}
+            </TabPanel>
+            <TabPanel value="3">
+              <BurnPack />
+            </TabPanel>
+            <TabPanel value="4">
+              <ConnectWallet />
             </TabPanel>
           </TabContext>
           <Footer/>

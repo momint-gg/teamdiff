@@ -60,6 +60,8 @@ contract GameItems is ERC1155, Ownable {
 
     // ======= Events ==========
     event packMinted(address user, uint256 id);
+    event packBurned(uint256[5]);
+
     // event VRFConsumerCreated(address a);
     // event Response(bool success, bytes data);
 
@@ -74,6 +76,10 @@ contract GameItems is ERC1155, Ownable {
         uint256 _revealTimestamp;
         // uint64 chainlinkSubId;
     }
+
+    //TODO show how many packs are still available
+    //TODO add boolean to show if packs are available.
+    uint256 public packsAvailable;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -98,6 +104,7 @@ contract GameItems is ERC1155, Ownable {
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
+        packsAvailable = MAX_PACKS;
         // vrf = new VRFv2Consumer(params.chainlinkSubId); //chainlink
     }
 
@@ -134,7 +141,8 @@ contract GameItems is ERC1155, Ownable {
             );
 
             _mint(address(msg.sender), index, 1, "0x00");
-
+            //TODO add callback to hook onto frontend
+            //
             supplyOfToken[index] += 1;
             numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
         }
@@ -142,18 +150,19 @@ contract GameItems is ERC1155, Ownable {
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public {
-        require(
-            starterPacksMinted < MAX_PACKS,
-            "All packs have already been minted!"
-        );
-        require(
-            balanceOf(msg.sender, starterPackId) < 1,
-            "Can only mint one starter pack per account"
-        );
+//        require(
+//            starterPacksMinted < MAX_PACKS,
+//            "All packs have already been minted!"
+//        );
+//        require(
+//            balanceOf(msg.sender, starterPackId) < 1,
+//            "Can only mint one starter pack per account"
+//        );
 
         _mint(address(msg.sender), starterPackId, 1, "");
 
         starterPacksMinted += 1;
+        packsAvailable -= 1;
         emit packMinted(msg.sender, starterPacksMinted);
     }
 
@@ -175,12 +184,13 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
+
     function burnStarterPack() public {
-        require(packsReadyToOpen, "Packs aren't ready to open yet!");
-        require(
-            balanceOf(address(msg.sender), starterPackId) == 1,
-            "Pack has already been burned or does not exist."
-        );
+//        require(packsReadyToOpen, "Packs aren't ready to open yet!");
+//        require(
+//            balanceOf(address(msg.sender), starterPackId) == 1,
+//            "Pack has already been burned or does not exist."
+//        );
 
         // Indices for players in the pack, 1 of each position
         uint256[5] memory indices = generateStarterPackIndices();
@@ -189,6 +199,8 @@ contract GameItems is ERC1155, Ownable {
         for (uint8 i = 0; i < indices.length; i++) {
             mintAthlete(indices[i]);
         }
+        //TODO add event to get indexes of the athletes minted, for displaying on the frontend
+        emit packBurned(indices);
         // Burning the starter pack
         _burn(address(msg.sender), starterPackId, 1);
     }
