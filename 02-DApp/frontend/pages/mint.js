@@ -1,15 +1,15 @@
 import { useAccount, useConnect, useContractRead, useContract, useEnsLookup } from 'wagmi'
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Button, Chip, Container, Paper, Fab } from "@mui/material";
+import ConnectWalletModal from '../components/ConnectWalletModal';
 
 export default function Mint({setDisplay}) {
-  const [{ data: connectData, error: connectError }, connect] = useConnect()
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   })
-  console.log(setDisplay)
+  const [modalOpen, setModalOpen] = useState(false);
+
   if (true) {
     return (
         <Box>
@@ -21,19 +21,6 @@ export default function Mint({setDisplay}) {
         justifyContent="center"
         alignItems="center"
         >
-         {/* <img src={accountData.ens?.avatar} alt="ENS Avatar" /> */}
-          {/* <div>{accountData.ens?.name
-//             ? `${accountData.ens?.name} (${accountData.address})`
-//             : accountData.address}</div>
-//          <div>Connected to {accountData.connector.name}</div>
-//          <Button variant="outlined" color="secondary" onClick={disconnect}>Disconnect</Button> */}
-         {/* background: ;
-// filter: blur(100px); */}
-{/* //             <Paper elevation={0} style={{background: 'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)'}}/>
-//             <Chip style={{width: 120, background: 'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)'}}>
-//                 This is a Chip
-//             </Chip> */}
-         
         <Box
             justifyContent="center"
             alignItems="center"
@@ -70,25 +57,14 @@ export default function Mint({setDisplay}) {
                 paddingTop: '20px'
             }}
         >
-        <Button variant="contained" color="inherit" style={{color:'black', borderRadius:"40px", width:'10%', fontSize:20}}>
-                MINT
+        <Button variant="contained" color="inherit" style={{color:'black', borderRadius:"40px", fontSize:20}}
+          onClick = {() => {if (!accountData) {setModalOpen(true)}}}>
+               {accountData? "MINT" : "CONNECT WALLET TO MINT"}
         </Button>
+        {modalOpen && <ConnectWalletModal modalOpen={modalOpen} handleClickAway={null} setModalOpen={setModalOpen} />}
         </Box>
         </Container>
         </Box>
     )
   }
-  return (<div></div>)
-
-  // return (
-  //   <Box>
-  //     {connectData.connectors.map((x) => (
-  //       <Button variant="outlined" color="secondary" disabled={!x.ready} key={x.id} onClick={() => connect(x)}>
-  //         {x.name}
-  //         {!x.ready && ' (unsupported)'}
-  //       </Button>          
-  //     ))}
-  //     {connectError && <div>{connectError?.message ?? 'Failed to connect'}</div>}
-  //   </Box>
-  // )
 }

@@ -10,12 +10,12 @@ import TabPanel from '@mui/lab/TabPanel'
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext'
 import Typography from '@mui/material/Typography';
+import logo from '../assets/images/logo.png';
+import Image from 'next/image';
 
 //************* */
 // Custom Page Imports
 //********************** */
-import About from './about';
-import Mint from './mint';
 import Collection from './collection';
 import MintHome from './mintHome';
 
@@ -23,6 +23,7 @@ import MintHome from './mintHome';
 //  Component Imports */
 //******************* */
 import ConnectWallet from './connectWallet';
+import WalletLogin from '../components/WalletLogin';
 
 
 // API key for Ethereum node
@@ -67,6 +68,21 @@ export default function Index(props) {
     return (
       <Provider autoConnect connectors={connectors}>
         <Box>
+          <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            p: 1,
+            m: 1,
+            borderRadius: 1,
+            alignItems: 'center',
+          }}>
+          <Image
+            src={logo}
+            alt="TeamDiff logo"
+          />
+          <WalletLogin/>           
+          </Box>
           <TabContext value={value}>
             <Box>
               {/* //Do we want to have this be a SPA with all tabs?
@@ -79,12 +95,8 @@ export default function Index(props) {
                 <Tab label="PLAY" value="0" />
                 <Tab label="COLLECTION" value="1" />
                 <Tab label="MINT" value="2" />
-                 {/*<Tab label="" value="0" />*/}
               </TabList>
             </Box>
-            {/* <TabPanel value="0">
-              <ConnectWallet />
-            </TabPanel> */}
             <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 Home
@@ -96,10 +108,6 @@ export default function Index(props) {
 
             <TabPanel value="2">
               <MintHome />
-            {/*<TabPanel value="2">*/}
-            {/*  <Typography variant="h2" color="secondary" component="div">*/}
-            {/*    <Mint />*/}
-            {/*  </Typography>*/}
             </TabPanel>
           </TabContext>
           <Footer/>
