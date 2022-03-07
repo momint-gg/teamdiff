@@ -59,8 +59,8 @@ contract GameItems is ERC1155, Ownable {
     // address vrfAddress = 0xce33C9b8d69Fb99a715279503980Cf54f9A57218;
 
     // ======= Events ==========
-    event packMinted(address user, uint256 id);
-    event packBurned(uint256[5]);
+    event packMinted(address signer, uint256 id);
+    event packBurned(uint256[5], address signer);
 
     // event VRFConsumerCreated(address a);
     // event Response(bool success, bytes data);
@@ -199,8 +199,7 @@ contract GameItems is ERC1155, Ownable {
         for (uint8 i = 0; i < indices.length; i++) {
             mintAthlete(indices[i]);
         }
-        //TODO add event to get indexes of the athletes minted, for displaying on the frontend
-        emit packBurned(indices);
+        emit packBurned(indices, msg.sender);
         // Burning the starter pack
         _burn(address(msg.sender), starterPackId, 1);
     }

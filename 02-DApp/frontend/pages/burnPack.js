@@ -23,46 +23,25 @@ export default function BurnPack({setDisplay}) {
     //Use Effect for component mount
     useEffect(() => {
         if (accountData) {
-            //console.log("signer: " + JSON.stringify(signerData, null, 2));
+            //Initialize connections to GameItems contract
             const GameItemsContract = new ethers.Contract(
                 CONSTANTS.CONTRACT_ADDR,
                 GameItemsJSON.abi,
                 provider
             );
             setGameItemsContract(GameItemsContract);
-            // const packsAvail = await GameItemsContract.packsAvailable();
-            // setPacksAvailable(packsAvail);
 
-            const packBurnedCallback = (athleteIndices) => {
-                //setMintedPackId(packID);
-                //Since all packs are like an ERC-20, there will only ever be one index on opensea,
-                console.log("callbacked called with data: " + athleteIndices);
-                setIsMinting(false);
-                setHasMinted(true);
-                console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
-                setMintedIndices(athleteIndices);
-                //alert(`Your Team Diff Starter Pack is all done minting -- see it here: https://testnets.opensea.io/assets/${GameItemsContract.address}/0`)
-
-                //alert(`Your Team Diff Starter Pack is all done minting -- see it here: https://testnets.opensea.io/assets/${address}/0`)
+            //Callback for when pack burned function is called from GameItems contracts
+            const packBurnedCallback = (athleteIndices, signer) => {
+                if (signer == accountData.address) {
+                    setIsMinting(false);
+                    setHasMinted(true);
+                    //console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
+                    setMintedIndices(athleteIndices);
+                }
             }
-            // A filter that matches my Signer as the author
-            //let filter = GameItemsContract.filters.mintStarterPack(signerData);
-            // List all token transfers  *from*  myAddress
-            // const signerAddress = await signerData.getAddress();
-            // let filter = {
-            //     address: signerAddress,
-            //     // topics: [
-            //     //     utils.id("Transfer(address,address,uint256)"),
-            //     //     hexZeroPad(myAddress, 32)
-            //     // ]
-            // };
-            //console.log("signeraddy: " + signerAddress)
-            // List all token transfers *from* myAddress
-            //GameItemsContract.filters.packMinted(signerData)
-            //GameItemsContract.on(filter, packMintedCallback);
 
-            //TODO filter this listener to only trigger when pack Minted is called by signerAddress
-            //Listen to event for when pack mint function is called
+            //Listen to event for when pack burn function is called
             GameItemsContract.once('packBurned', packBurnedCallback);
         } else {
             console.log("no account data found!");
@@ -167,15 +146,15 @@ export default function BurnPack({setDisplay}) {
                     Your Starter Pack has been burned
                 </Typography>
                 {/*TODO: show a collection of their newly minted athlete cards on the screen*/}
-                {/*<a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/' + mintedIndices[0]}>*/}
-                {/*    View on OpenSea.*/}
-                {/*</a>*/}
                 {mintedIndices?.map(index => (
                     <a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/' + index}>
                         {"View Athlete #" + index + " on OpenSea."}
                     </a>
                 ))}
-                {console.log("mintIndices: " + mintedIndices)}
+                <Typography>
+                    Note that it may take a few minutes for images and metadata to properly load on OpenSea.
+                </Typography>
+
             </Box>
             }
             {(!accountData && !hasMinted && !isMinting) &&
