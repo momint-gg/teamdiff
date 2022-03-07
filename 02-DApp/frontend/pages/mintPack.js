@@ -2,7 +2,6 @@ import { useAccount, useConnect, useSigner, useProvider, useContract, useEnsLook
 import {useEffect, useState} from 'react';
 import { ethers } from 'ethers';
 import 'bootstrap/dist/css/bootstrap.css'
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab } from "@mui/material";
 import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
@@ -10,61 +9,56 @@ import * as utils from "@ethersproject/hash";
 import {hexZeroPad} from "@ethersproject/bytes";
 
 export default function MintPack({setDisplay}) {
+    //WAGMI Hooks
     const [{data: connectData, error: connectError}, connect] = useConnect()
-    const [mintedPackId, setMintedPackId] = useState(null);
     const [{data: accountData}, disconnect] = useAccount({
         fetchEns: true,
     })
     const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
     const [{data: signerData, error, loading}, getSigner] = useSigner()
+
+    //State Variables
     const [gameItemsContract, setGameItemsContract] = useState(null);
     const [isMinting, setIsMinting] = useState(false);
     const [hasMinted, setHasMinted] = useState(false);
     const [packsAvailable, setPacksAvailable] = useState(null);
-    const [eventAddress, setEventAddress] = useState(null);
 
     //Use Effect for component mount
     useEffect(async () => {
         if (accountData) {
-            //console.log("signer: " + JSON.stringify(signerData, null, 2));
+
+            //Initialize connections to GameItems contract
             const GameItemsContract = new ethers.Contract(
                 CONSTANTS.CONTRACT_ADDR,
                 GameItemsJSON.abi,
                 provider
             );
             setGameItemsContract(GameItemsContract);
+
+            //Grab packs available
             const packsAvail = await GameItemsContract.packsAvailable();
             setPacksAvailable(packsAvail);
-            //const signerAddress = await signerData.getAddress();
-            const signerAddress = "0x14D8DF624769E6075769a59490319625F50B2B17";
 
-            const packMintedCallback = (address, packID) => {
-                console.log("Event address " + address);
-
-                if(address == signerAddress) {
-
+            //Callback for when packMinted Events is fired from contract
+            const signerAddress = accountData.address;
+            const packMintedCallback = (signer, packID) => {
+                if(signer == signerAddress) {
                     setIsMinting(false);
-                    // setEventAddress(address);
                     setHasMinted(true);
                 }
             }
-            // A filter that matches my Signer as the author
-            //TODO this signerData won't always be intilized immediately
 
+            // A filter that matches my address as the signer of the contract call
+            // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
             console.log(hexZeroPad(signerAddress, 32));
             let filter = {
                 address: GameItemsContract.address,
                 topics: [
                     utils.id("packMinted(address,uint256)"),
-                    //"0x00000000000000000000000014d8df624769e6075769a59490319625f50b2b17"
                     //TODO something wrong with this line
-                    hexZeroPad(signerAddress, 32)
+                    //hexZeroPad(signerAddress, 32)
                 ]
             };
-
-            //TODO filter this listener to only trigger when pack Minted is called by signerAddress
-            //Listen to event for when pack mint function is called
-            // GameItemsContract.once('packMinted', packMintedCallback);
             GameItemsContract.on(filter, packMintedCallback);
 
         } else {
@@ -77,7 +71,6 @@ export default function MintPack({setDisplay}) {
         if (gameItemsContract) {
             // Create a new instance of the Contract with a Signer, which allows
             // update methods
-            //  setGameItemsContract(gameItemsContract.connect(signerData));
             let gameItemsContractWithSigner = gameItemsContract.connect(signerData);
 
             const mintTxn = await gameItemsContractWithSigner.mintStarterPack()
@@ -139,9 +132,6 @@ export default function MintPack({setDisplay}) {
                                 {"There are " + packsAvailable + " packs still available"}
                             </h3>
                         }
-                        {/*<Fab >*/}
-                        {/*    MintPack Start Pack*/}
-                        {/*</Fab>*/}
                     </Box>
                     <Box
                         justifyContent="center"
@@ -172,9 +162,12 @@ export default function MintPack({setDisplay}) {
                 <Typography>
                     Your Team Diff Starter Pack is all done minting!
                 </Typography>
-                <a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/0'}>
+                <a href={'https://testnets.opensea.io/assets/'+ gameItemsContract.address + '/0'} target={"_blank"}>
                  View on OpenSea.
                 </a>
+                <Typography>
+                    Note that it may take a few minutes for images and metadata to properly load on OpenSea.
+                </Typography>
                 </Box>
             }
             {(!accountData && !hasMinted && !isMinting) &&
