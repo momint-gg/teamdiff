@@ -373,7 +373,7 @@ class DataFetcher():
         for athlete, info in self.athletes.items():
             self.nft_metadata[athlete] = {}
             self.nft_metadata[athlete]["name"] = info["Name"]
-            self.nft_metadata[athlete]["description"] = "Combine this card with 4 other athletes to build your dream roster"
+            self.nft_metadata[athlete]["description"] = "Combine this card with 4 other athletes to build your dream roster. TeamDiff Genesis mint 2022."
             self.nft_metadata[athlete]["image"] = "https://ipfs.io/ipfs/" + \
                 self.athletes[athlete]["ipfs"]["Hash"]
             self.nft_metadata[athlete]["attributes"] = [
