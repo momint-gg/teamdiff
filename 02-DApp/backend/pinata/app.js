@@ -11,7 +11,8 @@ async function uploadHeadshots(imgDirPath) {
     const auth = await pinata.testAuthentication();
 
     if (auth.authenticated === false) {
-        console.log("Not authenticated with Pinata!");
+        console.log("ERROR: Not authenticated with Pinata! Terminating upload...");
+        return;
     }
 
     const files = fs.readdirSync(imgDirPath);
