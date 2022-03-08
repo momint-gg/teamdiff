@@ -2,9 +2,8 @@ const fs = require("fs");
 const pinataSDK = require("@pinata/sdk");
 require("dotenv").config();
 
-const PINATA_KEY = "4a0eaf0152b418694da3";
-const SECRET_API_KEY =
-    "7a597eb3bd423d47dd112f5267ecdf6871e6bb4f33f806cf7782c3df1d33c1fd";
+const PINATA_KEY = "";
+const SECRET_API_KEY = "";
 
 const pinata = pinataSDK(PINATA_KEY, SECRET_API_KEY);
 
