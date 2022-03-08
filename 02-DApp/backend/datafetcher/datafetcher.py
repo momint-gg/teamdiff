@@ -14,6 +14,8 @@ import subprocess
 import time
 import urllib.request
 
+from zmq import THREAD_NAME_PREFIX
+
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -201,7 +203,8 @@ class DataFetcher():
         return name.split("(")[0].strip().lower()
 
     def set_athletes_and_teams_from_csv(self, file_name):
-        print("Setting athletes and teams from " + str(file_name) + "...")
+        print("(Step 1/7) Setting athletes and teams from " +
+              str(file_name) + "...\n")
         self._set_athletes(file_name)
 
         fields = ", ".join(self.player_fields)
@@ -226,15 +229,20 @@ class DataFetcher():
             self.teams.append(
                 athlete["title"]["Team"]) if athlete["title"]["Team"] not in self.teams else None
 
-        print()
-        print("These athletes were successfully pulled from the file:")
-        for summoner_id in sorted(self.athletes.keys(), key=lambda athelete: athelete.lower()):
-            print(summoner_id)
-        print()
-        print("Done!")
+        print("These athletes were set:\n")
+
+        for i, summoner_id in enumerate(sorted(self.athletes.keys(), key=lambda athlete: athlete.lower())):
+            print(str(i+1) + ".", summoner_id)
+
+        print("\nThese teams were set:\n")
+
+        for i, team in enumerate(self.teams):
+            print(str(i+1) + ".", team)
+
+        print("\nDone!\n")
 
     def fetch_athlete_game_stats(self):
-        print("Fetching athlete game stats...")
+        print("(Step 2/7) Fetching athlete game stats...")
         for team in self.teams:
             game_data = self._fetch_game_data(
                 team, self.start_date, self.time_interval)['cargoquery']
@@ -274,10 +282,10 @@ class DataFetcher():
 
                     self.athlete_game_stats[current_summoner_id][game_id][stat] = int(
                         value)
-        print("Done!")
+        print("Done!\n")
 
     def aggregate_athlete_game_stats(self):
-        print("Aggregating athlete game stats...")
+        print("(Step 3/7) Aggregating athlete game stats...")
         agg_game_stats = {}
         for current_summoner_id, games in self.athlete_game_stats.items():
             if current_summoner_id not in agg_game_stats:
@@ -306,14 +314,33 @@ class DataFetcher():
 
                     agg_game_stats[current_summoner_id][stat] += value
 
+        seen_summoner_ids = set(agg_game_stats.keys())
+        all_summoner_ids = set(self.athletes.keys())
+        no_games_summoner_ids = all_summoner_ids.difference(seen_summoner_ids)
+
+        for summoner_id in no_games_summoner_ids:
+            agg_game_stats[summoner_id] = {
+                'assists': 0,
+                'assists10': 0,
+                'cs': 0,
+                'damage_to_champions': 0,
+                'deaths': 0,
+                'gold': 0,
+                'kills': 0,
+                'kills10': 0,
+                'summoner_id': summoner_id,
+                'wins': 0
+            }
+
         self.aggregated_athlete_game_stats = [
             stats for _, stats in agg_game_stats.items()]
-        print("Done!")
+
+        print("Done!\n")
 
     def fetch_athlete_headshots(self):
-        print("Fetching athlete headshots...\n")
+        print("(Step 4/7) Fetching athlete headshots...\n")
         for i, athlete in enumerate(sorted(self.athletes.keys())):
-            print("(", i+1, "/", len(self.athletes), ")", sep="")
+            print("(Athlete ", i+1, "/", len(self.athletes), ") ", athlete, sep="")
 
             response = self.site.api('cargoquery',
                                      limit=1,
@@ -341,13 +368,15 @@ class DataFetcher():
                       athlete, "failed to upload to IPFS")
             finally:
                 pprint(self.athletes[athlete]["ipfs"])
+                print()
                 os.replace(athlete + ".png",
                            "../pinata/headshots/" + athlete + ".png")
                 time.sleep(5)
 
-        print("\nDone!")
+        print("Done!\n")
 
     def create_nft_metadata_ordered(self):
+        print("(Step 6/7) Creating position-ordered NFT metadata JSON files...\n")
         file_name = 0
         for target_position in self.positions:
             for athlete, info in self.athletes.items():
@@ -377,8 +406,10 @@ class DataFetcher():
                         self.nft_metadata[athlete], "nft_metadata_ordered/" + str(file_name) + ".json")
 
                     file_name += 1
+        print()
 
     def create_nft_metadata_random(self):
+        print("(Step 7/7) Creating random-ordered NFT metadata JSON files...\n")
         random_athletes = []
         for athlete, info in self.athletes.items():
             self.nft_metadata[athlete] = {}
@@ -420,40 +451,32 @@ class DataFetcher():
         return True
 
     def upload_headshots_to_pinata(self):
-        print("Uploading headshots to Pinata...\n")
+        print("(Step 5/7) Uploading headshots to Pinata...\n")
         time.sleep(1)
         subprocess.call(["node", "../pinata/app.js", "-p"])
-        print("\nDone!")
+        print("Done!\n")
 
 
 def main():
+    print("\nStarting datafetch...\n")
     df = DataFetcher()
-    print("Starting datafetch...\n")
 
     df.set_athletes_and_teams_from_csv("athletes.csv")
-    print()
 
     target_athlete_count = 50
     if not df.is_correct_athlete_count(target_athlete_count):
         return
 
     df.fetch_athlete_game_stats()
-    print()
-
     df.aggregate_athlete_game_stats()
-    print()
 
     df.fetch_athlete_headshots()
-    print()
     df.upload_headshots_to_pinata()
-    print()
 
     df.create_nft_metadata_ordered()
-    print()
     df.create_nft_metadata_random()
-    print()
 
-    print("Datafetch complete!")
+    print("\nDatafetch complete!")
 
 
 main()

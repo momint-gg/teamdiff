@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,8 +12,5 @@
   "license": "ISC",
   "dependencies": {
     "@pinata/sdk": "^1.1.23"
-  },
-  "devDependencies": {
-    "dotenv": "^16.0.0"
   }
 }
