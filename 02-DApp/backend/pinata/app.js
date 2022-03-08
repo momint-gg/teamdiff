@@ -7,7 +7,7 @@ const SECRET_API_KEY = "";
 
 const pinata = pinataSDK(PINATA_KEY, SECRET_API_KEY);
 
-async function uploadHeadshots(imgDirPath) {
+async function uploadHeadshots(pathToHeadshotsDir) {
     const auth = await pinata.testAuthentication();
 
     if (auth.authenticated === false) {
@@ -15,12 +15,12 @@ async function uploadHeadshots(imgDirPath) {
         return;
     }
 
-    const files = fs.readdirSync(imgDirPath);
+    const files = fs.readdirSync(pathToHeadshotsDir);
 
     for (let i = 0; i < files.length; i++) {
         console.log(`(${i + 1}/${files.length}) ${files[i]}`);
         const readableStreamForFile = fs.createReadStream(
-            imgDirPath + `/${files[i]}`
+            pathToHeadshotsDir + `/${files[i]}`
         );
         let result = await pinata.pinFileToIPFS(readableStreamForFile);
         console.log(result.IpfsHash);
@@ -29,14 +29,14 @@ async function uploadHeadshots(imgDirPath) {
 
 async function main() {
     const args = process.argv.slice(2);
-    let imgDirPath = "headshots";
+    let pathToHeadshotsDir = "headshots";
 
     if (args.length === 1 && args[0] === "-p") {
         // If calling this script from datafetcher.py, the headshot folder
         // path is relative to datafetcher.py instead of pinata/app.js
-        imgDirPath = "../pinata/headshots";
+        pathToHeadshotsDir = "../pinata/headshots";
     }
-    await uploadHeadshots(imgDirPath);
+    await uploadHeadshots(pathToHeadshotsDir);
 }
 
 main();

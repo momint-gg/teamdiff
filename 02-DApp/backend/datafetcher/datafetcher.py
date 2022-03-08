@@ -290,27 +290,21 @@ class DataFetcher():
                     stat = stat if stat != "player_win" else "wins"
 
                     if stat not in agg_game_stats[current_summoner_id]:
-                        if stat == "wins":
-                            agg_game_stats[current_summoner_id]["wins"] = 0
-
-                        elif stat == "kills":
-                            agg_game_stats[current_summoner_id][stat] = 0
+                        if stat == "kills":
                             agg_game_stats[current_summoner_id]["kills10"] = 0
 
-                        elif stat == "assists":
-                            agg_game_stats[current_summoner_id][stat] = 0
+                        if stat == "assists":
                             agg_game_stats[current_summoner_id]["assists10"] = 0
-                        
-                        else:
-                            agg_game_stats[current_summoner_id][stat] = 0
 
-                    agg_game_stats[current_summoner_id][stat] += value
+                        agg_game_stats[current_summoner_id][stat] = 0
 
                     if stat == "kills" and value >= 10:
                         agg_game_stats[current_summoner_id]["kills10"] += 1
 
                     if stat == "assists" and value >= 10:
                         agg_game_stats[current_summoner_id]["assists10"] += 1
+
+                    agg_game_stats[current_summoner_id][stat] += value
 
         self.aggregated_athlete_game_stats = [
             stats for _, stats in agg_game_stats.items()]
