@@ -14,8 +14,6 @@ import subprocess
 import time
 import urllib.request
 
-from zmq import THREAD_NAME_PREFIX
-
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
