@@ -29,6 +29,7 @@ contract GameItems is ERC1155, Ownable {
     uint256 private NFT_PER_ATHLETE;
     uint256 chainlinkSubId;
     uint256 public REVEAL_TIMESTAMP = 10000;
+    string public name = "TeamDiff";
 
     // When we flip the switch and let everyone open packs
     bool public packsReadyToOpen = true;
@@ -150,14 +151,14 @@ contract GameItems is ERC1155, Ownable {
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public {
-//        require(
-//            starterPacksMinted < MAX_PACKS,
-//            "All packs have already been minted!"
-//        );
-//        require(
-//            balanceOf(msg.sender, starterPackId) < 1,
-//            "Can only mint one starter pack per account"
-//        );
+        //        require(
+        //            starterPacksMinted < MAX_PACKS,
+        //            "All packs have already been minted!"
+        //        );
+        //        require(
+        //            balanceOf(msg.sender, starterPackId) < 1,
+        //            "Can only mint one starter pack per account"
+        //        );
 
         _mint(address(msg.sender), starterPackId, 1, "");
 
@@ -186,11 +187,11 @@ contract GameItems is ERC1155, Ownable {
     // Passing in random indices here!
 
     function burnStarterPack() public {
-//        require(packsReadyToOpen, "Packs aren't ready to open yet!");
-//        require(
-//            balanceOf(address(msg.sender), starterPackId) == 1,
-//            "Pack has already been burned or does not exist."
-//        );
+        //        require(packsReadyToOpen, "Packs aren't ready to open yet!");
+        //        require(
+        //            balanceOf(address(msg.sender), starterPackId) == 1,
+        //            "Pack has already been burned or does not exist."
+        //        );
 
         // Indices for players in the pack, 1 of each position
         uint256[5] memory indices = generateStarterPackIndices();
