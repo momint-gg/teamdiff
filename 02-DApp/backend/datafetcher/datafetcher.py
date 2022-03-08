@@ -406,7 +406,7 @@ class DataFetcher():
                         self.nft_metadata[athlete], "nft_metadata_ordered/" + str(file_name) + ".json")
 
                     file_name += 1
-        print()
+        print("\nDone!\n")
 
     def create_nft_metadata_random(self):
         print("(Step 7/7) Creating random-ordered NFT metadata JSON files...\n")
@@ -442,6 +442,8 @@ class DataFetcher():
 
             file_name += 1
 
+        print("\nDone!")
+
     def is_correct_athlete_count(self, target_count):
         if len(self.athletes.keys()) != target_count:
             print("ERROR: self.athletes has size", len(
@@ -476,7 +478,7 @@ def main():
     df.create_nft_metadata_ordered()
     df.create_nft_metadata_random()
 
-    print("\nDatafetch complete!")
+    print("\nDatafetch complete!\n")
 
 
 main()
