@@ -2,26 +2,20 @@
 
 import csv
 import datetime as dt
-from dotenv import load_dotenv
 import ipfsApi
 import json
 import mwclient
 from pprint import pprint
 import os
-from os.path import join, dirname
 import random
 import re
-import shutil
 import ssl
-from subprocess import call, check_output
+import subprocess
 import time
 import urllib.request
-import yaml
 
 
 ssl._create_default_https_context = ssl._create_unverified_context
-dotenv_path = join(dirname(__file__), '.env')
-load_dotenv()
 
 
 class DataFetcher():
@@ -224,7 +218,7 @@ class DataFetcher():
         ).get("cargoquery")
 
         parsed = json.dumps(response)
-        decoded = yaml.safe_load(parsed)
+        decoded = json.loads(parsed)
 
         for athlete in decoded:
             summoner_id = self._clean_summoner_id(athlete["title"]["Player"])
@@ -290,25 +284,33 @@ class DataFetcher():
                 agg_game_stats[current_summoner_id] = {
                     "summoner_id": current_summoner_id
                 }
+
             for _, game in games.items():
                 for stat, value in game.items():
-                    if stat == "player_win":
-                        if "wins" not in agg_game_stats[current_summoner_id]:
-                            agg_game_stats[current_summoner_id]["wins"] = 0
-                        agg_game_stats[current_summoner_id]["wins"] += value
+                    stat = stat if stat != "player_win" else "wins"
 
                     if stat not in agg_game_stats[current_summoner_id]:
-                        agg_game_stats[current_summoner_id][stat] = value
-                        if stat == "kills":
+                        if stat == "wins":
+                            agg_game_stats[current_summoner_id]["wins"] = 0
+
+                        elif stat == "kills":
+                            agg_game_stats[current_summoner_id][stat] = 0
                             agg_game_stats[current_summoner_id]["kills10"] = 0
-                        if stat == "assists":
+
+                        elif stat == "assists":
+                            agg_game_stats[current_summoner_id][stat] = 0
                             agg_game_stats[current_summoner_id]["assists10"] = 0
-                    else:
-                        agg_game_stats[current_summoner_id][stat] += value
-                        if stat == "kills" and agg_game_stats[current_summoner_id]["kills"] >= 10:
-                            agg_game_stats[current_summoner_id]["kills10"] = 1
-                        if stat == "assists" and agg_game_stats[current_summoner_id]["assists"] >= 10:
-                            agg_game_stats[current_summoner_id]["assists10"] = 1
+                        
+                        else:
+                            agg_game_stats[current_summoner_id][stat] = 0
+
+                    agg_game_stats[current_summoner_id][stat] += value
+
+                    if stat == "kills" and value >= 10:
+                        agg_game_stats[current_summoner_id]["kills10"] += 1
+
+                    if stat == "assists" and value >= 10:
+                        agg_game_stats[current_summoner_id]["assists10"] += 1
 
         self.aggregated_athlete_game_stats = [
             stats for _, stats in agg_game_stats.items()]
@@ -326,6 +328,7 @@ class DataFetcher():
                                      where='Link="%s"' % self.clean_to_raw_summoner_ids[athlete],
                                      format="json"
                                      )
+
             parsed = json.dumps(response)
             decoded = json.loads(parsed)
 
@@ -342,7 +345,6 @@ class DataFetcher():
                 }
                 print("ERROR: Headshot of athlete",
                       athlete, "failed to upload to IPFS")
-
             finally:
                 pprint(self.athletes[athlete]["ipfs"])
                 os.replace(athlete + ".png",
@@ -356,6 +358,7 @@ class DataFetcher():
         for target_position in self.positions:
             for athlete, info in self.athletes.items():
                 current_athlete_position = info["Role"] if info["Role"] != "Bot" else "ADC"
+
                 if current_athlete_position == target_position:
                     self.nft_metadata[athlete] = {}
                     self.nft_metadata[athlete]["name"] = info["Name"]
@@ -372,10 +375,13 @@ class DataFetcher():
                             "value": current_athlete_position
                         },
                     ]
+
                     if not os.path.isdir("nft_metadata_ordered/"):
                         os.mkdir("nft_metadata_ordered/")
+
                     self._convert_to_json(
                         self.nft_metadata[athlete], "nft_metadata_ordered/" + str(file_name) + ".json")
+
                     file_name += 1
 
     def create_nft_metadata_random(self):
@@ -401,11 +407,14 @@ class DataFetcher():
         random.shuffle(random_athletes)
 
         file_name = 0
+
         for athlete in random_athletes:
             if not os.path.isdir("nft_metadata_random/"):
                 os.mkdir("nft_metadata_random/")
+
             self._convert_to_json(
                 self.nft_metadata[athlete], "nft_metadata_random/" + str(file_name) + ".json")
+
             file_name += 1
 
     def is_correct_athlete_count(self, target_count):
@@ -419,7 +428,7 @@ class DataFetcher():
     def upload_headshots_to_pinata(self):
         print("Uploading headshots to Pinata...\n")
         time.sleep(1)
-        call(["node", "../pinata/app.js", "-p"])
+        subprocess.call(["node", "../pinata/app.js", "-p"])
         print("\nDone!")
 
 
@@ -436,8 +445,10 @@ def main():
 
     df.fetch_athlete_game_stats()
     print()
+
     df.aggregate_athlete_game_stats()
-    print()
+    pprint(df.aggregated_athlete_game_stats)
+    return
 
     df.fetch_athlete_headshots()
     print()
