@@ -447,7 +447,7 @@ def main():
     print()
 
     df.aggregate_athlete_game_stats()
-    pprint()
+    print()
 
     df.fetch_athlete_headshots()
     print()
