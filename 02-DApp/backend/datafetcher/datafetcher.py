@@ -1,5 +1,8 @@
+#!/usr/bin/python3
+
 import csv
 import datetime as dt
+from dotenv import load_dotenv
 import ipfsApi
 import json
 import mwclient
@@ -8,11 +11,13 @@ import os
 from os.path import join, dirname
 import random
 import re
+import shutil
 import ssl
+from subprocess import call, check_output
 import time
 import urllib.request
 import yaml
-from dotenv import load_dotenv
+
 
 ssl._create_default_https_context = ssl._create_unverified_context
 dotenv_path = join(dirname(__file__), '.env')
@@ -226,6 +231,7 @@ class DataFetcher():
             self.athletes[summoner_id] = athlete["title"]
             self.teams.append(
                 athlete["title"]["Team"]) if athlete["title"]["Team"] not in self.teams else None
+
         print()
         print("These athletes were successfully pulled from the file:")
         for summoner_id in sorted(self.athletes.keys(), key=lambda athelete: athelete.lower()):
@@ -309,7 +315,7 @@ class DataFetcher():
         print("Done!")
 
     def fetch_athlete_headshots(self):
-        print("Fetching athlete headshots...")
+        print("Fetching athlete headshots...\n")
         for i, athlete in enumerate(sorted(self.athletes.keys())):
             print("(", i+1, "/", len(self.athletes), ")", sep="")
 
@@ -327,21 +333,23 @@ class DataFetcher():
                 url = str(decoded['cargoquery'][0]['title']['FileName'])
                 self._download_photo(self.site, url, athlete)
                 self.athletes[athlete]["ipfs"] = self.ipfs.add(
-                    "./" + athlete + ".png")
+                    athlete + ".png")
             except:
-                print("ERROR: Headshot of athlete",
-                      athlete, "failed to upload to IPFS")
                 self.athletes[athlete]["ipfs"] = {
                     "Name": "",
                     "Hash": "",
-                    "Size": ""
+                    "Size": "",
                 }
+                print("ERROR: Headshot of athlete",
+                      athlete, "failed to upload to IPFS")
+
             finally:
                 pprint(self.athletes[athlete]["ipfs"])
-                os.remove(
-                    "./" + athlete + ".png") if os.path.exists("./" + athlete + ".png") else None
+                os.replace(athlete + ".png",
+                           "../pinata/headshots/" + athlete + ".png")
                 time.sleep(5)
-        print("Done!")
+
+        print("\nDone!")
 
     def create_nft_metadata_ordered(self):
         file_name = 0
@@ -351,8 +359,8 @@ class DataFetcher():
                 if current_athlete_position == target_position:
                     self.nft_metadata[athlete] = {}
                     self.nft_metadata[athlete]["name"] = info["Name"]
-                    self.nft_metadata[athlete]["description"] = "This is a professional eSports athelete!"
-                    self.nft_metadata[athlete]["image"] = "https://ipfs.io/ipfs/" + \
+                    self.nft_metadata[athlete]["description"] = "Combine this card with 4 other athletes to build your dream roster. TeamDiff Genesis mint 2022."
+                    self.nft_metadata[athlete]["image"] = "https://gateway.pinata.cloud/ipfs/" + \
                         self.athletes[athlete]["ipfs"]["Hash"]
                     self.nft_metadata[athlete]["attributes"] = [
                         {
@@ -364,6 +372,8 @@ class DataFetcher():
                             "value": current_athlete_position
                         },
                     ]
+                    if not os.path.isdir("nft_metadata_ordered/"):
+                        os.mkdir("nft_metadata_ordered/")
                     self._convert_to_json(
                         self.nft_metadata[athlete], "nft_metadata_ordered/" + str(file_name) + ".json")
                     file_name += 1
@@ -374,7 +384,7 @@ class DataFetcher():
             self.nft_metadata[athlete] = {}
             self.nft_metadata[athlete]["name"] = info["Name"]
             self.nft_metadata[athlete]["description"] = "Combine this card with 4 other athletes to build your dream roster. TeamDiff Genesis mint 2022."
-            self.nft_metadata[athlete]["image"] = "https://ipfs.io/ipfs/" + \
+            self.nft_metadata[athlete]["image"] = "https://gateway.pinata.cloud/ipfs/" + \
                 self.athletes[athlete]["ipfs"]["Hash"]
             self.nft_metadata[athlete]["attributes"] = [
                 {
@@ -392,6 +402,8 @@ class DataFetcher():
 
         file_name = 0
         for athlete in random_athletes:
+            if not os.path.isdir("nft_metadata_random/"):
+                os.mkdir("nft_metadata_random/")
             self._convert_to_json(
                 self.nft_metadata[athlete], "nft_metadata_random/" + str(file_name) + ".json")
             file_name += 1
@@ -404,11 +416,16 @@ class DataFetcher():
 
         return True
 
+    def upload_headshots_to_pinata(self):
+        print("Uploading headshots to Pinata...\n")
+        time.sleep(1)
+        call(["node", "../pinata/app.js", "-p"])
+        print("\nDone!")
+
 
 def main():
     df = DataFetcher()
-    print("Starting datafetch...")
-    print()
+    print("Starting datafetch...\n")
 
     df.set_athletes_and_teams_from_csv("athletes.csv")
     print()
@@ -423,6 +440,9 @@ def main():
     print()
 
     df.fetch_athlete_headshots()
+    print()
+    df.upload_headshots_to_pinata()
+    print()
 
     df.create_nft_metadata_ordered()
     print()
