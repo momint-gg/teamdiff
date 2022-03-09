@@ -34,9 +34,6 @@ contract GameItems is ERC1155, Ownable {
     // When we flip the switch and let everyone open packs
     bool public packsReadyToOpen = true;
 
-    // Where to start pack IDs
-    uint256 private starterPackId = NUM_ATHLETES + 1;
-    uint256 private boosterPackId = NUM_ATHLETES + 2;
     // Total amount of packs minted so far
     uint256 private starterPacksMinted;
     uint256 private boosterPacksMinted;
@@ -141,7 +138,7 @@ contract GameItems is ERC1155, Ownable {
                 "All of this athlete have already been minted!"
             );
 
-            _mint(address(msg.sender), index, 1, "0x00");
+            _mint(msg.sender, index, 1, "0x00");
 
             supplyOfToken[index] += 1;
             numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
@@ -150,6 +147,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public {
+        uint256 starterPackId = NUM_ATHLETES;
         //        require(
         //            starterPacksMinted < MAX_PACKS,
         //            "All packs have already been minted!"
@@ -159,7 +157,8 @@ contract GameItems is ERC1155, Ownable {
         //            "Can only mint one starter pack per account"
         //        );
 
-        _mint(address(msg.sender), starterPackId, 1, "");
+        // Making the index 1 after the athletes end
+        _mint(msg.sender, starterPackId, 1, "0x00");
 
         starterPacksMinted += 1;
         packsAvailable -= 1;
@@ -167,6 +166,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     function mintBoosterPack() public {
+        uint256 boosterPackId = NUM_ATHLETES + 1;
         require(
             boosterPacksMinted < MAX_PACKS,
             "All packs have already been minted!"
@@ -176,7 +176,7 @@ contract GameItems is ERC1155, Ownable {
             "Can only mint two booster packs per account"
         );
 
-        _mint(address(msg.sender), boosterPackId, 1, "");
+        _mint(msg.sender, boosterPackId, 1, "");
 
         boosterPacksMinted += 1;
         emit packMinted(msg.sender, boosterPacksMinted);
@@ -186,6 +186,8 @@ contract GameItems is ERC1155, Ownable {
     // Passing in random indices here!
 
     function burnStarterPack() public {
+        uint256 starterPackId = NUM_ATHLETES;
+
         //        require(packsReadyToOpen, "Packs aren't ready to open yet!");
         //        require(
         //            balanceOf(address(msg.sender), starterPackId) == 1,
@@ -201,10 +203,12 @@ contract GameItems is ERC1155, Ownable {
         }
         emit packBurned(indices, msg.sender);
         // Burning the starter pack
-        _burn(address(msg.sender), starterPackId, 1);
+        _burn(msg.sender, starterPackId, 1);
     }
 
     function burnBoosterPack() public {
+        uint256 boosterPackId = NUM_ATHLETES + 1;
+
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), boosterPackId) > 0,
@@ -263,8 +267,7 @@ contract GameItems is ERC1155, Ownable {
         }
 
         //Setting pack URIs after the athletes (i.e. 50.json, 51.json)
-        setTokenUri(NUM_ATHLETES + 1, string(abi.encodePacked(starterPackURI)));
-        setTokenUri(NUM_ATHLETES + 2, string(abi.encodePacked(boosterPackURI)));
+        setTokenUri(NUM_ATHLETES, string(abi.encodePacked(starterPackURI)));
     }
 
     //Generate pseudo random starter pack indices
