@@ -35,8 +35,8 @@ contract GameItems is ERC1155, Ownable {
     bool public packsReadyToOpen = true;
 
     // Where to start pack IDs
-    uint256 private starterPackId = NUM_ATHLETES;
-    uint256 private boosterPackId = starterPackId;
+    uint256 private starterPackId = NUM_ATHLETES + 1;
+    uint256 private boosterPackId = NUM_ATHLETES + 2;
     // Total amount of packs minted so far
     uint256 private starterPacksMinted;
     uint256 private boosterPacksMinted;
@@ -142,8 +142,7 @@ contract GameItems is ERC1155, Ownable {
             );
 
             _mint(address(msg.sender), index, 1, "0x00");
-            //TODO add callback to hook onto frontend
-            //
+
             supplyOfToken[index] += 1;
             numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
         }

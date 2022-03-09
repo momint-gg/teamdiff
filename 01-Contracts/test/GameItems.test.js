@@ -197,12 +197,17 @@ describe("GameItems.test", async () => {
     // What we could do on front end (5 random indices)
     // Testing contract
     let txn = await GameItem.setStartingIndex();
+    console.log("Setting starting indices");
     await txn.wait();
     txn = await GameItem.setURIs(); // This takes awhile
+    console.log("Setting URIs");
     await txn.wait();
     txn = await GameItem.mintStarterPack();
+    console.log("Minting starting pack");
     await txn.wait();
-    txn = await GameItem.burnStarterPack(); // If we check wallet, should have athlete NFTs now
-    await txn.wait();
+    console.log("Starter pack minted to owner: ", owner.address);
+    // txn = await GameItem.burnStarterPack(); // If we check wallet, should have athlete NFTs now
+    // console.log("Burning starter pack");
+    // await txn.wait();
   });
 });
