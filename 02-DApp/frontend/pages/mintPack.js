@@ -195,7 +195,7 @@ export default function MintPack({ setDisplay }) {
             href={
               'https://testnets.opensea.io/assets/' +
               gameItemsContract.address +
-              '/0'
+              '/50' //the pack Id is after the athletes (not 0)
             }
             target={'_blank'}
           >

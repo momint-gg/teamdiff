@@ -16,6 +16,7 @@ const main = async () => {
   console.log("Now setting token URIs...");
   txn = await gameContract.setURIs();
   await txn.wait();
+  
   console.log(
     "Contract deployed to:",
     gameContract.address,
