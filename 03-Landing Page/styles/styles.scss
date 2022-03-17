@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100;0,200;0,300;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 $breakpoint-mobile: 768px;
+$breakpoint-large: 992px;
 
 .background {
   margin-bottom: 1px;
@@ -24,6 +25,7 @@ body {
   background: linear-gradient(116.82deg, #2f0d32 0%, #000000 100%);
   font-style: normal;
   font-weight: normal;
+  min-width: fit-content;
 }
 
 span.early-access {
@@ -57,9 +59,13 @@ h3 {
 .second-cta {
   text-align: center;
   padding-top: 4rem;
-  margin-left: 5rem;
-  margin-right: 5rem;
   margin-bottom: 1.5rem;
+  margin-right: 1rem;
+  margin-left: 1rem;
+  @media (min-width: $breakpoint-large) {
+    margin-left: 5rem;
+    margin-right: 5rem;
+  }
 }
 
 .footer {
