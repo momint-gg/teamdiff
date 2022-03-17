@@ -70,24 +70,20 @@ h3 {
 
 .footer {
   margin-top: 6rem;
-  // margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
-.footer-link {
-  color: white;
-  text-decoration: none;
-  font-weight: 900;
+.footer-item {
+  color: rgb(214, 214, 214);
+  opacity: 90%;
   &:hover {
-    color: rgb(214, 214, 214);
+    color: white;
+    opacity: 100%;
   }
-  // margin-left: 1.5rem;
-}
-
-.footer-icon {
-  color: white;
-  &:hover {
-    color: rgb(214, 214, 214);
+  &.footer-link {
+    font-weight: 900;
+    text-decoration: none;
   }
 }
 
@@ -100,10 +96,17 @@ h3 {
 }
 
 .sign-up-link {
-  color: white;
   text-decoration: none;
   font-weight: 700;
+  color: rgb(214, 214, 214);
   &:active {
+    color: white;
+  }
+}
+
+p {
+  &.trademark {
     color: rgb(214, 214, 214);
+    font-family: "Exo", sans-serif;
   }
 }
