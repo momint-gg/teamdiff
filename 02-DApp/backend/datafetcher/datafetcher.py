@@ -469,6 +469,8 @@ def main():
 
     df.fetch_athlete_game_stats()
     df.aggregate_athlete_game_stats()
+    
+    df._convert_to_json(df.aggregated_athlete_game_stats, "aggregated_stats.json")
 
     df.fetch_athlete_headshots()
     df.upload_headshots_to_pinata()
