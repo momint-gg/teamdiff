@@ -8,7 +8,20 @@ const main = async () => {
     // gasPrice: 203000000000,
   });
   await gameContract.deployed();
-  console.log("Contract deployed to:", gameContract.address);
+
+  //Initial functions that need to be run
+  console.log("First setting starting index...");
+  let txn = await gameContract.setStartingIndex();
+  await txn.wait();
+  console.log("Now setting token URIs...");
+  txn = await gameContract.setURIs();
+  await txn.wait();
+  
+  console.log(
+    "Contract deployed to:",
+    gameContract.address,
+    " and URIs are all set."
+  );
 };
 
 const runMain = async () => {

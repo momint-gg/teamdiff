@@ -184,6 +184,10 @@ describe("GameItems.test", async () => {
   //   await txn.wait();
   //   txn = await GameItem.setURIs();
   //   await txn.wait();
+  //   const uri1 = await GameItem.uri(49);
+  //   const uri2 = await GameItem.uri(50);
+  //   console.log("ATHLETE 49 URI ", uri1);
+  //   console.log("STARTER PACK URI ", uri2);
   // });
 
   // it("Generates pseudo random indices", async () => {
@@ -192,17 +196,34 @@ describe("GameItems.test", async () => {
   //   txn = await GameItem.generateBoosterPackIndices();
   // });
 
-  // Testing burn pack functionality and minting with 5 random athletes
+  // Testing to see if a pack is given to the caller
   it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
-    // What we could do on front end (5 random indices)
-    // Testing contract
     let txn = await GameItem.setStartingIndex();
+    console.log("Setting starting indices");
     await txn.wait();
     txn = await GameItem.setURIs(); // This takes awhile
+    console.log("Setting URIs");
     await txn.wait();
     txn = await GameItem.mintStarterPack();
+    console.log("Minting starting pack");
     await txn.wait();
+    console.log("Starter pack minted to owner: ", owner.address);
+  });
+
+  // Testing to see if 5 athletes are minted to caller with correct metadata
+  it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
+    let txn = await GameItem.setStartingIndex();
+    console.log("Setting starting indices");
+    await txn.wait();
+    txn = await GameItem.setURIs(); // This takes awhile
+    console.log("Setting URIs");
+    await txn.wait();
+    txn = await GameItem.mintStarterPack();
+    console.log("Minting starting pack");
+    await txn.wait();
+    console.log("Starter pack minted to owner: ", owner.address);
     txn = await GameItem.burnStarterPack(); // If we check wallet, should have athlete NFTs now
+    console.log("Burning starter pack");
     await txn.wait();
   });
 });
