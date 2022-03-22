@@ -45,8 +45,25 @@ export default function Collection() {
         return (
             <Box>
             <Typography variant="h2" color="secondary" component="div">
-                Your collection
+               PACKS
             </Typography>
+            <hr
+                style={{
+                    color: "secondary",
+                    backgroundColor: "secondary",
+                    height: 5
+                }}
+            />
+            <Typography variant="h2" color="secondary" component="div">
+                PLAYERS
+            </Typography>
+            <hr
+                style={{
+                    color: "secondary",
+                    backgroundColor: "secondary",
+                    height: 5
+                }}
+            />
                 <Grid container spacing={3}>
                     {nftData?.map(athleteData => (
                         <Grid item xs={4}>

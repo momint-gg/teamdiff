@@ -10,6 +10,8 @@ import TabPanel from '@mui/lab/TabPanel'
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext'
 import Typography from '@mui/material/Typography';
+import logo from '../assets/images/logo.png';
+import Image from 'next/image';
 
 //************* */
 // Custom Page Imports
@@ -24,6 +26,7 @@ import MintHome from './mintHome';
 //******************* */
 import ConnectWallet from './connectWallet';
 import BurnPack from "./burnPack";
+import WalletLogin from '../components/WalletLogin';
 
 
 // API key for Ethereum node
@@ -68,6 +71,21 @@ export default function Index(props) {
     return (
       <Provider autoConnect connectors={connectors}>
         <Box>
+          <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            p: 1,
+            m: 1,
+            borderRadius: 1,
+            alignItems: 'center',
+          }}>
+          <Image
+            src={logo}
+            alt="TeamDiff logo"
+          />
+          <WalletLogin/>           
+          </Box>
           <TabContext value={value}>
             <Box>
               {/* //Do we want to have this be a SPA with all tabs?
@@ -81,12 +99,8 @@ export default function Index(props) {
                 <Tab label="COLLECTION" value="1" />
                 <Tab label="MINT" value="2" />
                 <Tab label="BURN" value="3" />
-
-                <Tab label="CONNECT" value="4" />
-
               </TabList>
             </Box>
-
             <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 Home

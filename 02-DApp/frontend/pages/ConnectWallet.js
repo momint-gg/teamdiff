@@ -1,8 +1,6 @@
-import { useAccount, useConnect, useContractRead, useContract, useEnsLookup } from 'wagmi'
-import { useState } from 'react';
+import { useAccount, useConnect } from 'wagmi'
 import 'bootstrap/dist/css/bootstrap.css'
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 export default function ConnectWallet() {
   const [{ data: connectData, error: connectError }, connect] = useConnect()
