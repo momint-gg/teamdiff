@@ -13,7 +13,7 @@ contract Athletes is Ownable {
     uint256 numAthletes;
 
     struct Athlete {
-        uint256 id; // e.g. athlete #42
+        uint256 athleteID; // e.g. athlete #42
         uint256[] weeklyScores; // e.g. [0,2,1,3,5,...]
     }
 
@@ -36,6 +36,11 @@ contract Athletes is Ownable {
             athletes.push(currAthlete);
         }
 
+        return athletes;
+    }
+
+    // For testing mainly
+    function getAthletes() public view returns (Athlete[] memory) {
         return athletes;
     }
 }
