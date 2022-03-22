@@ -28,5 +28,6 @@ contract Athletes is Ownable {
     function getStats() public view returns (Athlete[] memory) {
         // To do: Return the mapping as array of Athletes
         // return athleteToScores;
+        for (uint256 i = 0; i < athleteToScores.length; i++)
     }
 }
