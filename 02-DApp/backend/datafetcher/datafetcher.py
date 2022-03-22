@@ -38,6 +38,7 @@ class DataFetcher():
         self.athlete_game_stats = {}
         self.aggregated_athlete_game_stats = []
         self.nft_metadata = {}
+        self.game_stat = {}
 
     scoreboard_player_fields = [
         "SP.OverviewPage",
@@ -280,6 +281,9 @@ class DataFetcher():
 
                     self.athlete_game_stats[current_summoner_id][game_id][stat] = int(
                         value)
+
+        self.game_stats = [
+            {"summonerId": athlete, "games": games} for athlete, games in self.athlete_game_stats.items()]
         print("Done!\n")
 
     def aggregate_athlete_game_stats(self):
@@ -469,8 +473,10 @@ def main():
 
     df.fetch_athlete_game_stats()
     df.aggregate_athlete_game_stats()
-    
-    df._convert_to_json(df.aggregated_athlete_game_stats, "aggregated_stats.json")
+
+    df._convert_to_json(df.aggregated_athlete_game_stats,
+                        "aggregated_stats.json")
+    df._convert_to_json(df.game_stats, "game_stats.json")
 
     df.fetch_athlete_headshots()
     df.upload_headshots_to_pinata()
