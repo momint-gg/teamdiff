@@ -53,8 +53,6 @@ export default function MintHome() {
                 <Image
                     src={profilePic}
                     alt="Picture of the author"
-                    // width={60%
-                    //height=
                 />
                 
             </Container>
