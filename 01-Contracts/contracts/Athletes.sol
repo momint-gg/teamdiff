@@ -21,13 +21,21 @@ contract Athletes is Ownable {
         public
         onlyOwner
     {
+        if (athleteToScores[athleteId].length == 0) {
+            numAthletes++;
+        }
         athleteToScores[athleteId].push(weeklyScore);
     }
 
     // Can't directly return a mapping, so returning an array of Athletes
-    function getStats() public view returns (Athlete[] memory) {
-        // To do: Return the mapping as array of Athletes
-        // return athleteToScores;
-        for (uint256 i = 0; i < athleteToScores.length; i++)
+    function getStats() public returns (Athlete[] memory) {
+        delete athletes; // Clearing arr first
+
+        for (uint256 i = 0; i < numAthletes; i++) {
+            Athlete memory currAthlete = Athlete(i, athleteToScores[i]); // Order doesn't matter
+            athletes.push(currAthlete);
+        }
+
+        return athletes;
     }
 }
