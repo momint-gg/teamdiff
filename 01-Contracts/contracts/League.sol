@@ -7,8 +7,8 @@ import "./Athletes.sol";
 
 contract League is Ownable, Athletes {
     // Vars
-    uint256 numWeeks = 10; // How long is a tournament?
-    uint256 leagueSize = 8;
+    uint256 numWeeks = 8; // Length of a split
+    uint256 leagueSize = 8; // For testing
     uint256 currentWeekNum; // Keeping track of week number
 
     mapping(address => uint256) userToTotalPts;
@@ -67,5 +67,5 @@ contract League is Ownable, Athletes {
 
     // Sets the initial schedule for the league
     // Randomly assigns matchups
-    function setLeagueSchedule() public onlyOwner {}
+    function setLeagueSchedule(uint256 leagueSize) public onlyOwner {}
 }
