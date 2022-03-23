@@ -75,8 +75,8 @@ contract GameItems is ERC1155, Ownable {
         // uint64 chainlinkSubId;
     }
 
-    //TODO show how many packs are still available
-    //TODO add boolean to show if packs are available.
+    // TODO show how many packs are still available
+    // TODO add boolean to show if packs are available.
     uint256 public packsAvailable;
 
     // Mappings
