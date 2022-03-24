@@ -15,6 +15,9 @@ contract League is Ownable, Athletes {
     mapping(address => uint256[]) userToWeeklyPts;
     mapping(address => uint256[]) userLineup;
 
+    // Our Athletes.sol contract
+    Athletes athletesContract;
+
     struct Matchup {
         address[2] players;
     }
@@ -34,14 +37,19 @@ contract League is Ownable, Athletes {
 
         // Calculating users' total scores
         for (uint256 i = 0; i < lineup1.length; i++) {
-            uint256[] memory currAthleteScores1 = athleteToScores[lineup1[i]];
-            uint256[] memory currAthleteScores2 = athleteToScores[lineup2[i]];
+            // Calling the Athletes.sol contract to get the scores of ith athlete
+            uint256[] memory currAthleteScores1 = athletesContract
+                .getAthleteScores(lineup1[i]);
+            uint256[] memory currAthleteScores2 = athletesContract
+                .getAthleteScores(lineup2[i]);
+            // Getting the last score in the array
             uint256 latestScore1 = currAthleteScores1[
                 currAthleteScores1.length - 1
             ];
             uint256 latestScore2 = currAthleteScores2[
                 currAthleteScores2.length - 1
             ];
+            // Calculating scores for users
             if (latestScore1 > latestScore2) {
                 addr1Score += 1;
             } else {
@@ -65,7 +73,15 @@ contract League is Ownable, Athletes {
         return userLineup[msg.sender];
     }
 
-    // Sets the initial schedule for the league
-    // Randomly assigns matchups
-    function setLeagueSchedule(uint256 leagueSize) public onlyOwner {}
+    // Sets the initial schedule for the league -- this will be done off chain
+    // Will figure out exact way to pass in params later once Isaiah is done
+    function setLeagueSchedule() public onlyOwner {}
+
+    // Setting the address for our athlete contract
+    function setAthleteContractAddress(address _athleteContractAddress)
+        public
+        onlyOwner
+    {
+        athletesContract = Athletes(_athleteContractAddress);
+    }
 }
