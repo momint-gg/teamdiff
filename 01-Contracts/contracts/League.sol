@@ -58,9 +58,18 @@ contract League is Ownable, Athletes {
         }
         // Incrementing week #
         currentWeekNum += 1;
-        // Returning winner
-        if (addr1Score > addr2Score) return addr1;
-        else return addr2;
+        // Updating mappings and returning the winner
+        if (addr1Score > addr2Score) {
+            userToWeeklyPts[addr1].push(1);
+            userToWeeklyPts[addr2].push(0);
+            userToTotalPts[addr1] += 1;
+            return addr1;
+        } else {
+            userToWeeklyPts[addr2].push(1);
+            userToWeeklyPts[addr1].push(0);
+            userToTotalPts[addr2] += 1;
+            return addr2;
+        }
     }
 
     // Setting the lineup for a user
@@ -83,5 +92,15 @@ contract League is Ownable, Athletes {
         onlyOwner
     {
         athletesContract = Athletes(_athleteContractAddress);
+    }
+
+    // Getter for user to total pts
+    function getUserTotalPts() public view returns (uint256) {
+        return userToTotalPts[msg.sender];
+    }
+
+    // Getter for user to weekly pts
+    function getUserWeeklypts() public view returns (uint256[] memory) {
+        return userToWeeklyPts[msg.sender];
     }
 }

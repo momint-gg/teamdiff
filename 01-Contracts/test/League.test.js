@@ -48,6 +48,8 @@ describe("League.test", async () => {
   });
 
   // Basically the whole test for league functionality
+  // If this works we chillllllllllin baby
+  // Update: LEZ GOO
   it("Correctly evaluates a matchup", async () => {
     // First adding stats for first 10 athletes (0-9)
     console.log("In test");
@@ -56,16 +58,16 @@ describe("League.test", async () => {
       let txn = await athleteContract.connect(owner).appendStats(i, randomNum);
       await txn.wait();
     }
-
     // Setting address of our athlete contract
-    console.log("Setting the address now for Athletes.sol...");
     let txn = await contract.setAthleteContractAddress(athleteContract.address);
     await txn.wait();
 
-    console.log("Now calculating the winner...");
     txn = await contract.evaluateMatch(owner.address, addr1.address);
     await txn.wait();
 
-    console.log("Winner calculated!", txn);
+    txn = await contract.connect(owner).getUserTotalPts();
+    console.log("Weekly pts fow owner ", txn);
+    txn = await contract.connect(addr1).getUserTotalPts();
+    console.log("Weekly pts for addr1 ", txn);
   });
 });
