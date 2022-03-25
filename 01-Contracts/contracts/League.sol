@@ -103,4 +103,12 @@ contract League is Ownable, Athletes {
     function getUserWeeklypts() public view returns (uint256[] memory) {
         return userToWeeklyPts[msg.sender];
     }
+
+
+    //TODO
+    //1.) View function to calculate score on-chain for a given line-up and week
+    //2.) Pool Prize mechanics
+    //3.) League membership mechanics
+    //4.) League schedule creation mechanics
+    //5.) lock set line-up with onlyOwner function
 }
