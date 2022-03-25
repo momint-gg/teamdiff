@@ -22,7 +22,10 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
     uint256 public version;
     string public name;
+    uint256[5] public leagueMembers;
 
+
+    
     /**
      * @dev Initializes the proxy with `beacon`.
      *
