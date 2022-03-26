@@ -110,3 +110,13 @@ p {
     font-family: "Exo", sans-serif;
   }
 }
+
+.hiw-icon {
+  text-align: center;
+  margin-bottom: 1rem;
+  margin-left: 25%;
+  @media (max-width: $breakpoint-mobile) {
+    margin-top: 1rem;
+    margin-left: 0;
+  }
+}
