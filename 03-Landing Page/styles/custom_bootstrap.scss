@@ -1,0 +1,39 @@
+// Import functions to override
+@import "../node_modules/bootstrap/scss/functions";
+
+// Insert Custom Variables
+$primary: #aa10ad;
+
+button {
+  &.btn-primary {
+    background: linear-gradient(95.66deg, #5a165b 0%, #aa10ad 100%);
+  }
+
+  &.btn-secondary {
+    border: 2px solid #ffffff;
+    background: #ffffff;
+    color: $primary;
+  }
+
+  &.btn-outline-primary {
+    background: none;
+    border: 2px solid $primary;
+    color: white;
+  }
+
+  &.btn-outline-secondary {
+    background: none;
+    color: #ffffff;
+    border: 2px solid white;
+    &:hover {
+      background-color: #ffffff;
+      color: $primary;
+    }
+  }
+
+  border-radius: 40px !important;
+  padding: 0.8rem 2rem !important;
+  font-weight: 800 !important;
+}
+
+@import "./imports.scss";

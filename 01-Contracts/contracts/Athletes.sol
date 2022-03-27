@@ -43,4 +43,13 @@ contract Athletes is Ownable {
     function getAthletes() public view returns (Athlete[] memory) {
         return athletes;
     }
+
+    // Function for the other contract to call, getting a specific athlete's scores
+    function getAthleteScores(uint256 index)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return athleteToScores[index];
+    }
 }

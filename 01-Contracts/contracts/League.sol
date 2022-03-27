@@ -15,6 +15,9 @@ contract League is Ownable, Athletes {
     mapping(address => uint256[]) userToWeeklyPts;
     mapping(address => uint256[]) userLineup;
 
+    // Our Athletes.sol contract
+    Athletes athletesContract;
+
     struct Matchup {
         address[2] players;
     }
@@ -34,14 +37,19 @@ contract League is Ownable, Athletes {
 
         // Calculating users' total scores
         for (uint256 i = 0; i < lineup1.length; i++) {
-            uint256[] memory currAthleteScores1 = athleteToScores[lineup1[i]];
-            uint256[] memory currAthleteScores2 = athleteToScores[lineup2[i]];
+            // Calling the Athletes.sol contract to get the scores of ith athlete
+            uint256[] memory currAthleteScores1 = athletesContract
+                .getAthleteScores(lineup1[i]);
+            uint256[] memory currAthleteScores2 = athletesContract
+                .getAthleteScores(lineup2[i]);
+            // Getting the last score in the array
             uint256 latestScore1 = currAthleteScores1[
                 currAthleteScores1.length - 1
             ];
             uint256 latestScore2 = currAthleteScores2[
                 currAthleteScores2.length - 1
             ];
+            // Calculating scores for users
             if (latestScore1 > latestScore2) {
                 addr1Score += 1;
             } else {
@@ -50,9 +58,18 @@ contract League is Ownable, Athletes {
         }
         // Incrementing week #
         currentWeekNum += 1;
-        // Returning winner
-        if (addr1Score > addr2Score) return addr1;
-        else return addr2;
+        // Updating mappings and returning the winner
+        if (addr1Score > addr2Score) {
+            userToWeeklyPts[addr1].push(1);
+            userToWeeklyPts[addr2].push(0);
+            userToTotalPts[addr1] += 1;
+            return addr1;
+        } else {
+            userToWeeklyPts[addr2].push(1);
+            userToWeeklyPts[addr1].push(0);
+            userToTotalPts[addr2] += 1;
+            return addr2;
+        }
     }
 
     // Setting the lineup for a user
@@ -65,7 +82,33 @@ contract League is Ownable, Athletes {
         return userLineup[msg.sender];
     }
 
-    // Sets the initial schedule for the league
-    // Randomly assigns matchups
-    function setLeagueSchedule(uint256 leagueSize) public onlyOwner {}
+    // Sets the initial schedule for the league -- this will be done off chain
+    // Will figure out exact way to pass in params later once Isaiah is done
+    function setLeagueSchedule() public onlyOwner {}
+
+    // Setting the address for our athlete contract
+    function setAthleteContractAddress(address _athleteContractAddress)
+        public
+        onlyOwner
+    {
+        athletesContract = Athletes(_athleteContractAddress);
+    }
+
+    // Getter for user to total pts
+    function getUserTotalPts() public view returns (uint256) {
+        return userToTotalPts[msg.sender];
+    }
+
+    // Getter for user to weekly pts
+    function getUserWeeklypts() public view returns (uint256[] memory) {
+        return userToWeeklyPts[msg.sender];
+    }
+
+
+    //TODO
+    //1.) View function to calculate score on-chain for a given line-up and week
+    //2.) Pool Prize mechanics
+    //3.) League membership mechanics
+    //4.) League schedule creation mechanics
+    //5.) lock set line-up with onlyOwner function
 }

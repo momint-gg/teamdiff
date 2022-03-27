@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100;0,200;0,300;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+$breakpoint-mobile: 768px;
+$breakpoint-large: 992px;
+
+.background {
+  margin-bottom: 1px;
+}
+
+p {
+  font-family: Open Sans;
+}
+
+a,
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "Exo", sans-serif;
+}
+
+body {
+  color: white;
+  background: linear-gradient(116.82deg, #2f0d32 0%, #000000 100%);
+  font-style: normal;
+  font-weight: normal;
+  min-width: fit-content;
+}
+
+span.early-access {
+  color: black;
+  font-weight: 700;
+  background-color: white;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  font-size: smaller;
+}
+
+.fw-900 {
+  font-weight: 900;
+}
+
+.mb-7 {
+  margin-bottom: 7rem;
+  @media (max-width: $breakpoint-mobile) {
+    margin-bottom: 3rem;
+  }
+}
+
+h3 {
+  font-weight: 600;
+}
+
+.second-cta {
+  text-align: center;
+  padding-top: 4rem;
+  margin-bottom: 1.5rem;
+  margin-right: 1rem;
+  margin-left: 1rem;
+  @media (min-width: $breakpoint-large) {
+    margin-left: 10rem;
+    margin-right: 10rem;
+  }
+}
+
+.footer {
+  margin-top: 6rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.footer-item {
+  color: rgb(214, 214, 214);
+  opacity: 90%;
+  &:hover {
+    color: white;
+    opacity: 100%;
+  }
+  &.footer-link {
+    font-weight: 900;
+    text-decoration: none;
+  }
+}
+
+.bg-second-cta {
+  background: linear-gradient(10deg, #2f0d30 0%, #aa10ad 100%);
+}
+
+.bg-how-it-works {
+  background: linear-gradient(98deg, #1a2231 0%, rgb(19, 20, 22) 100%);
+}
+
+.sign-up-link {
+  text-decoration: none;
+  font-weight: 700;
+  color: rgb(214, 214, 214);
+  &:active {
+    color: white;
+  }
+}
+
+p {
+  &.trademark {
+    color: rgb(214, 214, 214);
+    font-family: "Exo", sans-serif;
+  }
+}
+
+.hiw-icon {
+  text-align: center;
+  margin-bottom: 1rem;
+  margin-left: 25%;
+  @media (max-width: $breakpoint-mobile) {
+    margin-top: 1rem;
+    margin-left: 0;
+  }
+}
