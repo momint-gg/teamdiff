@@ -48,7 +48,7 @@ export default function BurnPack({setDisplay}) {
         }
     }, [])
 
-
+    //TODO hide burn pack if they don't
     const burnStarterPack = async () => {
         if (gameItemsContract) {
             // Create a new instance of the Contract with a Signer, which allows

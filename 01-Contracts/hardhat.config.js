@@ -49,10 +49,10 @@ module.exports = {
     //   //url: "http://127.0.0.1:8545" //<-- don't need to set this (just do npx hardhat node)
     // },
     //Config for Rinkeby
-    rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
-      accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
-    },
+    // rinkeby: {
+    //   url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
+    //   accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key
+    // },
     // localhost: {
     //   url: "http://127.0.0.1:8545"
     // },

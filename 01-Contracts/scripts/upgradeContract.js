@@ -100,6 +100,22 @@ async function main() {
   // //call incrementVersion on league proxy as non-admin
   //txn = await BeaconInstance.version();
 
+
+  //Let's create a clone and test if it delegates calls correctly.
+  //TODO let's save optimization for later and stick with beacon pattern for now
+  // txn = await LeagueMakerInstance.createLeagueClone(GameLogicInstance.address);
+  // var GameLogicCloneAddress = "";
+  // receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     GameLogicCloneAddress = event.args;
+  //   }
+  // }
+  // console.log("Clone address: " + GameLogicCloneAddress);
+  // const cloneContract = await hre.ethers.getContractAt("GameLogic", GameLogicCloneAddress);
+
+  // console.log("GAme Logic address: " + cloneContract.address);
   //You can view hardhat node console to see console.log messages from contracts, and verify version state is changing in correct memory
   txn = await LeagueMakerInstance.testCallDoesNotExist(
     LeagueProxyInstance.address
@@ -107,23 +123,46 @@ async function main() {
   txn = await LeagueMakerInstance.testCallDoesNotExist(
     LeagueProxyInstance.address
   );
-  txn = await LeagueMakerInstance.testCallDoesNotExist(
-    GameLogicInstance.address
-  );
-  receipt = await txn.wait();
-  for (const event of receipt.events) {
-    if (event.event != null) {
-      console.log(`Event ${event.event} with args ${event.args}`);
-    }
-  }
+  // txn = await LeagueMakerInstance.testCallDoesNotExist(
+  //   cloneContract.address
+  // );
+  // txn = await LeagueMakerInstance.testCallDoesNotExist(
+  //   GameLogicCloneAddress
+  // );
+
+
+  //Trying to trigger LeagueProxyInstance fallback function from web3 js 
+  //const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
+  //const msgData = web3.eth.abi.encodeFunctionSignature("initialize(uint256)",
+  //                                                      1);
+  // const msgData = "0x00";
   // txn = await web3.eth.sendTransaction({
   //   from: addr1,
-  //   to: contractAddress,
-  //   value: 0,     // If you want to send ether with the call.
-  //   // gas: ???,       // If you want to specify the gas.
+  //   to: LeagueProxyInstance.address,
+  //   value: 1,     // If you want to send ether with the call.
+  //   gas: 2,       // If you want to specify the gas.
   //   // gasPrice: ???,  // If you want to specify the gas price.
-  //   data: msgData},
+  //   data: msgData
+  // }, function(err, transactionHash) {
+  //   if (err) { 
+  //       console.log(err); 
+  //   } else {
+  //       console.log(transactionHash);
+  //   }
+  // });
+  //txn = await LeagueProxyInstance.incrementVersion();
+  // txn = await LeagueMakerInstance.testCallDoesNotExist(
+  //   GameLogicInstance.address
   // );
+  // receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //   }
+  // }
+  //console.log("Clone deployed to : " + JSON.stringify(receipt, null, 2));
+
+
 
   //console.log("txn: " + JSON.stringify(txn, null, 2));
 
