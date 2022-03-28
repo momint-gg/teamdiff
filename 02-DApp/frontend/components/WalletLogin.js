@@ -45,7 +45,7 @@ export default function WalletLogin() {
                     variant="outlined"
                     clickable={true}
                     onClick={handleClick}
-                    sx={{height:40, width:170, fontSize:18}}
+                    sx={{height:40, fontSize:18}}
                 />
                 {menu ? (
                     <Box
