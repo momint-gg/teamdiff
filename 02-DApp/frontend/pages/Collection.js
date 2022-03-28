@@ -5,6 +5,7 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
 import constants from "../Constants";
 import ConnectWallet from "./ConnectWallet";
+import AthleteCardModal from "../components/AthleteCardModal";
 
 export default function Collection() {
     const [{ data: accountData }, disconnect] = useAccount({
@@ -13,6 +14,22 @@ export default function Collection() {
     const [nftResp, setNFTResp] = useState(null);
     const [packNFTs, setPackNFTs] = useState([]);
     const [athleteNFTs, setAthleteNFTs] = useState([]);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [currAthlete, setCurrAthlete] = useState(null);
+    const handleModalOpen = () => {
+        setModalOpen(true);
+    };
+    const handleModalClose = () => {
+        setModalOpen(false);
+    };
+    const handleClick = () => {
+        setMenu((menu) => !menu);
+    };
+    const handleClickAway = () => {
+        setMenu(false);
+    };
+
     useEffect(() => {
         // declare the async data fetching function
         const getNFTData = async () => {
@@ -62,7 +79,7 @@ export default function Collection() {
             <Grid container spacing={3}>
                     {packNFTs?.map(athleteData => (
                         <Grid item xs={4}>
-                            <AthleteCard athleteData={athleteData} />
+                            <AthleteCard athleteData={athleteData} setAthlete={setCurrAthlete} setModalOpen={setModalOpen} />
                         </Grid>
                     ))}
                 </Grid>
@@ -79,10 +96,11 @@ export default function Collection() {
                 <Grid container spacing={3}>
                     {athleteNFTs?.map(athleteData => (
                         <Grid item xs={4}>
-                            <AthleteCard athleteData={athleteData} />
+                            <AthleteCard athleteData={athleteData} setAthlete={setCurrAthlete} setModalOpen={setModalOpen}/>
                         </Grid>
                     ))}
                 </Grid>
+            <AthleteCardModal modalOpen={modalOpen} athleteData={currAthlete} handleModalClose={handleModalClose} />
             </Box>
         );
     } else if (accountData) {
@@ -100,7 +118,6 @@ export default function Collection() {
             <Typography variant="h2" color="secondary" component="div">
                 Please connect your wallet to get started.
             </Typography>
-            {/* <ConnectWallet></ConnectWallet> */}
         </Box>
     );
 }
