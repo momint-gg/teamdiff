@@ -11,7 +11,8 @@ export default function Collection() {
         fetchEns: true,
       })
     const [nftResp, setNFTResp] = useState(null);
-    const [nftData, setNFTData] = useState([]);
+    const [packNFTs, setPackNFTs] = useState([]);
+    const [athleteNFTs, setAthleteNFTs] = useState([]);
     useEffect(() => {
         // declare the async data fetching function
         const getNFTData = async () => {
@@ -29,7 +30,12 @@ export default function Collection() {
                     contractAddress: constants.CONTRACT_ADDR,
                     tokenId: token
                 })
-                setNFTData(nftData => [...nftData, response]);
+                if (response.title?.includes("Pack")) {
+                    setPackNFTs(packNFTs => [...packNFTs, response]);
+                } else {
+                    setAthleteNFTs(athleteNFTs => [...athleteNFTs, response]);
+                }
+                
             }
         }
       
@@ -40,8 +46,7 @@ export default function Collection() {
         
     }, [])
 
-    if (accountData && nftResp && nftData.length>0) {
-        console.log(nftData);
+    if (accountData && nftResp) {
         return (
             <Box>
             <Typography variant="h2" color="secondary" component="div">
@@ -54,6 +59,13 @@ export default function Collection() {
                     height: 5
                 }}
             />
+            <Grid container spacing={3}>
+                    {packNFTs?.map(athleteData => (
+                        <Grid item xs={4}>
+                            <AthleteCard athleteData={athleteData} />
+                        </Grid>
+                    ))}
+                </Grid>
             <Typography variant="h2" color="secondary" component="div">
                 PLAYERS
             </Typography>
@@ -65,7 +77,7 @@ export default function Collection() {
                 }}
             />
                 <Grid container spacing={3}>
-                    {nftData?.map(athleteData => (
+                    {athleteNFTs?.map(athleteData => (
                         <Grid item xs={4}>
                             <AthleteCard athleteData={athleteData} />
                         </Grid>
