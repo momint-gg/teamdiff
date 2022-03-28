@@ -56,7 +56,7 @@ export default function Collection() {
                 style={{
                     color: "secondary",
                     backgroundColor: "secondary",
-                    height: 5
+                    height: 5,
                 }}
             />
             <Grid container spacing={3}>
@@ -66,7 +66,7 @@ export default function Collection() {
                         </Grid>
                     ))}
                 </Grid>
-            <Typography variant="h2" color="secondary" component="div">
+            <Typography variant="h2" color="secondary" component="div" style={{marginTop: 10}}>
                 PLAYERS
             </Typography>
             <hr
