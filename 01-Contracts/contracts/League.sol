@@ -25,6 +25,7 @@ contract League is Ownable, Athletes {
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
+    // TODO: Event emitted for each user matchup 
     function evaluateMatch(address addr1, address addr2)
         public
         onlyOwner
@@ -49,7 +50,7 @@ contract League is Ownable, Athletes {
             uint256 latestScore2 = currAthleteScores2[
                 currAthleteScores2.length - 1
             ];
-            // Calculating scores for users
+
             if (latestScore1 > latestScore2) {
                 addr1Score += 1;
             } else {
@@ -103,7 +104,6 @@ contract League is Ownable, Athletes {
     function getUserWeeklypts() public view returns (uint256[] memory) {
         return userToWeeklyPts[msg.sender];
     }
-
 
     //TODO
     //1.) View function to calculate score on-chain for a given line-up and week
