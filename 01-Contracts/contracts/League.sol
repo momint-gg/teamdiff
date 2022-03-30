@@ -25,7 +25,7 @@ contract League is Ownable, Athletes {
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
-    // TODO: Event emitted for each user matchup 
+    // TODO: Event emitted for each user matchup
     function evaluateMatch(address addr1, address addr2)
         public
         onlyOwner
@@ -111,4 +111,15 @@ contract League is Ownable, Athletes {
     //3.) League membership mechanics
     //4.) League schedule creation mechanics
     //5.) lock set line-up with onlyOwner function
+
+    //TODO Henry:
+    // Add whitelist logic
+    // List of users that can join league, if you join the league
+    // When user joins league they pay an amount set by the league admin (payable function)
+    // Amount is in USDC
+    // Initially set by the league owner, cannot be reset
+    // If user is whitelisted, then they can join the league
+    // If whitelist has a length of 0 then ignore whitelist, anyone can join the league
+
+    // Start prize pool mechanics
 }
