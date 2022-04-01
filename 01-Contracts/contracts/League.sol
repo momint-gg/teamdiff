@@ -15,7 +15,7 @@ contract League is Ownable, Athletes, Whitelist {
     uint256 numWeeks = 8; // Length of a split
     uint256 leagueSize = 8; // For testing
     uint256 currentWeekNum; // Keeping track of week number
-    // address polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy
+    address polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
     mapping(address => uint256) userToTotalPts;
@@ -25,7 +25,7 @@ contract League is Ownable, Athletes, Whitelist {
     // Our league's users
     // Reminder: We are inheriting the add / remove from whitelist functions from Whitelist.sol
     address[] users; // All of our leagues users
-    address creator; // We are going to need to keep track of the league owner somehow -- set when we make the proxy
+    address creator; // This will be set initially
     uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
     uint256 private _totalSupply; // Total supply of USDC
 
@@ -42,13 +42,19 @@ contract League is Ownable, Athletes, Whitelist {
     }
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
+    constructor(address _creator, uint256 _stakeAmount) {
+        creator = _creator;
+        stakeAmount = _stakeAmount;
+        whitelistContract = new Whitelist(_creator); // Initializing our whitelist
+    }
+
     // Whoever calls this will become the league creator, and set the stake amount
     // Maybe add this to the proxy constructor? --> We need THIS to be called when a new proxy is created @Trey
     // The owner of the contract should be automatically set to "creator"
     // If testing: Make sure you have rinkeby USDC in your account
-    function createNewLeague(uint256 _stakeAmount) public {
+    function newLeagueSetup(uint256 _stakeAmount) public onlyCreator {
         // Before calling this function, make sure to set creator address as the owner
-        creator = msg.sender; // creator will be the owner
+        addAddressToWhitelist(msg.sender);
         users.push(msg.sender);
         stakeAmount = _stakeAmount;
         stake(rinkebyUSDCAddress, stakeAmount);
@@ -57,7 +63,6 @@ contract League is Ownable, Athletes, Whitelist {
     // User joining the league
     function joinLeague() public onlyWhitelisted {
         users.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
-        //TODO: Logic for user paying USDC
         stake(rinkebyUSDCAddress, stakeAmount);
     }
 
@@ -158,10 +163,9 @@ contract League is Ownable, Athletes, Whitelist {
         return userToWeeklyPts[msg.sender];
     }
 
-    // Checking to see if this is the leage creator
-    modifier onlyCreator() {
-        require(msg.sender == creator);
-        _;
+    // Returning the contracts USDC balance
+    function getUSDCBalance(address _token) public view returns (uint256) {
+        return IERC20(_token).balanceOf(address(this));
     }
 
     //TODO

@@ -13,17 +13,28 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract Whitelist is Ownable {
     mapping(address => bool) public whitelist;
+    address leagueCreator;
     uint256 numWhitelisted; // Keeping track of the number of users whitelisted (slight modification to code)
 
     event WhitelistedAddressAdded(address addr);
     event WhitelistedAddressRemoved(address addr);
 
+    constructor(address _creator) {
+        leagueCreator = _creator;
+    }
+
     /**
      * @dev Throws if called by any account that's not whitelisted.
      */
     modifier onlyWhitelisted() {
-        // In our case, whitelisted can also mean nobody has been added to the whitelist
+        // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
         require(whitelist[msg.sender] || numWhitelisted == 0);
+        _;
+    }
+
+    // Checking to see if this is the league creator
+    modifier onlyCreator() {
+        require(msg.sender == leagueCreator);
         _;
     }
 
@@ -34,7 +45,7 @@ contract Whitelist is Ownable {
      */
     function addAddressToWhitelist(address addr)
         public
-        onlyOwner
+        onlyCreator
         returns (bool success)
     {
         if (!whitelist[addr]) {
@@ -53,7 +64,7 @@ contract Whitelist is Ownable {
      */
     function addAddressesToWhitelist(address[] memory addrs)
         public
-        onlyOwner
+        onlyCreator
         returns (bool success)
     {
         for (uint256 i = 0; i < addrs.length; i++) {
@@ -72,7 +83,7 @@ contract Whitelist is Ownable {
      */
     function removeAddressFromWhitelist(address addr)
         public
-        onlyOwner
+        onlyCreator
         returns (bool success)
     {
         if (whitelist[addr]) {
@@ -91,7 +102,7 @@ contract Whitelist is Ownable {
      */
     function removeAddressesFromWhitelist(address[] memory addrs)
         public
-        onlyOwner
+        onlyCreator
         returns (bool success)
     {
         for (uint256 i = 0; i < addrs.length; i++) {
