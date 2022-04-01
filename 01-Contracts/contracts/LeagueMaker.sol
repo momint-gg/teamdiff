@@ -70,13 +70,10 @@ contract LeagueMaker {
     // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
-
     }
 
     //To use Clone library
     using Clones for address;
-
-
 
     function upgrade(address newLogicImpl) public {
         upgradeableBeacon.upgradeTo(newLogicImpl);
@@ -110,16 +107,12 @@ contract LeagueMaker {
 
         //console.log(address(proxy));
         return address(proxy);
-
     }
-
 
     event cloneCreated(address clone);
 
     // ============= Deploy Ligthweight clone ===========
-    function createLeagueClone(address implementation)         
-        external
-    {
+    function createLeagueClone(address implementation) external {
         //Try returning just a clone with the implementation address
         //return implementation.cloneDeterministic(msg.sender);
         address cloneAddy = implementation.clone();
@@ -128,10 +121,7 @@ contract LeagueMaker {
         //return cloneAddy;
     }
 
-    function setBeacon(address logic)
-        external
-        returns (address)
-    {
+    function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});
         UpgradeableBeacon newBeacon = new UpgradeableBeacon(logic);
         //delete parameters;

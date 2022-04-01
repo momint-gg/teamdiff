@@ -3,25 +3,78 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
+import "./Whitelist.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract League is Ownable, Athletes {
+contract League is Ownable, Athletes, Whitelist {
+    using SafeMath for uint256;
+
     // Vars
     uint256 numWeeks = 8; // Length of a split
     uint256 leagueSize = 8; // For testing
     uint256 currentWeekNum; // Keeping track of week number
+    // address polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy
+    address rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
     mapping(address => uint256[]) userLineup;
 
+    // Our league's users
+    // Reminder: We are inheriting the add / remove from whitelist functions from Whitelist.sol
+    address[] users; // All of our leagues users
+    address creator; // We are going to need to keep track of the league owner somehow -- set when we make the proxy
+    uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
+    uint256 private _totalSupply; // Total supply of USDC
+
+    //Events
+    event Staked(address sender, uint256 amount);
+
     // Our Athletes.sol contract
     Athletes athletesContract;
+    // Our Whitelist contract
+    Whitelist whitelistContract;
 
     struct Matchup {
         address[2] players;
     }
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+
+    // Whoever calls this will become the league creator, and set the stake amount
+    // Maybe add this to the proxy constructor? --> We need THIS to be called when a new proxy is created @Trey
+    // The owner of the contract should be automatically set to "creator"
+    // If testing: Make sure you have rinkeby USDC in your account
+    function createNewLeague(uint256 _stakeAmount) public {
+        // Before calling this function, make sure to set creator address as the owner
+        creator = msg.sender; // creator will be the owner
+        users.push(msg.sender);
+        stakeAmount = _stakeAmount;
+        stake(rinkebyUSDCAddress, stakeAmount);
+    }
+
+    // User joining the league
+    function joinLeague() public onlyWhitelisted {
+        users.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
+        //TODO: Logic for user paying USDC
+        stake(rinkebyUSDCAddress, stakeAmount);
+    }
+
+    // User staking the currency
+    // I think this means they won't be able to stake decimal amounts
+    function stake(address _token, uint256 amount) internal {
+        require(amount > 0, "Cannot stake 0");
+        _totalSupply = _totalSupply.add(amount);
+        // _balances[msg.sender] = _balances[msg.sender].add(amount);
+        // Before this you should have approved the amount
+        // This will transfer the amount of  _token from caller to contract
+        IERC20(_token).transferFrom(msg.sender, address(this), amount);
+        emit Staked(msg.sender, amount);
+    }
+
+    // TODO: Should we write this or just make it so that you can't leave once you join?
+    function removeFromLeague() public onlyWhitelisted {}
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
@@ -103,6 +156,12 @@ contract League is Ownable, Athletes {
     // Getter for user to weekly pts
     function getUserWeeklypts() public view returns (uint256[] memory) {
         return userToWeeklyPts[msg.sender];
+    }
+
+    // Checking to see if this is the leage creator
+    modifier onlyCreator() {
+        require(msg.sender == creator);
+        _;
     }
 
     //TODO
