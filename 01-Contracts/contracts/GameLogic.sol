@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-//import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Athletes.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 //import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {

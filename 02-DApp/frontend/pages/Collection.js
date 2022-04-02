@@ -5,13 +5,31 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
 import constants from "../Constants";
 import ConnectWallet from "./ConnectWallet";
+import AthleteCardModal from "../components/AthleteCardModal";
 
 export default function Collection() {
     const [{ data: accountData }, disconnect] = useAccount({
         fetchEns: true,
       })
     const [nftResp, setNFTResp] = useState(null);
-    const [nftData, setNFTData] = useState([]);
+    const [packNFTs, setPackNFTs] = useState([]);
+    const [athleteNFTs, setAthleteNFTs] = useState([]);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [currAthlete, setCurrAthlete] = useState(null);
+    const handleModalOpen = () => {
+        setModalOpen(true);
+    };
+    const handleModalClose = () => {
+        setModalOpen(false);
+    };
+    const handleClick = () => {
+        setMenu((menu) => !menu);
+    };
+    const handleClickAway = () => {
+        setMenu(false);
+    };
+
     useEffect(() => {
         // declare the async data fetching function
         const getNFTData = async () => {
@@ -29,7 +47,12 @@ export default function Collection() {
                     contractAddress: constants.CONTRACT_ADDR,
                     tokenId: token
                 })
-                setNFTData(nftData => [...nftData, response]);
+                if (response.title?.includes("Pack")) {
+                    setPackNFTs(packNFTs => [...packNFTs, response]);
+                } else {
+                    setAthleteNFTs(athleteNFTs => [...athleteNFTs, response]);
+                }
+                
             }
         }
       
@@ -40,8 +63,7 @@ export default function Collection() {
         
     }, [])
 
-    if (accountData && nftResp && nftData.length>0) {
-        console.log(nftData);
+    if (accountData && nftResp) {
         return (
             <Box>
             <Typography variant="h2" color="secondary" component="div">
@@ -51,10 +73,17 @@ export default function Collection() {
                 style={{
                     color: "secondary",
                     backgroundColor: "secondary",
-                    height: 5
+                    height: 5,
                 }}
             />
-            <Typography variant="h2" color="secondary" component="div">
+            <Grid container spacing={3}>
+                    {packNFTs?.map(athleteData => (
+                        <Grid item xs={4}>
+                            <AthleteCard athleteData={athleteData} setAthlete={setCurrAthlete} setModalOpen={setModalOpen} />
+                        </Grid>
+                    ))}
+                </Grid>
+            <Typography variant="h2" color="secondary" component="div" style={{marginTop: 10}}>
                 PLAYERS
             </Typography>
             <hr
@@ -65,12 +94,13 @@ export default function Collection() {
                 }}
             />
                 <Grid container spacing={3}>
-                    {nftData?.map(athleteData => (
+                    {athleteNFTs?.map(athleteData => (
                         <Grid item xs={4}>
-                            <AthleteCard athleteData={athleteData} />
+                            <AthleteCard athleteData={athleteData} setAthlete={setCurrAthlete} setModalOpen={setModalOpen}/>
                         </Grid>
                     ))}
                 </Grid>
+            <AthleteCardModal modalOpen={modalOpen} athleteData={currAthlete} handleModalClose={handleModalClose} />
             </Box>
         );
     } else if (accountData) {
@@ -88,7 +118,6 @@ export default function Collection() {
             <Typography variant="h2" color="secondary" component="div">
                 Please connect your wallet to get started.
             </Typography>
-            {/* <ConnectWallet></ConnectWallet> */}
         </Box>
     );
 }

@@ -91,6 +91,7 @@ contract LeagueMaker {
     //     upgradeableBeacon.upgradeTo(newLogicImpl);
     // }
 
+
     // ======== Deploy contract ========
     function createLeague(string calldata _name)
         external
@@ -124,9 +125,7 @@ contract LeagueMaker {
 
 
     // ============= Deploy Ligthweight clone ===========
-    function createLeagueClone(address implementation)         
-        external
-    {
+    function createLeagueClone(address implementation) external {
         //Try returning just a clone with the implementation address
         //return implementation.cloneDeterministic(msg.sender);
         address cloneAddy = implementation.clone();
@@ -135,10 +134,7 @@ contract LeagueMaker {
         //return cloneAddy;
     }
 
-    function setBeacon(address logic)
-        external
-        returns (address)
-    {
+    function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});
         UpgradeableBeacon newBeacon = new UpgradeableBeacon(logic);
         //delete parameters;

@@ -1,29 +1,30 @@
 import { Fragment } from "react";
 import { Card, CardContent, CardMedia, Typography, CardActions, Button } from "@mui/material"
-  
+import { useState } from 'react';
 
-export default function AthleteCard(athleteData) {
+export default function AthleteCard({athleteData, setAthlete, setModalOpen}) {
+  console.log(athleteData)
     const card = (
         <Fragment>
           <CardContent>
             <Typography variant="h5" color="secondary" component="div">
-                {athleteData?.athleteData.title}
+                {athleteData?.title}
             </Typography>
             <CardMedia
                 component="img"
                 height="400"
-                image={athleteData?.athleteData.metadata.image}
+                image={athleteData?.metadata.image}
                 alt="NFT Image"
             />
             <Typography variant="title" color="inherit" noWrap>
                 &nbsp;
             </Typography>
             <Typography variant="body1" color="inherit">
-                {athleteData?.athleteData.description}
+                {athleteData?.description}
             </Typography>
           </CardContent>
           <CardActions>
-            <Button size="small" color="secondary">View Details</Button>
+            <Button size="small" color="secondary" onClick={() => {setAthlete(athleteData); setModalOpen(true)}}>View Details</Button>
           </CardActions>
         </Fragment>
       );

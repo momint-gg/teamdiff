@@ -291,9 +291,7 @@ class DataFetcher():
         agg_game_stats = {}
         for current_summoner_id, games in self.athlete_game_stats.items():
             if current_summoner_id not in agg_game_stats:
-                agg_game_stats[current_summoner_id] = {
-                    "summoner_id": current_summoner_id
-                }
+                agg_game_stats[current_summoner_id] = {}
 
             for _, game in games.items():
                 for stat, value in game.items():
@@ -330,12 +328,10 @@ class DataFetcher():
                 'gold': 0,
                 'kills': 0,
                 'kills10': 0,
-                'summoner_id': summoner_id,
                 'wins': 0
             }
 
-        self.aggregated_athlete_game_stats = [
-            stats for _, stats in agg_game_stats.items()]
+        self.aggregated_athlete_game_stats = agg_game_stats
 
         print("Done!\n")
 

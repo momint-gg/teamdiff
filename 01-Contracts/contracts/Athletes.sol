@@ -3,10 +3,12 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 // Storage contract for Athletes
 // Will be updated with match data
 contract Athletes is Ownable {
+    using SafeMath for uint256;
     // Our mapping of athletes (e.g. athlete # 4 => [1, 4, 2, 3] maps the first 4 weeks of scores)
     mapping(uint256 => uint256[]) public athleteToScores;
     Athlete[] public athletes;

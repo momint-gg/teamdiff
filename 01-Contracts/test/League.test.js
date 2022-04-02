@@ -49,7 +49,6 @@ describe("League.test", async () => {
 
   // Basically the whole test for league functionality
   // If this works we chillllllllllin baby
-  // Update: LEZ GOO
   it("Correctly evaluates a matchup", async () => {
     // First adding stats for first 10 athletes (0-9)
     console.log("In test");
