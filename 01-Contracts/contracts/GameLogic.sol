@@ -2,7 +2,8 @@
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+//import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Athletes.sol";
 //import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 
@@ -46,8 +47,6 @@ contract GameLogic is Initializable {
         leagueName = "League Name";
         athletesContract = Athletes(athletesDataStorage);
         leagueMembers.push(msg.sender);
-        // console.log(string(abi.encodePacked("GameLogic initialized!: ", leagueMembers[0])));
-        //console.log(leagueMembers[0]);
         console.log("Proxy initialized!");
     }
 
@@ -61,30 +60,29 @@ contract GameLogic is Initializable {
     {
         console.log("setting schedule");
         //mapping(uint256 => uint256[2][]) storage schedule;
-        //create two arrays of indices that represent indices in league.sol
+        //create two arrays of indices that represent indices in leagueMembers
+        //essentially splitting the league into two halves, to assign matchups 
         uint256[4] memory leftHalf;
         uint256[4] memory rightHalf;
         for(uint week = 0; week < 8; week++) {
-            //address[8] = matchupSlots;
             console.log("\n"); 
             console.log(week);
             console.log("************************");
 
             uint256 matchupSlots;
-            //Round league size to even number, for bytes
+            //Create matchup slots that represents 2 * (number of matches each week), which includes byes
             (leagueMembers.length % 2 == 0) ? (
                 matchupSlots = leagueMembers.length
             ) : (
                 matchupSlots = (leagueMembers.length + 1)
             );
 
-            //fill values of array
+            //Grab temp value of rightHalf for final swap
             uint256 rightArrTemp = rightHalf[0];
-            // console.log("rightArrTemp");
-            // console.log(rightArrTemp);
-            //console.log(matchupSlots / 2);
+
+            //fill values of array
             for(uint256 i = 0; i < matchupSlots / 2; i++) {
-                //set indixes of leftHAlf and rightHAlf
+                //set elements of leftHalf and rightHalf to be indexes of users in leagueMembers
                 // console.log("i: ");
                 // console.log(i);
                 // console.log("leftHalf start ");
@@ -94,16 +92,19 @@ contract GameLogic is Initializable {
                 // console.log(rightHalf[i]);
                 // console.log("\n");  
                 if(week == 0) {
-                    //init values in leftHalf and rightHalf
+                    //init values in leftHalf and rightHalf with basic starting value
+                    //TODO introduce randomness here with an offset value
                     leftHalf[i] = i;
                     rightHalf[i] = i + matchupSlots / 2;
                 }
-                //otherwise rotate all indices clockwise
+                //otherwise rotate all elemnts clockwise between the two arrays
+                //[0, 1, 2, 3] ==> [5, 6, 7, 8]
+                //[4, 5, 6, 7] ==> [0, 1, 2, 3]
                 else {
                     uint256 temp = leftHalf[i];
                     rightHalf[i] = temp;
                     leftHalf[i] = rightHalf[(i + 1) % ((matchupSlots / 2))];
-                    
+                
 
                 }
                 // if(i != matchupSlots / 2 - 1 || week == 0) {
@@ -114,7 +115,6 @@ contract GameLogic is Initializable {
                 //     console.log("\n");  
 
                 // }
-                //console.log(matchupSlots - i - week - 1);
             }
             if(week != 0) {
                 leftHalf[(matchupSlots / 2) - 1] = rightArrTemp;
@@ -124,12 +124,11 @@ contract GameLogic is Initializable {
                 // console.log(rightHalf[(matchupSlots / 2) - 1]);
                 // console.log("\n"); 
             }
-            //address[] memory matchupCandidates;
             for(uint256 i = 0; i < matchupSlots / 2; i++) {
-
-                //if matchupslots greater than number of leagueMembers
-                    //just match the last player with bye
+                //temporary array to hold single matchup
                 address[2] memory matchupArray;
+                //if matchupslots greater than number of leagueMembers
+                    //just match the last player with bye week (zero address)
                 if(rightHalf[i] >= leagueMembers.length) {
                     matchupArray = [leagueMembers[leftHalf[i]], address(0)];
                 }
@@ -139,18 +138,14 @@ contract GameLogic is Initializable {
                 else {
                     matchupArray = [leagueMembers[leftHalf[i]], leagueMembers[rightHalf[i]]];
                 }
-                // console.log(matchupArray[0]);
-                // //console.log(leftHalf[i]);
-                // console.log(" vs ");
-                // console.log(matchupArray[1]);
-                // //console.log(rightHalf[i]);
-                // console.log("\n");  
+
+                //Add matchup array to struct, to allow for nested structure
                 Matchup memory matchup = Matchup({
                     players: matchupArray
                 });                  
 
-
-                schedule[week][i / 2] = matchup;
+                //Add matchup to schedule for current week
+                schedule[week][i] = matchup;
                 console.log(matchup.players[0]);
                 console.log(" vs ");
                 console.log(matchup.players[1]);
@@ -183,6 +178,63 @@ contract GameLogic is Initializable {
     function addUserToWhitelist() public {
         whitelist.push(msg.sender);
     }
+
+    // Setting the address for our athlete contract
+    function setAthleteContractAddress(address _athleteContractAddress)
+        public
+        onlyOwner
+    {
+        athletesContract = Athletes(_athleteContractAddress);
+    }
+
+    // Evaluating a match between two users (addresses)
+    // Returns which user won
+    function evaluateMatch(address addr1, address addr2)
+        public
+        onlyOwner
+        returns (address)
+    {
+        uint256[] memory lineup1 = userLineup[addr1];
+        uint256[] memory lineup2 = userLineup[addr2];
+        uint256 addr1Score;
+        uint256 addr2Score;
+
+        // Calculating users' total scores
+        for (uint256 i = 0; i < lineup1.length; i++) {
+            // Calling the Athletes.sol contract to get the scores of ith athlete
+            uint256[] memory currAthleteScores1 = athletesContract
+                .getAthleteScores(lineup1[i]);
+            uint256[] memory currAthleteScores2 = athletesContract
+                .getAthleteScores(lineup2[i]);
+            // Getting the last score in the array
+            uint256 latestScore1 = currAthleteScores1[
+                currAthleteScores1.length - 1
+            ];
+            uint256 latestScore2 = currAthleteScores2[
+                currAthleteScores2.length - 1
+            ];
+            // Calculating scores for users
+            if (latestScore1 > latestScore2) {
+                addr1Score += 1;
+            } else {
+                addr2Score += 1;
+            }
+        }
+        // Incrementing week #
+        currentWeekNum += 1;
+        // Updating mappings and returning the winner
+        if (addr1Score > addr2Score) {
+            userToWeeklyPts[addr1].push(1);
+            userToWeeklyPts[addr2].push(0);
+            userToTotalPts[addr1] += 1;
+            return addr1;
+        } else {
+            userToWeeklyPts[addr2].push(1);
+            userToWeeklyPts[addr1].push(0);
+            userToTotalPts[addr2] += 1;
+            return addr2;
+        }
+    }    
 
     /**
      * @dev Fallback function.
