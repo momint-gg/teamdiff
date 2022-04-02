@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 import "./LeagueBeaconProxy.sol";
+import "./Athletes.sol";
 
 //import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 //OPEN ISSUES
@@ -46,58 +47,69 @@ import "./LeagueBeaconProxy.sol";
 // contract LeagueProxy is ERC1967UpgradeUpgradeable/*, UUPSUpgradeable, OwnableUpgradeable*/ {
 //TODO must add owner
 contract LeagueMaker {
+    //To use Clone library
+    using Clones for address;
     // ======== Structs ========
     struct Parameters {
         string name;
         uint256 version;
+        uint256 numWeeks;
+        //uint256 currentWeekNum;
+        address athletesDataStorage;
     }
 
     // ======= Events ==========
     event LeagueCreated(string name, address a);
+    event cloneCreated(address clone);
+    event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
     // upgradeable beacon
     UpgradeableBeacon immutable upgradeableBeacon;
+    Athletes immutable athletesDataStorage;
     //TODO I think I want to store the logic contract address here as well
 
     // ======== Mutable storage ========
     Parameters public parameters;
     address public beaconAddress;
     uint256 public version = 1;
-    uint256 public secretNumber = 42;
+    //uint256 public secretNumber = 42;
+    //uint256 version = 8; // Length of a split
+    uint256 numWeeks = 8; // Length of a split
+    uint256 leagueSize = 8; // For testing
 
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
+        athletesDataStorage = new Athletes();
 
     }
 
-    //To use Clone library
-    using Clones for address;
-
-
-
-    function upgrade(address newLogicImpl) public {
-        upgradeableBeacon.upgradeTo(newLogicImpl);
-    }
+    //Disable this function
+    // function upgrade(address newLogicImpl) public {
+    //     upgradeableBeacon.upgradeTo(newLogicImpl);
+    // }
 
     // ======== Deploy contract ========
-    function createLeague(string calldata _name, uint256 _version)
+    function createLeague(string calldata _name)
         external
         returns (
-            ///function createLeague(string _name, uint256 _version)
-            ///payable
             address
         )
     {
-        parameters = Parameters({name: _name, version: _version});
-        //bytes memory delegateCallData = abi.encodeWithSignature("initialize(string calldata, uint256)", parameters.name, parameters.version);
-        //bytes memory delegateCallData = abi.encodeWithSignature("initialize(string calldata)", "test name");
+        parameters = Parameters({
+            name: _name, 
+            version: version,
+            numWeeks: numWeeks,
+            athletesDataStorage: address(athletesDataStorage)
+        });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(uint256)",
-            parameters.version
+            "initialize(uint256,uint256,address)",
+            parameters.version,
+            parameters.numWeeks,
+            parameters.athletesDataStorage
         );
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
@@ -106,15 +118,10 @@ contract LeagueMaker {
 
         emit LeagueCreated(parameters.name, address(proxy));
         delete parameters;
-        //proxy.version();
-
-        //console.log(address(proxy));
         return address(proxy);
-
     }
 
 
-    event cloneCreated(address clone);
 
     // ============= Deploy Ligthweight clone ===========
     function createLeagueClone(address implementation)         
@@ -148,15 +155,53 @@ contract LeagueMaker {
         return address(upgradeableBeacon);
     }
 
-    event Response(bool success, bytes data);
 
     // Calling a function that does not exist triggers the fallback function.
     function testCallDoesNotExist(address _addr) public {
         //This calls the game logic incrementVersion which is great
         //but how do we call it in js?
+        // (bool success, bytes memory data) = _addr.call(
+        //     abi.encodeWithSignature("incrementVersion()")
+        // );
         (bool success, bytes memory data) = _addr.call(
-            abi.encodeWithSignature("incrementVersion()")
+            abi.encodeWithSignature("setLeagueSchedule()")
         );
+        (success,  data) = _addr.call(
+            abi.encodeWithSignature("addUserToLeague()")
+        );
+        (success,  data) = _addr.call(
+            abi.encodeWithSignature("addUserToLeague()")
+        );
+        // (bool success, bytes memory data) = _addr.call(
+        //     abi.encodeWithSignature("setLeagueSchedule()")
+        // );
+        //console.log("called test call");
+
+        emit Response(success, data);
+    }
+
+    function addUsersToLeagueHelper(address[] memory addresses, address _addr) public {
+        //This calls the game logic incrementVersion which is great
+        //but how do we call it in js?
+        // (bool success, bytes memory data) = _addr.call(
+        //     abi.encodeWithSignature("incrementVersion()")
+        // );
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < addresses.length; i++) {
+            (success, data) = _addr.call(
+                abi.encodeWithSignature(
+                    "addUserToLeague(address)",
+                    addresses[i]
+                )
+            );
+        }
+        // (success,  data) = _addr.call(
+        //     abi.encodeWithSignature("addUserToLeague()")
+        // );
+        // (success,  data) = _addr.call(
+        //     abi.encodeWithSignature("addUserToLeague()")
+        // );
         // (bool success, bytes memory data) = _addr.call(
         //     abi.encodeWithSignature("setLeagueSchedule()")
         // );

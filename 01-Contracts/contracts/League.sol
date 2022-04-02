@@ -13,7 +13,7 @@ contract League is Ownable, Athletes {
 
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
-    mapping(address => uint256[]) userLineup;
+    mapping(address => uint256[]) userLineup; 
 
     // Our Athletes.sol contract
     Athletes athletesContract;
@@ -72,10 +72,12 @@ contract League is Ownable, Athletes {
         }
     }
 
+
     // Setting the lineup for a user
     function setLineup(uint256[] memory athleteIds) public {
         userLineup[msg.sender] = athleteIds;
     }
+
 
     // Returning the lineup for a user
     function getLineup() public view returns (uint256[] memory) {
