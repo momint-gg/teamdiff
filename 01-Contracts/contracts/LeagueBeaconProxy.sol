@@ -20,9 +20,16 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
-    uint256 public version;
-    string public name;
-    uint256[5] public leagueMembers;
+    uint256 public version; // Length of a split
+    uint256 public numWeeks; // Length of a split
+    uint256 public leagueSize; // For testing
+    uint256 public currentWeekNum; // Keeping track of week number
+    address[] public leagueMembers;
+    address[] whitelist;
+    string public leagueName;
+    mapping(address => uint256) userToTotalPts;
+    mapping(address => uint256[]) userToWeeklyPts;
+    mapping(address => uint256[]) userLineup;
 
 
     

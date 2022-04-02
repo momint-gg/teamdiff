@@ -20,7 +20,7 @@ contract League is Ownable, Athletes, Whitelist {
 
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
-    mapping(address => uint256[]) userLineup;
+    mapping(address => uint256[]) userLineup; 
 
     // Our league's users
     // Reminder: We are inheriting the add / remove from whitelist functions from Whitelist.sol
@@ -131,10 +131,12 @@ contract League is Ownable, Athletes, Whitelist {
         }
     }
 
+
     // Setting the lineup for a user
     function setLineup(uint256[] memory athleteIds) public {
         userLineup[msg.sender] = athleteIds;
     }
+
 
     // Returning the lineup for a user
     function getLineup() public view returns (uint256[] memory) {
