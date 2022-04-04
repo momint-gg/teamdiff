@@ -10,8 +10,9 @@ import TabPanel from '@mui/lab/TabPanel'
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext'
 import Typography from '@mui/material/Typography';
-import logo from '../assets/images/logo.png';
+import logo from '../assets/images/logo-horizontal.png';
 import Image from 'next/image';
+// import '../assets/fonts/Exo/Exo-VariableFont_wght.ttf';
 
 //************* */
 // Custom Page Imports
@@ -70,7 +71,7 @@ export default function Index(props) {
   if (typeof window !== "undefined") {
     return (
       <Provider autoConnect connectors={connectors}>
-        <Box>
+        <Box sx={{paddingLeft: 5, paddingRight: 5}}>
           <Box
           sx={{
             display: 'flex',
@@ -83,22 +84,25 @@ export default function Index(props) {
           <Image
             src={logo}
             alt="TeamDiff logo"
+            width="300px"
+            height="75px"
           />
           <WalletLogin/>           
           </Box>
           <TabContext value={value}>
-            <Box>
+            <Box sx={{marginLeft:-5, marginRight: -5, borderBottom: 1, borderColor: 'white'}}>
               {/* //Do we want to have this be a SPA with all tabs?
               This might be an issue when certain tabs are fetching data, but maybe not */}
               <TabList 
                 onChange={handleChange} 
                 indicatorColor="secondary"
                 textColor="white"
+                sx= {{marginLeft: 5}}
               >
-                <Tab label="PLAY" value="0" />
-                <Tab label="COLLECTION" value="1" />
-                <Tab label="MINT" value="2" />
-                <Tab label="BURN" value="3" />
+                <Tab label="PLAY" value="0" sx={{fontSize: 30}} />
+                <Tab label="COLLECTION" value="1" sx={{fontSize: 30}} />
+                <Tab label="MINT" value="2" sx={{fontSize: 30}} />
+                <Tab label="BURN" value="3" sx={{fontSize: 30}} />
               </TabList>
             </Box>
             <TabPanel value="0">
@@ -120,8 +124,8 @@ export default function Index(props) {
               <ConnectWallet />
             </TabPanel>
           </TabContext>
-          <Footer/>
         </Box>
+        <Footer/>
       </Provider>
     );
 }

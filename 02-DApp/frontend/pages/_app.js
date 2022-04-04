@@ -4,6 +4,7 @@ import theme from '../styles/theme'
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 //@import url('https://fonts.googleapis.com/css?family=Exo+2');
+import "@fontsource/exo";
 import '../styles/globalStyles.css';
 
 function MyApp({ Component, pageProps }) {

@@ -22,6 +22,12 @@ const theme = createTheme({
       contrastText: '#40fff2',
     },
   },
+  typography: {
+    fontFamily: [
+      'Exo',
+      'sans-serif',
+    ].join(','),
+  },
   overrides: {
     Button: {
       label: {

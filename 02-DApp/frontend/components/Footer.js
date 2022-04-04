@@ -10,7 +10,7 @@ export default function Footer() {
                         nub
                     </svg>
                 </a>
-                <span className="text-muted">© 2021 Momint LLC</span>
+                <span className="text-muted">© 2022 TeamDiff LLC</span>
             </div>
 
             <ul className="nav col-md-4 justify-content-end list-unstyled d-flex">
