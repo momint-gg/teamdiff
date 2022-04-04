@@ -64,10 +64,10 @@ contract LeagueMaker {
 
     // ======== Mutable storage ========
     address beaconAddress;
-    address[] leagueAddresses; //list of all deployed leagueAddresses
+    address[] public leagueAddresses; //list of all deployed leagueAddresses
     //TODO how can we tell what league a user belongs to?
     //Honestly might be easiest to give them a membership nft :/
-    mapping(address => address[]) userToLeagueMap;
+    mapping(address => address[]) public userToLeagueMap;
 
     //Proxy Constructor Parameters
     struct Parameters {
@@ -116,7 +116,7 @@ contract LeagueMaker {
         });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,uint256,address,address,address,address,address)",
+            "initialize(string,uint256,uint256,uint256,address,address,address,address,address,address)",
             parameters.name,
             parameters.version,
             parameters.numWeeks,
@@ -125,7 +125,8 @@ contract LeagueMaker {
             parameters.owner,
             parameters.admin,
             parameters.polygonUSDCAddress,
-            parameters.rinkebyUSDCAddress
+            parameters.rinkebyUSDCAddress,
+            address(this)
         );
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
@@ -138,6 +139,25 @@ contract LeagueMaker {
         emit LeagueCreated(parameters.name, address(proxy));
         delete parameters;
         return address(proxy);
+    }
+
+    //TODO set to only admin,
+    //Set all schedules for all leagues 
+    function setLeagueSchedules() public {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("setLeagueSchedule()")
+            );
+        }
+        emit Response(success, data);
+    }
+
+    //TODO set to onlyProxy
+    //Add or update userToLeagueMapping with additional pairs
+    function updateUserToLeagueMapping(address user) external {
+        userToLeagueMap[user].push(msg.sender);
     }
 
 
@@ -174,12 +194,12 @@ contract LeagueMaker {
     function testCallDoesNotExist(address _addr) public {
         //This calls the game logic incrementVersion which is great
         //but how do we call it in js?
-        // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("incrementVersion()")
-        // );
         (bool success, bytes memory data) = _addr.call(
-            abi.encodeWithSignature("setLeagueSchedule()")
+            abi.encodeWithSignature("incrementVersion()")
         );
+        // (bool success, bytes memory data) = _addr.call(
+        //     abi.encodeWithSignature("setLeagueSchedule()")
+        // );
         // (bool success,  bytes memory data) = _addr.call(
         //     abi.encodeWithSignature("version()")
         // );

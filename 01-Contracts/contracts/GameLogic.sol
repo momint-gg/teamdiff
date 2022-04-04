@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
 import "./Whitelist.sol";
+import "./LeagueMaker.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
@@ -47,6 +48,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     Athletes athletesContract;
     // Our Whitelist contract
     Whitelist whitelistContract;
+    // Our LeagueMaker contract
+    LeagueMaker leagueMakerContract;
+
     struct Matchup {
         address[2] players;
     }
@@ -65,7 +69,8 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         address _owner,
         address _admin, 
         address _polygonUSDCAddress,
-        address _rinkebyUSDCAddress
+        address _rinkebyUSDCAddress,
+        address leagueMakerContractAddress
         ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
@@ -76,6 +81,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         stakeAmount = _stakeAmount;
         //stake(rinkebyUSDCAddress, stakeAmount);
         athletesContract = Athletes(athletesDataStorageAddress);
+        leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
         //owner = _owner;
         //admin = _admin;
         _setupRole(DEFAULT_ADMIN_ROLE, _admin);
@@ -113,7 +119,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
                     )
                 )
             ) + leagueMembers.length * leagueMembers.length));
-            console.log(randomShifter);
+            //console.log(randomShifter);
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
         //essentially splitting the league into two halves, to assign matchups 
@@ -319,6 +325,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     function addUserToLeague(address user) public {
         if(leagueMembers.length < 8) {
             leagueMembers.push(user);
+            leagueMakerContract.updateUserToLeagueMapping(user);
         }
         else {
             console.log("too many users in league to add new user");
