@@ -3,60 +3,104 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./Athletes.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-//import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "./Athletes.sol";
+import "./Whitelist.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
-contract GameLogic is Initializable {
+contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
+    //Modifiers
+    using SafeMath for uint256;
+
+    /**
+     * @dev Throws if called by any account that's not Admin
+     * The creator of the league will be set to Admin, and have admin privileges
+     */
+    modifier onlyAdmin() {
+        // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        _;
+    }
+
     // Vars
-    //TODO initialize all these in the initialize constructor
-    uint256 version; // Length of a split
-    uint256 numWeeks; // Length of a split
-    uint256 leagueSize; // For testing
+    uint256 public version; // tsting
+    string public leagueName;
+    uint256 public numWeeks; // Length of a split
     uint256 currentWeekNum; // Keeping track of week number
     address[] leagueMembers;
-    address[] whitelist;
-    string leagueName;
+    //address[] whitelist;
+    //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
+    //address owner;
+    // address admin;
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
     mapping(address => uint256[]) userLineup;
+    uint256 private totalSupply;// Total supply of USDC
+    uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
+    address polygonUSDCAddress; // When we deploy to mainnet
+    address rinkebyUSDCAddress;
 
     // Our Athletes.sol contract
     Athletes athletesContract;
-
+    // Our Whitelist contract
+    Whitelist whitelistContract;
     struct Matchup {
         address[2] players;
     }
     mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
+    //Events
+    event Staked(address sender, uint256 amount);
 
-    // function initialize(string calldata _name, uint256 _version) public initializer {
-    //Delegate call fails when string is passed
+    //Initialize all parameters of proxy
     function initialize(
+        string calldata _name,
         uint256 _version,
         uint256 _numWeeks,
-        // uint256 _currentWeekNum
-        address athletesDataStorage
-        //uint256 _leagueSize
+        uint256 _stakeAmount,
+        address athletesDataStorageAddress,
+        address _owner,
+        address _admin, 
+        address _polygonUSDCAddress,
+        address _rinkebyUSDCAddress
         ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
+        leagueName = _name;
         version = _version;
         numWeeks = _numWeeks;
         currentWeekNum = uint256(0);
-        leagueName = "League Name";
-        athletesContract = Athletes(athletesDataStorage);
+        totalSupply = uint256(0);
+        stakeAmount = _stakeAmount;
+        stake(rinkebyUSDCAddress, stakeAmount);
+        athletesContract = Athletes(athletesDataStorageAddress);
+        //owner = _owner;
+        //admin = _admin;
+        _setupRole(DEFAULT_ADMIN_ROLE, _admin);
+        polygonUSDCAddress = _polygonUSDCAddress;
+        rinkebyUSDCAddress = _rinkebyUSDCAddress;
+
         leagueMembers.push(msg.sender);
+        whitelistContract = new Whitelist(); // Initializing our whitelist
+
         console.log("Proxy initialized!");
     }
 
-    function incrementVersion() external returns (uint256) {
+    function incrementVersion() public returns  (uint256)  {
         console.log("incrementing version:");
-        version = version + 1;
+        version = version + 2;
         console.log(version);
+        console.log(leagueName);
     }
 
-    function setLeagueSchedule() external 
+    /*************************************************/
+    /************ TEAM DIFF ONLY FUNCTIONS ***********/
+    /*************************************************/
+    function setLeagueSchedule() 
+        external 
+        onlyOwner
     {
         console.log("setting schedule");
         //mapping(uint256 => uint256[2][]) storage schedule;
@@ -155,30 +199,6 @@ contract GameLogic is Initializable {
         }
     }
 
-    // Setting the lineup for a user
-    function setLineup(uint256[] memory athleteIds) public {
-        userLineup[msg.sender] = athleteIds;
-    }
-
-
-    // Returning the lineup for a user
-    function getLineup() public view returns (uint256[] memory) {
-        return userLineup[msg.sender];
-    }
-
-    // Add user to league
-    function addUserToLeague(address user) public {
-        //for testing
-        leagueMembers.push(user);
-        //for prod
-        // leagueMembers.push(msg.sender);
-    }
-
-    // Add user to whitelist
-    function addUserToWhitelist() public {
-        whitelist.push(msg.sender);
-    }
-
     // Setting the address for our athlete contract
     function setAthleteContractAddress(address _athleteContractAddress)
         public
@@ -189,6 +209,7 @@ contract GameLogic is Initializable {
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
+    // TODO: Event emitted for each user matchup
     function evaluateMatch(address addr1, address addr2)
         public
         onlyOwner
@@ -236,13 +257,102 @@ contract GameLogic is Initializable {
         }
     }    
 
-    /**
-     * @dev Fallback function.
-     * Implemented entirely in `_fallback`.
-    //  */
-    // fallback() external payable {
-    //     //_fallback();
-    //     //_delegate();
-    //     console.log("fallback in the logic");
-    // }
+
+
+    /******************************************************/
+    /***************** STAKING FUNCTIONS ******************/
+    /******************************************************/
+
+    // User staking the currency
+    // I think this means they won't be able to stake decimal amounts
+    function stake(address _token, uint256 amount) internal {
+        require(amount > 0, "Cannot stake 0");
+        totalSupply = totalSupply.add(amount);
+        // _balances[msg.sender] = _balances[msg.sender].add(amount);
+        // Before this you should have approved the amount
+        // This will transfer the amount of  _token from caller to contract
+        IERC20(_token).transferFrom(msg.sender, address(this), amount);
+        emit Staked(msg.sender, amount);
+    }
+
+    // Returning the contracts USDC balance
+    function getUSDCBalance(address _token) public view returns (uint256) {
+        return IERC20(_token).balanceOf(address(this));
+    }
+
+
+
+    //***************************************************/
+    //*************** LEAGUE PLAY FUNCTION **************/
+    //***************************************************/
+    // Setting the lineup for a user
+    function setLineup(uint256[] memory athleteIds) public {
+        userLineup[msg.sender] = athleteIds;
+    }
+
+    // Returning the lineup for a user
+    function getLineup() public view returns (uint256[] memory) {
+        return userLineup[msg.sender];
+    }
+
+        // Getter for user to total pts
+    function getUserTotalPts() public view returns (uint256) {
+        return userToTotalPts[msg.sender];
+    }
+
+    // Getter for user to weekly pts
+    function getUserWeeklypts() public view returns (uint256[] memory) {
+        return userToWeeklyPts[msg.sender];
+    }
+
+
+
+
+    /*****************************************************************/
+    /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
+    /*****************************************************************/
+    // Add user to league
+    //for testing
+    function addUserToLeague(address user) public {
+        if(leagueMembers.length < 8) {
+            leagueMembers.push(user);
+        }
+        else {
+            console.log("too many users in league to add new user");
+        }
+    }
+
+    // User joining the league
+    function joinLeague() public onlyWhitelisted {
+        //TODO check leagueSize on frontend instead to ensure this operation is valid
+        leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
+        stake(rinkebyUSDCAddress, stakeAmount);
+    }
+
+    // TODO: Should we write this or just make it so that you can't leave once you join?
+    function removeFromLeague() public onlyWhitelisted {}
+
+
+    // Add user to whitelist
+    function addUserToWhitelist() public onlyAdmin {
+        whitelist[msg.sender] = true;
+    }
+
+        //TODO
+    //1.) View function to calculate score on-chain for a given line-up and week
+    //2.) Pool Prize mechanics
+    //3.) League membership mechanics
+    //4.) League schedule creation mechanics
+    //5.) lock set line-up with onlyOwner function
+
+    //TODO Henry:
+    // Add whitelist logic
+    // List of users that can join league, if you join the league
+    // When user joins league they pay an amount set by the league admin (payable function)
+    // Amount is in USDC
+    // Initially set by the league owner, cannot be reset
+    // If user is whitelisted, then they can join the league
+    // If whitelist has a length of 0 then ignore whitelist, anyone can join the league
+
+    // Start prize pool mechanics
 }

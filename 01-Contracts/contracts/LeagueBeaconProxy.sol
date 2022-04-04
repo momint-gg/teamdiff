@@ -10,7 +10,12 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
-
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./Athletes.sol";
+import "./Whitelist.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /**
  * @dev This contract implements a proxy that gets the implementation address for each call from a {UpgradeableBeacon}.
  *
@@ -19,19 +24,37 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol";
  *
  * _Available since v3.4._
  */
-contract LeagueBeaconProxy is Proxy, ERC1967Upgrade {
-    uint256 public version; // Length of a split
-    uint256 public numWeeks; // Length of a split
-    uint256 public leagueSize; // For testing
-    uint256 public currentWeekNum; // Keeping track of week number
-    address[] public leagueMembers;
-    address[] whitelist;
+contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
+
+
+        uint256 public version; // tsting
     string public leagueName;
+    uint256 public numWeeks; // Length of a split
+    uint256 currentWeekNum; // Keeping track of week number
+    address[] leagueMembers;
+    address[] whitelist;
+    //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
+    //address owner;
+    // address admin;
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
     mapping(address => uint256[]) userLineup;
+    uint256 private totalSupply;// Total supply of USDC
+    uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
+    address polygonUSDCAddress; // When we deploy to mainnet
+    address rinkebyUSDCAddress;
 
+    // Our Athletes.sol contract
+    Athletes athletesContract;
+    // Our Whitelist contract
+    Whitelist whitelistContract;
+    struct Matchup {
+        address[2] players;
+    }
+    mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
+    //Events
+    event Staked(address sender, uint256 amount);
     
     /**
      * @dev Initializes the proxy with `beacon`.

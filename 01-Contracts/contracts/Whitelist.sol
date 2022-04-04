@@ -13,15 +13,15 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract Whitelist is Ownable {
     mapping(address => bool) public whitelist;
-    address leagueCreator;
+    //address leagueCreator;
     uint256 numWhitelisted; // Keeping track of the number of users whitelisted (slight modification to code)
 
     event WhitelistedAddressAdded(address addr);
     event WhitelistedAddressRemoved(address addr);
 
-    constructor(address _creator) {
-        leagueCreator = _creator;
-    }
+    // constructor(address _creator) {
+    //     leagueCreator = _creator;
+    // }
 
     /**
      * @dev Throws if called by any account that's not whitelisted.
@@ -33,10 +33,10 @@ contract Whitelist is Ownable {
     }
 
     // Checking to see if this is the league creator
-    modifier onlyCreator() {
-        require(msg.sender == leagueCreator);
-        _;
-    }
+    // modifier onlyCreator() {
+    //     require(msg.sender == leagueCreator);
+    //     _;
+    // }
 
     /*
      * @dev add an address to the whitelist
@@ -45,7 +45,7 @@ contract Whitelist is Ownable {
      */
     function addAddressToWhitelist(address addr)
         public
-        onlyCreator
+        onlyOwner
         returns (bool success)
     {
         if (!whitelist[addr]) {
@@ -64,7 +64,7 @@ contract Whitelist is Ownable {
      */
     function addAddressesToWhitelist(address[] memory addrs)
         public
-        onlyCreator
+        onlyOwner
         returns (bool success)
     {
         for (uint256 i = 0; i < addrs.length; i++) {
@@ -83,7 +83,7 @@ contract Whitelist is Ownable {
      */
     function removeAddressFromWhitelist(address addr)
         public
-        onlyCreator
+        onlyOwner
         returns (bool success)
     {
         if (whitelist[addr]) {
@@ -102,7 +102,7 @@ contract Whitelist is Ownable {
      */
     function removeAddressesFromWhitelist(address[] memory addrs)
         public
-        onlyCreator
+        onlyOwner
         returns (bool success)
     {
         for (uint256 i = 0; i < addrs.length; i++) {
