@@ -49,14 +49,7 @@ import "./Athletes.sol";
 contract LeagueMaker {
     //To use Clone library
     using Clones for address;
-    // ======== Structs ========
-    struct Parameters {
-        string name;
-        uint256 version;
-        uint256 numWeeks;
-        //uint256 currentWeekNum;
-        address athletesDataStorage;
-    }
+
 
     // ======= Events ==========
     event LeagueCreated(string name, address a);
@@ -67,16 +60,32 @@ contract LeagueMaker {
     // upgradeable beacon
     UpgradeableBeacon immutable upgradeableBeacon;
     Athletes immutable athletesDataStorage;
-    //TODO I think I want to store the logic contract address here as well
+    
 
     // ======== Mutable storage ========
+    address beaconAddress;
+    address[] leagueAddresses; //list of all deployed leagueAddresses
+    //TODO how can we tell what league a user belongs to?
+    //Honestly might be easiest to give them a membership nft :/
+    mapping(address => address[]) userToLeagueMap;
+
+    //Proxy Constructor Parameters
+    struct Parameters {
+        string name;
+        uint256 version;
+        uint256 numWeeks;
+        uint256 stakeAmount;
+        address athletesDataStorageAddress;
+        address owner;
+        address admin;
+        address polygonUSDCAddress;
+        address rinkebyUSDCAddress;        
+    }
     Parameters public parameters;
-    address public beaconAddress;
-    uint256 public version = 1;
-    //uint256 public secretNumber = 42;
-    //uint256 version = 8; // Length of a split
-    uint256 numWeeks = 8; // Length of a split
-    uint256 leagueSize = 8; // For testing
+    uint256 _version = 2;
+    uint256 _numWeeks = 8; // Length of a split
+    address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
+    address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
@@ -86,37 +95,46 @@ contract LeagueMaker {
 
     }
 
-    //Disable this function
-    // function upgrade(address newLogicImpl) public {
-    //     upgradeableBeacon.upgradeTo(newLogicImpl);
-    // }
-
-
-    // ======== Deploy contract ========
-    function createLeague(string calldata _name)
-        external
-        returns (
-            address
+    // ======== Deploy New League Proxy ========
+    function createLeague(
+        string calldata _name,
+        uint256 _stakeAmount
         )
+        external
+        returns ( address )
     {
         parameters = Parameters({
             name: _name, 
-            version: version,
-            numWeeks: numWeeks,
-            athletesDataStorage: address(athletesDataStorage)
+            version: _version,
+            numWeeks: _numWeeks,
+            stakeAmount: _stakeAmount,
+            athletesDataStorageAddress: address(athletesDataStorage),
+            owner: address(this),
+            admin: msg.sender,
+            polygonUSDCAddress: _polygonUSDCAddress,
+            rinkebyUSDCAddress: _rinkebyUSDCAddress
         });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(uint256,uint256,address)",
+            "initialize(string,uint256,uint256,uint256,address,address,address,address,address)",
+            parameters.name,
             parameters.version,
             parameters.numWeeks,
-            parameters.athletesDataStorage
+            parameters.stakeAmount,
+            parameters.athletesDataStorageAddress,
+            parameters.owner,
+            parameters.admin,
+            parameters.polygonUSDCAddress,
+            parameters.rinkebyUSDCAddress
         );
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
             delegateCallData
         );
 
+        leagueAddresses.push(address(proxy));
+        
+        
         emit LeagueCreated(parameters.name, address(proxy));
         delete parameters;
         return address(proxy);
@@ -125,14 +143,14 @@ contract LeagueMaker {
 
 
     // ============= Deploy Ligthweight clone ===========
-    function createLeagueClone(address implementation) external {
-        //Try returning just a clone with the implementation address
-        //return implementation.cloneDeterministic(msg.sender);
-        address cloneAddy = implementation.clone();
-        console.log(cloneAddy);
-        emit cloneCreated(cloneAddy);
-        //return cloneAddy;
-    }
+    // function createLeagueClone(address implementation) external {
+    //     //Try returning just a clone with the implementation address
+    //     //return implementation.cloneDeterministic(msg.sender);
+    //     address cloneAddy = implementation.clone();
+    //     console.log(cloneAddy);
+    //     emit cloneCreated(cloneAddy);
+    //     //return cloneAddy;
+    // }
 
     function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});
@@ -156,18 +174,24 @@ contract LeagueMaker {
     function testCallDoesNotExist(address _addr) public {
         //This calls the game logic incrementVersion which is great
         //but how do we call it in js?
-        // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("incrementVersion()")
-        // );
         (bool success, bytes memory data) = _addr.call(
-            abi.encodeWithSignature("setLeagueSchedule()")
+            abi.encodeWithSignature("incrementVersion()")
         );
-        (success,  data) = _addr.call(
-            abi.encodeWithSignature("addUserToLeague()")
-        );
-        (success,  data) = _addr.call(
-            abi.encodeWithSignature("addUserToLeague()")
-        );
+        // (bool success, bytes memory data) = _addr.call(
+        //     abi.encodeWithSignature("setLeagueSchedule()")
+        // );
+        // (bool success,  bytes memory data) = _addr.call(
+        //     abi.encodeWithSignature("version()")
+        // );
+        // //console.log("Data");
+        // (success,  data) = _addr.call(
+        //     abi.encodeWithSignature("numWeeks()")
+        // );
+        // //console.log(data);
+        // (success,  data) = _addr.call(
+        //     abi.encodeWithSignature("leagueName()")
+        // );
+        //console.log(data);
         // (bool success, bytes memory data) = _addr.call(
         //     abi.encodeWithSignature("setLeagueSchedule()")
         // );

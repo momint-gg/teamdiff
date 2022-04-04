@@ -1,6 +1,8 @@
 const { ethers, upgrades } = require("hardhat");
 var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
+const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
+//01-Contracts\build\contracts\contracts\LeagueBeaconProxy.sol\LeagueBeaconProxy.json
 
 async function main() {
   // Deploying
@@ -25,38 +27,11 @@ async function main() {
   await BeaconInstance.deployed();
   console.log("Beacon deployed to:", BeaconInstance.address);
 
-  //Create Proxy
-  const LeagueProxyFactory = await ethers.getContractFactory(
-    "LeagueBeaconProxy"
-  );
-  // const delegateCallData = abi.encodeWithSignature("initialize(uint256)", parameters.version);
-  // const LeagueBeaconProxy  = new LeagueBeaconProxy(
-  //     address(upgradeableBeacon),
-  //     delegateCallData
-  // );
+  //Signers
+  [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await hre.ethers.getSigners();
 
-  // let func = web3.eth.abi.encodeFunctionCall(
-  //   {
-  //     name: "initialize",
-  //     type: "function",
-  //     inputs: [
-  //       {
-  //         type: "uint256",
-  //         name: "_version",
-  //       },
-  //     ],
-  //   },
-  //   [1]
-  // );
-  // const LeagueProxyInstance = await LeagueProxyFactory.deploy(
-  //   BeaconInstance.address,
-  //   func
-  // );
-  // const LeagueProxyInstance2 = await LeagueProxyFactory.deploy(
-  //   BeaconInstance.address,
-  //   func
-  // );
-  // //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
+  
+  //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
   // await LeagueProxyInstance.deployed();
   // await LeagueProxyInstance2.deployed();
   var txn = await LeagueMakerInstance.createLeague("new");
@@ -74,33 +49,67 @@ async function main() {
   // Testing creatueLEague
   //////////////////
   //TODO Consider creating a contract wiht the abi and address, and sendTransactions to that contract
+  //#1
   const LeagueProxyInstance = await hre.ethers.getContractAt("LeagueBeaconProxy", leagueProxyContractAddress);
-  //txn = await LeagueProxyInstance.incrementVersion();
+  
+  //#2
+  // const MyContract = await ethers.getContractFactory("LeagueBeaconProxy");
+  // const LeagueProxyInstance = await MyContract.attach(
+  //   leagueProxyContractAddress // The deployed contract address
+  // ); 
+  
+  
+  //#3
+  //const provider = new ethers.providers.getDefaultProvider();
+  // const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
+
+  // const LeagueProxyInstance = new ethers.Contract(
+  //     leagueProxyContractAddress,
+  //     LeagueBeaconProxyJSON.abi,
+  //     provider
+  // );
+
+
+  //STILL TRYING TO CALL INCREMENT VERSION FROM FRONT END
+  // const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
+  // // const msgData = web3.eth.abi.encodeFunctionSignature("initialize(uint256)",
+  // //                                                      1);
+  // // const msgData = "0x00";
+  // txn = await web3.eth.sendTransaction({
+  //   from: 0x0,
+  //   to: LeagueProxyInstance.address,
+  //   //value: 1,     // If you want to send ether with the call.
+  //   //gas: 2,       // If you want to specify the gas.
+  //   // gasPrice: ???,  // If you want to specify the gas price.
+  //   data: msgData
+  // }, function(err, transactionHash) {
+  //   if (err) { 
+  //       console.log(err); 
+  //   } else {
+  //       console.log(transactionHash);
+  //   }
+  // });
+  txn = await LeagueProxyInstance.incrementVersion();
   console.log(
     "League Proxy init state: " 
       + "\n\tVersion: " + (await LeagueProxyInstance.version())
       + "\n\tnumWeeks: " + (await LeagueProxyInstance.numWeeks())
-      //+ "\n\tleagueMembers: " + (await LeagueProxyInstance.leagueMembers())
-      // + "\n\tVersion: " + (await LeagueProxyInstance.version())
-      // + "\n\tVersion: " + (await LeagueProxyInstance.version())
+      + "\n\tleagueName: " + (await LeagueProxyInstance.leagueName())
   );
 
-  //txn = await LeagueProxyInstance.incrementVersion();
-
-  [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await hre.ethers.getSigners();
   
-  txn = await LeagueMakerInstance.addUsersToLeagueHelper(
-    [owner.address, addr1.address, addr2.address, addr3.address],
-    LeagueProxyInstance.address
-  );
-  //receipt = await txn.wait();
+  // txn = await LeagueMakerInstance.addUsersToLeagueHelper(
+  //   [owner.address, addr1.address, addr2.address, addr3.address],
+  //   LeagueProxyInstance.address
+  // );
+  // //receipt = await txn.wait();
   txn = await LeagueMakerInstance.testCallDoesNotExist(
     LeagueProxyInstance.address
   );
-  // console.log(
-  //   "League Proxy updated state: " 
-  //     + "\n\tVersion: " + (await LeagueProxyInstance.version())
-  // );
+  console.log(
+    "League Proxy updated state: " 
+      + "\n\tVersion: " + (await LeagueProxyInstance.version())
+  );
 
     //*******************
   // Testing delegate call functionality within contract
@@ -120,7 +129,49 @@ async function main() {
   // }
 
 
+//Create Proxy
+  // const LeagueProxyFactory = await ethers.getContractFactory(
+  //   "LeagueBeaconProxy"
+  // );
+  // const delegateCallData = abi.encodeWithSignature("initialize(uint256)", parameters.version);
+  // const LeagueBeaconProxy  = new LeagueBeaconProxy(
+  //     address(upgradeableBeacon),
+  //     delegateCallData
+  // );
 
+  // let func = web3.eth.abi.encodeFunctionCall(
+  //   {
+  //     name: "initialize",
+  //     type: "function",
+  //     inputs: [
+  //       {
+  //         type: "uint256",
+  //         name: "_version",
+  //       },
+  //       {
+  //         type: "uint256",
+  //         name: "_numWeeks",
+  //       },
+  //       // {
+  //       //   type: "address",
+  //       //   name: "athletesDataStorage",
+  //       // },
+  //       {
+  //         type: "string",
+  //         name: "_name",
+  //       },
+  //     ],
+  //   },
+  //   [2, 8, "test name"]
+  // );
+  // const LeagueProxyInstance = await LeagueProxyFactory.deploy(
+  //   BeaconInstance.address,
+  //   func
+  // );
+  // const LeagueProxyInstance2 = await LeagueProxyFactory.deploy(
+  //   BeaconInstance.address,
+  //   func
+  // );
 
 
   // console.log(
