@@ -174,12 +174,12 @@ contract LeagueMaker {
     function testCallDoesNotExist(address _addr) public {
         //This calls the game logic incrementVersion which is great
         //but how do we call it in js?
-        (bool success, bytes memory data) = _addr.call(
-            abi.encodeWithSignature("incrementVersion()")
-        );
         // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("setLeagueSchedule()")
+        //     abi.encodeWithSignature("incrementVersion()")
         // );
+        (bool success, bytes memory data) = _addr.call(
+            abi.encodeWithSignature("setLeagueSchedule()")
+        );
         // (bool success,  bytes memory data) = _addr.call(
         //     abi.encodeWithSignature("version()")
         // );

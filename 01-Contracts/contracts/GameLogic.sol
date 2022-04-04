@@ -74,7 +74,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         currentWeekNum = uint256(0);
         totalSupply = uint256(0);
         stakeAmount = _stakeAmount;
-        stake(rinkebyUSDCAddress, stakeAmount);
+        //stake(rinkebyUSDCAddress, stakeAmount);
         athletesContract = Athletes(athletesDataStorageAddress);
         //owner = _owner;
         //admin = _admin;
@@ -98,11 +98,22 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
+    //TODO set to only owner
     function setLeagueSchedule() 
         external 
-        onlyOwner
     {
         console.log("setting schedule");
+        uint256 randomShifter = ((uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp,
+                        msg.sender,
+                        block.difficulty,
+                        leagueName
+                    )
+                )
+            ) + leagueMembers.length * leagueMembers.length));
+            console.log(randomShifter);
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
         //essentially splitting the league into two halves, to assign matchups 
@@ -127,19 +138,10 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
             //fill values of array
             for(uint256 i = 0; i < matchupSlots / 2; i++) {
                 //set elements of leftHalf and rightHalf to be indexes of users in leagueMembers
-                // console.log("i: ");
-                // console.log(i);
-                // console.log("leftHalf start ");
-
-                // console.log(leftHalf[i]);
-                // console.log("righthalf start");
-                // console.log(rightHalf[i]);
-                // console.log("\n");  
                 if(week == 0) {
                     //init values in leftHalf and rightHalf with basic starting value
-                    //TODO introduce randomness here with an offset value
-                    leftHalf[i] = i;
-                    rightHalf[i] = i + matchupSlots / 2;
+                    leftHalf[(i + randomShifter) % ((matchupSlots / 2))] = i;
+                    rightHalf[(i + randomShifter) % ((matchupSlots / 2))] = i + matchupSlots / 2;
                 }
                 //otherwise rotate all elemnts clockwise between the two arrays
                 //[0, 1, 2, 3] ==> [5, 6, 7, 8]
@@ -151,11 +153,12 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
                 
 
                 }
-                // if(i != matchupSlots / 2 - 1 || week == 0) {
+                //if(i != matchupSlots / 2 - 1 || week == 0) {
+                // if(week == 0) {
                 //     console.log("lefthalf end");
-                //     console.log(leftHalf[i]);
+                //     console.log(leftHalf[(i + randomShifter) % ((matchupSlots / 2))]);
                 //     console.log("righthalf end");
-                //     console.log(rightHalf[i]);
+                //     console.log(rightHalf[(i + randomShifter) % ((matchupSlots / 2))]);
                 //     console.log("\n");  
 
                 // }

@@ -27,12 +27,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
 
 
-        uint256 public version; // tsting
+    uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
     uint256 currentWeekNum; // Keeping track of week number
     address[] leagueMembers;
-    address[] whitelist;
+    //address[] whitelist;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     //address owner;
     // address admin;
@@ -53,8 +53,6 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
     }
     mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
-    //Events
-    event Staked(address sender, uint256 amount);
     
     /**
      * @dev Initializes the proxy with `beacon`.

@@ -34,7 +34,7 @@ async function main() {
   //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
   // await LeagueProxyInstance.deployed();
   // await LeagueProxyInstance2.deployed();
-  var txn = await LeagueMakerInstance.createLeague("new");
+  var txn = await LeagueMakerInstance.createLeague("best league", 1);
   var leagueProxyContractAddress;
   //console.log("txn result: " + txn);
   receipt = await txn.wait();
@@ -89,23 +89,36 @@ async function main() {
   //       console.log(transactionHash);
   //   }
   // });
-  txn = await LeagueProxyInstance.incrementVersion();
-  console.log(
-    "League Proxy init state: " 
-      + "\n\tVersion: " + (await LeagueProxyInstance.version())
-      + "\n\tnumWeeks: " + (await LeagueProxyInstance.numWeeks())
-      + "\n\tleagueName: " + (await LeagueProxyInstance.leagueName())
-  );
+  //txn = await LeagueProxyInstance.incrementVersion();
+  // console.log(
+  //   "League Proxy init state: " 
+  //     + "\n\tVersion: " + (await LeagueProxyInstance.version())
+  //     + "\n\tnumWeeks: " + (await LeagueProxyInstance.numWeeks())
+  //     + "\n\tleagueName: " + (await LeagueProxyInstance.leagueName())
+  // );
 
   
-  // txn = await LeagueMakerInstance.addUsersToLeagueHelper(
-  //   [owner.address, addr1.address, addr2.address, addr3.address],
-  //   LeagueProxyInstance.address
-  // );
-  // //receipt = await txn.wait();
+  txn = await LeagueMakerInstance.addUsersToLeagueHelper(
+    [owner.address, addr1.address, addr2.address, addr3.address],
+    LeagueProxyInstance.address
+  );
+  receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      //GameLogicCloneAddress = event.args;
+    }
+  }
   txn = await LeagueMakerInstance.testCallDoesNotExist(
     LeagueProxyInstance.address
   );
+  receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      //GameLogicCloneAddress = event.args;
+    }
+  }
   console.log(
     "League Proxy updated state: " 
       + "\n\tVersion: " + (await LeagueProxyInstance.version())
