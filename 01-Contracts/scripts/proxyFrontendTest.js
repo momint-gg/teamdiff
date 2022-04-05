@@ -7,13 +7,13 @@ const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeacon
 async function main() {
   // Deploying
 
-  //Create GAme Logicr
+  //Create Game Logic Instance
   const GameLogicFactory = await ethers.getContractFactory("GameLogic");
   const GameLogicInstance = await GameLogicFactory.deploy();
   await GameLogicInstance.deployed();
   console.log("GameLogic deployed to:", GameLogicInstance.address);
 
-  //Create League Maker
+  //Create League Maker INstance
   const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
   const LeagueMakerInstance = await LeagueMakerFactory.deploy(
     GameLogicInstance.address
@@ -21,7 +21,7 @@ async function main() {
   await LeagueMakerInstance.deployed();
   console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
 
-  //Create Beacon
+  //Create Beacon Instance
   const BeaconFactory = await ethers.getContractFactory("UpgradeableBeacon");
   const BeaconInstance = await BeaconFactory.deploy(GameLogicInstance.address);
   await BeaconInstance.deployed();
@@ -34,6 +34,7 @@ async function main() {
   /******************/
   /***TESTING *******/
   /******************/
+  //Different methods for creating a LeagueProxyInstance
   //#1
   //Using ethers.getContractAT to connect to address deployed by LeagueMaker createLEague function
   var txn = await LeagueMakerInstance.createLeague("best league", 1);
@@ -71,14 +72,14 @@ async function main() {
 
 
   //STILL TRYING TO CALL INCREMENT VERSION FROM FRONT END
-
+  //Different attempts at calling incrementVersion()
   //#1
   //Use eth.sendTransaction to deployed LeagueProxy Instance
   const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
   // const msgData = "0x00";
   txn = await web3.eth.sendTransaction({
     from: 0x0,
-    to: LeagueProxyInstance.address,
+    to: LeagueProxyInstance.address, 
     //value: 1,     // If you want to send ether with the call.
     //gas: 2,       // If you want to specify the gas.
     // gasPrice: ???,  // If you want to specify the gas price.
@@ -120,12 +121,12 @@ async function main() {
   
   
   //await LeagueMakerInstance.leagueAddresses();
-  signers.forEach(async (signer, index) => {
-    console.log(
-       "Signer: " + signer 
-        + "\n\tLeague 0: " + (await LeagueMakerInstance.leagueAddresses(0))
-    );
-  });
+  // signers.forEach(async (signer, index) => {
+  //   console.log(
+  //      "Signer: " + signer 
+  //       + "\n\tLeague 0: " + (await LeagueMakerInstance.leagueAddresses(0))
+  //   );
+  // });
 
 
   // console.log(
