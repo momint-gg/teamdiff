@@ -82,6 +82,7 @@ contract LeagueMaker {
         address rinkebyUSDCAddress;        
     }
     Parameters public parameters;
+    uint256 currentWeek = 0;
     uint256 _version = 2;
     uint256 _numWeeks = 8; // Length of a split
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
@@ -141,6 +142,9 @@ contract LeagueMaker {
         return address(proxy);
     }
 
+    //Create onlyOwner function to update week
+    
+
     //TODO set to only admin,
     //Set all schedules for all leagues 
     function setLeagueSchedules() public {
@@ -150,8 +154,48 @@ contract LeagueMaker {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueSchedule()")
             );
+            emit Response(success, data);
+
         }
-        emit Response(success, data);
+    }
+
+    //Locking lineups for all leagues
+    //TODO set to only owner
+    function lockLeagueLineups() public  {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("lockLineup()")
+            );
+            emit Response(success, data);
+        }
+    }
+
+    //Unlocking lineups for all leagues
+    //TODO set to only owner
+    function unlockLeagueLineups() public {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("unlockLineup()")
+            );
+            emit Response(success, data);
+
+        }
+    }
+
+    function evaluateAllWeeks() public {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("evaluateMatch(uint)"),
+                currentWeek
+            );
+            emit Response(success, data);
+        }
     }
 
     //TODO set to onlyProxy

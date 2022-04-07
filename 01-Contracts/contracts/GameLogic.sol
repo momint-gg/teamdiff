@@ -38,6 +38,8 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // address admin;
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
+    //TODO how should we lock this lineUp?
+    bool lineupIsLocked;
     mapping(address => uint256[]) userLineup;
     uint256 private totalSupply;// Total supply of USDC
     uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
@@ -79,6 +81,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         currentWeekNum = uint256(0);
         totalSupply = uint256(0);
         stakeAmount = _stakeAmount;
+        lineupIsLocked = false;
         //stake(rinkebyUSDCAddress, stakeAmount);
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
@@ -208,12 +211,33 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         }
     }
 
+    function lockLineup()
+        external
+        onlyOwner
+    {
+        lineupIsLocked = true;
+    }
+
+    function unlockLineup()
+        external
+        onlyOwner
+    {
+        lineupIsLocked = false;
+    }
+
     // Setting the address for our athlete contract
     function setAthleteContractAddress(address _athleteContractAddress)
         public
         onlyOwner
     {
         athletesContract = Athletes(_athleteContractAddress);
+    }
+
+    function evaluateWeek(uint256 weekNum) 
+        public
+        onlyOwner
+    {
+        //call evaulte match for each match in this weeks schedule
     }
 
     // Evaluating a match between two users (addresses)
@@ -295,7 +319,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
+    //Lineup must not be locked
     function setLineup(uint256[] memory athleteIds) public {
+        require(!lineupIsLocked, "lineup is locked for the week!");
         userLineup[msg.sender] = athleteIds;
     }
 
@@ -349,11 +375,11 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     }
 
         //TODO
-    //1.) View function to calculate score on-chain for a given line-up and week
-    //2.) Pool Prize mechanics
-    //3.) League membership mechanics
-    //4.) League schedule creation mechanics
-    //5.) lock set line-up with onlyOwner function
+    //1.) View function to calculate score on-chain for a given line-up and week (not started)
+    //2.) Pool Prize mechanics (in progress)
+    //3.) League membership mechanics (testing)
+    //4.) League schedule creation mechanics (testing)
+    //5.) lock set line-up with onlyOwner function (testing)
 
     //TODO Henry:
     // Add whitelist logic

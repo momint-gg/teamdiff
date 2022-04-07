@@ -54,4 +54,12 @@ contract Athletes is Ownable {
     {
         return athleteToScores[index];
     }
+
+    //TODO calculate score for an athlete entirely on-chain
+    function calculateScoreOnChain(uint256 athleteID) 
+        public
+        returns(uint256)
+    {
+        //grab raw stats for this athleteID, and return their calculated score here.
+    }
 }
