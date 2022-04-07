@@ -1,7 +1,9 @@
 const { ethers, upgrades } = require("hardhat");
 var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
-const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
+// const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
+const LeagueBeaconProxyJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
+
 //01-Contracts\build\contracts\contracts\LeagueBeaconProxy.sol\LeagueBeaconProxy.json
 
 async function main() {
@@ -34,10 +36,8 @@ async function main() {
   /******************/
   /***TESTING *******/
   /******************/
-  //Different methods for creating a LeagueProxyInstance
-  //#1
-  //Using ethers.getContractAT to connect to address deployed by LeagueMaker createLEague function
-  var txn = await LeagueMakerInstance.createLeague("best league", 1);
+
+  var txn = await LeagueMakerInstance.createLeague("best league", 0);
   var leagueProxyContractAddress;
   receipt = await txn.wait();
   for (const event of receipt.events) {
@@ -46,11 +46,15 @@ async function main() {
       leagueProxyContractAddress = event.args[1];
     }
   }
-  const LeagueProxyInstance = await hre.ethers.getContractAt(
-    "LeagueBeaconProxy",
-    leagueProxyContractAddress
-  );
-  console.log("League proxy instance address ", leagueProxyContractAddress);
+
+    //Different methods for creating a LeagueProxyInstance
+  //#1
+  //Using ethers.getContractAT to connect to address deployed by LeagueMaker createLEague function
+  // const LeagueProxyInstance = await hre.ethers.getContractAt(
+  //   "LeagueBeaconProxy",
+  //   leagueProxyContractAddress
+  // );
+  // console.log("League proxy instance address ", leagueProxyContractAddress);
 
   //#2
   //Creating contract with ethers.getContractFactory, and attaching to contract with deployed leagueProxyAddress from above
@@ -61,13 +65,13 @@ async function main() {
 
   //#3
   //Creating a new contract instance wiht the abi and address (must test on rinkeby)
-  //const provider = new ethers.providers.getDefaultProvider();
-  // const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
-  // const LeagueProxyInstance = new ethers.Contract(
-  //     leagueProxyContractAddress,
-  //     LeagueBeaconProxyJSON.abi,
-  //     provider
-  // );
+  const provider = new ethers.providers.getDefaultProvider();
+  //const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
+  const LeagueProxyInstance = new ethers.Contract(
+      leagueProxyContractAddress,
+      LeagueBeaconProxyJSON.abi,
+      provider
+  );
 
   //#4
   //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
@@ -80,7 +84,7 @@ async function main() {
   // // const msgData = "0x00";
   // txn = await web3.eth.sendTransaction(
   //   {
-  //     from: 0x0,
+  //     from: owner.address,
   //     to: LeagueProxyInstance.address,
   //     //value: 1,     // If you want to send ether with the call.
   //     //gas: 2,       // If you want to specify the gas.
@@ -95,21 +99,55 @@ async function main() {
   //     }
   //   }
   // );
+  // var receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     //leagueProxyContractAddress = event.args[1];
+  //   }
+  // }
+  // console.log("Done incrementing version! ", testIncrementVersion);
+  // console.log(
+  //   "Logging version after calling incrementVersion() --> ",
+  //   Number(await LeagueProxyInstance.version())
+  // );
 
   //#2
   //Straight up call incrementVersion on leagueProxyInstance
+  let LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(owner);
+
+  txn = await LeagueProxyInstanceWithSigner.incrementVersion({
+      gasLimit: 10000000,
+      //nonce: nonce || undefined,
+  })
+  txn = await LeagueProxyInstanceWithSigner.incrementVersion({
+    gasLimit: 10000000,
+    //nonce: nonce || undefined,
+  })
   // txn = await LeagueProxyInstance.incrementVersion();
+  var receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      //leagueProxyContractAddress = event.args[1];
+    }
+  }
+  console.log("Done incrementing version! ");
+  // console.log(
+  //   "Logging version after calling incrementVersion() --> ",
+  //   await LeagueProxyInstance.version())
+  // );
 
   // //Check the updated state after frontend call
-  // console.log(
-  //   "League Proxy init state: " +
-  //     "\n\tVersion: " +
-  //     (await LeagueProxyInstance.version()) +
-  //     "\n\tnumWeeks: " +
-  //     (await LeagueProxyInstance.numWeeks()) +
-  //     "\n\tleagueName: " +
-  //     (await LeagueProxyInstance.leagueName())
-  // );
+  console.log(
+    "League Proxy init state: " +
+      "\n\tVersion: " +
+      (await LeagueProxyInstanceWithSigner.getVersion()) +
+      "\n\tnumWeeks: " +
+      (await LeagueProxyInstanceWithSigner.numWeeks()) +
+      "\n\tleagueName: " +
+      (await LeagueProxyInstanceWithSigner.leagueName())
+  );
 
   //NOTE the below testCallDoesNotExist properly delegates function calls
   //to the proxy fallback function, but only because it is called from within

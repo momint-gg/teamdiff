@@ -15,6 +15,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
 import "./Whitelist.sol";
+import "./LeagueMaker.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /**
  * @dev This contract implements a proxy that gets the implementation address for each call from a {UpgradeableBeacon}.
@@ -25,8 +26,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
-
-
+    // Vars
     uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
@@ -48,11 +48,16 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
     Athletes athletesContract;
     // Our Whitelist contract
     Whitelist whitelistContract;
+    // Our LeagueMaker contract
+    LeagueMaker leagueMakerContract;
+
     struct Matchup {
         address[2] players;
     }
     mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
+    //Events
+    event Staked(address sender, uint256 amount);
     
     /**
      * @dev Initializes the proxy with `beacon`.

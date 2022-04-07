@@ -13,20 +13,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
 contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
-    //Modifiers
-    using SafeMath for uint256;
-
-    /**
-     * @dev Throws if called by any account that's not Admin
-     * The creator of the league will be set to Admin, and have admin privileges
-     */
-    modifier onlyAdmin() {
-        // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
-        _;
-    }
-
-    // Vars
+        // Vars
     uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
@@ -58,6 +45,21 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
 
     //Events
     event Staked(address sender, uint256 amount);
+
+    //Modifiers
+    using SafeMath for uint256;
+
+    /**
+     * @dev Throws if called by any account that's not Admin
+     * The creator of the league will be set to Admin, and have admin privileges
+     */
+    modifier onlyAdmin() {
+        // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        _;
+    }
+
+
 
     //Initialize all parameters of proxy
     function initialize(
@@ -94,11 +96,15 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         console.log("Proxy initialized!");
     }
 
+    event versionIncremented(uint256 newVersion);
     function incrementVersion() public returns  (uint256)  {
         console.log("incrementing version:");
-        version = version + 2;
+        version = version + 1;
         console.log(version);
-        console.log(leagueName);
+        //console.log(leagueName);
+        emit versionIncremented(
+            version
+        );
     }
 
     /*************************************************/
@@ -287,6 +293,10 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // Returning the contracts USDC balance
     function getUSDCBalance(address _token) public view returns (uint256) {
         return IERC20(_token).balanceOf(address(this));
+    }
+
+    function getVersion() view public returns (uint256) {
+        return version;
     }
 
 

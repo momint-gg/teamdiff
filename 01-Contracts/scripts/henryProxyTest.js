@@ -4,7 +4,9 @@
 
 require("dotenv").config();
 const { ethers } = require("ethers");
-const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
+var Web3 = require("web3");
+const web3 = new Web3("https://cloudflare-eth.com");
+const LeagueBeaconProxyJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
 
 async function main() {
   console.log("Starting");
@@ -34,9 +36,58 @@ async function main() {
   );
   console.log("Logging functions --> ", await LeagueProxyInstance.functions);
 
-  // const testIncrementVersion = await LeagueProxyInstance.incrementVersion();
-  // await testIncrementVersion.wait();
-  // console.log("Done incrementing version! ", testIncrementVersion);
+  const testIncrementVersion = await LeagueProxyInstance.incrementVersion();
+  var receipt = await testIncrementVersion.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      //leagueProxyContractAddress = event.args[1];
+    }
+  }
+  console.log("Done incrementing version! ", testIncrementVersion);
+  console.log(
+    "Logging version after calling incrementVersion() --> ",
+    Number(await LeagueProxyInstance.version())
+  );
+  //#0
+  //const txn = await LeagueProxyInstance.methods.incrementVersion().call();
+
+   //#1
+  //Use eth.sendTransaction to deployed LeagueProxy Instance
+  let accounts = await web3.eth.getAccounts();
+  //web3.eth.defaultAccount = accounts[0];  
+  const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
+  // // const msgData = "0x00";
+  
+  const txn = await web3.eth.sendTransaction(
+    {
+      from: accounts[0].address,
+      to: LeagueProxyInstance.address,
+      //value: 1,     // If you want to send ether with the call.
+      //gas: 2,       // If you want to specify the gas.
+      // gasPrice: ???,  // If you want to specify the gas price.
+      data: msgData,
+    },
+    function (err, transactionHash) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(transactionHash);
+      }
+    }
+  );
+  console.log("sending transaction...");
+  receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      //leagueProxyContractAddress = event.args[1];
+    }
+  }
+  console.log(
+    "Logging version after calling incrementVersion() --> ",
+    Number(await LeagueProxyInstance.version())
+  );
 }
 
 const runMain = async () => {
