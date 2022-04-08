@@ -82,7 +82,7 @@ contract LeagueMaker {
         address rinkebyUSDCAddress;        
     }
     Parameters public parameters;
-    uint256 _version = 1;
+    uint256 _version = 0;
     uint256 _numWeeks = 8; // Length of a split
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;

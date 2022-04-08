@@ -17,8 +17,8 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
-    uint256 currentWeekNum; // Keeping track of week number
-    address[] leagueMembers;
+    uint256 public currentWeekNum; // Keeping track of week number
+    address[] public leagueMembers;
     //address[] whitelist;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     //address owner;
@@ -29,9 +29,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     bool lineupIsLocked;
     mapping(address => uint256[]) userLineup;
     uint256 private totalSupply;// Total supply of USDC
-    uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
-    address polygonUSDCAddress; // When we deploy to mainnet
-    address rinkebyUSDCAddress;
+    uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
+    address public polygonUSDCAddress; // When we deploy to mainnet
+    address public rinkebyUSDCAddress;
 
     // Our Athletes.sol contract
     Athletes athletesContract;
@@ -101,9 +101,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
 
     event versionIncremented(uint256 newVersion);
     function incrementVersion() public returns  (uint256)  {
-        console.log("incrementing version:");
+        //console.log("incrementing version:");
         version = version + 1;
-        console.log(version);
+        //console.log(version);
         //console.log(leagueName);
         emit versionIncremented(
             version
@@ -296,6 +296,18 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         }
     }    
 
+    /************************************************/
+    /***************** GETTERS **********************/
+    /************************************************/
+    function getVersion() view public returns (uint256) {
+        return version;
+    }
+
+    function getLeagueName() view public returns (string memory) {
+        return leagueName;
+    }
+
+
 
 
     /******************************************************/
@@ -319,9 +331,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         return IERC20(_token).balanceOf(address(this));
     }
 
-    function getVersion() view public returns (uint256) {
-        return version;
-    }
+
 
 
 

@@ -34,7 +34,7 @@ async function main() {
     "Logging version --> ",
     Number(await LeagueProxyInstance.version())
   );
-  console.log("Logging functions --> ", await LeagueProxyInstance.functions);
+  //console.log("Logging functions --> ", await LeagueProxyInstance.functions);
 
   const testIncrementVersion = await LeagueProxyInstance.incrementVersion();
   var receipt = await testIncrementVersion.wait();
