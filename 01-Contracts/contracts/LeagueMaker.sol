@@ -117,13 +117,13 @@ contract LeagueMaker {
         });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,uint256,address,address,address,address,address,address)",
+            "initialize(string,uint256,uint256,address,address,address,address,address)",
             parameters.name,
             parameters.version,
-            parameters.numWeeks,
+            //parameters.numWeeks,
             parameters.stakeAmount,
             parameters.athletesDataStorageAddress,
-            parameters.owner,
+            //parameters.owner,
             parameters.admin,
             parameters.polygonUSDCAddress,
             parameters.rinkebyUSDCAddress,
@@ -186,7 +186,7 @@ contract LeagueMaker {
         }
     }
 
-    function evaluateAllWeeks() public {
+    function evaluateWeekForAllLeagues() public {
         bool success;
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {

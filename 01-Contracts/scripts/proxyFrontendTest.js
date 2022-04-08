@@ -104,14 +104,20 @@ async function main() {
   //NOTE calling the public function variableNAme() on the proxy does not
     //return the state variable correctly. However, using get Methods on the 
     //game logic returns the state correctly :/
+    //**********NOTE **********/
+    //super weird thing is happening
+    //when the order of the state variables is slighlty different than whats in game logic, 
+    //all of sudden SOME of these state variable return correct variables
+    //But when i copy and paste all the variable over, it doesn't match. 
   console.log(
     "League Proxy 1 state: " +
       "\n\tVersion: " +
+      // (await LeagueProxyInstanceWithSigner.version()) +
       (await LeagueProxyInstanceWithSigner.getVersion()) +
-      "\n\tnumWeeks: " +
-      (await LeagueProxyInstanceWithSigner.numWeeks()) +
-      "\n\tcurrentWeekNum: " +
-      (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
+      // "\n\tnumWeeks: " +
+      // (await LeagueProxyInstanceWithSigner.numWeeks()) +
+      // "\n\tcurrentWeekNum: " +
+      // (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
       "\n\tleagueMembers: " +
       (await LeagueProxyInstanceWithSigner.leagueMembers(0)) +
       "\n\tstakeAmount: " +
@@ -121,6 +127,7 @@ async function main() {
       "\n\trinkebyUSDCAddress: " +
       (await LeagueProxyInstanceWithSigner.rinkebyUSDCAddress()) +
       "\n\tleagueName: " +
+      // (await LeagueProxyInstanceWithSigner.leagueName())
       (await LeagueProxyInstanceWithSigner.getLeagueName())
   );
 
@@ -162,10 +169,10 @@ async function main() {
     "League Proxy 2 state: " +
       "\n\tVersion: " +
       (await LeagueProxyInstance2WithSigner.getVersion()) +
-      "\n\tnumWeeks: " +
-      (await LeagueProxyInstance2WithSigner.numWeeks()) +
-      "\n\tcurrentWeekNum: " +
-      (await LeagueProxyInstance2WithSigner.currentWeekNum()) +
+      // "\n\tnumWeeks: " +
+      // (await LeagueProxyInstance2WithSigner.numWeeks()) +
+      // "\n\tcurrentWeekNum: " +
+      // (await LeagueProxyInstance2WithSigner.currentWeekNum()) +
       "\n\tleagueMembers: " +
       (await LeagueProxyInstance2WithSigner.leagueMembers(0)) +
       "\n\tstakeAmount: " +
