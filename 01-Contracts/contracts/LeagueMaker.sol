@@ -75,6 +75,7 @@ contract LeagueMaker {
         uint256 version;
         uint256 numWeeks;
         uint256 stakeAmount;
+        bool isPublic;
         address athletesDataStorageAddress;
         address owner;
         address admin;
@@ -99,7 +100,8 @@ contract LeagueMaker {
     // ======== Deploy New League Proxy ========
     function createLeague(
         string calldata _name,
-        uint256 _stakeAmount
+        uint256 _stakeAmount,
+        bool _isPublic
         )
         external
         returns ( address )
@@ -109,6 +111,7 @@ contract LeagueMaker {
             version: _version,
             numWeeks: _numWeeks,
             stakeAmount: _stakeAmount,
+            isPublic: _isPublic,
             athletesDataStorageAddress: address(athletesDataStorage),
             owner: address(this),
             admin: msg.sender,
@@ -117,11 +120,12 @@ contract LeagueMaker {
         });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,address,address,address,address,address)",
+            "initialize(string,uint256,uint256,bool,address,address,address,address,address)",
             parameters.name,
             parameters.version,
             //parameters.numWeeks,
             parameters.stakeAmount,
+            parameters.isPublic,
             parameters.athletesDataStorageAddress,
             //parameters.owner,
             parameters.admin,

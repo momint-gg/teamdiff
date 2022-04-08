@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
     //TODO create a "LeagueLogic" interface?
 contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
-        // Vars
+    // Vars
     uint256 public version; // tsting
     string public leagueName;
     //uint256 public numWeeks; // Length of a split
@@ -30,17 +30,28 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //Maps each league member to an array that represents a win or loss for each week
     mapping(address => uint256[8]) userToRecord;
     //TODO how should we lock this lineUp?
+    bool leagueEntryIsClosed;
     bool lineupIsLocked;
+    //bool isPublic;
+    //TODO can we set this to a fixed size line up array of size 5?
     mapping(address => uint256[]) userLineup;
-    uint256 private totalSupply;// Total supply of USDC
+    //uint256 private totalSupply;// Total supply of USDC
     uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    address public polygonUSDCAddress; // When we deploy to mainnet
-    address public rinkebyUSDCAddress;
+    
     struct Matchup {
         address[2] players;
     }
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    
+    /**********************/
+    /* IMMUTABLE STORAGE  */
+    /**********************/
+    struct Stats {
+        uint256 kills;
+    }
 
+    address public polygonUSDCAddress; // When we deploy to mainnet
+    address public rinkebyUSDCAddress;
     // Our Athletes.sol contract
     Athletes athletesContract;
     // Our Whitelist contract
@@ -73,6 +84,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         uint256 _version,
         //uint256 _numWeeks,
         uint256 _stakeAmount,
+        bool _isPublic,
         address athletesDataStorageAddress,
         //address _owner,
         address _admin, 
@@ -82,13 +94,14 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         version = _version;
-
         leagueName = _name;
         //numWeeks = _numWeeks;
         //currentWeekNum = uint256(0);
-        totalSupply = uint256(0);
+        //totalSupply = uint256(0);
         stakeAmount = _stakeAmount;
+        isPublic = _isPublic;
         lineupIsLocked = false;
+        leagueEntryIsClosed = false;
         //stake(rinkebyUSDCAddress, stakeAmount);
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
@@ -98,7 +111,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
 
-        leagueMembers.push(msg.sender);
+        leagueMembers.push(_admin);
         whitelistContract = new Whitelist(); // Initializing our whitelist
 
         console.log("Proxy initialized!");
@@ -222,12 +235,12 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         }
     }
 
-    // function incrementCurrentWeekNum() 
-    //     external
-    //     onlyOwner
-    // {
-    //     currentWeekNum += 1;
-    // }
+    function setLeagueEntryIsClosed() 
+        external 
+        onlyOwner
+    {
+        leagueEntryIsClosed = true;
+    }
 
     function lockLineup()
         external
@@ -244,12 +257,13 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     }
 
     // Setting the address for our athlete contract
-    function setAthleteContractAddress(address _athleteContractAddress)
-        public
-        onlyOwner
-    {
-        athletesContract = Athletes(_athleteContractAddress);
-    }
+    //TODO do we need this?
+    // function setAthleteContractAddress(address _athleteContractAddress)
+    //     public
+    //     onlyOwner
+    // {
+    //     athletesContract = Athletes(_athleteContractAddress);
+    // }
 
     //Evalautes all matchups for a given week
     function evaluateWeek(uint256 currentWeekNum) 
@@ -316,7 +330,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     /************************************************/
     /***************** GETTERS **********************/
     /************************************************/
-    function getVersion() view public returns (uint256) {
+    function getVersion() view public returns (uint256 version) {
         return version;
     }
 
@@ -324,12 +338,19 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         return leagueName;
     }
 
-        // Returning the lineup for a user
-    function getLineup() public view returns (uint256[] memory) {
-        return userLineup[msg.sender];
+    function getStakeAmount() view public returns (uint256 stakeAmount) {
+        return stakeAmount;
     }
 
+    //Returns total pot of the league
+    // function getTotalPrizePot() view public returns (uint256) {
+    //     return stakeAmount * leagueMembers.length;
+    // }
 
+        // Returning the lineup for a user
+    function getLineup() view public returns (uint256[] memory) {
+        return userLineup[msg.sender];
+    }
 
 
     /******************************************************/
@@ -340,7 +361,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // I think this means they won't be able to stake decimal amounts
     function stake(address _token, uint256 amount) internal {
         require(amount > 0, "Cannot stake 0");
-        totalSupply = totalSupply.add(amount);
+        //totalSupply = totalSupply.add(amount);
         // _balances[msg.sender] = _balances[msg.sender].add(amount);
         // Before this you should have approved the amount
         // This will transfer the amount of  _token from caller to contract
@@ -385,6 +406,18 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         return userToRecord[msg.sender];
     }
 
+    //Given manually inputted athlete stats, return the calculated
+    //athleteScores.
+    //Allows verification of our off-chain calculations
+    // function calculateScoreOnChain(Stats calldata athleteStats)
+    //     pure
+    //     public
+    //     returns (uint256 score)  {
+    //     //calculate score with given stats
+    //     //placeholder lol
+    //     return athleteStats.kills * 2;
+    // }
+
 
 
 
@@ -393,18 +426,21 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     /*****************************************************************/
     // Add user to league
     //for testing
-    function addUserToLeague(address user) public {
-        if(leagueMembers.length < 8) {
-            leagueMembers.push(user);
-            leagueMakerContract.updateUserToLeagueMapping(user);
-        }
-        else {
-            console.log("too many users in league to add new user");
-        }
-    }
+    // function addUserToLeague(address user) public {
+    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
+    //     if(leagueMembers.length < 8) {
+    //         leagueMembers.push(user);
+    //         leagueMakerContract.updateUserToLeagueMapping(user);
+    //     }
+    //     else {
+    //         console.log("too many users in league to add new user");
+    //     }
+    // }
 
     // User joining the league
     function joinLeague() public onlyWhitelisted {
+        require(!leagueEntryIsClosed, "League Entry is Closed!");
+
         //TODO check leagueSize on frontend instead to ensure this operation is valid
         leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
         stake(rinkebyUSDCAddress, stakeAmount);

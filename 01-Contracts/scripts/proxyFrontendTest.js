@@ -38,7 +38,7 @@ async function main() {
   /******************/
 
   //Create two league proxy instances
-  var txn = await LeagueMakerInstance.createLeague("best league", 10);
+  var txn = await LeagueMakerInstance.createLeague("best league", 10, true);
   var leagueProxyContractAddress;
   receipt = await txn.wait();
   for (const event of receipt.events) {
@@ -48,7 +48,7 @@ async function main() {
     }
   }
 
-  txn = await LeagueMakerInstance.createLeague("league #2", 10);
+  txn = await LeagueMakerInstance.createLeague("league #2", 10, false);
   var leagueProxyContractAddress2;
   receipt = await txn.wait();
   for (const event of receipt.events) {
@@ -66,6 +66,7 @@ async function main() {
       GameLogicJSON.abi,
       provider
   );
+  //console.log("LeagueProxyStorage: " + JSON.stringify(LeagueMakerInstance.storage(), null, 2));
   const LeagueProxyInstance2 = new ethers.Contract(
     leagueProxyContractAddress2,
     GameLogicJSON.abi,
@@ -108,18 +109,22 @@ async function main() {
     //super weird thing is happening
     //when the order of the state variables is slighlty different than whats in game logic, 
     //all of sudden SOME of these state variable return correct variables
-    //But when i copy and paste all the variable over, it doesn't match. 
+    //But when i copy and paste all the variable over from game logic to league beacon proxy,
+    // the below non-getter function calls don't return the correct value. 
   console.log(
     "League Proxy 1 state: " +
       "\n\tVersion: " +
-      // (await LeagueProxyInstanceWithSigner.version()) +
-      (await LeagueProxyInstanceWithSigner.getVersion()) +
+      (await LeagueProxyInstanceWithSigner.version()) +
+      // (await LeagueProxyInstanceWithSigner.getVersion()) +
       // "\n\tnumWeeks: " +
       // (await LeagueProxyInstanceWithSigner.numWeeks()) +
       // "\n\tcurrentWeekNum: " +
       // (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
       "\n\tleagueMembers: " +
       (await LeagueProxyInstanceWithSigner.leagueMembers(0)) +
+      // (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
+      "\n\tisPublic: " +
+      (await LeagueProxyInstanceWithSigner.isPublic()) +
       "\n\tstakeAmount: " +
       (await LeagueProxyInstanceWithSigner.stakeAmount()) +
       "\n\tpolygonUSDCAddress: " +
@@ -127,8 +132,8 @@ async function main() {
       "\n\trinkebyUSDCAddress: " +
       (await LeagueProxyInstanceWithSigner.rinkebyUSDCAddress()) +
       "\n\tleagueName: " +
-      // (await LeagueProxyInstanceWithSigner.leagueName())
-      (await LeagueProxyInstanceWithSigner.getLeagueName())
+      (await LeagueProxyInstanceWithSigner.leagueName())
+      // (await LeagueProxyInstanceWithSigner.getLeagueName())
   );
 
 
@@ -168,13 +173,15 @@ async function main() {
   console.log(
     "League Proxy 2 state: " +
       "\n\tVersion: " +
-      (await LeagueProxyInstance2WithSigner.getVersion()) +
+      (await LeagueProxyInstance2WithSigner.version()) +
       // "\n\tnumWeeks: " +
       // (await LeagueProxyInstance2WithSigner.numWeeks()) +
       // "\n\tcurrentWeekNum: " +
       // (await LeagueProxyInstance2WithSigner.currentWeekNum()) +
       "\n\tleagueMembers: " +
       (await LeagueProxyInstance2WithSigner.leagueMembers(0)) +
+      "\n\tisPublic: " +
+      (await LeagueProxyInstance2WithSigner.isPublic()) +
       "\n\tstakeAmount: " +
       (await LeagueProxyInstance2WithSigner.stakeAmount()) +
       "\n\tpolygonUSDCAddress: " +
@@ -182,7 +189,7 @@ async function main() {
       "\n\trinkebyUSDCAddress: " +
       (await LeagueProxyInstance2WithSigner.rinkebyUSDCAddress()) +
       "\n\tleagueName: " +
-      (await LeagueProxyInstance2WithSigner.getLeagueName())
+      (await LeagueProxyInstance2WithSigner.leagueName())
   );
 
   

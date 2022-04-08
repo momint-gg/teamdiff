@@ -22,38 +22,82 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *
  * _Available since v3.4._
  */
-contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
-    // Vars
-    
-    
-    uint256 public version; // tsting
+contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whitelist {
+ uint256 public version; // tsting
     string public leagueName;
-    uint256 public numWeeks; // Length of a split
-    uint256 public currentWeekNum; // Keeping track of week number
+    //uint256 public numWeeks; // Length of a split
+    //uint256 public currentWeekNum; // Keeping track of week number
     address[] public leagueMembers;
     //address[] whitelist;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     //address owner;
     // address admin;
-    mapping(address => uint256) userToTotalPts;
-    mapping(address => uint256[]) userToWeeklyPts;
+    //Maps each league member to the running count of their total wins
+    //TODO, do we need this data structure?
+    //mapping(address => uint256) userToTotalWins;
+    //Maps each league member to an array that represents a win or loss for each week
+    mapping(address => uint256[8]) userToRecord;
+    //TODO how should we lock this lineUp?
+    bool leagueEntryIsClosed;
+    bool lineupIsLocked;
+    //bool isPublic;
+    //TODO can we set this to a fixed size line up array of size 5?
     mapping(address => uint256[]) userLineup;
-    uint256 private totalSupply;// Total supply of USDC
+    //uint256 private totalSupply;// Total supply of USDC
     uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    address public polygonUSDCAddress; // When we deploy to mainnet
-    address public rinkebyUSDCAddress;
-
-    // Our Athletes.sol contract
-    Athletes athletesContract;
-    // Our Whitelist contract
-    Whitelist whitelistContract;
-    // Our LeagueMaker contract
-    LeagueMaker leagueMakerContract;
-
+    
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    
+    /**********************/
+    /* IMMUTABLE STORAGE  */
+    /**********************/
+    // struct Stats {
+    //     uint256 kills;
+    // }
+
+    // address public polygonUSDCAddress; // When we deploy to mainnet
+    // address public rinkebyUSDCAddress;
+    // // Our Athletes.sol contract
+    // Athletes athletesContract;
+    // // Our Whitelist contract
+    // Whitelist whitelistContract;
+    // // Our LeagueMaker contract
+    // LeagueMaker leagueMakerContract;
+
+    // Vars
+    //Hmmm when I uncomment the below, some of the storage slots are correctly initialized
+        //but I can't figure out why, so I'll just use getters in the gamelogic contract for now
+    // uint256 public version; // tsting
+    // string public leagueName;
+    // uint256 public numWeeks; // Length of a split
+    // uint256 public currentWeekNum; // Keeping track of week number
+    // address[] public leagueMembers;
+    // //address[] whitelist;
+    // //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
+    // //address owner;
+    // // address admin;
+    // mapping(address => uint256) userToTotalPts;
+    // mapping(address => uint256[]) userToWeeklyPts;
+    // mapping(address => uint256[]) userLineup;
+    // uint256 private totalSupply;// Total supply of USDC
+    // uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
+    // address public polygonUSDCAddress; // When we deploy to mainnet
+    // address public rinkebyUSDCAddress;
+
+    // // Our Athletes.sol contract
+    // Athletes athletesContract;
+    // // Our Whitelist contract
+    // Whitelist whitelistContract;
+    // // Our LeagueMaker contract
+    // LeagueMaker leagueMakerContract;
+
+    // struct Matchup {
+    //     address[2] players;
+    // }
+    // mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     //Events
     //event Staked(address sender, uint256 amount);
