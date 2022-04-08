@@ -82,6 +82,7 @@ contract LeagueMaker {
         address rinkebyUSDCAddress;        
     }
     Parameters public parameters;
+    uint256 public currentWeek = 0;
     uint256 _version = 0;
     uint256 _numWeeks = 8; // Length of a split
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
@@ -190,8 +191,9 @@ contract LeagueMaker {
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("evaluateMatch(uint)"),
-                currentWeek
+                abi.encodeWithSignature("evaluateWeek(uint)",
+                    currentWeek
+                )
             );
             emit Response(success, data);
         }

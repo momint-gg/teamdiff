@@ -244,6 +244,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         onlyOwner
     {
         //call evaulte match for each match in this weeks schedule
+        
     }
 
     // Evaluating a match between two users (addresses)
