@@ -44,39 +44,44 @@ contract League is Ownable {
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     constructor(uint256 _stakeAmount) {
-        stakeAmount = _stakeAmount;
+        stakeAmount = _stakeAmount * 10**6; // Converting to USDC decimal storage (stored as 10^6)
         whitelistContract = new Whitelist(); // Initializing our whitelist
     }
 
-    // Whoever calls this will become the league creator, and set the stake amount
-    // Maybe add this to the proxy constructor? --> We need THIS to be called when a new proxy is created @Trey
-    // The owner of the contract should be automatically set to "creator"
-    // If testing: Make sure you have rinkeby USDC in your account
-    // function newLeagueSetup(uint256 _stakeAmount) public {
-    //     // Before calling this function, make sure to set creator address as the owner
-    //     // addAddressToWhitelist(msg.sender);
-    //     users.push(msg.sender);
-    //     stakeAmount = _stakeAmount;
-    //     stake(rinkebyUSDCAddress, stakeAmount);
-    // }
-
-    // User joining the league
-    function joinLeague() public {
-        users.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
-        stake(stakeAmount);
-    }
-
-    // User staking the currency
+    // User joining the league and staking the league's currency amount
+    // Add modifier for only whitelisted
     // I think this means they won't be able to stake decimal amounts
-    function stake(uint256 amount) internal {
-        require(amount > 0, "Cannot stake 0");
+    function joinLeague() public payable {
+        users.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
         require(
-            USDC.balanceOf(msg.sender) > amount,
+            USDC.balanceOf(msg.sender) > stakeAmount,
             "User must have enough USDC to join league"
         );
-        require(USDC.approve(msg.sender, amount), "token must be approved");
-        _safeTransferFrom(USDC, msg.sender, address(this), amount);
-        emit Staked(msg.sender, amount);
+        require(USDC.allowance(msg.sender, address(this)) >= stakeAmount);
+        _safeTransferFrom(USDC, msg.sender, address(this), stakeAmount);
+        emit Staked(msg.sender, stakeAmount);
+        // stake(stakeAmount);
+    }
+
+    // Returning the contracts USDC balance
+    function getUSDCBalance() public view returns (uint256) {
+        return IERC20(rinkebyUSDCAddress).balanceOf(address(this));
+    }
+
+    // Returning the sender's USDC balance (testing)
+    function getUserUSDCBalance() public view returns (uint256) {
+        return IERC20(rinkebyUSDCAddress).balanceOf(msg.sender);
+    }
+
+    // Transfer ERC20 Token
+    function _safeTransferFrom(
+        IERC20 token,
+        address sender,
+        address recipient,
+        uint256 amount
+    ) private {
+        bool sent = token.transferFrom(sender, recipient, amount);
+        require(sent, "Token transfer failed");
     }
 
     // TODO: Should we write this or just make it so that you can't leave once you join?
@@ -84,7 +89,6 @@ contract League is Ownable {
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
-
     function evaluateMatch(address addr1, address addr2)
         public
         onlyOwner
@@ -162,21 +166,5 @@ contract League is Ownable {
     // Getter for user to weekly pts
     function getUserWeeklypts() public view returns (uint256[] memory) {
         return userToWeeklyPts[msg.sender];
-    }
-
-    // Returning the contracts USDC balance
-    function getUSDCBalance() public view returns (uint256) {
-        return IERC20(rinkebyUSDCAddress).balanceOf(address(this));
-    }
-
-    // Transfer ERC20 Token
-    function _safeTransferFrom(
-        IERC20 token,
-        address sender,
-        address recipient,
-        uint256 amount
-    ) private {
-        bool sent = token.transferFrom(sender, recipient, amount);
-        require(sent, "Token transfer failed");
     }
 }
