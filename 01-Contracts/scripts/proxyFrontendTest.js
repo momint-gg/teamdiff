@@ -2,7 +2,7 @@ const { ethers, upgrades } = require("hardhat");
 var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
 // const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
-const LeagueBeaconProxyJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
+const GameLogicJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
 
 //01-Contracts\build\contracts\contracts\LeagueBeaconProxy.sol\LeagueBeaconProxy.json
 
@@ -37,13 +37,23 @@ async function main() {
   /***TESTING *******/
   /******************/
 
-  var txn = await LeagueMakerInstance.createLeague("best league", 0);
+  var txn = await LeagueMakerInstance.createLeague("best league", 10);
   var leagueProxyContractAddress;
   receipt = await txn.wait();
   for (const event of receipt.events) {
     if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
       leagueProxyContractAddress = event.args[1];
+    }
+  }
+
+  txn = await LeagueMakerInstance.createLeague("league #2", 10);
+  var leagueProxyContractAddress2;
+  receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      leagueProxyContractAddress2 = event.args[1];
     }
   }
 
@@ -69,48 +79,20 @@ async function main() {
   //const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
   const LeagueProxyInstance = new ethers.Contract(
       leagueProxyContractAddress,
-      LeagueBeaconProxyJSON.abi,
+      GameLogicJSON.abi,
       provider
   );
+  const LeagueProxyInstance2 = new ethers.Contract(
+    leagueProxyContractAddress2,
+    GameLogicJSON.abi,
+    provider
+);
 
   //#4
   //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
 
   //STILL TRYING TO CALL INCREMENT VERSION FROM FRONT END
-  //Different attempts at calling incrementVersion()
-  //#1
-  //Use eth.sendTransaction to deployed LeagueProxy Instance
-  // const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
-  // // const msgData = "0x00";
-  // txn = await web3.eth.sendTransaction(
-  //   {
-  //     from: owner.address,
-  //     to: LeagueProxyInstance.address,
-  //     //value: 1,     // If you want to send ether with the call.
-  //     //gas: 2,       // If you want to specify the gas.
-  //     // gasPrice: ???,  // If you want to specify the gas price.
-  //     data: msgData,
-  //   },
-  //   function (err, transactionHash) {
-  //     if (err) {
-  //       console.log(err);
-  //     } else {
-  //       console.log(transactionHash);
-  //     }
-  //   }
-  // );
-  // var receipt = await txn.wait();
-  // for (const event of receipt.events) {
-  //   if (event.event != null) {
-  //     console.log(`Event ${event.event} with args ${event.args}`);
-  //     //leagueProxyContractAddress = event.args[1];
-  //   }
-  // }
-  // console.log("Done incrementing version! ", testIncrementVersion);
-  // console.log(
-  //   "Logging version after calling incrementVersion() --> ",
-  //   Number(await LeagueProxyInstance.version())
-  // );
+
 
   //#2
   //Straight up call incrementVersion on leagueProxyInstance
@@ -120,12 +102,21 @@ async function main() {
       gasLimit: 10000000,
       //nonce: nonce || undefined,
   })
+  var receipt = await txn.wait();
+
   txn = await LeagueProxyInstanceWithSigner.incrementVersion({
     gasLimit: 10000000,
     //nonce: nonce || undefined,
   })
+  receipt = await txn.wait();
+
+  txn = await LeagueProxyInstanceWithSigner.incrementVersion({
+    gasLimit: 10000000,
+    //nonce: nonce || undefined,
+  })
+  receipt = await txn.wait();
+
   // txn = await LeagueProxyInstance.incrementVersion();
-  var receipt = await txn.wait();
   for (const event of receipt.events) {
     if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
@@ -133,20 +124,78 @@ async function main() {
     }
   }
   console.log("Done incrementing version! ");
-  // console.log(
-  //   "Logging version after calling incrementVersion() --> ",
-  //   await LeagueProxyInstance.version())
-  // );
-
-  // //Check the updated state after frontend call
   console.log(
-    "League Proxy init state: " +
+    "League Proxy 1 state: " +
       "\n\tVersion: " +
       (await LeagueProxyInstanceWithSigner.getVersion()) +
       "\n\tnumWeeks: " +
       (await LeagueProxyInstanceWithSigner.numWeeks()) +
+      "\n\tcurrentWeekNum: " +
+      (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
+      "\n\tleagueMembers: " +
+      (await LeagueProxyInstanceWithSigner.leagueMembers(0)) +
+      "\n\tstakeAmount: " +
+      (await LeagueProxyInstanceWithSigner.stakeAmount()) +
+      "\n\tpolygonUSDCAddress: " +
+      (await LeagueProxyInstanceWithSigner.polygonUSDCAddress()) +
+      "\n\trinkebyUSDCAddress: " +
+      (await LeagueProxyInstanceWithSigner.rinkebyUSDCAddress()) +
       "\n\tleagueName: " +
-      (await LeagueProxyInstanceWithSigner.leagueName())
+      (await LeagueProxyInstanceWithSigner.getLeagueName())
+  );
+
+
+  //Contract Number 2
+
+  let LeagueProxyInstance2WithSigner = LeagueProxyInstance2.connect(owner);
+
+  txn = await LeagueProxyInstance2WithSigner.incrementVersion({
+      gasLimit: 10000000,
+      //nonce: nonce || undefined,
+  })
+  var receipt = await txn.wait();
+
+  txn = await LeagueProxyInstance2WithSigner.incrementVersion({
+    gasLimit: 10000000,
+    //nonce: nonce || undefined,
+  })
+  receipt = await txn.wait();
+
+  // txn = await LeagueProxyInstanceWithSigner.incrementVersion({
+  //   gasLimit: 10000000,
+  //   //nonce: nonce || undefined,
+  // })
+  // receipt = await txn.wait();
+
+  // txn = await LeagueProxyInstance.incrementVersion();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      console.log(`Event ${event.event} with args ${event.args}`);
+      //leagueProxyContractAddress = event.args[1];
+    }
+  }
+  console.log("Done incrementing version on Contract 2! ");
+
+
+  // //Check the updated state after frontend call
+  console.log(
+    "League Proxy 2 state: " +
+      "\n\tVersion: " +
+      (await LeagueProxyInstance2WithSigner.getVersion()) +
+      "\n\tnumWeeks: " +
+      (await LeagueProxyInstance2WithSigner.numWeeks()) +
+      "\n\tcurrentWeekNum: " +
+      (await LeagueProxyInstance2WithSigner.currentWeekNum()) +
+      "\n\tleagueMembers: " +
+      (await LeagueProxyInstance2WithSigner.leagueMembers(0)) +
+      "\n\tstakeAmount: " +
+      (await LeagueProxyInstance2WithSigner.stakeAmount()) +
+      "\n\tpolygonUSDCAddress: " +
+      (await LeagueProxyInstance2WithSigner.polygonUSDCAddress()) +
+      "\n\trinkebyUSDCAddress: " +
+      (await LeagueProxyInstance2WithSigner.rinkebyUSDCAddress()) +
+      "\n\tleagueName: " +
+      (await LeagueProxyInstance2WithSigner.getLeagueName())
   );
 
   //NOTE the below testCallDoesNotExist properly delegates function calls

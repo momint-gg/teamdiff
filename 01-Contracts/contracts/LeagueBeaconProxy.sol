@@ -3,9 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-//import "./IBeacon.sol";
-// import "../Proxy.sol";
-// import "../ERC1967/ERC1967Upgrade.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import "@openzeppelin/contracts/proxy/Proxy.sol";
@@ -30,8 +27,8 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
     uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
-    uint256 currentWeekNum; // Keeping track of week number
-    address[] leagueMembers;
+    uint256 public currentWeekNum; // Keeping track of week number
+    address[] public leagueMembers;
     //address[] whitelist;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     //address owner;
@@ -40,9 +37,9 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
     mapping(address => uint256[]) userToWeeklyPts;
     mapping(address => uint256[]) userLineup;
     uint256 private totalSupply;// Total supply of USDC
-    uint256 stakeAmount; // Amount that will be staked (in USDC) for each league
-    address polygonUSDCAddress; // When we deploy to mainnet
-    address rinkebyUSDCAddress;
+    uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
+    address public polygonUSDCAddress; // When we deploy to mainnet
+    address public rinkebyUSDCAddress;
 
     // Our Athletes.sol contract
     Athletes athletesContract;
