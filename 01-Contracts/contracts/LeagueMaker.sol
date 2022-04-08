@@ -141,6 +141,9 @@ contract LeagueMaker {
         return address(proxy);
     }
 
+    //Create onlyOwner function to update week
+    
+
     //TODO set to only admin,
     //Set all schedules for all leagues 
     function setLeagueSchedules() public {
@@ -150,8 +153,48 @@ contract LeagueMaker {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueSchedule()")
             );
+            emit Response(success, data);
+
         }
-        emit Response(success, data);
+    }
+
+    //Locking lineups for all leagues
+    //TODO set to only owner
+    function lockLeagueLineups() public  {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("lockLineup()")
+            );
+            emit Response(success, data);
+        }
+    }
+
+    //Unlocking lineups for all leagues
+    //TODO set to only owner
+    function unlockLeagueLineups() public {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("unlockLineup()")
+            );
+            emit Response(success, data);
+
+        }
+    }
+
+    function evaluateAllWeeks() public {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("evaluateMatch(uint)"),
+                currentWeek
+            );
+            emit Response(success, data);
+        }
     }
 
     //TODO set to onlyProxy
