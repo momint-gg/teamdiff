@@ -1,7 +1,9 @@
 const { ethers, upgrades } = require("hardhat");
 var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
-const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
+// const LeagueBeaconProxyJSON = require("../build/contracts/contracts/LeagueBeaconProxy.sol/LeagueBeaconProxy.json");
+const LeagueBeaconProxyJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
+
 //01-Contracts\build\contracts\contracts\LeagueBeaconProxy.sol\LeagueBeaconProxy.json
 
 async function main() {
@@ -28,16 +30,14 @@ async function main() {
   console.log("Beacon deployed to:", BeaconInstance.address);
 
   //Signers
-  [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await hre.ethers.getSigners();
-
+  [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
+    await hre.ethers.getSigners();
 
   /******************/
   /***TESTING *******/
   /******************/
-  //Different methods for creating a LeagueProxyInstance
-  //#1
-  //Using ethers.getContractAT to connect to address deployed by LeagueMaker createLEague function
-  var txn = await LeagueMakerInstance.createLeague("best league", 1);
+
+  var txn = await LeagueMakerInstance.createLeague("best league", 0);
   var leagueProxyContractAddress;
   receipt = await txn.wait();
   for (const event of receipt.events) {
@@ -46,95 +46,138 @@ async function main() {
       leagueProxyContractAddress = event.args[1];
     }
   }
-  const LeagueProxyInstance = await hre.ethers.getContractAt("LeagueBeaconProxy", leagueProxyContractAddress);
-  
+
+    //Different methods for creating a LeagueProxyInstance
+  //#1
+  //Using ethers.getContractAT to connect to address deployed by LeagueMaker createLEague function
+  // const LeagueProxyInstance = await hre.ethers.getContractAt(
+  //   "LeagueBeaconProxy",
+  //   leagueProxyContractAddress
+  // );
+  // console.log("League proxy instance address ", leagueProxyContractAddress);
+
   //#2
   //Creating contract with ethers.getContractFactory, and attaching to contract with deployed leagueProxyAddress from above
   // const MyContract = await ethers.getContractFactory("LeagueBeaconProxy");
   // const LeagueProxyInstance = await MyContract.attach(
   //   leagueProxyContractAddress // The deployed contract address
-  // ); 
-  
-  
+  // );
+
   //#3
   //Creating a new contract instance wiht the abi and address (must test on rinkeby)
-  //const provider = new ethers.providers.getDefaultProvider();
-  // const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
-  // const LeagueProxyInstance = new ethers.Contract(
-  //     leagueProxyContractAddress,
-  //     LeagueBeaconProxyJSON.abi,
-  //     provider
-  // );
+  const provider = new ethers.providers.getDefaultProvider();
+  //const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
+  const LeagueProxyInstance = new ethers.Contract(
+      leagueProxyContractAddress,
+      LeagueBeaconProxyJSON.abi,
+      provider
+  );
 
   //#4
   //const LeagueProxyInstance = await LeagueProxyFactory.deploy(BeaconInstance.address, web3.eth.abi.encodeFunctionSignature('initialize(uint256)'));
-
-
 
   //STILL TRYING TO CALL INCREMENT VERSION FROM FRONT END
   //Different attempts at calling incrementVersion()
   //#1
   //Use eth.sendTransaction to deployed LeagueProxy Instance
-  const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
-  // const msgData = "0x00";
-  txn = await web3.eth.sendTransaction({
-    from: 0x0,
-    to: LeagueProxyInstance.address, 
-    //value: 1,     // If you want to send ether with the call.
-    //gas: 2,       // If you want to specify the gas.
-    // gasPrice: ???,  // If you want to specify the gas price.
-    data: msgData
-  }, function(err, transactionHash) {
-    if (err) { 
-        console.log(err); 
-    } else {
-        console.log(transactionHash);
-    }
-  });
+  // const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
+  // // const msgData = "0x00";
+  // txn = await web3.eth.sendTransaction(
+  //   {
+  //     from: owner.address,
+  //     to: LeagueProxyInstance.address,
+  //     //value: 1,     // If you want to send ether with the call.
+  //     //gas: 2,       // If you want to specify the gas.
+  //     // gasPrice: ???,  // If you want to specify the gas price.
+  //     data: msgData,
+  //   },
+  //   function (err, transactionHash) {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       console.log(transactionHash);
+  //     }
+  //   }
+  // );
+  // var receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     //leagueProxyContractAddress = event.args[1];
+  //   }
+  // }
+  // console.log("Done incrementing version! ", testIncrementVersion);
+  // console.log(
+  //   "Logging version after calling incrementVersion() --> ",
+  //   Number(await LeagueProxyInstance.version())
+  // );
 
   //#2
   //Straight up call incrementVersion on leagueProxyInstance
-  txn = await LeagueProxyInstance.incrementVersion();
+  let LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(owner);
 
-  //Check the updated state after frontend call
-  console.log(
-    "League Proxy init state: " 
-      + "\n\tVersion: " + (await LeagueProxyInstance.version())
-      + "\n\tnumWeeks: " + (await LeagueProxyInstance.numWeeks())
-      + "\n\tleagueName: " + (await LeagueProxyInstance.leagueName())
-  );
-
- //NOTE the below testCallDoesNotExist properly delegates function calls 
-      //to the proxy fallback function, but only because it is called from within 
-      //a solidity contract
-  txn = await LeagueMakerInstance.testCallDoesNotExist(
-    LeagueProxyInstance.address
-  );
-  //txn = await LeagueMakerInstance.setLeagueSchedules();
-  receipt = await txn.wait();
+  txn = await LeagueProxyInstanceWithSigner.incrementVersion({
+      gasLimit: 10000000,
+      //nonce: nonce || undefined,
+  })
+  txn = await LeagueProxyInstanceWithSigner.incrementVersion({
+    gasLimit: 10000000,
+    //nonce: nonce || undefined,
+  })
+  // txn = await LeagueProxyInstance.incrementVersion();
+  var receipt = await txn.wait();
   for (const event of receipt.events) {
     if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
-      //GameLogicCloneAddress = event.args;
+      //leagueProxyContractAddress = event.args[1];
     }
   }
-  
-  
+  console.log("Done incrementing version! ");
+  // console.log(
+  //   "Logging version after calling incrementVersion() --> ",
+  //   await LeagueProxyInstance.version())
+  // );
+
+  // //Check the updated state after frontend call
+  console.log(
+    "League Proxy init state: " +
+      "\n\tVersion: " +
+      (await LeagueProxyInstanceWithSigner.getVersion()) +
+      "\n\tnumWeeks: " +
+      (await LeagueProxyInstanceWithSigner.numWeeks()) +
+      "\n\tleagueName: " +
+      (await LeagueProxyInstanceWithSigner.leagueName())
+  );
+
+  //NOTE the below testCallDoesNotExist properly delegates function calls
+  //to the proxy fallback function, but only because it is called from within
+  //a solidity contract
+  // txn = await LeagueMakerInstance.testCallDoesNotExist(
+  //   LeagueProxyInstance.address
+  // );
+  // //txn = await LeagueMakerInstance.setLeagueSchedules();
+  // receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     //GameLogicCloneAddress = event.args;
+  //   }
+  // }
+
   //await LeagueMakerInstance.leagueAddresses();
   // signers.forEach(async (signer, index) => {
   //   console.log(
-  //      "Signer: " + signer 
+  //      "Signer: " + signer
   //       + "\n\tLeague 0: " + (await LeagueMakerInstance.leagueAddresses(0))
   //   );
   // });
 
-
   // console.log(
-  //   "League Proxy updated state: " 
+  //   "League Proxy updated state: "
   //     + "\n\tVersion: " + (await LeagueProxyInstance.version())
   // );
 
-    //*******************
+  //*******************
   // Testing delegate call functionality within contract
   // */
   // txn = await LeagueMakerInstance.testCallDoesNotExist(
@@ -151,8 +194,7 @@ async function main() {
   //   }
   // }
 
-
-//Create Proxy
+  //Create Proxy
   // const LeagueProxyFactory = await ethers.getContractFactory(
   //   "LeagueBeaconProxy"
   // );
@@ -196,12 +238,9 @@ async function main() {
   //   func
   // );
 
-
   // console.log(
   //   "Game Logic updated state: " + (await GameLogicInstance.version())
   // );
-
-
 
   // console.log("LEague Proxy deployed to:", LeagueProxyInstance.address);
   // console.log("LEague Proxy 2 deployed to:", LeagueProxyInstance2.address);
@@ -253,7 +292,6 @@ async function main() {
   // //call incrementVersion on league proxy as non-admin
   //txn = await BeaconInstance.version();
 
-
   //Let's create a clone and test if it delegates calls correctly.
   //TODO let's save optimization for later and stick with beacon pattern for now
   // txn = await LeagueMakerInstance.createLeagueClone(GameLogicInstance.address);
@@ -273,7 +311,6 @@ async function main() {
   // txn = await LeagueMakerInstance.testCallDoesNotExist(
   //   GameLogicInstance.address
   // );
-
 
   //*******************
   // Testing delegate call functionality within contract
@@ -298,11 +335,10 @@ async function main() {
   //   GameLogicCloneAddress
   // );
 
-
-  //Trying to trigger LeagueProxyInstance fallback function from web3 js 
+  //Trying to trigger LeagueProxyInstance fallback function from web3 js
   // const signature = web3.utils.sha3('incrementVersion()').slice(0,10);
   // //const msgData = signature;// + web3.utils.toHex(valueToUpdate).slice(2).padStart(64, '0');
-        
+
   // const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
   // // const msgData = web3.eth.abi.encodeFunctionSignature("initialize(uint256)",
   // //                                                      1);
@@ -315,8 +351,8 @@ async function main() {
   //   // gasPrice: ???,  // If you want to specify the gas price.
   //   data: msgData
   // }, function(err, transactionHash) {
-  //   if (err) { 
-  //       console.log(err); 
+  //   if (err) {
+  //       console.log(err);
   //   } else {
   //       console.log(transactionHash);
   //   }
@@ -332,8 +368,6 @@ async function main() {
   //   }
   // }
   //console.log("Clone deployed to : " + JSON.stringify(receipt, null, 2));
-
-
 
   //console.log("txn: " + JSON.stringify(txn, null, 2));
 
