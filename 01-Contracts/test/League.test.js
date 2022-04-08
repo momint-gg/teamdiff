@@ -28,7 +28,13 @@ describe("League.test", async () => {
   // Ran before every unit test
   beforeEach(async () => {});
 
-  // Below test must be run on rinkeby
+  // Below tests need to be run on rinkeby
+  it("Correctly gets the USDC balance for my wallet", async () => {
+    let bal = await contract.getUserUSDCBalance();
+    console.log("USDC Balance ", bal);
+    expect(Number(bal)).to.be.greaterThan(0);
+  });
+
   it("Allows a user to stake USDC and is receieved by the contract when user joins league", async () => {
     console.log("Start");
     let txn = await contract.connect(owner).joinLeague();
