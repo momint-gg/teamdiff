@@ -28,7 +28,11 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //TODO, do we need this data structure?
     //mapping(address => uint256) userToTotalWins;
     //Maps each league member to an array that represents a win or loss for each week
-    mapping(address => uint256[8]) userToRecord;
+    //TODO add logic for bye week?
+        //bye = 2?
+        //win = 1?
+        //loss = 0
+    mapping(address => uint256[8]) public userToRecord;
     //TODO how should we lock this lineUp?
     bool leagueEntryIsClosed;
     bool lineupIsLocked;
@@ -117,15 +121,15 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         console.log("Proxy initialized!");
     }
 
-    event versionIncremented(uint256 newVersion);
+    //event versionIncremented(uint256 newVersion);
     function incrementVersion() public  {
         //console.log("incrementing version:");
-        version = version + 1;
+        version += 1;
         //console.log(version);
         //console.log(leagueName);
-        emit versionIncremented(
-            version
-        );
+        // emit versionIncremented(
+        //     version
+        // );
     }
 
     /*************************************************/
@@ -134,6 +138,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //TODO set to only owner
     function setLeagueSchedule() 
         external 
+        onlyOwner
     {
         console.log("setting schedule");
         uint256 randomShifter = ((uint256(
@@ -330,17 +335,17 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     /************************************************/
     /***************** GETTERS **********************/
     /************************************************/
-    function getVersion() view public returns (uint256 version) {
-        return version;
-    }
+    // function getVersion() view public returns (uint256 version) {
+    //     return version;
+    // }
 
-    function getLeagueName() view public returns (string memory) {
-        return leagueName;
-    }
+    // function getLeagueName() view public returns (string memory) {
+    //     return leagueName;
+    // }
 
-    function getStakeAmount() view public returns (uint256 stakeAmount) {
-        return stakeAmount;
-    }
+    // function getStakeAmount() view public returns (uint256 stakeAmount) {
+    //     return stakeAmount;
+    // }
 
     //Returns total pot of the league
     // function getTotalPrizePot() view public returns (uint256) {
@@ -348,9 +353,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // }
 
         // Returning the lineup for a user
-    function getLineup() view public returns (uint256[] memory) {
-        return userLineup[msg.sender];
-    }
+    // function getLineup() view public returns (uint256[] memory) {
+    //     return userLineup[msg.sender];
+    // }
 
 
     /******************************************************/
@@ -402,9 +407,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     }
 
     // Getter for user to weekly pts
-    function getUserRecord() public view returns (uint256[8] memory) {
-        return userToRecord[msg.sender];
-    }
+    // function getUserRecord() public view returns (uint256[8] memory) {
+    //     return userToRecord[msg.sender];
+    // }
 
     //Given manually inputted athlete stats, return the calculated
     //athleteScores.
