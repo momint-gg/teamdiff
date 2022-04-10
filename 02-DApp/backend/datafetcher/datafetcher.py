@@ -335,14 +335,26 @@ class DataFetcher():
 
         print("Done!\n")
 
-    def fetch_athlete_headshots(self):
-        print("(Step 4/7) Fetching athlete headshots...\n")
+    def fetch_athlete_headshot_data(self):
+        print("(Step 5/7) Fetching athlete headshot data...\n")
         for i, athlete in enumerate(sorted(self.athletes.keys())):
             print("(Athlete ", i+1, "/", len(self.athletes), ") ", athlete, sep="")
-
             self.athletes[athlete]["ipfs"] = {
-                "Name": athlete + ".png",
+                "Name": "",
+                "Hash": "",
+                "Size": "",
             }
+            try:
+                self.athletes[athlete]["ipfs"] = self.ipfs.add("../pinata/headshots/" +
+                                                               athlete + ".png")[0]
+            except:
+                print("ERROR: Headshot of athlete",
+                      athlete, "couldn't be retrieved")
+            finally:
+                print(self.athletes[athlete]["ipfs"]["Hash"])
+                print()
+                time.sleep(5)
+
         print("Done!\n")
 
     def create_nft_metadata_ordered(self):
@@ -423,7 +435,7 @@ class DataFetcher():
         return True
 
     def upload_headshots_to_pinata(self):
-        print("(Step 5/7) Uploading headshots to Pinata...\n")
+        print("\n(Step 4/7) Uploading headshots to Pinata...\n")
         time.sleep(1)
         subprocess.call(["node", "../pinata/app.js", "-p"])
         print("Done!\n")
@@ -446,8 +458,8 @@ def main():
                         "aggregated_stats.json")
     df._convert_to_json(df.game_stats, "game_stats.json")
 
-    df.fetch_athlete_headshots()
     df.upload_headshots_to_pinata()
+    df.fetch_athlete_headshot_data()
 
     df.create_nft_metadata_ordered()
     df.create_nft_metadata_random()
