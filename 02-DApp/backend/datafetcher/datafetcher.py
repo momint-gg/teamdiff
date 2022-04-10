@@ -10,6 +10,7 @@ import os
 import random
 import re
 import ssl
+import sys
 import subprocess
 import time
 import urllib.request
@@ -18,14 +19,15 @@ import urllib.request
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-class DataFetcher():
+class Datafetcher():
     def __init__(self,
+                 athlete_source,
                  tournament,
+                 time_interval,
                  site="lol.fandom.com",
                  path="/",
                  start_date=dt.datetime.strptime(dt.datetime.utcnow().isoformat()[
                      :19], "%Y-%m-%dT%H:%M:%S").date(),
-                 time_interval=7
                  ):
         self.site = mwclient.Site(site, path)
         self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
@@ -39,6 +41,7 @@ class DataFetcher():
         self.aggregated_athlete_game_stats = []
         self.nft_metadata = {}
         self.game_stat = {}
+        self.athlete_source = athlete_source
 
     scoreboard_player_fields = [
         "SP.OverviewPage",
@@ -129,8 +132,6 @@ class DataFetcher():
         with open(csv_name, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for i, row in enumerate(reader):
-                if i < 2:
-                    continue
                 raw_summoner_id = row[0].split(",")[0]
                 clean_summoner_id = self._clean_summoner_id(raw_summoner_id)
                 self.clean_to_raw_summoner_ids[clean_summoner_id] = raw_summoner_id
@@ -201,10 +202,10 @@ class DataFetcher():
     def _clean_summoner_id(self, name, lower=True):
         return name.split("(")[0].strip().lower()
 
-    def set_athletes_and_teams_from_csv(self, file_name):
+    def set_athletes_and_teams_from_csv(self):
         print("(Step 1/7) Setting athletes and teams from " +
-              str(file_name) + "...\n")
-        self._set_athletes(file_name)
+              str(self.athlete_source) + "...\n")
+        self._set_athletes(self.athlete_source)
 
         fields = ", ".join(self.player_fields)
         where = ' OR '.join(
@@ -231,7 +232,7 @@ class DataFetcher():
         print("These athletes were set:\n")
 
         for i, summoner_id in enumerate(sorted(self.athletes.keys(), key=lambda athlete: athlete.lower())):
-            print(str(i+1) + ".", summoner_id)
+            print(summoner_id)
 
         print("\nThese teams were set:\n")
 
@@ -241,7 +242,7 @@ class DataFetcher():
         print("\nDone!\n")
 
     def fetch_athlete_game_stats(self):
-        print("(Step 2/7) Fetching athlete game stats...")
+        print("(Step 2/7) Fetching athlete game stats...\n")
         for team in self.teams:
             game_data = self._fetch_game_data(
                 team, self.start_date, self.time_interval)['cargoquery']
@@ -282,10 +283,12 @@ class DataFetcher():
                     self.athlete_game_stats[current_summoner_id][game_id][stat] = int(
                         value)
 
-        print("Done!\n")
+        self._convert_to_json(self.athlete_game_stats, "game_stats.json")
+
+        print("\nDone!\n")
 
     def aggregate_athlete_game_stats(self):
-        print("(Step 3/7) Aggregating athlete game stats...")
+        print("(Step 3/7) Aggregating athlete game stats...\n")
         agg_game_stats = {}
         for current_summoner_id, games in self.athlete_game_stats.items():
             if current_summoner_id not in agg_game_stats:
@@ -331,7 +334,10 @@ class DataFetcher():
 
         self.aggregated_athlete_game_stats = agg_game_stats
 
-        print("Done!\n")
+        self._convert_to_json(self.aggregated_athlete_game_stats,
+                              "aggregated_stats.json")
+
+        print("\nDone!\n")
 
     def fetch_athlete_headshot_data(self):
         print("(Step 5/7) Fetching athlete headshot data...\n")
@@ -438,12 +444,33 @@ class DataFetcher():
         subprocess.call(["node", "../pinata/app.js", "-p"])
         print("Done!\n")
 
+    def usage():
+        print(
+            "\nUSAGE: python3 datafetcher.py -a \"{path/to/athlete_source_file.csv}\" -t \"{Tournament name}\" -d {Number of days in the past to fetch query stats from}\n")
+
 
 def main():
-    print("\nStarting datafetch...\n")
-    df = DataFetcher(tournament="LCS 2022 Spring")
+    if len(sys.argv) != 7:
+        Datafetcher.usage()
+        return
 
-    df.set_athletes_and_teams_from_csv("athletes.csv")
+    a = sys.argv[1]
+    t = sys.argv[3]
+    d = sys.argv[5]
+
+    if a != "-a" or t != "-t" or d != "-d":
+        Datafetcher.usage()
+        return
+
+    athlete_source = sys.argv[2]
+    tournament = sys.argv[4]
+    days = int(sys.argv[6])
+
+    df = Datafetcher(athlete_source, tournament, days)
+    print("\nStarting datafetch for the last", days,
+          "for the following tournament:", tournament + "...\n")
+
+    df.set_athletes_and_teams_from_csv()
 
     target_athlete_count = 50
     if not df.is_correct_athlete_count(target_athlete_count):
@@ -451,10 +478,6 @@ def main():
 
     df.fetch_athlete_game_stats()
     df.aggregate_athlete_game_stats()
-
-    df._convert_to_json(df.aggregated_athlete_game_stats,
-                        "aggregated_stats.json")
-    df._convert_to_json(df.athlete_game_stats, "game_stats.json")
 
     df.upload_headshots_to_pinata()
     df.fetch_athlete_headshot_data()
