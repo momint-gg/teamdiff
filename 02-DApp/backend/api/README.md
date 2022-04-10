@@ -23,4 +23,4 @@ http://54.209.44.47:3000/aggregated_stats
 
 #### Get most recent individual player game stats:
 
-http://54.209.44.47:3000//game_stats
+http://54.209.44.47:3000/game_stats
