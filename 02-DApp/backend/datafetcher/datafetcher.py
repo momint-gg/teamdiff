@@ -340,37 +340,9 @@ class DataFetcher():
         for i, athlete in enumerate(sorted(self.athletes.keys())):
             print("(Athlete ", i+1, "/", len(self.athletes), ") ", athlete, sep="")
 
-            response = self.site.api('cargoquery',
-                                     limit=1,
-                                     tables="PlayerImages",
-                                     fields="FileName",
-                                     where='Link="%s"' % self.clean_to_raw_summoner_ids[athlete],
-                                     format="json"
-                                     )
-
-            parsed = json.dumps(response)
-            decoded = json.loads(parsed)
-
-            try:
-                url = str(decoded['cargoquery'][0]['title']['FileName'])
-                self._download_photo(self.site, url, athlete)
-                self.athletes[athlete]["ipfs"] = self.ipfs.add(
-                    athlete + ".png")
-            except:
-                self.athletes[athlete]["ipfs"] = {
-                    "Name": "",
-                    "Hash": "",
-                    "Size": "",
-                }
-                print("ERROR: Headshot of athlete",
-                      athlete, "failed to upload to IPFS")
-            finally:
-                pprint(self.athletes[athlete]["ipfs"])
-                print()
-                os.replace(athlete + ".png",
-                           "../pinata/headshots/" + athlete + ".png")
-                time.sleep(5)
-
+            self.athletes[athlete]["ipfs"] = {
+                "Name": athlete + ".png",
+            }
         print("Done!\n")
 
     def create_nft_metadata_ordered(self):
