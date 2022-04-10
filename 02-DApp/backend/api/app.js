@@ -30,18 +30,6 @@ app.get("/game_stats", (req, res) => {
     res.send(gameStats);
 });
 
-app.get("/nft_metadata_ordered", (req, res) => {
-    const rawMetadata = fs.readFileSync("../datafetcher/nft_metadata_ordered.json");
-    const metadata = JSON.parse(rawMetadata);
-    res.send(metadata);
-});
-
-app.get("/nft_metadata_random", (req, res) => {
-    const rawMetadata = fs.readFileSync("../datafetcher/nft_metadata_random.json");
-    const metadata = JSON.parse(rawMetadata);
-    res.send(metadata);
-});
-
 const PORT = 3000;
 
 app.listen(PORT, () => {
