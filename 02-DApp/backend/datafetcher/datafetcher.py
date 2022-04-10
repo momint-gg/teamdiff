@@ -20,9 +20,9 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 class DataFetcher():
     def __init__(self,
+                 tournament,
                  site="lol.fandom.com",
                  path="/",
-                 tournament="LCS 2022 Spring",
                  start_date=dt.datetime.strptime(dt.datetime.utcnow().isoformat()[
                      :19], "%Y-%m-%dT%H:%M:%S").date(),
                  time_interval=7
@@ -443,7 +443,7 @@ class DataFetcher():
 
 def main():
     print("\nStarting datafetch...\n")
-    df = DataFetcher()
+    df = DataFetcher(tournament="LCS 2022 Spring")
 
     df.set_athletes_and_teams_from_csv("athletes.csv")
 
