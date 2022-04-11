@@ -3,10 +3,12 @@ import {useEffect, useState} from 'react';
 import { ethers } from 'ethers';
 import 'bootstrap/dist/css/bootstrap.css'
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import Image from 'next/image';
 import {Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, Grid} from "@mui/material";
 import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
 import AthleteCard from "../components/AthleteCard";
+import profilePic from '../assets/images/starter-pack.png';
 
 export default function BurnPack({setDisplay}) {
     const [{data: connectData, error: connectError}, connect] = useConnect()
@@ -96,7 +98,15 @@ export default function BurnPack({setDisplay}) {
                         background: 'linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)',
                         filter: 'blur(35px)'
                     }}/>
-                    <img src='/starterPack.png' style={{position: 'absolute'}}/>
+                    <Container sx={{position:"absolute"}}>
+                    <Image
+                        src={profilePic}
+                        alt="Picture of the author"
+                        width="310px"
+                        height="450px"
+                        position="absolute"
+                    />
+                    </Container>
                 </Box>
 
                 <Box

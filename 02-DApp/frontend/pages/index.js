@@ -21,6 +21,7 @@ import About from './about';
 import MintPack from './mintPack';
 import Collection from './collection';
 import MintHome from './mintHome';
+import Play from './Play';
 
 //******************* */
 //  Component Imports */
@@ -107,7 +108,7 @@ export default function Index(props) {
             </Box>
             <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
-                Home
+                <Play />
               </Typography>
             </TabPanel>
             <TabPanel value="1">
@@ -125,7 +126,9 @@ export default function Index(props) {
             </TabPanel>
           </TabContext>
         </Box>
-        <Footer/>
+        <Box>
+          <Footer />
+        </Box>
       </Provider>
     );
 }

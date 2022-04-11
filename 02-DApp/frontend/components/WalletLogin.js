@@ -40,7 +40,7 @@ export default function WalletLogin() {
                 <Chip
                     avatar={<Avatar alt="Avatar" src={accountData.ens?.avatar ? accountData.ens.avatar : "avatar.png"} />}
                     label={accountData.ens?.name
-                        ? `${accountData.ens?.name} (${shortenedAddress})`
+                        ? `${accountData.ens?.name}`
                         : shortenedAddress}
                     variant="outlined"
                     clickable={true}

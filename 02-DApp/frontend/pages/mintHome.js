@@ -65,7 +65,7 @@ export default function MintHome() {
                 </Box>
                 
             </Container>
-            <Container sx={{marginRight:-20}}>
+            <Container sx={{marginRight:-50}}>
                 <Image
                     src={profilePic}
                     alt="Picture of the author"

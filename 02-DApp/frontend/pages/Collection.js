@@ -82,7 +82,7 @@ export default function Collection() {
                             <AthleteCard athleteData={athleteData} setAthlete={setCurrAthlete} setModalOpen={setModalOpen} />
                         </Grid>
                     ))}
-                </Grid>
+            </Grid>
             <Typography variant="h2" color="secondary" component="div" style={{marginTop: 10}}>
                 PLAYERS
             </Typography>

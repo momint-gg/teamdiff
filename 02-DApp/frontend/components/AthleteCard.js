@@ -3,7 +3,6 @@ import { Card, CardContent, CardMedia, Typography, CardActions, Button } from "@
 import { useState } from 'react';
 
 export default function AthleteCard({athleteData, setAthlete, setModalOpen}) {
-  console.log(athleteData)
     const card = (
         <Fragment>
           <CardContent>
