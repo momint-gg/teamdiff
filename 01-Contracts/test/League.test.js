@@ -1,6 +1,5 @@
 const { expect } = require("chai");
 const hre = require("hardhat");
-const League = artifacts.require("League.sol");
 
 describe("League.test", async () => {
   var owner;
@@ -61,7 +60,6 @@ describe("League.test", async () => {
 
   // We are testing with TestUSDC (made by me) because there is NO RINKEBY USDC ABI >:(
   it("Allows a user to stake USDC and is receieved by the contract when user joins league", async () => {
-    console.log("Start");
     // const rinkebyUSDCToken = new ethers.Contract('0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b', json_file.abi ,owner)
 
     // Approving the transaction first
@@ -79,6 +77,20 @@ describe("League.test", async () => {
     expect(balance).to.equal(10);
   });
 
+  it("Allows another user (addr1) with >= 10 USDC to join the league", async () => {
+    let approval = await usdcContract
+      .connect(addr1)
+      .approve(contract.address, 10);
+    await approval.wait();
+
+    let txn = await contract.connect(addr1).joinLeagueAndStake();
+    await txn.wait();
+
+    const usersLen = await contract.getUsersLength();
+    // Expecting 2 users now in the users array
+    expect(Number(usersLen)).to.equal(2);
+  });
+
   it("Correctly sets athlete IDs and gets a user's lineup", async () => {
     const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
     const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
@@ -90,11 +102,10 @@ describe("League.test", async () => {
     await txn.wait();
 
     const lineup = await contract.connect(owner).getLineup(); // Getting the caller's lineup
-    console.log("Lineup for owner is ", lineup);
-
+    // console.log("Lineup for owner is ", lineup);
     await contract.connect(addr1);
     const lineup2 = await contract.connect(addr1).getLineup();
-    console.log("Lineup for addr1 is ", lineup2);
+    // console.log("Lineup for addr1 is ", lineup2);
     expect(lineup).to.not.equal(lineup2);
   });
 
@@ -116,8 +127,8 @@ describe("League.test", async () => {
     await txn.wait();
 
     txn = await contract.connect(owner).getUserTotalPts();
-    console.log("Weekly pts fow owner ", txn);
+    console.log("Weekly pts fow owner ", Number(txn));
     txn = await contract.connect(addr1).getUserTotalPts();
-    console.log("Weekly pts for addr1 ", txn);
+    console.log("Weekly pts for addr1 ", Number(txn));
   });
 });

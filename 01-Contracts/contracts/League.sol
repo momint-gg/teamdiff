@@ -166,4 +166,9 @@ contract League is Ownable {
     function getUserWeeklypts() public view returns (uint256[] memory) {
         return userToWeeklyPts[msg.sender];
     }
+
+    // For testing if join league function Works
+    function getUsersLength() public view returns (uint256) {
+        return users.length;
+    }
 }
