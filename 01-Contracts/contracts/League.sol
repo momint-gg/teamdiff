@@ -49,21 +49,17 @@ contract League is Ownable {
     constructor(uint256 _stakeAmount, address _testUSDCAddress) {
         console.log("ADDY is ", _testUSDCAddress);
         testUSDC = TestUSDC(_testUSDCAddress); // Deploying test USDC
-        stakeAmount = _stakeAmount * 10**6; // Converting to USDC decimal storage (stored as 10^6)
+        stakeAmount = _stakeAmount; // Converting to USDC decimal storage (stored as 10^6)
         whitelistContract = new Whitelist(); // Initializing our whitelist
     }
 
     // User joining the league and staking the league's currency amount
     // Add modifier for only whitelisted
     // I think this means they won't be able to stake decimal amounts
-    function joinLeague() public payable {
-        users.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
-        require(
-            testUSDC.balanceOf(msg.sender) > stakeAmount,
-            "User must have enough USDC to join league"
-        );
-        require(testUSDC.allowance(msg.sender, address(this)) >= stakeAmount);
-        _safeTransferFrom(testUSDC, msg.sender, address(this), stakeAmount);
+    function joinLeagueAndStake() public payable {
+        users.push(msg.sender);
+        // Note: this will fail if allowance is not high enough (set through token.approve())
+        testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
         // stake(stakeAmount);
     }

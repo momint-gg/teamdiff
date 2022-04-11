@@ -39,86 +39,85 @@ describe("League.test", async () => {
   // Ran before every unit test
   beforeEach(async () => {});
 
-  // Below tests need to be run on rinkeby
-  it("Correctly gets the USDC balance for my wallet", async () => {
-    let bal = await contract.getUserUSDCBalance();
-    console.log("USDC Balance ", bal);
-    expect(Number(bal)).to.equal(0);
+  it("Gives owner 10", async () => {
+    // Transferring 10 USDC to the sender so they have a balance
+    // Approving the transaction (important!) of 10 USDC
+    // Any time you want to transfer in an erc20 you NEED to approve the transfer for the sender
+    let approval = await usdcContract.connect(owner).approve(owner.address, 10);
+    await approval.wait();
+
+    let txn = await usdcContract.transferFrom(owner.address, addr1.address, 10);
+    await txn.wait();
+
+    // Sender should now have 10 (test) USDC
+    expect(Number(await usdcContract.balanceOf(addr1.address))).to.equal(10);
+    expect(Number(await usdcContract.balanceOf(owner.address))).to.equal(90);
 
     console.log(
-      "TUSDC contract balance ",
-      Number(await usdcContract.getContractBal())
+      "Balance of user in League.sol ",
+      await contract.getUserUSDCBalance()
     );
   });
 
-  it("Deploys a test USDC contract and gives the sender a balance", async () => {
-    // Transferring 10 USDC to the sender so they have a balance
-    // Approving the transaction (important!) of 10 USDC
-    console.log("Approving transaction");
-    let approval = await usdcContract.approve(owner.address, 10);
-    await approval.wait();
-    console.log(approval);
-
-    console.log("About to transfer (test) usdc");
-    let txn = await usdcContract.transferToSender();
-    await txn.wait();
-    // txn = await contract.getUserUSDCBalance();
-    // console.log("User balance: ", txn);
-  });
-
-  // We are testing with TestUSDC (made by me) because there is NO RINKEBY USDC ABI >:( -- wtf brooooooo
+  // We are testing with TestUSDC (made by me) because there is NO RINKEBY USDC ABI >:(
   it("Allows a user to stake USDC and is receieved by the contract when user joins league", async () => {
     console.log("Start");
-    // First: Approve the transfer first (will do in metamask normally) -- have to do when on mainnet
     // const rinkebyUSDCToken = new ethers.Contract('0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b', json_file.abi ,owner)
 
-    // Joining the league, staking the 10 USDC
-    let txn = await contract.joinLeague();
+    // Approving the transaction first
+    // Passing in the LEAGUE CONTRACT as the first param, amount as the second *** (important)
+    // Need to approve spending for the contract, in UI will have metamask popup to approve transaction
+    let approval = await usdcContract
+      .connect(owner)
+      .approve(contract.address, 10);
+    await approval.wait();
+
+    let txn = await contract.connect(owner).joinLeagueAndStake();
     await txn.wait();
-    console.log("Joined league :)");
+
     const balance = await contract.getUSDCBalance();
-    // console.log("Contract balance is ", Number(balance));
+    expect(balance).to.equal(10);
   });
 
-  // it("Correctly sets athlete IDs and gets a user's lineup", async () => {
-  //   const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
-  //   const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
+  it("Correctly sets athlete IDs and gets a user's lineup", async () => {
+    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
+    const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
 
-  //   let txn = await contract.connect(owner).setLineup(athleteIds);
-  //   await txn.wait();
+    let txn = await contract.connect(owner).setLineup(athleteIds);
+    await txn.wait();
 
-  //   txn = await contract.connect(addr1).setLineup(athleteIds2);
-  //   await txn.wait();
+    txn = await contract.connect(addr1).setLineup(athleteIds2);
+    await txn.wait();
 
-  //   const lineup = await contract.connect(owner).getLineup(); // Getting the caller's lineup
-  //   console.log("Lineup for owner is ", lineup);
+    const lineup = await contract.connect(owner).getLineup(); // Getting the caller's lineup
+    console.log("Lineup for owner is ", lineup);
 
-  //   await contract.connect(addr1);
-  //   const lineup2 = await contract.connect(addr1).getLineup();
-  //   console.log("Lineup for addr1 is ", lineup2);
-  //   expect(lineup).to.not.equal(lineup2);
-  // });
+    await contract.connect(addr1);
+    const lineup2 = await contract.connect(addr1).getLineup();
+    console.log("Lineup for addr1 is ", lineup2);
+    expect(lineup).to.not.equal(lineup2);
+  });
 
-  // // Basically the whole test for league functionality
-  // // If this works we chillllllllllin baby
-  // it("Correctly evaluates a matchup", async () => {
-  //   // First adding stats for first 10 athletes (0-9)
-  //   console.log("In test");
-  //   for (let i = 0; i < 10; i++) {
-  //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
-  //     let txn = await athleteContract.connect(owner).appendStats(i, randomNum);
-  //     await txn.wait();
-  //   }
-  //   // Setting address of our athlete contract
-  //   let txn = await contract.setAthleteContractAddress(athleteContract.address);
-  //   await txn.wait();
+  // Basically the whole test for league functionality
+  // If this works we chillllllllllin baby
+  it("Correctly evaluates a matchup", async () => {
+    // First adding stats for first 10 athletes (0-9)
+    console.log("In test");
+    for (let i = 0; i < 10; i++) {
+      const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
+      let txn = await athleteContract.connect(owner).appendStats(i, randomNum);
+      await txn.wait();
+    }
+    // Setting address of our athlete contract
+    let txn = await contract.setAthleteContractAddress(athleteContract.address);
+    await txn.wait();
 
-  //   txn = await contract.evaluateMatch(owner.address, addr1.address);
-  //   await txn.wait();
+    txn = await contract.evaluateMatch(owner.address, addr1.address);
+    await txn.wait();
 
-  //   txn = await contract.connect(owner).getUserTotalPts();
-  //   console.log("Weekly pts fow owner ", txn);
-  //   txn = await contract.connect(addr1).getUserTotalPts();
-  //   console.log("Weekly pts for addr1 ", txn);
-  // });
+    txn = await contract.connect(owner).getUserTotalPts();
+    console.log("Weekly pts fow owner ", txn);
+    txn = await contract.connect(addr1).getUserTotalPts();
+    console.log("Weekly pts for addr1 ", txn);
+  });
 });
