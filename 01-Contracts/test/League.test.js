@@ -9,8 +9,19 @@ describe("League.test", async () => {
 
   // Ran before first unit test
   before(async () => {
+    // Deploying test USDC contract
+    TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
+    usdcContract = await TestUSDCContractFactory.deploy(...[100]); // Setting supply as 100
+    [owner, addr1] = await hre.ethers.getSigners();
+    await usdcContract.deployed();
+    usdcContract.connect(owner);
+    console.log("Deployed to: " + usdcContract.address);
+
+    // Deploying league test contract
     LeagueContractFactory = await hre.ethers.getContractFactory("League");
-    contract = await LeagueContractFactory.deploy(...[10]); // Setting owner as creator and stake amount of 10
+    contract = await LeagueContractFactory.deploy(
+      ...[10, usdcContract.address] //Test USDC contract address
+    );
     [owner, addr1] = await hre.ethers.getSigners();
     await contract.deployed();
     contract.connect(owner);
@@ -32,15 +43,41 @@ describe("League.test", async () => {
   it("Correctly gets the USDC balance for my wallet", async () => {
     let bal = await contract.getUserUSDCBalance();
     console.log("USDC Balance ", bal);
-    expect(Number(bal)).to.be.greaterThan(0);
+    expect(Number(bal)).to.equal(0);
+
+    console.log(
+      "TUSDC contract balance ",
+      Number(await usdcContract.getContractBal())
+    );
   });
 
+  it("Deploys a test USDC contract and gives the sender a balance", async () => {
+    // Transferring 10 USDC to the sender so they have a balance
+    // Approving the transaction (important!) of 10 USDC
+    console.log("Approving transaction");
+    let approval = await usdcContract.approve(owner.address, 10);
+    await approval.wait();
+    console.log(approval);
+
+    console.log("About to transfer (test) usdc");
+    let txn = await usdcContract.transferToSender();
+    await txn.wait();
+    // txn = await contract.getUserUSDCBalance();
+    // console.log("User balance: ", txn);
+  });
+
+  // We are testing with TestUSDC (made by me) because there is NO RINKEBY USDC ABI >:( -- wtf brooooooo
   it("Allows a user to stake USDC and is receieved by the contract when user joins league", async () => {
     console.log("Start");
-    let txn = await contract.connect(owner).joinLeague();
+    // First: Approve the transfer first (will do in metamask normally) -- have to do when on mainnet
+    // const rinkebyUSDCToken = new ethers.Contract('0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b', json_file.abi ,owner)
+
+    // Joining the league, staking the 10 USDC
+    let txn = await contract.joinLeague();
     await txn.wait();
     console.log("Joined league :)");
     const balance = await contract.getUSDCBalance();
+    // console.log("Contract balance is ", Number(balance));
   });
 
   // it("Correctly sets athlete IDs and gets a user's lineup", async () => {
