@@ -1,12 +1,26 @@
-Base URL: 
+# API
+
+## Installation
+
+```
+npm install
+```
+
+## Usage
+```
+node app.js 
+```
+
+## Endpoints
+
+#### Base URL: 
 
 http://54.209.44.47:3000/
 
-Get current week's aggregated stats:
+#### Get most recent aggregated stats:
 
-http://54.209.44.47:3000/stats/aggregated_stats
+http://54.209.44.47:3000/aggregated_stats
 
-Get current week's individual player game stats:
+#### Get most recent individual player game stats:
 
-http://54.209.44.47:3000/stats/game_stats
-
+http://54.209.44.47:3000/game_stats

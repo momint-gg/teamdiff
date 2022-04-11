@@ -95,12 +95,12 @@ async function main() {
   })
   receipt = await txn.wait();
 
-  for (const event of receipt.events) {
-    if (event.event != null) {
-      console.log(`Event ${event.event} with args ${event.args}`);
-      //leagueProxyContractAddress = event.args[1];
-    }
-  }
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     //leagueProxyContractAddress = event.args[1];
+  //   }
+  // }
   console.log("Done incrementing version! ");
   //NOTE calling the public function variableNAme() on the proxy does not
     //return the state variable correctly. However, using get Methods on the 
@@ -122,6 +122,8 @@ async function main() {
       // (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
       "\n\tleagueMembers: " +
       (await LeagueProxyInstanceWithSigner.leagueMembers(0)) +
+      "\n\tuserRecord: " +
+      (await LeagueProxyInstanceWithSigner.userToRecord(owner.address, 0)) +
       // (await LeagueProxyInstanceWithSigner.currentWeekNum()) +
       "\n\tisPublic: " +
       (await LeagueProxyInstanceWithSigner.isPublic()) +
@@ -160,12 +162,12 @@ async function main() {
   // receipt = await txn.wait();
 
   // txn = await LeagueProxyInstance.incrementVersion();
-  for (const event of receipt.events) {
-    if (event.event != null) {
-      console.log(`Event ${event.event} with args ${event.args}`);
-      //leagueProxyContractAddress = event.args[1];
-    }
-  }
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     //leagueProxyContractAddress = event.args[1];
+  //   }
+  // }
   console.log("Done incrementing version on Contract 2! ");
 
 

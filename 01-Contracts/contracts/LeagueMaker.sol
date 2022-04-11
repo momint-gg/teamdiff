@@ -46,14 +46,14 @@ import "./Athletes.sol";
 //This hi-keyyyy doesn't need to be upgradeable lol
 // contract LeagueProxy is ERC1967UpgradeUpgradeable/*, UUPSUpgradeable, OwnableUpgradeable*/ {
 //TODO must add owner
-contract LeagueMaker {
+contract LeagueMaker is Ownable {
     //To use Clone library
-    using Clones for address;
+    //using Clones for address;
 
 
     // ======= Events ==========
     event LeagueCreated(string name, address a);
-    event cloneCreated(address clone);
+    //event cloneCreated(address clone);
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
@@ -147,11 +147,14 @@ contract LeagueMaker {
     }
 
     //Create onlyOwner function to update week
-    
+    function incrementCurrentWeek() public onlyOwner {
+        currentWeek += 1;
+    }
 
-    //TODO set to only admin,
+    //TODO set to only owner,
+        //owner will be our Team Diff wallet
     //Set all schedules for all leagues 
-    function setLeagueSchedules() public {
+    function setLeagueSchedules() public onlyOwner {
         bool success;
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {
@@ -165,7 +168,21 @@ contract LeagueMaker {
 
     //Locking lineups for all leagues
     //TODO set to only owner
-    function lockLeagueLineups() public  {
+    //Locks the league Members for all leagues, so nobody new can join or leave
+    function lockLeagueMembership() public onlyOwner {
+        bool success;
+        bytes memory data;
+        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+            (success, data) = leagueAddresses[i].call(
+                abi.encodeWithSignature("setLeagueEntryIsClosed()")
+            );
+            emit Response(success, data);
+        }
+    }
+
+    //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
+    //TODO set to only owner
+    function lockLeagueLineups() public  onlyOwner{
         bool success;
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {
@@ -178,7 +195,7 @@ contract LeagueMaker {
 
     //Unlocking lineups for all leagues
     //TODO set to only owner
-    function unlockLeagueLineups() public {
+    function unlockLeagueLineups() public onlyOwner{
         bool success;
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {
@@ -190,7 +207,8 @@ contract LeagueMaker {
         }
     }
 
-    function evaluateWeekForAllLeagues() public {
+    //Evaluates weekly scores for all matchups in all leagues
+    function evaluateWeekForAllLeagues() public onlyOwner{
         bool success;
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {
@@ -204,22 +222,11 @@ contract LeagueMaker {
     }
 
     //TODO set to onlyProxy
+        //May need to create new access control privilege here
     //Add or update userToLeagueMapping with additional pairs
     function updateUserToLeagueMapping(address user) external {
         userToLeagueMap[user].push(msg.sender);
     }
-
-
-
-    // ============= Deploy Ligthweight clone ===========
-    // function createLeagueClone(address implementation) external {
-    //     //Try returning just a clone with the implementation address
-    //     //return implementation.cloneDeterministic(msg.sender);
-    //     address cloneAddy = implementation.clone();
-    //     console.log(cloneAddy);
-    //     emit cloneCreated(cloneAddy);
-    //     //return cloneAddy;
-    // }
 
     function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});
@@ -229,73 +236,68 @@ contract LeagueMaker {
         return address(newBeacon);
     }
 
-    //Public getters for testing purposes
-    // function getImplementation() public view returns (address) {
-    //     return logic;
+    // function getBeacon() public view returns (address) {
+    //     return address(upgradeableBeacon);
     // }
-
-    function getBeacon() public view returns (address) {
-        return address(upgradeableBeacon);
-    }
 
 
     // Calling a function that does not exist triggers the fallback function.
-    function testCallDoesNotExist(address _addr) public {
-        //This calls the game logic incrementVersion which is great
-        //but how do we call it in js?
-        (bool success, bytes memory data) = _addr.call(
-            abi.encodeWithSignature("incrementVersion()")
-        );
-        // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("setLeagueSchedule()")
-        // );
-        // (bool success,  bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("version()")
-        // );
-        // //console.log("Data");
-        // (success,  data) = _addr.call(
-        //     abi.encodeWithSignature("numWeeks()")
-        // );
-        // //console.log(data);
-        // (success,  data) = _addr.call(
-        //     abi.encodeWithSignature("leagueName()")
-        // );
-        //console.log(data);
-        // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("setLeagueSchedule()")
-        // );
-        //console.log("called test call");
+    // function testCallDoesNotExist(address _addr) public {
+    //     //This calls the game logic incrementVersion which is great
+    //     //but how do we call it in js?
+    //     (bool success, bytes memory data) = _addr.call(
+    //         abi.encodeWithSignature("incrementVersion()")
+    //     );
+    //     // (bool success, bytes memory data) = _addr.call(
+    //     //     abi.encodeWithSignature("setLeagueSchedule()")
+    //     // );
+    //     // (bool success,  bytes memory data) = _addr.call(
+    //     //     abi.encodeWithSignature("version()")
+    //     // );
+    //     // //console.log("Data");
+    //     // (success,  data) = _addr.call(
+    //     //     abi.encodeWithSignature("numWeeks()")
+    //     // );
+    //     // //console.log(data);
+    //     // (success,  data) = _addr.call(
+    //     //     abi.encodeWithSignature("leagueName()")
+    //     // );
+    //     //console.log(data);
+    //     // (bool success, bytes memory data) = _addr.call(
+    //     //     abi.encodeWithSignature("setLeagueSchedule()")
+    //     // );
+    //     //console.log("called test call");
 
-        emit Response(success, data);
-    }
+    //     emit Response(success, data);
+    // }
 
-    function addUsersToLeagueHelper(address[] memory addresses, address _addr) public {
-        //This calls the game logic incrementVersion which is great
-        //but how do we call it in js?
-        // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("incrementVersion()")
-        // );
-        bool success;
-        bytes memory data;
-        for(uint256 i = 0; i < addresses.length; i++) {
-            (success, data) = _addr.call(
-                abi.encodeWithSignature(
-                    "addUserToLeague(address)",
-                    addresses[i]
-                )
-            );
-        }
-        // (success,  data) = _addr.call(
-        //     abi.encodeWithSignature("addUserToLeague()")
-        // );
-        // (success,  data) = _addr.call(
-        //     abi.encodeWithSignature("addUserToLeague()")
-        // );
-        // (bool success, bytes memory data) = _addr.call(
-        //     abi.encodeWithSignature("setLeagueSchedule()")
-        // );
-        //console.log("called test call");
+    // function addUsersToLeagueHelper(address[] memory addresses, address _addr) public {
+    //     //This calls the game logic incrementVersion which is great
+    //     //but how do we call it in js?
+    //     // (bool success, bytes memory data) = _addr.call(
+    //     //     abi.encodeWithSignature("incrementVersion()")
+    //     // );
+    //     bool success;
+    //     bytes memory data;
+    //     for(uint256 i = 0; i < addresses.length; i++) {
+    //         (success, data) = _addr.call(
+    //             abi.encodeWithSignature(
+    //                 "addUserToLeague(address)",
+    //                 addresses[i]
+    //             )
+    //         );
+    //     }
+    //     // (success,  data) = _addr.call(
+    //     //     abi.encodeWithSignature("addUserToLeague()")
+    //     // );
+    //     // (success,  data) = _addr.call(
+    //     //     abi.encodeWithSignature("addUserToLeague()")
+    //     // );
+    //     // (bool success, bytes memory data) = _addr.call(
+    //     //     abi.encodeWithSignature("setLeagueSchedule()")
+    //     // );
+    //     //console.log("called test call");
 
-        emit Response(success, data);
-    }
+    //     emit Response(success, data);
+    // }
 }
