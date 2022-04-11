@@ -16,9 +16,10 @@ contract League is Ownable {
     uint256 numWeeks = 8; // Length of a split
     uint256 leagueSize = 8; // For testing
     uint256 currentWeekNum; // Keeping track of week number
-    address rinkebyUSDCAddress = 0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b; // Note for addresses: If invalid checksum, check cases
+
+    // Note for addresses: If invalid checksum, check cases
+    // address rinkebyUSDCAddress = 0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b;
     address polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
-    // IERC20 USDC = IERC20(rinkebyUSDCAddress);
 
     mapping(address => uint256) userToTotalPts;
     mapping(address => uint256[]) userToWeeklyPts;
@@ -59,36 +60,31 @@ contract League is Ownable {
     function joinLeagueAndStake() public payable {
         users.push(msg.sender);
         // Note: this will fail if allowance is not high enough (set through token.approve())
+        // Todo for mainnet: replace transferFrom staement with commented out (remember to prompt for approval of transaction on frontend!)
+        // IERC20(polygonUSDCAddress).transferFrom(msg.sender, address(this), stakeAmount)
+
         testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
-        // stake(stakeAmount);
     }
 
     // Returning the contracts USDC balance
     function getUSDCBalance() public view returns (uint256) {
-        // return IERC20(rinkebyUSDCAddress).balanceOf(address(this));
+        // Todo for mainnet: replace return statement with the commented out statement
+        // return IERC20(polygonUSDCAddress).balanceOf(address(this));
+
         return testUSDC.balanceOf(address(this));
     }
 
     // Returning the sender's USDC balance (testing)
     function getUserUSDCBalance() public view returns (uint256) {
-        // return IERC20(rinkebyUSDCAddress).balanceOf(msg.sender);
+        // Todo for mainnet: replace return statement with the commented out statement
+        // return IERC20(polygonUSDCAddress).balanceOf(msg.sender);
+
         return testUSDC.balanceOf(msg.sender);
     }
 
-    // Transfer ERC20 Token
-    function _safeTransferFrom(
-        IERC20 token,
-        address sender,
-        address recipient,
-        uint256 amount
-    ) private {
-        bool sent = token.transferFrom(sender, recipient, amount);
-        require(sent, "Token transfer failed");
-    }
-
     // TODO: Should we write this or just make it so that you can't leave once you join?
-    function removeFromLeague() public {}
+    function removeFromLeague() public onlyOwner {}
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
