@@ -44,7 +44,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+     mapping(uint256 => Matchup[])  schedule; // Schedule for the league (generated before), maps week # => [matchups]
     
     /**********************/
     /* IMMUTABLE STORAGE  */
@@ -62,7 +62,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
     //Our MOBALogicHElper contract
-    //MOBALogicHelper mobaLogicHelper;
+    MOBALogicHelper mobaLogicHelper;
 
     //Events
     event Staked(address sender, uint256 amount);
@@ -114,7 +114,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist
-        //mobaLogicHelper = new MOBALogicHelper();
+        mobaLogicHelper = new MOBALogicHelper();
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
 
@@ -150,87 +150,35 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
         //essentially splitting the league into two halves, to assign matchups 
-        uint256[4] memory leftHalf;
-        uint256[4] memory rightHalf;
-        for(uint week = 0; week < numWeeks; week++) {
+        // uint256[4] memory leftHalf;
+        // uint256[4] memory rightHalf;
+        uint256[8] memory matchupPlayerIndices;
+        for(uint256 week = 0; week < numWeeks; week++) {
             console.log("\n"); 
             console.log(week);
             console.log("************************");
 
-            uint256 matchupSlots;
-            //Create matchup slots that represents 2 * (number of matches each week), which includes byes
-            (leagueMembers.length % 2 == 0) ? (
-                matchupSlots = leagueMembers.length
-            ) : (
-                matchupSlots = (leagueMembers.length + 1)
-            );
-
-            //Grab temp value of rightHalf for final swap
-            uint256 rightArrTemp = rightHalf[0];
-
-            //fill values of array
-            for(uint256 i = 0; i < matchupSlots / 2; i++) {
-                //set elements of leftHalf and rightHalf to be indexes of users in leagueMembers
-                if(week == 0) {
-                    //init values in leftHalf and rightHalf with basic starting value
-                    leftHalf[(i + randomShifter) % ((matchupSlots / 2))] = i;
-                    rightHalf[(i + randomShifter) % ((matchupSlots / 2))] = i + matchupSlots / 2;
-                }
-                //otherwise rotate all elemnts clockwise between the two arrays
-                //[0, 1, 2, 3] ==> [5, 6, 7, 8]
-                //[4, 5, 6, 7] ==> [0, 1, 2, 3]
-                else {
-                    uint256 temp = leftHalf[i];
-                    rightHalf[i] = temp;
-                    leftHalf[i] = rightHalf[(i + 1) % ((matchupSlots / 2))];
-                
-
-                }
-                //if(i != matchupSlots / 2 - 1 || week == 0) {
-                // if(week == 0) {
-                //     console.log("lefthalf end");
-                //     console.log(leftHalf[(i + randomShifter) % ((matchupSlots / 2))]);
-                //     console.log("righthalf end");
-                //     console.log(rightHalf[(i + randomShifter) % ((matchupSlots / 2))]);
-                //     console.log("\n");  
-
-                // }
-            }
-            if(week != 0) {
-                leftHalf[(matchupSlots / 2) - 1] = rightArrTemp;
-                // console.log("lefthalf last");
-                // console.log(leftHalf[(matchupSlots / 2) - 1]);
-                // console.log("righthalf last");
-                // console.log(rightHalf[(matchupSlots / 2) - 1]);
-                // console.log("\n"); 
-            }
-            for(uint256 i = 0; i < matchupSlots / 2; i++) {
-                //temporary array to hold single matchup
-                address[2] memory matchupArray;
-                //if matchupslots greater than number of leagueMembers
-                    //just match the last player with bye week (zero address)
-                if(rightHalf[i] >= leagueMembers.length) {
-                    matchupArray = [leagueMembers[leftHalf[i]], address(0)];
-                }
-                else if(leftHalf[i] >= leagueMembers.length) {
-                    matchupArray = [address(0), leagueMembers[rightHalf[i]]];
-                }
-                else {
-                    matchupArray = [leagueMembers[leftHalf[i]], leagueMembers[rightHalf[i]]];
-                }
-
-                //Add matchup array to struct, to allow for nested structure
-                Matchup memory matchup = Matchup({
-                    players: matchupArray
-                });                  
-
+                //generate playerIndices array for each week
+                matchupPlayerIndices = mobaLogicHelper.setMatchupPlayerIndices(
+                    matchupPlayerIndices,
+                    leagueMembers.length,
+                    week,
+                    leagueName
+                );
                 //Add matchup to schedule for current week
-                schedule[week].push(matchup);
-                console.log(matchup.players[0]);
-                console.log(" vs ");
-                console.log(matchup.players[1]);
-                console.log("\n");
-            }
+
+                
+                schedule[week] = mobaLogicHelper.generateWeekMatchups(
+                    matchupPlayerIndices,
+                    leagueMembers,
+                    week
+                );
+                 //= matches;
+                // console.log(schedule[week].players[0]);
+                // console.log(" vs ");
+                // console.log(matchup.players[1]);
+                // console.log("\n");
+            
 
         }
     }
@@ -267,7 +215,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     // }
 
     //Evalautes all matchups for a given week
-    /*function evaluateWeek(uint256 currentWeekNum) 
+    function evaluateWeek(uint256 currentWeekNum) 
         public
         onlyOwner
     {
@@ -277,13 +225,17 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
             // uint256[] memory lineup2 = userLineup[schedule[currentWeekNum][i].players[1]];
         
             //call evaulate match between members of Match
-            address winner = mobaLogicHelper.evaluateMatch(
-                schedule[currentWeekNum][i].players[0], 
-                schedule[currentWeekNum][i].players[1], 
-                currentWeekNum,
-                userLineup[schedule[currentWeekNum][i].players[0]],
-                userLineup[schedule[currentWeekNum][i].players[1]]
-            );
+            // address winner = mobaLogicHelper.evaluateMatch(
+            //     schedule[currentWeekNum][i].players[0], 
+            //     schedule[currentWeekNum][i].players[1], 
+            //     currentWeekNum,
+            //     userLineup[schedule[currentWeekNum][i].players[0]],
+            //     userLineup[schedule[currentWeekNum][i].players[1]]
+            // );
+            // (winner == addr1) ? (
+            //     userToRecord[addr1][currentWeekNum] = 1;
+            //     userToRecord[addr2][currentWeekNum] = 0;
+            // )
             // if (addr1Score > addr2Score) {
             //     userToRecord[addr1][currentWeekNum] = 1;
             //     userToRecord[addr2][currentWeekNum] = 0;
@@ -297,7 +249,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
             // }
         }
     }
-    */
+    
     // Evaluating a match between two users (addresses)
     // Returns which user won
     // TODO: Event emitted for each user matchup
@@ -431,14 +383,14 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     //Given manually inputted athlete stats, return the calculated
     //athleteScores.
     // //Allows verification of our off-chain calculations
-    // function calculateScoreOnChain(Stats calldata athleteStats)
-    //     pure
-    //     public
-    //     returns (uint256 score)  {
-    //     //calculate score with given stats
-    //     //placeholder lol
-    //     return athleteStats.kills * 2;
-    // }
+    function calculateScoreOnChain(Stats calldata athleteStats)
+        pure
+        public
+        returns (uint256 score)  {
+        //calculate score with given stats
+        //placeholder lol
+        return athleteStats.kills * 2;
+    }
 
 
 
