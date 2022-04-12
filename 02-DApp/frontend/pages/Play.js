@@ -79,6 +79,7 @@ export default function Play() {
 
 
     return (
+        // <div>fuck YOU</div>
         <Box>
         {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && 
         <Grid container spacing={3}>
