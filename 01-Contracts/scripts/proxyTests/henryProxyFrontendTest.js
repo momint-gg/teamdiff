@@ -1,12 +1,12 @@
 // @Trey running this as a node script (not hardhat)
 // Don't wanna use any hardhat stuff here bc of lack of Beacon Proxy support
-//Note: Must run with "node henryProxyTest.js" (not npx hardhat...)
+//Note: Must run with "node henryProxyFrontendTest.js" (not npx hardhat...)
 
 require("dotenv").config();
 const { ethers } = require("ethers");
 var Web3 = require("web3");
 const web3 = new Web3("https://cloudflare-eth.com");
-const LeagueBeaconProxyJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
+const LeagueBeaconProxyJSON = require("../../build/contracts/contracts/GameLogic.sol/GameLogic.json");
 
 async function main() {
   console.log("Starting");
@@ -52,13 +52,13 @@ async function main() {
   //#0
   //const txn = await LeagueProxyInstance.methods.incrementVersion().call();
 
-   //#1
+  //#1
   //Use eth.sendTransaction to deployed LeagueProxy Instance
   let accounts = await web3.eth.getAccounts();
-  //web3.eth.defaultAccount = accounts[0];  
+  //web3.eth.defaultAccount = accounts[0];
   const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
   // // const msgData = "0x00";
-  
+
   const txn = await web3.eth.sendTransaction(
     {
       from: accounts[0].address,

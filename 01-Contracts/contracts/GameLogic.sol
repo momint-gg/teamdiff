@@ -10,9 +10,8 @@ import "./Whitelist.sol";
 import "./LeagueMaker.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
-    //TODO create a "LeagueLogic" interface?
+//TODO create a "LeagueLogic" interface?
 contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // Vars
     uint256 public version; // tsting
@@ -29,9 +28,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //mapping(address => uint256) userToTotalWins;
     //Maps each league member to an array that represents a win or loss for each week
     //TODO add logic for bye week?
-        //bye = 2?
-        //win = 1?
-        //loss = 0
+    //bye = 2?
+    //win = 1?
+    //loss = 0
     mapping(address => uint256[8]) public userToRecord;
     //TODO how should we lock this lineUp?
     bool leagueEntryIsClosed;
@@ -41,12 +40,12 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     mapping(address => uint256[]) userLineup;
     //uint256 private totalSupply;// Total supply of USDC
     uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+
     struct Matchup {
         address[2] players;
     }
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
-    
+
     /**********************/
     /* IMMUTABLE STORAGE  */
     /**********************/
@@ -62,7 +61,6 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     Whitelist whitelistContract;
     // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
-
 
     //Events
     event Staked(address sender, uint256 amount);
@@ -80,8 +78,6 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         _;
     }
 
-
-
     //Initialize all parameters of proxy
     function initialize(
         string calldata _name,
@@ -91,11 +87,11 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         bool _isPublic,
         address athletesDataStorageAddress,
         //address _owner,
-        address _admin, 
+        address _admin,
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
         address leagueMakerContractAddress
-        ) public initializer {
+    ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         version = _version;
         leagueName = _name;
@@ -122,7 +118,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     }
 
     //event versionIncremented(uint256 newVersion);
-    function incrementVersion() public  {
+    function incrementVersion() public {
         //console.log("incrementing version:");
         version += 1;
         //console.log(version);
@@ -136,12 +132,10 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     //TODO set to only owner
-    function setLeagueSchedule() 
-        external 
-        onlyOwner
-    {
+    function setLeagueSchedule() external onlyOwner {
         console.log("setting schedule");
-        uint256 randomShifter = ((uint256(
+        uint256 randomShifter = (
+            (uint256(
                 keccak256(
                     abi.encodePacked(
                         block.timestamp,
@@ -150,36 +144,38 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
                         leagueName
                     )
                 )
-            ) + leagueMembers.length * leagueMembers.length));
-            //console.log(randomShifter);
+            ) + leagueMembers.length * leagueMembers.length)
+        );
+        //console.log(randomShifter);
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
-        //essentially splitting the league into two halves, to assign matchups 
+        //essentially splitting the league into two halves, to assign matchups
         uint256[4] memory leftHalf;
         uint256[4] memory rightHalf;
-        for(uint week = 0; week < 8; week++) {
-            console.log("\n"); 
+        for (uint256 week = 0; week < 8; week++) {
+            console.log("\n");
             console.log(week);
             console.log("************************");
 
             uint256 matchupSlots;
             //Create matchup slots that represents 2 * (number of matches each week), which includes byes
-            (leagueMembers.length % 2 == 0) ? (
-                matchupSlots = leagueMembers.length
-            ) : (
-                matchupSlots = (leagueMembers.length + 1)
-            );
+            (leagueMembers.length % 2 == 0)
+                ? (matchupSlots = leagueMembers.length)
+                : (matchupSlots = (leagueMembers.length + 1));
 
             //Grab temp value of rightHalf for final swap
             uint256 rightArrTemp = rightHalf[0];
 
             //fill values of array
-            for(uint256 i = 0; i < matchupSlots / 2; i++) {
+            for (uint256 i = 0; i < matchupSlots / 2; i++) {
                 //set elements of leftHalf and rightHalf to be indexes of users in leagueMembers
-                if(week == 0) {
+                if (week == 0) {
                     //init values in leftHalf and rightHalf with basic starting value
                     leftHalf[(i + randomShifter) % ((matchupSlots / 2))] = i;
-                    rightHalf[(i + randomShifter) % ((matchupSlots / 2))] = i + matchupSlots / 2;
+                    rightHalf[(i + randomShifter) % ((matchupSlots / 2))] =
+                        i +
+                        matchupSlots /
+                        2;
                 }
                 //otherwise rotate all elemnts clockwise between the two arrays
                 //[0, 1, 2, 3] ==> [5, 6, 7, 8]
@@ -188,8 +184,6 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
                     uint256 temp = leftHalf[i];
                     rightHalf[i] = temp;
                     leftHalf[i] = rightHalf[(i + 1) % ((matchupSlots / 2))];
-                
-
                 }
                 //if(i != matchupSlots / 2 - 1 || week == 0) {
                 // if(week == 0) {
@@ -197,37 +191,36 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
                 //     console.log(leftHalf[(i + randomShifter) % ((matchupSlots / 2))]);
                 //     console.log("righthalf end");
                 //     console.log(rightHalf[(i + randomShifter) % ((matchupSlots / 2))]);
-                //     console.log("\n");  
+                //     console.log("\n");
 
                 // }
             }
-            if(week != 0) {
+            if (week != 0) {
                 leftHalf[(matchupSlots / 2) - 1] = rightArrTemp;
                 // console.log("lefthalf last");
                 // console.log(leftHalf[(matchupSlots / 2) - 1]);
                 // console.log("righthalf last");
                 // console.log(rightHalf[(matchupSlots / 2) - 1]);
-                // console.log("\n"); 
+                // console.log("\n");
             }
-            for(uint256 i = 0; i < matchupSlots / 2; i++) {
+            for (uint256 i = 0; i < matchupSlots / 2; i++) {
                 //temporary array to hold single matchup
                 address[2] memory matchupArray;
                 //if matchupslots greater than number of leagueMembers
-                    //just match the last player with bye week (zero address)
-                if(rightHalf[i] >= leagueMembers.length) {
+                //just match the last player with bye week (zero address)
+                if (rightHalf[i] >= leagueMembers.length) {
                     matchupArray = [leagueMembers[leftHalf[i]], address(0)];
-                }
-                else if(leftHalf[i] >= leagueMembers.length) {
+                } else if (leftHalf[i] >= leagueMembers.length) {
                     matchupArray = [address(0), leagueMembers[rightHalf[i]]];
-                }
-                else {
-                    matchupArray = [leagueMembers[leftHalf[i]], leagueMembers[rightHalf[i]]];
+                } else {
+                    matchupArray = [
+                        leagueMembers[leftHalf[i]],
+                        leagueMembers[rightHalf[i]]
+                    ];
                 }
 
                 //Add matchup array to struct, to allow for nested structure
-                Matchup memory matchup = Matchup({
-                    players: matchupArray
-                });                  
+                Matchup memory matchup = Matchup({players: matchupArray});
 
                 //Add matchup to schedule for current week
                 schedule[week].push(matchup);
@@ -236,28 +229,18 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
                 console.log(matchup.players[1]);
                 console.log("\n");
             }
-
         }
     }
 
-    function setLeagueEntryIsClosed() 
-        external 
-        onlyOwner
-    {
+    function setLeagueEntryIsClosed() external onlyOwner {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup()
-        external
-        onlyOwner
-    {
+    function lockLineup() external onlyOwner {
         lineupIsLocked = true;
     }
 
-    function unlockLineup()
-        external
-        onlyOwner
-    {
+    function unlockLineup() external onlyOwner {
         lineupIsLocked = false;
     }
 
@@ -271,25 +254,26 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // }
 
     //Evalautes all matchups for a given week
-    function evaluateWeek(uint256 currentWeekNum) 
-        public
-        onlyOwner
-    {
+    function evaluateWeek(uint256 currentWeekNum) public onlyOwner {
         //call evaulte match for each match in this weeks schedule
-        for(uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
+        for (uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
             //call evaulate match between members of Match
-            evaluateMatch(schedule[currentWeekNum][i].players[0], schedule[currentWeekNum][i].players[1], currentWeekNum);
+            evaluateMatch(
+                schedule[currentWeekNum][i].players[0],
+                schedule[currentWeekNum][i].players[1],
+                currentWeekNum
+            );
         }
     }
 
     // Evaluating a match between two users (addresses)
     // Returns which user won
     // TODO: Event emitted for each user matchup
-    function evaluateMatch(address addr1, address addr2, uint256 currentWeekNum)
-        public
-        onlyOwner
-        returns (address)
-    {
+    function evaluateMatch(
+        address addr1,
+        address addr2,
+        uint256 currentWeekNum
+    ) public onlyOwner returns (address) {
         uint256[] memory lineup1 = userLineup[addr1];
         uint256[] memory lineup2 = userLineup[addr2];
         uint256 addr1Score;
@@ -299,9 +283,9 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         for (uint256 i = 0; i < lineup1.length; i++) {
             // Calling the Athletes.sol contract to get the scores of ith athlete
             uint256[] memory currAthleteScores1 = athletesContract
-                                                .getAthleteScores(lineup1[i]);
+                .getAthleteScores(lineup1[i]);
             uint256[] memory currAthleteScores2 = athletesContract
-                                                .getAthleteScores(lineup2[i]);
+                .getAthleteScores(lineup2[i]);
             // Getting the last score in the array
             uint256 latestScore1 = currAthleteScores1[
                 currAthleteScores1.length - 1
@@ -330,7 +314,7 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
             //userToTotalWins[addr2] += 1;
             return addr2;
         }
-    }    
+    }
 
     /************************************************/
     /***************** GETTERS **********************/
@@ -352,11 +336,10 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //     return stakeAmount * leagueMembers.length;
     // }
 
-        // Returning the lineup for a user
+    // Returning the lineup for a user
     // function getLineup() view public returns (uint256[] memory) {
     //     return userLineup[msg.sender];
     // }
-
 
     /******************************************************/
     /***************** STAKING FUNCTIONS ******************/
@@ -379,10 +362,6 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         return IERC20(_token).balanceOf(address(this));
     }
 
-
-
-
-
     //***************************************************/
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
@@ -393,14 +372,12 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
         userLineup[msg.sender] = athleteIds;
     }
 
-
-
-        // Getter for user to total pts
+    // Getter for user to total pts
     function getUserTotalWins() public view returns (uint256) {
         //return userToTotalWins[msg.sender];
         uint256 winSum = 0;
         uint256 currentWeekNum = leagueMakerContract.currentWeek();
-        for(uint256 i = 0; i <= currentWeekNum; i++) {
+        for (uint256 i = 0; i <= currentWeekNum; i++) {
             winSum += userToRecord[msg.sender][i];
         }
         return winSum;
@@ -422,9 +399,6 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     //     //placeholder lol
     //     return athleteStats.kills * 2;
     // }
-
-
-
 
     /*****************************************************************/
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
@@ -454,13 +428,12 @@ contract GameLogic is Initializable, Ownable, AccessControl, Whitelist {
     // TODO: Should we write this or just make it so that you can't leave once you join?
     function removeFromLeague() public onlyWhitelisted {}
 
-
     // Add user to whitelist
     function addUserToWhitelist() public onlyAdmin {
         whitelist[msg.sender] = true;
     }
 
-        //TODO
+    //TODO
     //1.) View function to calculate score on-chain for a given line-up and week (not started)
     //2.) Pool Prize mechanics (in progress)
     //3.) League membership mechanics (testing)
