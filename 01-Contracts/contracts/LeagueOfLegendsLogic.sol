@@ -123,9 +123,7 @@ contract LeagueOfLegendsLogic is
         //mobaLogicHelper = new MOBALogicHelper();
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
-
         testUSDC = TestUSDC(_testUSDCAddress);
-        emit testUSDCDeployed(msg.sender, address(testUSDC));
 
         console.log("Proxy initialized!");
     }
@@ -305,15 +303,15 @@ contract LeagueOfLegendsLogic is
     /************************************************/
     /***************** GETTERS **********************/
     /************************************************/
-    // function getVersion() view public returns (uint256 version) {
-    //     return version;
-    // }
+    function getVersion() public view returns (uint256 version) {
+        return version;
+    }
 
     function getLeagueName() public view returns (string memory) {
         return leagueName;
     }
 
-    function getStakeAmount() public pure returns (uint256 stakeAmount) {
+    function getStakeAmount() public view returns (uint256) {
         return stakeAmount;
     }
 
@@ -422,7 +420,7 @@ contract LeagueOfLegendsLogic is
 
         //TODO check leagueSize on frontend instead to ensure this operation is valid
         leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
-        // Note: Need to prompt an approval on the frontend before this can work
+        // Important Note: Need to prompt an approval on the frontend before this can work
         testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
     }
@@ -431,8 +429,8 @@ contract LeagueOfLegendsLogic is
     // function removeFromLeague() public onlyWhitelisted {}
 
     // // Add user to whitelist
-    function addUserToWhitelist() public onlyAdmin {
-        whitelist[msg.sender] = true;
+    function addUserToWhitelist(address _userToAdd) public onlyAdmin {
+        whitelist[_userToAdd] = true;
     }
 
     //TODO

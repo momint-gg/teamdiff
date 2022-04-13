@@ -104,7 +104,8 @@ contract LeagueMaker is Ownable {
     function createLeague(
         string calldata _name,
         uint256 _stakeAmount,
-        bool _isPublic
+        bool _isPublic,
+        address _testUSDCAddress // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
     ) external returns (address) {
         parameters = Parameters({
             name: _name,
@@ -117,7 +118,7 @@ contract LeagueMaker is Ownable {
             admin: msg.sender,
             polygonUSDCAddress: _polygonUSDCAddress,
             rinkebyUSDCAddress: _rinkebyUSDCAddress,
-            testUSDCAddress: address(testUSDC)
+            testUSDCAddress: _testUSDCAddress
         });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
