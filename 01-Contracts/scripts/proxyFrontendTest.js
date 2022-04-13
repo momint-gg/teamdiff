@@ -16,6 +16,11 @@ async function main() {
   await MOBALogicLibraryInstance.deployed();
   console.log("MOBALogicLibrary deployed to:", MOBALogicLibraryInstance.address);
 
+  //Create League Maker Library Instance
+  const LeagueMakerLibraryFactory = await ethers.getContractFactory("LeagueMakerLibrary");
+  const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
+  await LeagueMakerLibraryInstance.deployed();
+  console.log("LeagueMakerLibrary deployed to:", LeagueMakerLibraryInstance.address);
   
   //Create Game Logic Instance
   const LeagueOfLegendsLogicFactory = await ethers.getContractFactory("LeagueOfLegendsLogic",{
@@ -28,7 +33,12 @@ async function main() {
   console.log("LeagueOfLegendsLogic deployed to:", LeagueOfLegendsLogicInstance.address);
 
   //Create League Maker INstance
-  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
+  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker", {
+    libraries: {
+      LeagueMakerLibrary: LeagueMakerLibraryInstance.address,
+    }
+  });
+
   const LeagueMakerInstance = await LeagueMakerFactory.deploy(
     LeagueOfLegendsLogicInstance.address
   );
@@ -240,8 +250,9 @@ async function main() {
  
 
     //Set league schedule
-    LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
-    txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
+    //LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
+    // txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
+    txn = await LeagueMakerInstance.setLeagueSchedules();
         
     // const msgData = web3.eth.abi.encodeFunctionSignature("setLeagueSchedule()");
 
