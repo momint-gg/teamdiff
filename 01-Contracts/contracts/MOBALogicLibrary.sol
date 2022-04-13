@@ -218,8 +218,6 @@ library MOBALogicLibrary {
         score += 2 * athleteStats.kills * 100;
         score -= athleteStats.deaths * 100;
         score += athleteStats.assists * 100;
-        //this has to be an int
-        
         score += athleteStats.minionScore * 100 / 50;
         if(athleteStats.kills >= 10) {
             score += 500;
@@ -227,7 +225,7 @@ library MOBALogicLibrary {
         if(athleteStats.assists >= 10) {
             score += 500;
         }
-        //returns the scaled up score by 100
+        //returns the score * 100, can scale down on frontend to enable floats
         return score;
     }   
 

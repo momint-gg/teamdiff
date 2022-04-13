@@ -239,7 +239,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
     // Add user to league
-    //for testing
+    //for testing only
     function addUserToLeague(address user) public {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         if(leagueMembers.length < 8) {
