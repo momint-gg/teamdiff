@@ -14,6 +14,7 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 
 import "./LeagueBeaconProxy.sol";
 import "./Athletes.sol";
+import "./TestUSDC.sol";
 
 //import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 //OPEN ISSUES
@@ -60,6 +61,9 @@ contract LeagueMaker is Ownable {
     UpgradeableBeacon immutable upgradeableBeacon;
     Athletes immutable athletesDataStorage;
 
+    // For staking
+    TestUSDC testUSDC;
+
     // ======== Mutable storage ========
     address beaconAddress;
     address[] public leagueAddresses; //list of all deployed leagueAddresses
@@ -79,6 +83,7 @@ contract LeagueMaker is Ownable {
         address admin;
         address polygonUSDCAddress;
         address rinkebyUSDCAddress;
+        address testUSDCAddress;
     }
     Parameters public parameters;
     uint256 public currentWeek = 0;
@@ -92,6 +97,7 @@ contract LeagueMaker is Ownable {
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
         athletesDataStorage = new Athletes();
+        testUSDC = new TestUSDC(); //will take this out for mainnet, but need for staking
     }
 
     // ======== Deploy New League Proxy ========
@@ -110,11 +116,12 @@ contract LeagueMaker is Ownable {
             owner: address(this),
             admin: msg.sender,
             polygonUSDCAddress: _polygonUSDCAddress,
-            rinkebyUSDCAddress: _rinkebyUSDCAddress
+            rinkebyUSDCAddress: _rinkebyUSDCAddress,
+            testUSDCAddress: address(testUSDC)
         });
         //TODO memory clean-up should be done
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,bool,address,address,address,address,address)",
+            "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
             parameters.name,
             parameters.version,
             //parameters.numWeeks,
@@ -125,8 +132,10 @@ contract LeagueMaker is Ownable {
             parameters.admin,
             parameters.polygonUSDCAddress,
             parameters.rinkebyUSDCAddress,
+            parameters.testUSDCAddress,
             address(this)
         );
+
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
             delegateCallData

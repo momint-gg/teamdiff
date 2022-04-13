@@ -69,11 +69,12 @@ contract LeagueOfLegendsLogic is
     LeagueMaker leagueMakerContract;
     //Our MOBALogicHElper contract
     //MOBALogicHelper mobaLogicHelper;
-    // Test USDC
+    // Test USDC contract
     TestUSDC testUSDC;
 
     //Events
     event Staked(address sender, uint256 amount);
+    event testUSDCDeployed(address sender, address contractAddress);
 
     //Modifiers
     using SafeMath for uint256;
@@ -122,7 +123,9 @@ contract LeagueOfLegendsLogic is
         //mobaLogicHelper = new MOBALogicHelper();
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
+
         testUSDC = TestUSDC(_testUSDCAddress);
+        emit testUSDCDeployed(msg.sender, address(testUSDC));
 
         console.log("Proxy initialized!");
     }
@@ -322,6 +325,11 @@ contract LeagueOfLegendsLogic is
     // Returning the lineup for a user
     function getLineup() public view returns (uint256[] memory) {
         return userLineup[msg.sender];
+    }
+
+    // Getting the test usdc contract address (for testing)
+    function getTestUSDCAddress() public view returns (address) {
+        return address(testUSDC);
     }
 
     /******************************************************/

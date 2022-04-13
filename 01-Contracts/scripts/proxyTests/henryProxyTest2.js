@@ -62,6 +62,13 @@ async function main() {
     }
   }
   console.log("LEAGUE PROXY INSTANCE ADDRESS ", leagueProxyContractAddress);
+
+  LeagueProxyInstance = new ethers.Contract(
+    leagueProxyContractAddress,
+    LeagueOfLegendsLogicJSON.abi,
+    owner
+  );
+  console.log("Proxy instance constructed: ", LeagueProxyInstance);
 }
 
 const runMain = async () => {
