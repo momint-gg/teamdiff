@@ -240,7 +240,7 @@ async function main() {
  
 
     //Set league schedule
-    //LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
+    LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
     txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
         
     // const msgData = web3.eth.abi.encodeFunctionSignature("setLeagueSchedule()");

@@ -16,36 +16,36 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
     //TODO create a "MOBALogic" helper contract?
 contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whitelist {
-    // Vars
+    
+    //*******************/
+    // MUTABLE STORAGE  */
+    /********************/
     uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
     uint256 public currentWeekNum; // Keeping track of week number
     address[] public leagueMembers;
-    //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     address admin;
     //Maps each league member to the running count of their total wins
     //TODO, do we need this data structure?
     mapping(address => uint256) userToTotalWins;
-    //Maps each league member to an array that represents a win or loss for each week
     //TODO add logic for bye week?
         //bye = 2?
         //win = 1?
         //loss = 0
+    //Maps each league member to an array that represents a win or loss for each week
     mapping(address => uint256[8]) public userToRecord;
-    //TODO how should we lock this lineUp?
     bool leagueEntryIsClosed;
     bool lineupIsLocked;
-    //bool isPublic;
     //TODO can we set this to a fixed size line up array of size 5?
     mapping(address => uint256[]) userLineup;
-    //uint256 private totalSupply;// Total supply of USDC
-    uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+    // Amount that will be staked (in USDC) for each league
+    uint256 public stakeAmount; 
+    // Schedule for the league (generated before), maps week # => [matchups]
     struct Matchup {
         address[2] players;
     }
-     mapping(uint256 => Matchup[])  schedule; // Schedule for the league (generated before), maps week # => [matchups]
+     mapping(uint256 => Matchup[])  schedule; 
     
     /**********************/
     /* IMMUTABLE STORAGE  */
@@ -53,7 +53,6 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     struct Stats {
         uint256 kills;
     }
-
     address public polygonUSDCAddress; // When we deploy to mainnet
     address public rinkebyUSDCAddress;
     // Our Athletes.sol contract
@@ -62,13 +61,15 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     Whitelist whitelistContract;
     // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
-    //Our MOBALogicHElper contract
-    //MOBALogicHelper mobaLogicHelper;
 
-    //Events
+    //**************/
+    //*** Events ***/
+    /***************/
     event Staked(address sender, uint256 amount);
 
-    //Modifiers
+    //*****************/
+    //*** Modifiers ***/
+    /******************/
     using SafeMath for uint256;
 
     /**
@@ -132,57 +133,11 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     //TODO set to only owner
+    //Only set to public for testing purposes for now
     function setLeagueSchedule() 
-        public 
+        public
     {
         console.log("setting schedule");
-        // uint256 randomShifter = ((uint256(
-        //         keccak256(
-        //             abi.encodePacked(
-        //                 block.timestamp,
-        //                 msg.sender,
-        //                 block.difficulty,
-        //                 leagueName
-        //             )
-        //         )
-        //     ) + leagueMembers.length * leagueMembers.length));
-            //console.log(randomShifter);
-        //mapping(uint256 => uint256[2][]) storage schedule;
-        //create two arrays of indices that represent indices in leagueMembers
-        //essentially splitting the league into two halves, to assign matchups 
-        // uint256[4] memory leftHalf;
-        // uint256[4] memory rightHalf;
-        /*uint256[8] memory matchupPlayerIndices;
-        for(uint256 week = 0; week < numWeeks; week++) {
-            console.log("\n"); 
-            console.log(week);
-            console.log("************************");
-
-                //generate playerIndices array for each week
-                matchupPlayerIndices = mobaLogicHelper.setMatchupPlayerIndices(
-                    matchupPlayerIndices,
-                    leagueMembers.length,
-                    week,
-                    leagueName
-                );
-                //Add matchup to schedule for current week
-
-                for(uint256 i = 0; i < 4; i++) {
-                    (schedule[week][i].players[0], schedule[week][i].players[1]) = mobaLogicHelper.generateWeekMatchups(
-                        matchupPlayerIndices,
-                        leagueMembers,
-                        week,
-                        i
-                    );
-                }
-                 //= matches;
-                // console.log(schedule[week].players[0]);
-                // console.log(" vs ");
-                // console.log(matchup.players[1]);
-                // console.log("\n");
-            
-
-        }*/
         MOBALogicLibrary.setLeagueSchedule(schedule, leagueMembers, numWeeks, leagueName);
     }
     
@@ -222,35 +177,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         public
         onlyOwner
     {
-        //call evaulte match for each match in this weeks schedule
-        for(uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
-            // uint256[] memory lineup1 = userLineup[schedule[currentWeekNum][i].players[0]];
-            // uint256[] memory lineup2 = userLineup[schedule[currentWeekNum][i].players[1]];
-        
-            //call evaulate match between members of Match
-            // address winner = mobaLogicHelper.evaluateMatch(
-            //     schedule[currentWeekNum][i].players[0], 
-            //     schedule[currentWeekNum][i].players[1], 
-            //     currentWeekNum,
-            //     userLineup[schedule[currentWeekNum][i].players[0]],
-            //     userLineup[schedule[currentWeekNum][i].players[1]]
-            // );
-            // (winner == addr1) ? (
-            //     userToRecord[addr1][currentWeekNum] = 1;
-            //     userToRecord[addr2][currentWeekNum] = 0;
-            // )
-            // if (addr1Score > addr2Score) {
-            //     userToRecord[addr1][currentWeekNum] = 1;
-            //     userToRecord[addr2][currentWeekNum] = 0;
-            //     //userToTotalWins[addr1] += 1;
-            //     return addr1;
-            // } else {
-            //     userToRecord[addr2][currentWeekNum] = 1;
-            //     userToRecord[addr1][currentWeekNum] = 0;
-            //     //userToTotalWins[addr2] += 1;
-            //     return addr2;
-            // }
-        }
+       MOBALogicLibrary.evaluateWeek(schedule, currentWeekNum, athletesContract, userToRecord, userToTotalWins, userLineup);
     }
     
     // Evaluating a match between two users (addresses)
