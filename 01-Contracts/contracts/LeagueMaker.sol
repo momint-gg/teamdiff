@@ -208,18 +208,18 @@ contract LeagueMaker is Ownable {
     }
 
     //Evaluates weekly scores for all matchups in all leagues
-    function evaluateWeekForAllLeagues() public onlyOwner{
-        bool success;
-        bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
-            (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("evaluateWeek(uint)",
-                    currentWeek
-                )
-            );
-            emit Response(success, data);
-        }
-    }
+    // function evaluateWeekForAllLeagues() public onlyOwner{
+    //     bool success;
+    //     bytes memory data;
+    //     for(uint256 i = 0; i < leagueAddresses.length; i++) {
+    //         (success, data) = leagueAddresses[i].call(
+    //             abi.encodeWithSignature("evaluateWeek(uint)",
+    //                 currentWeek
+    //             )
+    //         );
+    //         emit Response(success, data);
+    //     }
+    // }
 
     //TODO set to onlyProxy
         //May need to create new access control privilege here

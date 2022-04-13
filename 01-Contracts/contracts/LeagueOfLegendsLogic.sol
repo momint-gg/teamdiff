@@ -8,7 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
 import "./Whitelist.sol";
 import "./LeagueMaker.sol";
-import "./MOBALogicHelper.sol";
+//import "./MOBALogicHelper.sol";
+import "./MOBALogicLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
@@ -62,7 +63,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
     //Our MOBALogicHElper contract
-    MOBALogicHelper mobaLogicHelper;
+    //MOBALogicHelper mobaLogicHelper;
 
     //Events
     event Staked(address sender, uint256 amount);
@@ -114,7 +115,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist
-        mobaLogicHelper = new MOBALogicHelper();
+        //mobaLogicHelper = new MOBALogicHelper();
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
 
@@ -132,8 +133,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /*************************************************/
     //TODO set to only owner
     function setLeagueSchedule() 
-        external 
-        onlyOwner
+        public 
     {
         console.log("setting schedule");
         // uint256 randomShifter = ((uint256(
@@ -152,7 +152,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         //essentially splitting the league into two halves, to assign matchups 
         // uint256[4] memory leftHalf;
         // uint256[4] memory rightHalf;
-        uint256[8] memory matchupPlayerIndices;
+        /*uint256[8] memory matchupPlayerIndices;
         for(uint256 week = 0; week < numWeeks; week++) {
             console.log("\n"); 
             console.log(week);
@@ -182,7 +182,8 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
                 // console.log("\n");
             
 
-        }
+        }*/
+        MOBALogicLibrary.setLeagueSchedule(schedule, leagueMembers, numWeeks, leagueName);
     }
     
     function setLeagueEntryIsClosed() 
@@ -402,16 +403,16 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /*****************************************************************/
     // Add user to league
     //for testing
-    // function addUserToLeague(address user) public {
-    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
-    //     if(leagueMembers.length < 8) {
-    //         leagueMembers.push(user);
-    //         leagueMakerContract.updateUserToLeagueMapping(user);
-    //     }
-    //     else {
-    //         console.log("too many users in league to add new user");
-    //     }
-    // }
+    function addUserToLeague(address user) public {
+        require(!leagueEntryIsClosed, "League Entry is Closed!");
+        if(leagueMembers.length < 8) {
+            leagueMembers.push(user);
+            leagueMakerContract.updateUserToLeagueMapping(user);
+        }
+        else {
+            console.log("too many users in league to add new user");
+        }
+    }
 
     // User joining the league
     function joinLeague() public onlyWhitelisted {
@@ -420,6 +421,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         //TODO check leagueSize on frontend instead to ensure this operation is valid
         leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
         stake(rinkebyUSDCAddress, stakeAmount);
+
     }
 
     // // TODO: Should we write this or just make it so that you can't leave once you join?
