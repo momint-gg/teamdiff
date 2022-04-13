@@ -11,9 +11,8 @@ import "./LeagueMaker.sol";
 import "./LeagueOfLegendsLogic.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
-    //TODO create a "LeagueLogic" interface?
+//TODO create a "LeagueLogic" interface?
 library MOBALogicLibrary {
     // Vars
     // uint256 public version; // tsting
@@ -30,9 +29,9 @@ library MOBALogicLibrary {
     //mapping(address => uint256) userToTotalWins;
     //Maps each league member to an array that represents a win or loss for each week
     //TODO add logic for bye week?
-        //bye = 2?
-        //win = 1?
-        //loss = 0
+    //bye = 2?
+    //win = 1?
+    //loss = 0
     //mapping(address => uint256[8]) public userToRecord;
     //TODO how should we lock this lineUp?
     // bool leagueEntryIsClosed;
@@ -42,12 +41,12 @@ library MOBALogicLibrary {
     // //mapping(address => uint256[]) userLineup;
     // //uint256 private totalSupply;// Total supply of USDC
     // uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+
     // struct Matchup {
     //     address[2] players;
     // }
     // mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
-    
+
     // /**********************/
     // /* IMMUTABLE STORAGE  */
     // /**********************/
@@ -63,7 +62,6 @@ library MOBALogicLibrary {
     // Whitelist whitelistContract;
     // // Our LeagueMaker contract
     // //LeagueMaker leagueMakerContract;
-
 
     // //Events
     // event Staked(address sender, uint256 amount);
@@ -81,7 +79,6 @@ library MOBALogicLibrary {
     //     _;
     // }
 
-
     // //@dev must be implemented
     // //Initialize all parameters of proxy
     // function initialize(
@@ -92,13 +89,13 @@ library MOBALogicLibrary {
     //     bool _isPublic,
     //     address athletesDataStorageAddress,
     //     //address _owner,
-    //     address _admin, 
+    //     address _admin,
     //     address _polygonUSDCAddress,
     //     address _rinkebyUSDCAddress,
     //     address leagueMakerContractAddress
-    //     ) 
+    //     )
     //     virtual
-    //     public; 
+    //     public;
     //     //initializer;
     // //     //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
     // //     version = _version;
@@ -143,11 +140,10 @@ library MOBALogicLibrary {
         address[] storage leagueMembers,
         uint256 numWeeks,
         string calldata leagueName
-    ) 
-        public 
-    {
+    ) public {
         console.log("setting schedule");
-        uint256 randomShifter = ((uint256(
+        uint256 randomShifter = (
+            (uint256(
                 keccak256(
                     abi.encodePacked(
                         block.timestamp,
@@ -156,36 +152,38 @@ library MOBALogicLibrary {
                         leagueName
                     )
                 )
-            ) + leagueMembers.length * leagueMembers.length));
-            //console.log(randomShifter);
+            ) + leagueMembers.length * leagueMembers.length)
+        );
+        //console.log(randomShifter);
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
-        //essentially splitting the league into two halves, to assign matchups 
+        //essentially splitting the league into two halves, to assign matchups
         uint256[4] memory leftHalf;
         uint256[4] memory rightHalf;
-        for(uint week = 0; week < numWeeks; week++) {
-            console.log("\n"); 
+        for (uint256 week = 0; week < numWeeks; week++) {
+            console.log("\n");
             console.log(week);
             console.log("************************");
 
             uint256 matchupSlots;
             //Create matchup slots that represents 2 * (number of matches each week), which includes byes
-            (leagueMembers.length % 2 == 0) ? (
-                matchupSlots = leagueMembers.length
-            ) : (
-                matchupSlots = (leagueMembers.length + 1)
-            );
+            (leagueMembers.length % 2 == 0)
+                ? (matchupSlots = leagueMembers.length)
+                : (matchupSlots = (leagueMembers.length + 1));
 
             //Grab temp value of rightHalf for final swap
             uint256 rightArrTemp = rightHalf[0];
 
             //fill values of array
-            for(uint256 i = 0; i < matchupSlots / 2; i++) {
+            for (uint256 i = 0; i < matchupSlots / 2; i++) {
                 //set elements of leftHalf and rightHalf to be indexes of users in leagueMembers
-                if(week == 0) {
+                if (week == 0) {
                     //init values in leftHalf and rightHalf with basic starting value
                     leftHalf[(i + randomShifter) % ((matchupSlots / 2))] = i;
-                    rightHalf[(i + randomShifter) % ((matchupSlots / 2))] = i + matchupSlots / 2;
+                    rightHalf[(i + randomShifter) % ((matchupSlots / 2))] =
+                        i +
+                        matchupSlots /
+                        2;
                 }
                 //otherwise rotate all elemnts clockwise between the two arrays
                 //[0, 1, 2, 3] ==> [5, 6, 7, 8]
@@ -194,8 +192,6 @@ library MOBALogicLibrary {
                     uint256 temp = leftHalf[i];
                     rightHalf[i] = temp;
                     leftHalf[i] = rightHalf[(i + 1) % ((matchupSlots / 2))];
-                
-
                 }
                 //if(i != matchupSlots / 2 - 1 || week == 0) {
                 // if(week == 0) {
@@ -203,37 +199,39 @@ library MOBALogicLibrary {
                 //     console.log(leftHalf[(i + randomShifter) % ((matchupSlots / 2))]);
                 //     console.log("righthalf end");
                 //     console.log(rightHalf[(i + randomShifter) % ((matchupSlots / 2))]);
-                //     console.log("\n");  
+                //     console.log("\n");
 
                 // }
             }
-            if(week != 0) {
+            if (week != 0) {
                 leftHalf[(matchupSlots / 2) - 1] = rightArrTemp;
                 // console.log("lefthalf last");
                 // console.log(leftHalf[(matchupSlots / 2) - 1]);
                 // console.log("righthalf last");
                 // console.log(rightHalf[(matchupSlots / 2) - 1]);
-                // console.log("\n"); 
+                // console.log("\n");
             }
-            for(uint256 i = 0; i < matchupSlots / 2; i++) {
+            for (uint256 i = 0; i < matchupSlots / 2; i++) {
                 //temporary array to hold single matchup
                 address[2] memory matchupArray;
                 //if matchupslots greater than number of leagueMembers
-                    //just match the last player with bye week (zero address)
-                if(rightHalf[i] >= leagueMembers.length) {
+                //just match the last player with bye week (zero address)
+                if (rightHalf[i] >= leagueMembers.length) {
                     matchupArray = [leagueMembers[leftHalf[i]], address(0)];
-                }
-                else if(leftHalf[i] >= leagueMembers.length) {
+                } else if (leftHalf[i] >= leagueMembers.length) {
                     matchupArray = [address(0), leagueMembers[rightHalf[i]]];
-                }
-                else {
-                    matchupArray = [leagueMembers[leftHalf[i]], leagueMembers[rightHalf[i]]];
+                } else {
+                    matchupArray = [
+                        leagueMembers[leftHalf[i]],
+                        leagueMembers[rightHalf[i]]
+                    ];
                 }
 
                 //Add matchup array to struct, to allow for nested structure
-                LeagueOfLegendsLogic.Matchup memory matchup = LeagueOfLegendsLogic.Matchup({
-                    players: matchupArray
-                });                  
+                LeagueOfLegendsLogic.Matchup
+                    memory matchup = LeagueOfLegendsLogic.Matchup({
+                        players: matchupArray
+                    });
 
                 //Add matchup to schedule for current week
                 schedule[week].push(matchup);
@@ -242,9 +240,7 @@ library MOBALogicLibrary {
                 console.log(matchup.players[1]);
                 console.log("\n");
             }
-
         }
     }
     //self
-
 }

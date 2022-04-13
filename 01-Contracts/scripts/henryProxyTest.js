@@ -41,7 +41,7 @@ async function main() {
   for (const event of receipt.events) {
     if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
-      //leagueProxyContractAddress = event.args[1];
+      leagueProxyContractAddress = event.args[1];
     }
   }
   console.log("Done incrementing version! ", testIncrementVersion);
@@ -52,13 +52,13 @@ async function main() {
   //#0
   //const txn = await LeagueProxyInstance.methods.incrementVersion().call();
 
-   //#1
+  //#1
   //Use eth.sendTransaction to deployed LeagueProxy Instance
   let accounts = await web3.eth.getAccounts();
-  //web3.eth.defaultAccount = accounts[0];  
+  //web3.eth.defaultAccount = accounts[0];
   const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
   // // const msgData = "0x00";
-  
+
   const txn = await web3.eth.sendTransaction(
     {
       from: accounts[0].address,

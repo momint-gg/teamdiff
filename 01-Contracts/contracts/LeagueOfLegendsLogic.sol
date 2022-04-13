@@ -12,10 +12,14 @@ import "./LeagueMaker.sol";
 import "./MOBALogicLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
-    //TODO create a "MOBALogic" helper contract?
-contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whitelist {
+//TODO create a "MOBALogic" helper contract?
+contract LeagueOfLegendsLogic is
+    Initializable,
+    Ownable,
+    AccessControl,
+    Whitelist
+{
     // Vars
     uint256 public version; // tsting
     string public leagueName;
@@ -29,9 +33,9 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     mapping(address => uint256) userToTotalWins;
     //Maps each league member to an array that represents a win or loss for each week
     //TODO add logic for bye week?
-        //bye = 2?
-        //win = 1?
-        //loss = 0
+    //bye = 2?
+    //win = 1?
+    //loss = 0
     mapping(address => uint256[8]) public userToRecord;
     //TODO how should we lock this lineUp?
     bool leagueEntryIsClosed;
@@ -41,12 +45,12 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     mapping(address => uint256[]) userLineup;
     //uint256 private totalSupply;// Total supply of USDC
     uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+
     struct Matchup {
         address[2] players;
     }
-     mapping(uint256 => Matchup[])  schedule; // Schedule for the league (generated before), maps week # => [matchups]
-    
+    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+
     /**********************/
     /* IMMUTABLE STORAGE  */
     /**********************/
@@ -81,8 +85,6 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         _;
     }
 
-
-
     //Initialize all parameters of proxy
     function initialize(
         string calldata _name,
@@ -92,13 +94,11 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         bool _isPublic,
         address athletesDataStorageAddress,
         //address _owner,
-        address _admin, 
+        address _admin,
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
         address leagueMakerContractAddress
-        ) 
-         
-        public initializer {
+    ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         version = _version;
         leagueName = _name;
@@ -119,12 +119,11 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
 
-
         console.log("Proxy initialized!");
     }
 
     //event versionIncremented(uint256 newVersion);
-    function incrementVersion() public  {
+    function incrementVersion() public {
         version += 1;
     }
 
@@ -132,9 +131,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     //TODO set to only owner
-    function setLeagueSchedule() 
-        public 
-    {
+    function setLeagueSchedule() public {
         console.log("setting schedule");
         // uint256 randomShifter = ((uint256(
         //         keccak256(
@@ -146,10 +143,10 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         //             )
         //         )
         //     ) + leagueMembers.length * leagueMembers.length));
-            //console.log(randomShifter);
+        //console.log(randomShifter);
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
-        //essentially splitting the league into two halves, to assign matchups 
+        //essentially splitting the league into two halves, to assign matchups
         // uint256[4] memory leftHalf;
         // uint256[4] memory rightHalf;
         /*uint256[8] memory matchupPlayerIndices;
@@ -183,54 +180,45 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
             
 
         }*/
-        MOBALogicLibrary.setLeagueSchedule(schedule, leagueMembers, numWeeks, leagueName);
+        MOBALogicLibrary.setLeagueSchedule(
+            schedule,
+            leagueMembers,
+            numWeeks,
+            leagueName
+        );
     }
-    
-    function setLeagueEntryIsClosed() 
-        external 
-        onlyOwner
-    {
+
+    function setLeagueEntryIsClosed() external onlyOwner {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup()
-        external
-        onlyOwner
-    {
+    function lockLineup() external onlyOwner {
         lineupIsLocked = true;
     }
 
-    function unlockLineup()
-        external
-        onlyOwner
-    {
+    function unlockLineup() external onlyOwner {
         lineupIsLocked = false;
     }
-    
 
     // Setting the address for our athlete contract
-    //TODO do we need this?
-    // function setAthleteContractAddress(address _athleteContractAddress)
-    //     public
-    //     onlyOwner
-    // {
-    //     athletesContract = Athletes(_athleteContractAddress);
-    // }
-
-    //Evalautes all matchups for a given week
-    function evaluateWeek(uint256 currentWeekNum) 
+    //TODO do we need this? -- yes we do because we need a way for it to know which contract to call. Unless you have a better way
+    function setAthleteContractAddress(address _athleteContractAddress)
         public
         onlyOwner
     {
+        athletesContract = Athletes(_athleteContractAddress);
+    }
+
+    //Evalautes all matchups for a given week
+    function evaluateWeek(uint256 currentWeekNum) public onlyOwner {
         //call evaulte match for each match in this weeks schedule
-        for(uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
+        for (uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
             // uint256[] memory lineup1 = userLineup[schedule[currentWeekNum][i].players[0]];
             // uint256[] memory lineup2 = userLineup[schedule[currentWeekNum][i].players[1]];
-        
             //call evaulate match between members of Match
             // address winner = mobaLogicHelper.evaluateMatch(
-            //     schedule[currentWeekNum][i].players[0], 
-            //     schedule[currentWeekNum][i].players[1], 
+            //     schedule[currentWeekNum][i].players[0],
+            //     schedule[currentWeekNum][i].players[1],
             //     currentWeekNum,
             //     userLineup[schedule[currentWeekNum][i].players[0]],
             //     userLineup[schedule[currentWeekNum][i].players[1]]
@@ -252,7 +240,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
             // }
         }
     }
-    
+
     // Evaluating a match between two users (addresses)
     // Returns which user won
     // TODO: Event emitted for each user matchup
@@ -311,24 +299,23 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     //     return version;
     // }
 
-    function getLeagueName() view public returns (string memory) {
+    function getLeagueName() public view returns (string memory) {
         return leagueName;
     }
 
-    function getStakeAmount() view public returns (uint256 stakeAmount) {
+    function getStakeAmount() public view returns (uint256 stakeAmount) {
         return stakeAmount;
     }
 
     //Returns total pot of the league
-    function getTotalPrizePot() view public returns (uint256) {
+    function getTotalPrizePot() public view returns (uint256) {
         return stakeAmount * leagueMembers.length;
     }
 
-        // Returning the lineup for a user
-    function getLineup()   view public returns (uint256[] memory) {
+    // Returning the lineup for a user
+    function getLineup() public view returns (uint256[] memory) {
         return userLineup[msg.sender];
     }
-
 
     /******************************************************/
     /***************** STAKING FUNCTIONS ******************/
@@ -351,23 +338,17 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         return IERC20(_token).balanceOf(address(this));
     }
 
-
-
-
-
     //***************************************************/
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
     //Lineup must not be locked
-    function setLineup(uint256[] memory athleteIds)   public {
+    function setLineup(uint256[] memory athleteIds) public {
         require(!lineupIsLocked, "lineup is locked for the week!");
         userLineup[msg.sender] = athleteIds;
     }
 
-
-
-        // Getter for user to total pts
+    // Getter for user to total pts
     // function getUserTotalWins()   public view returns (uint256) {
     //     //return userToTotalWins[msg.sender];
     //     uint256 winSum = 0;
@@ -379,7 +360,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     // }
 
     // Getter for user to weekly pts
-    function getUserRecord()   public view returns (uint256[8] memory) {
+    function getUserRecord() public view returns (uint256[8] memory) {
         return userToRecord[msg.sender];
     }
 
@@ -395,9 +376,6 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     //     return athleteStats.kills * 2;
     // }
 
-
-
-
     /*****************************************************************/
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
@@ -405,11 +383,10 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     //for testing
     function addUserToLeague(address user) public {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
-        if(leagueMembers.length < 8) {
+        if (leagueMembers.length < 8) {
             leagueMembers.push(user);
             leagueMakerContract.updateUserToLeagueMapping(user);
-        }
-        else {
+        } else {
             console.log("too many users in league to add new user");
         }
     }
@@ -421,19 +398,17 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         //TODO check leagueSize on frontend instead to ensure this operation is valid
         leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
         stake(rinkebyUSDCAddress, stakeAmount);
-
     }
 
     // // TODO: Should we write this or just make it so that you can't leave once you join?
     // function removeFromLeague() public onlyWhitelisted {}
-
 
     // // Add user to whitelist
     function addUserToWhitelist() public onlyAdmin {
         whitelist[msg.sender] = true;
     }
 
-        //TODO
+    //TODO
     //1.) View function to calculate score on-chain for a given line-up and week (not started)
     //2.) Pool Prize mechanics (in progress)
     //3.) League membership mechanics (testing)

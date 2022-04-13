@@ -10,10 +10,9 @@ import "./Whitelist.sol";
 import "./LeagueMaker.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
-    //TODO create a "LeagueLogic" interface?
-contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
+//TODO create a "LeagueLogic" interface?
+contract MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     // Vars
     // uint256 public version; // tsting
     // string public leagueName;
@@ -41,13 +40,12 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     // //mapping(address => uint256[]) userLineup;
     // //uint256 private totalSupply;// Total supply of USDC
     // uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+
     struct Matchup {
         address[2] players;
     }
     //mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
     Matchup[] weekMatches;
- 
 
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
@@ -59,13 +57,11 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
         uint256 numOfLeagueMembers,
         uint256 week,
         string calldata leagueName
-        )
-        external
-        returns(uint256[8] memory)
-    {
+    ) external returns (uint256[8] memory) {
         //Matchup[] memory weekMatches;
         console.log("setting schedule");
-        uint256 randomShifter = ((uint256(
+        uint256 randomShifter = (
+            (uint256(
                 keccak256(
                     abi.encodePacked(
                         block.timestamp,
@@ -74,24 +70,27 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
                         leagueName
                     )
                 )
-            ) + numOfLeagueMembers * numOfLeagueMembers));
+            ) + numOfLeagueMembers * numOfLeagueMembers)
+        );
         uint256 matchupSlots;
         //Create matchup slots that represents 2 * (number of matches each week), which includes byes
-        (numOfLeagueMembers % 2 == 0) ? (
-            matchupSlots = numOfLeagueMembers
-        ) : (
-            matchupSlots = (numOfLeagueMembers + 1)
-        );
+        (numOfLeagueMembers % 2 == 0)
+            ? (matchupSlots = numOfLeagueMembers)
+            : (matchupSlots = (numOfLeagueMembers + 1));
         // uint256[4] memory matchupPlayerIndices;
         // uint256[4] memory matchupPlayerIndices;
         uint256 rightArrTemp = matchupPlayerIndices[4];
         //fill values of array
-        for(uint256 i = 0; i < matchupSlots / 2; i++) {
+        for (uint256 i = 0; i < matchupSlots / 2; i++) {
             //set elements of matchupPlayerIndices and rightHalf to be indexes of users in leagueMembers
-            if(week == 0) {
+            if (week == 0) {
                 //init values in leftHAlf and rightHalf with basic starting value
-                matchupPlayerIndices[(i + randomShifter) % ((matchupSlots / 2))] = i;
-                matchupPlayerIndices[(i + randomShifter) % ((matchupSlots / 2)) + 4] = i + matchupSlots / 2;
+                matchupPlayerIndices[
+                    (i + randomShifter) % ((matchupSlots / 2))
+                ] = i;
+                matchupPlayerIndices[
+                    ((i + randomShifter) % ((matchupSlots / 2))) + 4
+                ] = i + matchupSlots / 2;
             }
             //otherwise rotate all elemnts clockwise between the two arrays
             //[0, 1, 2, 3] ==> [5, 6, 7, 8]
@@ -99,8 +98,9 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
             else {
                 uint256 temp = matchupPlayerIndices[i];
                 matchupPlayerIndices[i + 4] = temp;
-                matchupPlayerIndices[i] = matchupPlayerIndices[(i + 1) % ((matchupSlots / 2)) + 4];
-
+                matchupPlayerIndices[i] = matchupPlayerIndices[
+                    ((i + 1) % ((matchupSlots / 2))) + 4
+                ];
             }
             //if(i != matchupSlots / 2 - 1 || week == 0) {
             // if(week == 0) {
@@ -108,17 +108,17 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
             //     console.log(matchupPlayerIndices[(i + randomShifter) % ((matchupSlots / 2))]);
             //     console.log("righthalf end");
             //     console.log(rightHalf[(i + randomShifter) % ((matchupSlots / 2))]);
-            //     console.log("\n");  
+            //     console.log("\n");
 
             // }
         }
-        if(week != 0) {
+        if (week != 0) {
             matchupPlayerIndices[(matchupSlots / 2) - 1] = rightArrTemp;
             // console.log("matchupPlayerIndices last");
             // console.log(matchupPlayerIndices[(matchupSlots / 2) - 1]);
             // console.log("righthalf last");
             // console.log(rightHalf[(matchupSlots / 2) - 1]);
-            // console.log("\n"); 
+            // console.log("\n");
         }
 
         return matchupPlayerIndices;
@@ -129,90 +129,78 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
         address[] calldata leagueMembers,
         uint256 week,
         uint256 i
-
-        )
-        external
-        returns(address, address)
-    {
+    ) external returns (address, address) {
         //Matchup[] memory weekMatches;
         console.log("setting schedule");
         uint256 matchupSlots;
-        (leagueMembers.length % 2 == 0) ? (
-            matchupSlots = leagueMembers.length
-        ) : (
-            matchupSlots = (leagueMembers.length + 1)
-        );
+        (leagueMembers.length % 2 == 0)
+            ? (matchupSlots = leagueMembers.length)
+            : (matchupSlots = (leagueMembers.length + 1));
         //for(uint256 i = 0; i < matchupSlots / 2; i++) {
-            //temporary array to hold single matchup
-            address[2] memory matchupTuple;
-            //if matchupslots greater than number of leagueMembers
-                //just match the last player with bye week (zero address)
-            if(matchupPlayerIndices[i+4] >= leagueMembers.length) {
-                matchupTuple = [leagueMembers[matchupPlayerIndices[i]], address(0)];
-            }
-            else if(matchupPlayerIndices[i] >= leagueMembers.length) {
-                matchupTuple = [address(0), leagueMembers[matchupPlayerIndices[i+4]]];
-            }
-            else {
-                matchupTuple = [leagueMembers[matchupPlayerIndices[i]], leagueMembers[matchupPlayerIndices[i+4]]];
-            }
-            return(matchupTuple[0], matchupTuple[1]);
+        //temporary array to hold single matchup
+        address[2] memory matchupTuple;
+        //if matchupslots greater than number of leagueMembers
+        //just match the last player with bye week (zero address)
+        if (matchupPlayerIndices[i + 4] >= leagueMembers.length) {
+            matchupTuple = [leagueMembers[matchupPlayerIndices[i]], address(0)];
+        } else if (matchupPlayerIndices[i] >= leagueMembers.length) {
+            matchupTuple = [
+                address(0),
+                leagueMembers[matchupPlayerIndices[i + 4]]
+            ];
+        } else {
+            matchupTuple = [
+                leagueMembers[matchupPlayerIndices[i]],
+                leagueMembers[matchupPlayerIndices[i + 4]]
+            ];
+        }
+        return (matchupTuple[0], matchupTuple[1]);
 
+        //Add matchup array to struct, to allow for nested structure
+        // Matchup storage matchup = Matchup({
+        //     players: matchupTuple
+        // });
+        // //return matchup;
 
-            //Add matchup array to struct, to allow for nested structure
-            // Matchup storage matchup = Matchup({
-            //     players: matchupTuple
-            // });    
-            // //return matchup;              
-
-            // //Add matchup to schedule for current week
-            // weekMatches[i] = matchup;
-            // console.log(matchup.players[0]);
-            // console.log(" vs ");
-            // console.log(matchup.players[1]);
-            // console.log("\n");
+        // //Add matchup to schedule for current week
+        // weekMatches[i] = matchup;
+        // console.log(matchup.players[0]);
+        // console.log(" vs ");
+        // console.log(matchup.players[1]);
+        // console.log("\n");
         //}
         //return weekMatches;
     }
 
-
-
     //function setmatchupTuple(uint256 week, )
 
-
     //TODO set to only owner
-    
+
     // function setLeagueScheduleHelper(
     //     uint256[] memory leagueMembers,
     //     uint256 numWeeks,
     //     string leagueName
-    //     ) 
-    //     external 
+    //     )
+    //     external
     //     returns (mapping(uint256 => Matchup[]) memory schedule)
     // {
 
     //     mapping(uint256 => Matchup[]) memory schedule; // Schedule for the league (generated before), maps week # => [matchups]
-        
-
 
     //     //mapping(uint256 => uint256[2][]) storage schedule;
     //     //create two arrays of indices that represent indices in leagueMembers
-    //     //essentially splitting the league into two halves, to assign matchups 
+    //     //essentially splitting the league into two halves, to assign matchups
     //     uint256[4] memory leftHalf;
     //     uint256[4] memory rightHalf;
     //     for(uint week = 0; week < numWeeks; week++) {
-    //         console.log("\n"); 
+    //         console.log("\n");
     //         console.log(week);
     //         console.log("************************");
-
-
-  
 
     //     }
     //     //return schedule;
     // }
 
- 
     // Setting the address for our athlete contract
     //TODO do we need this?
     // function setAthleteContractAddress(address _athleteContractAddress)
@@ -223,7 +211,7 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     // }
 
     //Evalautes all matchups for a given week
-    // function evaluateWeek(uint256 currentWeekNum) 
+    // function evaluateWeek(uint256 currentWeekNum)
     //     public
     //     onlyOwner
     // {
@@ -238,7 +226,7 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     // Returns which user won
     //@dev abtract function must be implement per league contract
     // TODO: Event emitted for each user matchup
-    //TODO put in Athletes, return address of winner 
+    //TODO put in Athletes, return address of winner
     /*function evaluateMatch(
             address addr1, 
             address addr2, 
@@ -344,16 +332,13 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     }
     */
 
-
-
-
     //***************************************************/
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
     //Lineup must not be locked
     //Abstract
-    // function setLineup(uint256[] memory athleteIds) 
+    // function setLineup(uint256[] memory athleteIds)
     //     virtual
     //     public;
     //  {
@@ -361,13 +346,11 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     //     userLineup[msg.sender] = athleteIds;
     // }
 
-
-
-        // Getter for user to total pts
-        //abstract
-    // function getUserTotalWins() 
-    //     public 
-    //     view 
+    // Getter for user to total pts
+    //abstract
+    // function getUserTotalWins()
+    //     public
+    //     view
     //     returns (uint256);
     //  {
     //     //return userToTotalWins[msg.sender];
@@ -380,9 +363,9 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     // }
 
     // Getter for user to weekly pts
-    // function getUserRecord() 
+    // function getUserRecord()
     //     virtual
-    //     public 
+    //     public
     //     view
     //     returns (uint256[8] memory);
     // //  {
@@ -400,9 +383,6 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
         //placeholder lol
         return athleteStats.kills * 2;
     }*/
-
-
-
 
     /*****************************************************************/
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
@@ -438,7 +418,7 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
         whitelist[msg.sender] = true;
     }*/
 
-        //TODO
+    //TODO
     //1.) View function to calculate score on-chain for a given line-up and week (not started)
     //2.) Pool Prize mechanics (in progress)
     //3.) League membership mechanics (testing)
