@@ -11,6 +11,7 @@ import "./LeagueMaker.sol";
 //import "./MOBALogicHelper.sol";
 import "./MOBALogicLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./TestUSDC.sol";
 
 // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
 //TODO create a "MOBALogic" helper contract?
@@ -68,6 +69,8 @@ contract LeagueOfLegendsLogic is
     LeagueMaker leagueMakerContract;
     //Our MOBALogicHElper contract
     //MOBALogicHelper mobaLogicHelper;
+    // Test USDC
+    TestUSDC testUSDC;
 
     //Events
     event Staked(address sender, uint256 amount);
@@ -97,7 +100,8 @@ contract LeagueOfLegendsLogic is
         address _admin,
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
-        address leagueMakerContractAddress
+        address leagueMakerContractAddress,
+        address _testUSDCAddress // need to use testUSDC to be able to test on hardhat
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         version = _version;
@@ -118,6 +122,7 @@ contract LeagueOfLegendsLogic is
         //mobaLogicHelper = new MOBALogicHelper();
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
+        testUSDC = TestUSDC(_testUSDCAddress);
 
         console.log("Proxy initialized!");
     }
@@ -201,13 +206,15 @@ contract LeagueOfLegendsLogic is
     }
 
     // Setting the address for our athlete contract
-    //TODO do we need this? -- yes we do because we need a way for it to know which contract to call. Unless you have a better way
-    function setAthleteContractAddress(address _athleteContractAddress)
-        public
-        onlyOwner
-    {
-        athletesContract = Athletes(_athleteContractAddress);
-    }
+    //TODO do we need this? -- yes we do because we need a way for it to know which contract to call. Could also pass into constructor if we deployed beforehand.
+    // Now that I think about it, should probably pass in the constructor of the LeagueMaker contract / the central one, because the Athletes.sol contract will be the same for each proxy
+    // ^ Looks like you already did that though, so if it works we should be good
+    // function setAthleteContractAddress(address _athleteContractAddress)
+    //     public
+    //     onlyOwner
+    // {
+    //     athletesContract = Athletes(_athleteContractAddress);
+    // }
 
     //Evalautes all matchups for a given week
     function evaluateWeek(uint256 currentWeekNum) public onlyOwner {
@@ -303,7 +310,7 @@ contract LeagueOfLegendsLogic is
         return leagueName;
     }
 
-    function getStakeAmount() public view returns (uint256 stakeAmount) {
+    function getStakeAmount() public pure returns (uint256 stakeAmount) {
         return stakeAmount;
     }
 
@@ -321,21 +328,20 @@ contract LeagueOfLegendsLogic is
     /***************** STAKING FUNCTIONS ******************/
     /******************************************************/
 
-    // User staking the currency
-    // I think this means they won't be able to stake decimal amounts
-    function stake(address _token, uint256 amount) internal {
-        require(amount > 0, "Cannot stake 0");
-        //totalSupply = totalSupply.add(amount);
-        // _balances[msg.sender] = _balances[msg.sender].add(amount);
-        // Before this you should have approved the amount
-        // This will transfer the amount of  _token from caller to contract
-        IERC20(_token).transferFrom(msg.sender, address(this), amount);
-        emit Staked(msg.sender, amount);
+    // Returning the contracts USDC balance
+    function getUSDCBalance() public view returns (uint256) {
+        // Todo for mainnet: replace return statement with the commented out statement
+        // return IERC20(polygonUSDCAddress).balanceOf(address(this));
+
+        return testUSDC.balanceOf(address(this));
     }
 
-    // Returning the contracts USDC balance
-    function getUSDCBalance(address _token) public view returns (uint256) {
-        return IERC20(_token).balanceOf(address(this));
+    // Returning the sender's USDC balance (testing)
+    function getUserUSDCBalance() public view returns (uint256) {
+        // Todo for mainnet: replace return statement with the commented out statement
+        // return IERC20(polygonUSDCAddress).balanceOf(msg.sender);
+
+        return testUSDC.balanceOf(msg.sender);
     }
 
     //***************************************************/
@@ -362,6 +368,16 @@ contract LeagueOfLegendsLogic is
     // Getter for user to weekly pts
     function getUserRecord() public view returns (uint256[8] memory) {
         return userToRecord[msg.sender];
+    }
+
+    // Getter for user to weekly pts
+    function getUserWeeklypts() public view returns (uint256[8] memory) {
+        return userToRecord[msg.sender];
+    }
+
+    // For testing if join league function Works
+    function getUsersLength() public view returns (uint256) {
+        return leagueMembers.length;
     }
 
     //Given manually inputted athlete stats, return the calculated
@@ -392,12 +408,15 @@ contract LeagueOfLegendsLogic is
     }
 
     // User joining the league
+    // I think this means they won't be able to stake decimal amounts
     function joinLeague() public onlyWhitelisted {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
 
         //TODO check leagueSize on frontend instead to ensure this operation is valid
         leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
-        stake(rinkebyUSDCAddress, stakeAmount);
+        // Note: Need to prompt an approval on the frontend before this can work
+        testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
+        emit Staked(msg.sender, stakeAmount);
     }
 
     // // TODO: Should we write this or just make it so that you can't leave once you join?

@@ -1,65 +1,81 @@
-// Moving henryProxyTest.js stuff over here
-// This doesn't work lol let's just use the other script for now...
 const { expect } = require("chai");
-const hre = require("hardhat");
-const LeagueBeaconProxyJSON = require("../build/contracts/contracts/GameLogic.sol/GameLogic.json");
+const { ethers } = require("hardhat");
+const LeagueOfLegendsLogicJSON = artifacts.require("LeagueOfLegendsLogic.sol");
 
-describe("LeagueProxy.test", async () => {
+describe("League Proxy Tests", async () => {
+  // Setting up a proxy to test, deploying contracts
   before(async () => {
-    const provider = new ethers.providers.AlchemyProvider(
-      "rinkeby",
-      process.env.ALCHEMY_KEY
+    //Create MOBA Logic Library instance
+    const MOBALogicLibraryFactory = await ethers.getContractFactory(
+      "MOBALogicLibrary"
     );
-    const wallet = process.env.PRIVATE_KEY;
-    console.log("Making wallet");
-    const signer = new ethers.Wallet(wallet, provider);
-    console.log("Wallet made");
-    // Hardcoded for now...
-    const leagueProxyInstanceAddress =
-      "0x5beBaB6dFcA391A6aC6117346d02D962d389fb57";
-
-    console.log("Constructing the contract ");
-    LeagueProxyInstance = new ethers.Contract(
-      leagueProxyInstanceAddress,
-      LeagueBeaconProxyJSON.abi,
-      signer
+    const MOBALogicLibraryInstance = await MOBALogicLibraryFactory.deploy();
+    await MOBALogicLibraryInstance.deployed();
+    console.log(
+      "MOBALogicLibrary deployed to:",
+      MOBALogicLibraryInstance.address
     );
-  });
 
-  it("Calls incrementVersion() successfully", async () => {
-    let accounts = await web3.eth.getAccounts();
-    //web3.eth.defaultAccount = accounts[0];
-    const msgData = web3.eth.abi.encodeFunctionSignature("incrementVersion()");
-    // // const msgData = "0x00";
-
-    const txn = await web3.eth.sendTransaction(
+    //Create Game Logic Instance
+    const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
+      "LeagueOfLegendsLogic",
       {
-        from: accounts[0].address,
-        to: LeagueProxyInstance.address,
-        //value: 1,     // If you want to send ether with the call.
-        //gas: 2,       // If you want to specify the gas.
-        // gasPrice: ???,  // If you want to specify the gas price.
-        data: msgData,
-      },
-      function (err, transactionHash) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(transactionHash);
-        }
+        libraries: {
+          MOBALogicLibrary: MOBALogicLibraryInstance.address,
+        },
       }
     );
-    console.log("sending transaction...");
+    const LeagueOfLegendsLogicInstance =
+      await LeagueOfLegendsLogicFactory.deploy();
+    await LeagueOfLegendsLogicInstance.deployed();
+    console.log(
+      "LeagueOfLegendsLogic deployed to:",
+      LeagueOfLegendsLogicInstance.address
+    );
+
+    //Create League Maker INstance
+    const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
+    const LeagueMakerInstance = await LeagueMakerFactory.deploy(
+      LeagueOfLegendsLogicInstance.address
+    );
+    await LeagueMakerInstance.deployed();
+    console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
+
+    //Create Beacon Instance
+    const BeaconFactory = await ethers.getContractFactory("UpgradeableBeacon");
+    const BeaconInstance = await BeaconFactory.deploy(
+      LeagueOfLegendsLogicInstance.address
+    );
+    await BeaconInstance.deployed();
+    console.log("Beacon deployed to:", BeaconInstance.address);
+
+    //Signers
+    [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
+      await ethers.getSigners();
+
+    //Create a league proxy instance
+    var txn = await LeagueMakerInstance.createLeague("best league", 10, true);
+    var leagueProxyContractAddress;
     receipt = await txn.wait();
     for (const event of receipt.events) {
       if (event.event != null) {
         console.log(`Event ${event.event} with args ${event.args}`);
-        //leagueProxyContractAddress = event.args[1];
+        leagueProxyContractAddress = event.args[1];
       }
     }
-    console.log(
-      "Logging version after calling incrementVersion() --> ",
-      Number(await LeagueProxyInstance.version())
+    console.log("LEAGUE PROXY INSTANCE ADDRESS ", leagueProxyContractAddress);
+
+    // The actual League Proxy Instance with the above address ^
+    var LeagueProxyInstance = new ethers.Contract(
+      leagueProxyContractAddress,
+      LeagueOfLegendsLogicJSON.abi,
+      rinkebySigner
     );
+  });
+
+  it("Successfully calls increment version to see if proxy is setup correctly", async () => {
+    const testIncrementVersion = await LeagueProxyInstance.incrementVersion();
+    // await testIncrementVersion.wait();
+    console.log(testIncrementVersion);
   });
 });
