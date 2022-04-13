@@ -50,7 +50,6 @@ contract LeagueMaker is Ownable {
     //To use Clone library
     //using Clones for address;
 
-
     // ======= Events ==========
     event LeagueCreated(string name, address a);
     //event cloneCreated(address clone);
@@ -60,7 +59,6 @@ contract LeagueMaker is Ownable {
     // upgradeable beacon
     UpgradeableBeacon immutable upgradeableBeacon;
     Athletes immutable athletesDataStorage;
-    
 
     // ======== Mutable storage ========
     address beaconAddress;
@@ -80,7 +78,7 @@ contract LeagueMaker is Ownable {
         address owner;
         address admin;
         address polygonUSDCAddress;
-        address rinkebyUSDCAddress;        
+        address rinkebyUSDCAddress;
     }
     Parameters public parameters;
     uint256 public currentWeek = 0;
@@ -94,7 +92,6 @@ contract LeagueMaker is Ownable {
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
         athletesDataStorage = new Athletes();
-
     }
 
     // ======== Deploy New League Proxy ========
@@ -102,12 +99,9 @@ contract LeagueMaker is Ownable {
         string calldata _name,
         uint256 _stakeAmount,
         bool _isPublic
-        )
-        external
-        returns ( address )
-    {
+    ) external returns (address) {
         parameters = Parameters({
-            name: _name, 
+            name: _name,
             version: _version,
             numWeeks: _numWeeks,
             stakeAmount: _stakeAmount,
@@ -139,8 +133,7 @@ contract LeagueMaker is Ownable {
         );
 
         leagueAddresses.push(address(proxy));
-        
-        
+
         emit LeagueCreated(parameters.name, address(proxy));
         delete parameters;
         return address(proxy);
@@ -152,17 +145,16 @@ contract LeagueMaker is Ownable {
     }
 
     //TODO set to only owner,
-        //owner will be our Team Diff wallet
-    //Set all schedules for all leagues 
+    //owner will be our Team Diff wallet
+    //Set all schedules for all leagues
     function setLeagueSchedules() public onlyOwner {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueSchedule()")
             );
             emit Response(success, data);
-
         }
     }
 
@@ -172,7 +164,7 @@ contract LeagueMaker is Ownable {
     function lockLeagueMembership() public onlyOwner {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueEntryIsClosed()")
             );
@@ -182,10 +174,10 @@ contract LeagueMaker is Ownable {
 
     //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
     //TODO set to only owner
-    function lockLeagueLineups() public  onlyOwner{
+    function lockLeagueLineups() public onlyOwner {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("lockLineup()")
             );
@@ -195,15 +187,14 @@ contract LeagueMaker is Ownable {
 
     //Unlocking lineups for all leagues
     //TODO set to only owner
-    function unlockLeagueLineups() public onlyOwner{
+    function unlockLeagueLineups() public onlyOwner {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("unlockLineup()")
             );
             emit Response(success, data);
-
         }
     }
 
@@ -222,7 +213,7 @@ contract LeagueMaker is Ownable {
     // }
 
     //TODO set to onlyProxy
-        //May need to create new access control privilege here
+    //May need to create new access control privilege here
     //Add or update userToLeagueMapping with additional pairs
     function updateUserToLeagueMapping(address user) external {
         userToLeagueMap[user].push(msg.sender);
@@ -239,7 +230,6 @@ contract LeagueMaker is Ownable {
     // function getBeacon() public view returns (address) {
     //     return address(upgradeableBeacon);
     // }
-
 
     // Calling a function that does not exist triggers the fallback function.
     // function testCallDoesNotExist(address _addr) public {
