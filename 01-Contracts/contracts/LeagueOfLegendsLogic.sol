@@ -330,6 +330,11 @@ contract LeagueOfLegendsLogic is
         return address(testUSDC);
     }
 
+    // Getting the admin address to make sure it was set correctly
+    function getAdmin() public view returns (address) {
+        return admin;
+    }
+
     /******************************************************/
     /***************** STAKING FUNCTIONS ******************/
     /******************************************************/
@@ -430,7 +435,8 @@ contract LeagueOfLegendsLogic is
 
     // // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
-        whitelist[_userToAdd] = true;
+        whitelistContract.addAddressToWhitelist(_userToAdd);
+        // whitelist[_userToAdd] = true;
     }
 
     //TODO

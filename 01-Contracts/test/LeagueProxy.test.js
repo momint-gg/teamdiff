@@ -135,7 +135,11 @@ describe("LeagueProxy.test", async () => {
 
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
     // TODO: Add addr1 to whitelist before prompting approval/joining the league
+    // Also to fix: Isn't setting admin correctly
     // Adding addr1 to whitelist so they can join the league
+    const admin = await proxyContract.getAdmin();
+    console.log("ADMIN IS ", admin);
+
     const addToWhitelist = await proxyContract
       .connect(owner)
       .addUserToWhitelist(addr1.address);
