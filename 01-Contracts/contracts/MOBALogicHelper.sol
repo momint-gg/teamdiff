@@ -127,10 +127,12 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
     function generateWeekMatchups(
         uint256[8] memory matchupPlayerIndices,
         address[] calldata leagueMembers,
-        uint256 week
+        uint256 week,
+        uint256 i
+
         )
         external
-        returns(Matchup[] memory)
+        returns(address, address)
     {
         //Matchup[] memory weekMatches;
         console.log("setting schedule");
@@ -140,7 +142,7 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
         ) : (
             matchupSlots = (leagueMembers.length + 1)
         );
-        for(uint256 i = 0; i < matchupSlots / 2; i++) {
+        //for(uint256 i = 0; i < matchupSlots / 2; i++) {
             //temporary array to hold single matchup
             address[2] memory matchupTuple;
             //if matchupslots greater than number of leagueMembers
@@ -154,21 +156,23 @@ contract  MOBALogicHelper is Initializable, Ownable, AccessControl, Whitelist {
             else {
                 matchupTuple = [leagueMembers[matchupPlayerIndices[i]], leagueMembers[matchupPlayerIndices[i+4]]];
             }
+            return(matchupTuple[0], matchupTuple[1]);
+
 
             //Add matchup array to struct, to allow for nested structure
-            Matchup memory matchup = Matchup({
-                players: matchupTuple
-            });    
-            //return matchup;              
+            // Matchup storage matchup = Matchup({
+            //     players: matchupTuple
+            // });    
+            // //return matchup;              
 
-            //Add matchup to schedule for current week
-            weekMatches[i] = matchup;
-            console.log(matchup.players[0]);
-            console.log(" vs ");
-            console.log(matchup.players[1]);
-            console.log("\n");
-        }
-        return weekMatches;
+            // //Add matchup to schedule for current week
+            // weekMatches[i] = matchup;
+            // console.log(matchup.players[0]);
+            // console.log(" vs ");
+            // console.log(matchup.players[1]);
+            // console.log("\n");
+        //}
+        //return weekMatches;
     }
 
 

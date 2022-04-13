@@ -25,7 +25,7 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     address admin;
     //Maps each league member to the running count of their total wins
     //TODO, do we need this data structure?
-    //mapping(address => uint256) userToTotalWins;
+    mapping(address => uint256) userToTotalWins;
     //Maps each league member to an array that represents a win or loss for each week
     //TODO add logic for bye week?
         //bye = 2?
@@ -136,16 +136,16 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
         onlyOwner
     {
         console.log("setting schedule");
-        uint256 randomShifter = ((uint256(
-                keccak256(
-                    abi.encodePacked(
-                        block.timestamp,
-                        msg.sender,
-                        block.difficulty,
-                        leagueName
-                    )
-                )
-            ) + leagueMembers.length * leagueMembers.length));
+        // uint256 randomShifter = ((uint256(
+        //         keccak256(
+        //             abi.encodePacked(
+        //                 block.timestamp,
+        //                 msg.sender,
+        //                 block.difficulty,
+        //                 leagueName
+        //             )
+        //         )
+        //     ) + leagueMembers.length * leagueMembers.length));
             //console.log(randomShifter);
         //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
@@ -167,12 +167,14 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
                 );
                 //Add matchup to schedule for current week
 
-                
-                schedule[week] = mobaLogicHelper.generateWeekMatchups(
-                    matchupPlayerIndices,
-                    leagueMembers,
-                    week
-                );
+                for(uint256 i = 0; i < 4; i++) {
+                    (schedule[week][i].players[0], schedule[week][i].players[1]) = mobaLogicHelper.generateWeekMatchups(
+                        matchupPlayerIndices,
+                        leagueMembers,
+                        week,
+                        i
+                    );
+                }
                  //= matches;
                 // console.log(schedule[week].players[0]);
                 // console.log(" vs ");
@@ -304,9 +306,9 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /************************************************/
     /***************** GETTERS **********************/
     /************************************************/
-    function getVersion() view public returns (uint256 version) {
-        return version;
-    }
+    // function getVersion() view public returns (uint256 version) {
+    //     return version;
+    // }
 
     function getLeagueName() view public returns (string memory) {
         return leagueName;
@@ -365,15 +367,15 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
 
 
         // Getter for user to total pts
-    function getUserTotalWins()   public view returns (uint256) {
-        //return userToTotalWins[msg.sender];
-        uint256 winSum = 0;
-        uint256 currentWeekNum = leagueMakerContract.currentWeek();
-        for(uint256 i = 0; i <= currentWeekNum; i++) {
-            winSum += userToRecord[msg.sender][i];
-        }
-        return winSum;
-    }
+    // function getUserTotalWins()   public view returns (uint256) {
+    //     //return userToTotalWins[msg.sender];
+    //     uint256 winSum = 0;
+    //     uint256 currentWeekNum = leagueMakerContract.currentWeek();
+    //     for(uint256 i = 0; i <= currentWeekNum; i++) {
+    //         winSum += userToRecord[msg.sender][i];
+    //     }
+    //     return winSum;
+    // }
 
     // Getter for user to weekly pts
     function getUserRecord()   public view returns (uint256[8] memory) {
@@ -383,14 +385,14 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     //Given manually inputted athlete stats, return the calculated
     //athleteScores.
     // //Allows verification of our off-chain calculations
-    function calculateScoreOnChain(Stats calldata athleteStats)
-        pure
-        public
-        returns (uint256 score)  {
-        //calculate score with given stats
-        //placeholder lol
-        return athleteStats.kills * 2;
-    }
+    // function calculateScoreOnChain(Stats calldata athleteStats)
+    //     pure
+    //     public
+    //     returns (uint256 score)  {
+    //     //calculate score with given stats
+    //     //placeholder lol
+    //     return athleteStats.kills * 2;
+    // }
 
 
 
