@@ -20,15 +20,12 @@ async function main() {
     MOBALogicLibraryInstance.address
   );
 
-<<<<<<< HEAD:01-Contracts/scripts/proxyTests/proxyFrontendTest.js
   //Create League Maker Library Instance
   const LeagueMakerLibraryFactory = await ethers.getContractFactory("LeagueMakerLibrary");
   const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
   await LeagueMakerLibraryInstance.deployed();
   console.log("LeagueMakerLibrary deployed to:", LeagueMakerLibraryInstance.address);
   
-=======
->>>>>>> reducing-contract-size-2:01-Contracts/scripts/proxyFrontendTest.js
   //Create Game Logic Instance
   const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
     "LeagueOfLegendsLogic",
@@ -83,6 +80,7 @@ async function main() {
   /******************/
 
   //Create two league proxy instances
+  //TODO must update 
   var txn = await LeagueMakerInstance.createLeague("best league", 10, true);
   var leagueProxyContractAddress;
   receipt = await txn.wait();
@@ -262,18 +260,12 @@ async function main() {
   //   (await LeagueProxyInstanceWithSigner.leagueMembers(0))
   // )
 
-<<<<<<< HEAD:01-Contracts/scripts/proxyTests/proxyFrontendTest.js
     //Set league schedule
     //LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
     // txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
     txn = await LeagueMakerInstance.setLeagueSchedules();
     receipt = await txn.wait();
     // const msgData = web3.eth.abi.encodeFunctionSignature("setLeagueSchedule()");
-=======
-  //Set league schedule
-  //LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
-  txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
->>>>>>> reducing-contract-size-2:01-Contracts/scripts/proxyFrontendTest.js
 
   // const msgData = web3.eth.abi.encodeFunctionSignature("setLeagueSchedule()");
 
