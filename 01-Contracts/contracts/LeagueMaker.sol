@@ -32,6 +32,8 @@ contract LeagueMaker is Ownable {
     address[] public leagueAddresses; //list of all deployed leagueAddresses
     //Maps Users to all the leagues they are a member of
     mapping(address => address[]) public userToLeagueMap;
+    uint256 version;
+    uint256 numWeeks;
 
     //Proxy Constructor Parameters
     struct Parameters {

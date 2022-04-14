@@ -9,10 +9,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-<<<<<<< HEAD
-//import "./VRFv2Consumer.sol";
-=======
->>>>>>> reducing-contract-size-2
 
 contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
