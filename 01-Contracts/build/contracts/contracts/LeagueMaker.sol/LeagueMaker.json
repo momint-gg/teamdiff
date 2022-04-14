@@ -175,64 +175,6 @@
     },
     {
       "inputs": [],
-      "name": "parameters",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "version",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "numWeeks",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "stakeAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "isPublic",
-          "type": "bool"
-        },
-        {
-          "internalType": "address",
-          "name": "athletesDataStorageAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "admin",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "polygonUSDCAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "rinkebyUSDCAddress",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "renounceOwnership",
       "outputs": [],
       "stateMutability": "nonpayable",

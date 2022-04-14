@@ -23,20 +23,23 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whitelist {
- uint256 public version; // tsting
+     // Vars
+    uint256 public version; // tsting
     string public leagueName;
-    //uint256 public numWeeks; // Length of a split
-    //uint256 public currentWeekNum; // Keeping track of week number
+    uint256 public numWeeks; // Length of a split
+    uint256 public currentWeekNum; // Keeping track of week number
     address[] public leagueMembers;
-    //address[] whitelist;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
-    //address owner;
-    // address admin;
+    address admin;
     //Maps each league member to the running count of their total wins
     //TODO, do we need this data structure?
-    //mapping(address => uint256) userToTotalWins;
+    mapping(address => uint256) userToTotalWins;
     //Maps each league member to an array that represents a win or loss for each week
-    mapping(address => uint256[8]) userToRecord;
+    //TODO add logic for bye week?
+        //bye = 2?
+        //win = 1?
+        //loss = 0
+    mapping(address => uint256[8]) public userToRecord;
     //TODO how should we lock this lineUp?
     bool leagueEntryIsClosed;
     bool lineupIsLocked;
@@ -49,8 +52,30 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whi
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+     mapping(uint256 => Matchup[])  schedule; // Schedule for the league (generated before), maps week # => [matchups]
     
+    /**********************/
+    /* IMMUTABLE STORAGE  */
+    /**********************/
+    struct Stats {
+        uint256 kills;
+    }
+
+    address public polygonUSDCAddress; // When we deploy to mainnet
+    address public rinkebyUSDCAddress;
+    // Our Athletes.sol contract
+    Athletes athletesContract;
+    // Our Whitelist contract
+    Whitelist whitelistContract;
+    // Our LeagueMaker contract
+    LeagueMaker leagueMakerContract;
+    //Our MOBALogicHElper contract
+    //MOBALogicHelper mobaLogicHelper;
+
+    //Events
+    event Staked(address sender, uint256 amount);
+    
+
     /**********************/
     /* IMMUTABLE STORAGE  */
     /**********************/

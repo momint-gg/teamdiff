@@ -19,6 +19,10 @@ contract Athletes is Ownable {
         uint256[] weeklyScores; // e.g. [0,2,1,3,5,...]
     }
 
+    struct Stats {
+        uint256 kills;
+    }
+
     function appendStats(uint256 athleteId, uint256 weeklyScore)
         public
         onlyOwner
@@ -56,10 +60,13 @@ contract Athletes is Ownable {
     }
 
     //TODO calculate score for an athlete entirely on-chain
-    function calculateScoreOnChain(uint256 athleteID) 
+    // //Allows verification of our off-chain calculations
+    function calculateScoreOnChain(Stats calldata athleteStats)
+        pure
         public
-        returns(uint256)
-    {
-        //grab raw stats for this athleteID, and return their calculated score here.
+        returns (uint256 score)  {
+        //calculate score with given stats
+        //placeholder lol
+        return athleteStats.kills * 2;
     }
 }
