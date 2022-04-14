@@ -17,14 +17,16 @@ library LeagueMakerLibrary {
     function setLeagueSchedules(
         address[] storage leagueAddresses
     ) public {
+
         bool success;
         bytes memory data;
         for(uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueSchedule()")
             );
-           // emit LeagueMaker.Response(success, data);
-
+           //emit Response(success, data);
+            console.log("succes: ");
+            console.log(success);
         }
     }
 

@@ -116,11 +116,11 @@ contract  LeagueOfLegendsLogic is Initializable, Ownable, AccessControl, Whiteli
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
-    //TODO set to only owner
+    //TODO set to only owner, hoever, the library needs to also be an owner :/
     //Only set to public for testing purposes for now
     function setLeagueSchedule() 
         external
-        onlyOwner
+        
     {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(schedule, leagueMembers, numWeeks, leagueName);

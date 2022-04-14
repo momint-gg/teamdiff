@@ -49,7 +49,7 @@ contract LeagueMaker is Ownable {
         returns ( address )
     {
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,bool,address,address,address,address,address)",
+            "initialize(string,uint256,bool,address,address,address,address,address)",
             _name, 
             _stakeAmount,
             _isPublic,
@@ -80,6 +80,7 @@ contract LeagueMaker is Ownable {
         //owner will be our Team Diff wallet
     //Set all schedules for all leagues 
     function setLeagueSchedules() public onlyOwner {
+        console.log("setting league schedule in leaguemaker");
         LeagueMakerLibrary.setLeagueSchedules(leagueAddresses);
     }
 
