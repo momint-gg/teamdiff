@@ -440,17 +440,22 @@ class Datafetcher():
 
     def upload_headshots_to_pinata(self):
         print("\n(Step 4/7) Uploading headshots to Pinata...\n")
+        # TODO: Bug - throws an error about missing a pinata key, but it still runs and works
         time.sleep(1)
         subprocess.call(["node", "../pinata/app.js", "-p"])
         print("Done!\n")
 
     def usage():
         print(
-            "\nUSAGE: python3 datafetcher.py -a \"{path/to/athlete_source_file.csv}\" -t \"{Tournament name}\" -d {Number of days in the past to fetch query stats from}\n")
+            "\nUSAGE: python3 datafetcher.py -a \"{path/to/athlete_source_file.csv}\" -t \"{Tournament name}\" -d {Number of days in the past to fetch query stats from}\n (optional) -os")
 
 
 def main():
-    if len(sys.argv) != 7:
+    if len(sys.argv) == 7:
+        only_scrape = False
+    elif len(sys.argv) == 8 and sys.argv[7] == "-os":
+        only_scrape = True
+    else:
         Datafetcher.usage()
         return
 
@@ -479,11 +484,12 @@ def main():
     df.fetch_athlete_game_stats()
     df.aggregate_athlete_game_stats()
 
-    df.upload_headshots_to_pinata()
-    df.fetch_athlete_headshot_data()
+    if not only_scrape:
+        df.upload_headshots_to_pinata()
+        df.fetch_athlete_headshot_data()
 
-    df.create_nft_metadata_ordered()
-    df.create_nft_metadata_random()
+        df.create_nft_metadata_ordered()
+        df.create_nft_metadata_random()
 
     print("\nDatafetch complete!\n")
 

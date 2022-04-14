@@ -35,6 +35,11 @@ The following command will fetch LCS Spring 2022 tournament game stats for all a
 ```
 python3 datafetcher.py -a athletes.csv -t "LCS Spring 2022" -d 7
 ```
+If you are only looking to scrape the athlete data and not pin it to ipfs, add a -os tag at the end of the command:
+
+```
+python3 datafetcher.py -a athletes.csv -t "LCS Spring 2022" -d 7 -os
+```
 
 #### athlete_source_file.csv
 
