@@ -17,7 +17,7 @@ async function main() {
   );
   const wallet = process.env.PRIVATE_KEY;
   console.log("Making wallet");
-  const signer = new ethers.Wallet(wallet, provider);
+  const rinkebySigner = new ethers.Wallet(wallet, provider);
   console.log("Wallet made");
   // Hardcoded for now...
   const leagueProxyInstanceAddress =
@@ -27,7 +27,7 @@ async function main() {
   const LeagueProxyInstance = new ethers.Contract(
     leagueProxyInstanceAddress,
     LeagueBeaconProxyJSON.abi,
-    signer
+    rinkebySigner
   );
 
   console.log(
@@ -41,7 +41,7 @@ async function main() {
   for (const event of receipt.events) {
     if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
-      //leagueProxyContractAddress = event.args[1];
+      leagueProxyContractAddress = event.args[1];
     }
   }
   console.log("Done incrementing version! ", testIncrementVersion);
@@ -49,8 +49,6 @@ async function main() {
     "Logging version after calling incrementVersion() --> ",
     Number(await LeagueProxyInstance.version())
   );
-  //#0
-  //const txn = await LeagueProxyInstance.methods.incrementVersion().call();
 
   //#1
   //Use eth.sendTransaction to deployed LeagueProxy Instance
@@ -77,11 +75,12 @@ async function main() {
     }
   );
   console.log("sending transaction...");
+  var leagueProxyContractAddress;
   receipt = await txn.wait();
   for (const event of receipt.events) {
     if (event.event != null) {
       console.log(`Event ${event.event} with args ${event.args}`);
-      //leagueProxyContractAddress = event.args[1];
+      leagueProxyContractAddress = event.args[1];
     }
   }
   console.log(
