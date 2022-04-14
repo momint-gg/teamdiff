@@ -190,5 +190,46 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
-  // it();
+  // Setting athletes and getting user's lineup
+  it("Correctly sets athlete IDs and gets a user's lineup", async () => {
+    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
+    const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
+
+    let txn = await proxyContract.connect(owner).setLineup(athleteIds);
+    await txn.wait();
+
+    txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
+    await txn.wait();
+
+    const lineup = await proxyContract.connect(owner).getLineup(); // Getting the caller's lineup
+    // console.log("Lineup for owner is ", lineup);
+    await proxyContract.connect(addr1);
+    const lineup2 = await proxyContract.connect(addr1).getLineup();
+    // console.log("Lineup for addr1 is ", lineup2);
+    expect(lineup).to.not.equal(lineup2);
+  });
+
+  // Correctly evaluates the matchup
+  // TODO: Add Athletes contract functions to LeagueOfLegendsLogic.sol
+
+  // it("Correctly evaluates a matchup", async () => {
+  //   // First adding stats for first 10 athletes (0-9)
+  //   console.log("In test");
+  //   for (let i = 0; i < 10; i++) {
+  //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
+  //     let txn = await athleteContract.connect(owner).appendStats(i, randomNum);
+  //     await txn.wait();
+  //   }
+  //   // Setting address of our athlete contract
+  //   let txn = await contract.setAthleteContractAddress(athleteContract.address);
+  //   await txn.wait();
+
+  //   txn = await contract.evaluateMatch(owner.address, addr1.address);
+  //   await txn.wait();
+
+  //   txn = await contract.connect(owner).getUserTotalPts();
+  //   console.log("Weekly pts fow owner ", Number(txn));
+  //   txn = await contract.connect(addr1).getUserTotalPts();
+  //   console.log("Weekly pts for addr1 ", Number(txn));
+  // });
 });
