@@ -9,22 +9,17 @@ import "./LeagueBeaconProxy.sol";
 import "./LeagueMaker.sol";
 
 library LeagueMakerLibrary {
-
-
     //TODO set to only owner,
-        //owner will be our Team Diff wallet
-    //Set all schedules for all leagues 
-    function setLeagueSchedules(
-        address[] storage leagueAddresses
-    ) public {
-
+    //owner will be our Team Diff wallet
+    //Set all schedules for all leagues
+    function setLeagueSchedules(address[] storage leagueAddresses) public {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueSchedule()")
             );
-           //emit Response(success, data);
+            //emit Response(success, data);
             console.log("succes: ");
             console.log(success);
         }
@@ -33,12 +28,10 @@ library LeagueMakerLibrary {
     //Locking lineups for all leagues
     //TODO set to only owner
     //Locks the league Members for all leagues, so nobody new can join or leave
-    function lockLeagueMembership(
-        address[] storage leagueAddresses
-    ) public {
+    function lockLeagueMembership(address[] storage leagueAddresses) public {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("setLeagueEntryIsClosed()")
             );
@@ -48,12 +41,10 @@ library LeagueMakerLibrary {
 
     //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
     //TODO set to only owner
-    function lockLeagueLineups(
-        address[] storage leagueAddresses
-    ) public {
+    function lockLeagueLineups(address[] storage leagueAddresses) public {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("lockLineup()")
             );
@@ -63,17 +54,14 @@ library LeagueMakerLibrary {
 
     //Unlocking lineups for all leagues
     //TODO set to only owner
-    function unlockLeagueLineups(
-        address[] storage leagueAddresses
-    ) public{
+    function unlockLeagueLineups(address[] storage leagueAddresses) public {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
                 abi.encodeWithSignature("unlockLineup()")
             );
             //emit LeagueMaker.Response(success, data);
-
         }
     }
 
@@ -81,14 +69,12 @@ library LeagueMakerLibrary {
     function evaluateWeekForAllLeagues(
         address[] storage leagueAddresses,
         uint256 currentWeek
-    ) public{
+    ) public {
         bool success;
         bytes memory data;
-        for(uint256 i = 0; i < leagueAddresses.length; i++) {
+        for (uint256 i = 0; i < leagueAddresses.length; i++) {
             (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("evaluateWeek(uint)",
-                    currentWeek
-                )
+                abi.encodeWithSignature("evaluateWeek(uint)", currentWeek)
             );
             //emit LeagueMaker.Response(success, data);
         }
