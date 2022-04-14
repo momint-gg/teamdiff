@@ -19,6 +19,17 @@ describe("LeagueProxy.test", async () => {
       MOBALogicLibraryInstance.address
     );
 
+    //Create League Maker Library Instance
+    const LeagueMakerLibraryFactory = await ethers.getContractFactory(
+      "LeagueMakerLibrary"
+    );
+    const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
+    await LeagueMakerLibraryInstance.deployed();
+    console.log(
+      "LeagueMakerLibrary deployed to:",
+      LeagueMakerLibraryInstance.address
+    );
+
     //Create Game Logic Instance
     const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
       "LeagueOfLegendsLogic",
@@ -36,8 +47,13 @@ describe("LeagueProxy.test", async () => {
       LeagueOfLegendsLogicInstance.address
     );
 
-    //Create League Maker INstance
-    const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
+    //Create League Maker Instance
+    const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker", {
+      libraries: {
+        LeagueMakerLibrary: LeagueMakerLibraryInstance.address,
+      },
+    });
+
     const LeagueMakerInstance = await LeagueMakerFactory.deploy(
       LeagueOfLegendsLogicInstance.address
     );
@@ -174,5 +190,5 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
-  it();
+  // it();
 });

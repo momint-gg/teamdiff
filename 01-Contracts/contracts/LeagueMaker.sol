@@ -36,20 +36,21 @@ contract LeagueMaker is Ownable {
     uint256 numWeeks;
 
     //Proxy Constructor Parameters
-    struct Parameters {
-        string name;
-        uint256 version;
-        uint256 numWeeks;
-        uint256 stakeAmount;
-        bool isPublic;
-        address athletesDataStorageAddress;
-        address owner;
-        address admin;
-        address polygonUSDCAddress;
-        address rinkebyUSDCAddress;
-        address testUSDCAddress;
-    }
-    Parameters public parameters;
+    // struct Parameters {
+    //     string name;
+    //     uint256 version;
+    //     uint256 numWeeks;
+    //     uint256 stakeAmount;
+    //     bool isPublic;
+    //     address athletesDataStorageAddress;
+    //     address owner;
+    //     address admin;
+    //     address polygonUSDCAddress;
+    //     address rinkebyUSDCAddress;
+    //     address testUSDCAddress;
+    // }
+    // Parameters public parameters;
+    uint256 _numWeeks = 8;
     uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
@@ -70,33 +71,47 @@ contract LeagueMaker is Ownable {
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
     ) external returns (address) {
-        parameters = Parameters({
-            name: _name,
-            version: _version,
-            numWeeks: _numWeeks,
-            stakeAmount: _stakeAmount,
-            isPublic: _isPublic,
-            athletesDataStorageAddress: address(athletesDataStorage),
-            owner: address(this),
-            admin: _adminAddress,
-            polygonUSDCAddress: _polygonUSDCAddress,
-            rinkebyUSDCAddress: _rinkebyUSDCAddress,
-            testUSDCAddress: _testUSDCAddress
-        });
-        //TODO memory clean-up should be done
+        // parameters = Parameters({
+        //     name: _name,
+        //     version: _version,
+        //     numWeeks: _numWeeks,
+        //     stakeAmount: _stakeAmount,
+        //     isPublic: _isPublic,
+        //     athletesDataStorageAddress: address(athletesDataStorage),
+        //     owner: address(this),
+        //     admin: _adminAddress,
+        //     polygonUSDCAddress: _polygonUSDCAddress,
+        //     rinkebyUSDCAddress: _rinkebyUSDCAddress,
+        //     testUSDCAddress: _testUSDCAddress
+        // });
+        // //TODO memory clean-up should be done
+        // bytes memory delegateCallData = abi.encodeWithSignature(
+        //     "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
+        //     parameters.name,
+        //     parameters.version,
+        //     //parameters.numWeeks,
+        //     parameters.stakeAmount,
+        //     parameters.isPublic,
+        //     parameters.athletesDataStorageAddress,
+        //     //parameters.owner,
+        //     parameters.admin,
+        //     parameters.polygonUSDCAddress,
+        //     parameters.rinkebyUSDCAddress,
+        //     parameters.testUSDCAddress,
+        //     address(this)
+        // );
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
-            parameters.name,
-            parameters.version,
-            //parameters.numWeeks,
-            parameters.stakeAmount,
-            parameters.isPublic,
-            parameters.athletesDataStorageAddress,
-            //parameters.owner,
-            parameters.admin,
-            parameters.polygonUSDCAddress,
-            parameters.rinkebyUSDCAddress,
-            parameters.testUSDCAddress,
+            _name,
+            //_version,
+            _numWeeks,
+            _stakeAmount,
+            _isPublic,
+            address(athletesDataStorage),
+            _adminAddress,
+            _polygonUSDCAddress,
+            _rinkebyUSDCAddress,
+            _testUSDCAddress,
             address(this)
         );
 
@@ -107,8 +122,8 @@ contract LeagueMaker is Ownable {
 
         leagueAddresses.push(address(proxy));
 
-        emit LeagueCreated(parameters.name, address(proxy));
-        delete parameters;
+        emit LeagueCreated(_name, address(proxy));
+        // delete parameters;
         return address(proxy);
     }
 

@@ -21,7 +21,7 @@ contract LeagueOfLegendsLogic is
     Whitelist
 {
     // Vars
-    uint256 public version; // tsting
+    //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
     uint256 public currentWeekNum; // Keeping track of week number
@@ -44,7 +44,7 @@ contract LeagueOfLegendsLogic is
     //TODO can we set this to a fixed size line up array of size 5?
     mapping(address => uint256[]) userLineup;
     //uint256 private totalSupply;// Total supply of USDC
-    uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
+    //uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
 
     struct Matchup {
         address[2] players;
@@ -105,8 +105,8 @@ contract LeagueOfLegendsLogic is
     //Initialize all parameters of proxy
     function initialize(
         string calldata _name,
-        uint256 _version,
-        // uint256 _numWeeks,
+        //uint256 _version,
+        uint256 _numWeeks,
         uint256 _stakeAmount,
         bool _isPublic,
         address athletesDataStorageAddress,
@@ -141,9 +141,9 @@ contract LeagueOfLegendsLogic is
     }
 
     //event versionIncremented(uint256 newVersion);
-    function incrementVersion() public {
-        version += 1;
-    }
+    // function incrementVersion() public {
+    //     version += 1;
+    // }
 
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/

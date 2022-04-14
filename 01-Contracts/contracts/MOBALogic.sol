@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.0;
+pragma solidity ^0.8.0;
 // import "hardhat/console.sol";
 // import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 // import "@openzeppelin/contracts/access/Ownable.sol";
@@ -9,7 +9,6 @@
 // import "./Whitelist.sol";
 // import "./LeagueMaker.sol";
 // import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
 
 // // contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
 //     //TODO create a "LeagueLogic" interface?
@@ -41,12 +40,12 @@
 //     //mapping(address => uint256[]) userLineup;
 //     //uint256 private totalSupply;// Total supply of USDC
 //     uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+
 //     struct Matchup {
 //         address[2] players;
 //     }
 //     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
-    
+
 //     /**********************/
 //     /* IMMUTABLE STORAGE  */
 //     /**********************/
@@ -62,7 +61,6 @@
 //     Whitelist whitelistContract;
 //     // Our LeagueMaker contract
 //     //LeagueMaker leagueMakerContract;
-
 
 //     //Events
 //     event Staked(address sender, uint256 amount);
@@ -80,7 +78,6 @@
 //         _;
 //     }
 
-
 //     //@dev must be implemented
 //     //Initialize all parameters of proxy
 //     function initialize(
@@ -91,13 +88,13 @@
 //         bool _isPublic,
 //         address athletesDataStorageAddress,
 //         //address _owner,
-//         address _admin, 
+//         address _admin,
 //         address _polygonUSDCAddress,
 //         address _rinkebyUSDCAddress,
 //         address leagueMakerContractAddress
-//         ) 
+//         )
 //         virtual
-//         public; 
+//         public;
 //         //initializer;
 //     //     //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
 //     //     version = _version;
@@ -133,8 +130,8 @@
 //     /************ TEAM DIFF ONLY FUNCTIONS ***********/
 //     /*************************************************/
 //     //TODO set to only owner
-//     function setLeagueSchedule() 
-//         external 
+//     function setLeagueSchedule()
+//         external
 //         onlyOwner
 //     {
 //         console.log("setting schedule");
@@ -151,11 +148,11 @@
 //             //console.log(randomShifter);
 //         //mapping(uint256 => uint256[2][]) storage schedule;
 //         //create two arrays of indices that represent indices in leagueMembers
-//         //essentially splitting the league into two halves, to assign matchups 
+//         //essentially splitting the league into two halves, to assign matchups
 //         uint256[4] memory leftHalf;
 //         uint256[4] memory rightHalf;
 //         for(uint week = 0; week < numWeeks; week++) {
-//             console.log("\n"); 
+//             console.log("\n");
 //             console.log(week);
 //             console.log("************************");
 
@@ -185,7 +182,6 @@
 //                     uint256 temp = leftHalf[i];
 //                     rightHalf[i] = temp;
 //                     leftHalf[i] = rightHalf[(i + 1) % ((matchupSlots / 2))];
-                
 
 //                 }
 //                 //if(i != matchupSlots / 2 - 1 || week == 0) {
@@ -194,7 +190,7 @@
 //                 //     console.log(leftHalf[(i + randomShifter) % ((matchupSlots / 2))]);
 //                 //     console.log("righthalf end");
 //                 //     console.log(rightHalf[(i + randomShifter) % ((matchupSlots / 2))]);
-//                 //     console.log("\n");  
+//                 //     console.log("\n");
 
 //                 // }
 //             }
@@ -204,7 +200,7 @@
 //                 // console.log(leftHalf[(matchupSlots / 2) - 1]);
 //                 // console.log("righthalf last");
 //                 // console.log(rightHalf[(matchupSlots / 2) - 1]);
-//                 // console.log("\n"); 
+//                 // console.log("\n");
 //             }
 //             for(uint256 i = 0; i < matchupSlots / 2; i++) {
 //                 //temporary array to hold single matchup
@@ -224,7 +220,7 @@
 //                 //Add matchup array to struct, to allow for nested structure
 //                 Matchup memory matchup = Matchup({
 //                     players: matchupArray
-//                 });                  
+//                 });
 
 //                 //Add matchup to schedule for current week
 //                 schedule[week].push(matchup);
@@ -237,8 +233,8 @@
 //         }
 //     }
 
-//     function setLeagueEntryIsClosed() 
-//         external 
+//     function setLeagueEntryIsClosed()
+//         external
 //         onlyOwner
 //     {
 //         leagueEntryIsClosed = true;
@@ -268,7 +264,7 @@
 //     // }
 
 //     //Evalautes all matchups for a given week
-//     function evaluateWeek(uint256 currentWeekNum) 
+//     function evaluateWeek(uint256 currentWeekNum)
 //         public
 //         onlyOwner
 //     {
@@ -329,7 +325,7 @@
 //             //userToTotalWins[addr2] += 1;
 //             return addr2;
 //         }
-//     }    
+//     }
 //     */
 //     /************************************************/
 //     /***************** GETTERS **********************/
@@ -352,15 +348,14 @@
 //     }
 
 //     //    Returning the lineup for a user
-//     function getLineup() 
+//     function getLineup()
 //         virtual
-//         view 
+//         view
 //         public
 //         returns (uint256[] memory);
 //     //  {
 //     //     return userLineup[msg.sender];
 //     // }
-
 
 //     /******************************************************/
 //     /***************** STAKING FUNCTIONS ******************/
@@ -383,17 +378,13 @@
 //         return IERC20(_token).balanceOf(address(this));
 //     }
 
-
-
-
-
 //     //***************************************************/
 //     //*************** LEAGUE PLAY FUNCTION **************/
 //     //***************************************************/
 //     // Setting the lineup for a user
 //     //Lineup must not be locked
 //     //Abstract
-//     function setLineup(uint256[] memory athleteIds) 
+//     function setLineup(uint256[] memory athleteIds)
 //         virtual
 //         public;
 //     //  {
@@ -401,14 +392,12 @@
 //     //     userLineup[msg.sender] = athleteIds;
 //     // }
 
-
-
 //         // Getter for user to total pts
 //         //abstract
-//     function getUserTotalWins() 
+//     function getUserTotalWins()
 //         virtual
-//         public 
-//         view 
+//         public
+//         view
 //         returns (uint256);
 //     //  {
 //     //     //return userToTotalWins[msg.sender];
@@ -421,9 +410,9 @@
 //     // }
 
 //     // Getter for user to weekly pts
-//     function getUserRecord() 
+//     function getUserRecord()
 //         virtual
-//         public 
+//         public
 //         view
 //         returns (uint256[8] memory);
 //     //  {
@@ -441,9 +430,6 @@
 //     //     //placeholder lol
 //     //     return athleteStats.kills * 2;
 //     // }
-
-
-
 
 //     /*****************************************************************/
 //     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
@@ -472,7 +458,6 @@
 
 //     // TODO: Should we write this or just make it so that you can't leave once you join?
 //     //function removeFromLeague() public onlyWhitelisted {}
-
 
 //     // Add user to whitelist
 //     function addUserToWhitelist() public onlyAdmin {
