@@ -27,6 +27,7 @@ contract LeagueOfLegendsLogic is
     uint256 public numWeeks; // Length of a split
     uint256 public currentWeekNum; // Keeping track of week number
     address[] public leagueMembers;
+
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     address admin;
     //Maps each league member to the running count of their total wins
@@ -84,16 +85,24 @@ contract LeagueOfLegendsLogic is
      * The creator of the league will be set to Admin, and have admin privileges
      */
     modifier onlyAdmin() {
-        // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+        require(msg.sender == admin, "Caller is not the admin");
         _;
     }
+
+    // modifier onlyAdmin() {
+    //     // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
+    //     require(
+    //         hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
+    //         "Caller is not the admin"
+    //     );
+    //     _;
+    // }
 
     //Initialize all parameters of proxy
     function initialize(
         string calldata _name,
         uint256 _version,
-        //uint256 _numWeeks,
+        // uint256 _numWeeks,
         uint256 _stakeAmount,
         bool _isPublic,
         address athletesDataStorageAddress,
@@ -101,8 +110,8 @@ contract LeagueOfLegendsLogic is
         address _admin,
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
-        address leagueMakerContractAddress,
-        address _testUSDCAddress // need to use testUSDC to be able to test on hardhat
+        address _testUSDCAddress, // need to use testUSDC to be able to test on hardhat
+        address leagueMakerContractAddress
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         version = _version;
@@ -110,8 +119,9 @@ contract LeagueOfLegendsLogic is
         numWeeks = uint256(8);
         //currentWeekNum = uint256(0);
         //totalSupply = uint256(0);
-        _setupRole(DEFAULT_ADMIN_ROLE, _admin);
+        _setupRole(DEFAULT_ADMIN_ROLE, _admin); // This isn't working for some reason @Trey so I am editing the modifier
         leagueMembers.push(_admin);
+        admin = _admin;
         stakeAmount = _stakeAmount;
         isPublic = _isPublic;
         lineupIsLocked = false;
@@ -355,6 +365,20 @@ contract LeagueOfLegendsLogic is
         return testUSDC.balanceOf(msg.sender);
     }
 
+    // // Delegates the prize pool for the league (for now, entire stake amount goes to the winner but we can change that)
+    function onLeagueEnd() public {
+        uint256 contractBalance = testUSDC.balanceOf(address(this));
+        address winner;
+        // Calculating the winner (may want to just update each week instead of doing this way...)
+        for (uint256 i = 0; i < leagueMembers.length; i++) {
+            if (userToTotalWins[leagueMembers[i]] > userToTotalWins[winner]) {
+                winner = leagueMembers[i];
+            }
+        }
+        // Approval on front end first, then transfer with the below
+        testUSDC.transferFrom(msg.sender, address(this), contractBalance);
+    }
+
     //***************************************************/
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
@@ -424,16 +448,18 @@ contract LeagueOfLegendsLogic is
         require(!leagueEntryIsClosed, "League Entry is Closed!");
 
         //TODO check leagueSize on frontend instead to ensure this operation is valid
-        leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array
-        // Important Note: Need to prompt an approval on the frontend before this can work
+        leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array/list
+
+        // Todo for mainnet: replace transferFrom staement with commented out (remember to prompt for approval of transaction on frontend!)
+        // IERC20(polygonUSDCAddress).transferFrom(msg.sender, address(this), stakeAmount)
         testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
     }
 
-    // // TODO: Should we write this or just make it so that you can't leave once you join?
+    // TODO: Should we write this or just make it so that you can't leave once you join?
     // function removeFromLeague() public onlyWhitelisted {}
 
-    // // Add user to whitelist
+    // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
         whitelistContract.addAddressToWhitelist(_userToAdd);
         // whitelist[_userToAdd] = true;
@@ -445,15 +471,4 @@ contract LeagueOfLegendsLogic is
     //3.) League membership mechanics (testing)
     //4.) League schedule creation mechanics (testing)
     //5.) lock set line-up with onlyOwner function (testing)
-
-    //TODO Henry:
-    // Add whitelist logic
-    // List of users that can join league, if you join the league
-    // When user joins league they pay an amount set by the league admin (payable function)
-    // Amount is in USDC
-    // Initially set by the league owner, cannot be reset
-    // If user is whitelisted, then they can join the league
-    // If whitelist has a length of 0 then ignore whitelist, anyone can join the league
-
-    // Start prize pool mechanics
 }

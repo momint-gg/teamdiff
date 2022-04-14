@@ -105,6 +105,7 @@ contract LeagueMaker is Ownable {
         string calldata _name,
         uint256 _stakeAmount,
         bool _isPublic,
+        address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
     ) external returns (address) {
         parameters = Parameters({
@@ -115,7 +116,7 @@ contract LeagueMaker is Ownable {
             isPublic: _isPublic,
             athletesDataStorageAddress: address(athletesDataStorage),
             owner: address(this),
-            admin: msg.sender,
+            admin: _adminAddress,
             polygonUSDCAddress: _polygonUSDCAddress,
             rinkebyUSDCAddress: _rinkebyUSDCAddress,
             testUSDCAddress: _testUSDCAddress

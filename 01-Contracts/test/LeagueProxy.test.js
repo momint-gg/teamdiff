@@ -63,11 +63,13 @@ describe("LeagueProxy.test", async () => {
     testUsdcContract.connect(owner);
     console.log("Test USDC Deployed to: " + testUsdcContract.address);
 
-    //Create a league proxy instance
+    // User creating a league proxy instance
+    console.log("User address is ", owner.address);
     var txn = await LeagueMakerInstance.createLeague(
       "best league",
       10,
       true,
+      owner.address, // Admin for proxy contract (league)
       testUsdcContract.address
     );
     var leagueProxyContractAddress;
@@ -88,22 +90,31 @@ describe("LeagueProxy.test", async () => {
       provider
     );
     proxyContract = LeagueProxyInstance.connect(owner);
-    console.log(proxyContract.functions);
   });
 
   // MAKING SURE LEAGUE WAS SETUP CORRECTLY
   it("Successfully gets stake amount for the proxy", async () => {
     const testStakeAmount = await proxyContract.getStakeAmount();
-    console.log(testStakeAmount);
 
     expect(Number(testStakeAmount)).to.equal(10);
   });
 
   it("Successfully gets the name for the proxy", async () => {
     const name = await proxyContract.getLeagueName();
-    console.log(name);
 
     expect(name).to.equal("best league");
+  });
+
+  it("Sets the admin role correctly", async () => {
+    const admin = await proxyContract.getAdmin();
+
+    expect(admin).to.equal(owner.address);
+  });
+
+  it("Set the TestUSDC Address correctly", async () => {
+    const addy = await proxyContract.getTestUSDCAddress();
+
+    expect(addy).to.equal(testUsdcContract.address);
   });
 
   // TESTING STAKING
@@ -114,44 +125,54 @@ describe("LeagueProxy.test", async () => {
     );
     expect(Number(initialLOLTUSDCBalance)).to.be.greaterThan(0);
 
-    let approval = await testUsdcContract.approve(owner.address, 10);
+    let approval = await testUsdcContract.approve(owner.address, 20);
     await approval.wait();
 
     let txn = await testUsdcContract.transferFrom(
       owner.address,
       addr1.address,
-      10
+      20
     );
     await txn.wait();
 
-    // Sender should now have 10 (test) USDC
+    // Sender should now have 20 (test) USDC
     expect(Number(await testUsdcContract.balanceOf(addr1.address))).to.equal(
-      10
+      20
     );
     expect(Number(await testUsdcContract.balanceOf(owner.address))).to.equal(
-      90
+      80
     );
   });
 
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
     // TODO: Add addr1 to whitelist before prompting approval/joining the league
-    // Also to fix: Isn't setting admin correctly
     // Adding addr1 to whitelist so they can join the league
-    const admin = await proxyContract.getAdmin();
-    console.log("ADMIN IS ", admin);
 
+    // The admin (owner) adding addr1 to whitelist
     const addToWhitelist = await proxyContract
       .connect(owner)
       .addUserToWhitelist(addr1.address);
+    await addToWhitelist.wait();
 
-    let approval = await testUsdcContract.approve(addr1.address, 10);
+    // Prompting approval for addr1
+    let approval = await testUsdcContract
+      .connect(addr1)
+      .approve(proxyContract.address, 10);
     await approval.wait();
 
-    await proxyContract.connect(addr1).joinLeague();
+    // Addr1 joining the league and staking the 10 USDC
+    let join = await proxyContract.connect(addr1).joinLeague();
+    await join.wait();
 
-    // Proxy contract balance should be updated
+    // Proxy contract balance and user balance should be updated
     expect(
       Number(await testUsdcContract.balanceOf(proxyContract.address))
     ).to.equal(10); // USDC Should be transferred to the league proxy
+    expect(Number(await testUsdcContract.balanceOf(addr1.address))).to.equal(
+      //20-10
+      10
+    );
   });
+
+  it();
 });
