@@ -219,9 +219,8 @@ describe("LeagueProxy.test", async () => {
   });
 
   // Correctly evaluates the matchup between two users
-  it("Correctly evaluates a matchup", async () => {
+  it("Correctly appends stats for athletes and evaluates a matchup", async () => {
     // Adding random stats for first 10 athletes (0-9)
-    console.log("In test");
     for (let i = 0; i < 10; i++) {
       const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
       let txn = await AthletesContractInstance.connect(owner).appendStats(
@@ -239,9 +238,9 @@ describe("LeagueProxy.test", async () => {
     console.log("Winner of the match is ", evalMatch);
 
     // Making sure the state variables were updated in LeagueOfLegendsLogic
-    txn = await proxyContract.connect(owner).getUserTotalPts();
-    console.log("Weekly pts fow owner ", Number(txn));
-    txn = await proxyConytract.connect(addr1).getUserTotalPts();
-    console.log("Weekly pts for addr1 ", Number(txn));
+    const ownerPts = await proxyContract.connect(owner).getUserTotalPts();
+    console.log("Weekly pts fow owner ", Number(ownerPts));
+    const addr1Pts = await proxyContract.connect(addr1).getUserTotalPts();
+    console.log("Weekly pts for addr1 ", Number(addr1Pts));
   });
 });

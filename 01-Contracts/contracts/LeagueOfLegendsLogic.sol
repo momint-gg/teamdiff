@@ -327,6 +327,11 @@ contract LeagueOfLegendsLogic is
         return leagueMembers.length;
     }
 
+    // Getter for user to total pts
+    function getUserTotalPts() public view returns (uint256) {
+        return userToTotalWins[msg.sender];
+    }
+
     //Given manually inputted athlete stats, return the calculated
     //athleteScores.
     // //Allows verification of our off-chain calculations
