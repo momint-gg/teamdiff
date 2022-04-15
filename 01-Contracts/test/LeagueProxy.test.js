@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
 const TestUSDCJSON = artifacts.require("TestUSDC.sol");
+const AthletesJSON = artifacts.require("Athletes.sol");
 
 // NOTE: For now, proxy tests must be run on rinkeby (hardhat doesn't support yet)
 // Make sure youre wallet has a lot of rinkey eth!
@@ -12,7 +13,7 @@ describe("LeagueProxy.test", async () => {
     const MOBALogicLibraryFactory = await ethers.getContractFactory(
       "MOBALogicLibrary"
     );
-    const MOBALogicLibraryInstance = await MOBALogicLibraryFactory.deploy();
+    MOBALogicLibraryInstance = await MOBALogicLibraryFactory.deploy();
     await MOBALogicLibraryInstance.deployed();
     console.log(
       "MOBALogicLibrary deployed to:",
@@ -160,6 +161,19 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
+  it("Gets the athletes contract address and constructs it (so we can test adding to it n shit) ", async () => {
+    const athleteContractAddress =
+      await proxyContract.getAthleteContractAddress();
+    // console.log(athleteContractAddress);
+
+    AthletesContractInstance = new ethers.Contract(
+      athleteContractAddress,
+      AthletesJSON.abi,
+      provider
+    );
+    AthletesContractInstance.connect(owner);
+  });
+
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
     // TODO: Add addr1 to whitelist before prompting approval/joining the league
     // Adding addr1 to whitelist so they can join the league
@@ -210,21 +224,21 @@ describe("LeagueProxy.test", async () => {
   });
 
   // Correctly evaluates the matchup
-  // TODO: Add Athletes contract functions to LeagueOfLegendsLogic.sol
-
   // it("Correctly evaluates a matchup", async () => {
   //   // First adding stats for first 10 athletes (0-9)
   //   console.log("In test");
   //   for (let i = 0; i < 10; i++) {
   //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
-  //     let txn = await athleteContract.connect(owner).appendStats(i, randomNum);
+  //     let txn = await AthletesContractInstance.connect(owner).appendStats(
+  //       i,
+  //       randomNum
+  //     );
   //     await txn.wait();
   //   }
-  //   // Setting address of our athlete contract
-  //   let txn = await contract.setAthleteContractAddress(athleteContract.address);
-  //   await txn.wait();
-
-  //   txn = await contract.evaluateMatch(owner.address, addr1.address);
+  //   // Setting address of our athlete contract //--> (dont need to do anymore)
+  //   // let txn = await contract.setAthleteContractAddress(athleteContract.address);
+  //   // await txn.wait();
+  //   // Call eval match function
   //   await txn.wait();
 
   //   txn = await contract.connect(owner).getUserTotalPts();

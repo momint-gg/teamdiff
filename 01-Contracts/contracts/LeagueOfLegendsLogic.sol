@@ -228,6 +228,16 @@ contract LeagueOfLegendsLogic is
         return admin;
     }
 
+    // Getting the athletes contract address
+    function getAthleteContractAddress() public view returns (address) {
+        return address(athletesContract);
+    }
+
+    // Gets the current week #
+    function getCurrentWeekNum() public view returns (uint256) {
+        return currentWeekNum;
+    }
+
     /******************************************************/
     /***************** STAKING FUNCTIONS ******************/
     /******************************************************/
