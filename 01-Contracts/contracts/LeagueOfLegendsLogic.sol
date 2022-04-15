@@ -174,6 +174,7 @@ contract LeagueOfLegendsLogic is
 
     // Setting the address for our athlete contract
     //TODO do we need this?
+    // Maybe
     // function setAthleteContractAddress(address _athleteContractAddress)
     //     public
     //     onlyOwner
@@ -191,6 +192,24 @@ contract LeagueOfLegendsLogic is
             userToTotalWins,
             userLineup
         );
+    }
+
+    // Evaluates match between two users
+    function evaluateMatch(address addr1, address addr2)
+        public
+        returns (address)
+    {
+        return
+            MOBALogicLibrary.evaluateMatch(
+                addr1,
+                addr2,
+                currentWeekNum,
+                athletesContract,
+                userLineup[addr1],
+                userLineup[addr2],
+                userToRecord,
+                userToTotalWins
+            );
     }
 
     /************************************************/

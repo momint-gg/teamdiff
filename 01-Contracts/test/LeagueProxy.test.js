@@ -80,6 +80,13 @@ describe("LeagueProxy.test", async () => {
     testUsdcContract.connect(owner);
     console.log("Test USDC Deployed to: " + testUsdcContract.address);
 
+    // Deploying athletes contract
+    AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
+    AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+    await AthletesContractInstance.deployed();
+    AthletesContractInstance.connect(owner);
+    console.log("Test USDC Deployed to: " + AthletesContractInstance.address);
+
     // User creating a league proxy instance
     console.log("User address is ", owner.address);
     var txn = await LeagueMakerInstance.createLeague(
@@ -87,7 +94,8 @@ describe("LeagueProxy.test", async () => {
       10,
       true,
       owner.address, // Admin for proxy contract (league)
-      testUsdcContract.address
+      testUsdcContract.address,
+      AthletesContractInstance.address
     );
     var leagueProxyContractAddress;
     receipt = await txn.wait();
@@ -161,19 +169,6 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
-  it("Gets the athletes contract address and constructs it (so we can test adding to it n shit) ", async () => {
-    const athleteContractAddress =
-      await proxyContract.getAthleteContractAddress();
-    // console.log(athleteContractAddress);
-
-    AthletesContractInstance = new ethers.Contract(
-      athleteContractAddress,
-      AthletesJSON.abi,
-      provider
-    );
-    AthletesContractInstance.connect(owner);
-  });
-
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
     // TODO: Add addr1 to whitelist before prompting approval/joining the league
     // Adding addr1 to whitelist so they can join the league
@@ -223,27 +218,30 @@ describe("LeagueProxy.test", async () => {
     expect(lineup).to.not.equal(lineup2);
   });
 
-  // Correctly evaluates the matchup
-  // it("Correctly evaluates a matchup", async () => {
-  //   // First adding stats for first 10 athletes (0-9)
-  //   console.log("In test");
-  //   for (let i = 0; i < 10; i++) {
-  //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
-  //     let txn = await AthletesContractInstance.connect(owner).appendStats(
-  //       i,
-  //       randomNum
-  //     );
-  //     await txn.wait();
-  //   }
-  //   // Setting address of our athlete contract //--> (dont need to do anymore)
-  //   // let txn = await contract.setAthleteContractAddress(athleteContract.address);
-  //   // await txn.wait();
-  //   // Call eval match function
-  //   await txn.wait();
+  // Correctly evaluates the matchup between two users
+  it("Correctly evaluates a matchup", async () => {
+    // Adding random stats for first 10 athletes (0-9)
+    console.log("In test");
+    for (let i = 0; i < 10; i++) {
+      const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
+      let txn = await AthletesContractInstance.connect(owner).appendStats(
+        i,
+        randomNum
+      );
+      await txn.wait();
+    }
 
-  //   txn = await contract.connect(owner).getUserTotalPts();
-  //   console.log("Weekly pts fow owner ", Number(txn));
-  //   txn = await contract.connect(addr1).getUserTotalPts();
-  //   console.log("Weekly pts for addr1 ", Number(txn));
-  // });
+    // Calling evaluateMatch from LeagueOfLegendsLogic
+    const evalMatch = await proxyContract
+      .connect(owner)
+      .evaluateMatch(owner.address, addr1.address);
+    await evalMatch.wait();
+    console.log("Winner of the match is ", evalMatch);
+
+    // Making sure the state variables were updated in LeagueOfLegendsLogic
+    txn = await proxyContract.connect(owner).getUserTotalPts();
+    console.log("Weekly pts fow owner ", Number(txn));
+    txn = await proxyConytract.connect(addr1).getUserTotalPts();
+    console.log("Weekly pts for addr1 ", Number(txn));
+  });
 });

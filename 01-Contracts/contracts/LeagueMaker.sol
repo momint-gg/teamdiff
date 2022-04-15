@@ -22,7 +22,7 @@ contract LeagueMaker is Ownable {
 
     // ======== Immutable storage ========
     UpgradeableBeacon immutable upgradeableBeacon;
-    Athletes immutable athletesDataStorage;
+    // Athletes immutable athletesDataStorage;
 
     // For staking
     TestUSDC testUSDC;
@@ -59,7 +59,7 @@ contract LeagueMaker is Ownable {
     // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
-        athletesDataStorage = new Athletes();
+        // athletesDataStorage = new Athletes(); // Moved to pass this in the create league function
         testUSDC = new TestUSDC(); //will take this out for mainnet, but need for staking
     }
 
@@ -69,7 +69,8 @@ contract LeagueMaker is Ownable {
         uint256 _stakeAmount,
         bool _isPublic,
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
-        address _testUSDCAddress // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
+        address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
+        address _athletesContractAddress
     ) external returns (address) {
         // parameters = Parameters({
         //     name: _name,
@@ -107,7 +108,7 @@ contract LeagueMaker is Ownable {
             _numWeeks,
             _stakeAmount,
             _isPublic,
-            address(athletesDataStorage),
+            _athletesContractAddress,
             _adminAddress,
             _polygonUSDCAddress,
             _rinkebyUSDCAddress,
