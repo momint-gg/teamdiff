@@ -238,19 +238,26 @@ describe("LeagueProxy.test", async () => {
     // console.log("Winner of the match is ", evalMatch);
   });
 
+  // Testing evaluateMatch
+  // It's working lets goooooooooooo
   it("Updates the mappings for owner and addr1 after match is evaluated", async () => {
     // Making sure the state variables were updated in LeagueOfLegendsLogic
+
     const ownerPts = await proxyContract.connect(owner).getUserTotalPts();
     const addr1Pts = await proxyContract.connect(addr1).getUserTotalPts();
     const ownerPtVal = Number(ownerPts);
     const addr1PtVal = Number(addr1Pts);
+
+    ownerWins = ownerPtVal === 1;
+    addr1Wins = addr1PtVal === 1;
+
     const ownerRecord = await proxyContract.connect(owner).getUserRecord();
     const addr1Record = await proxyContract.connect(addr1).getUserRecord();
     const ownerRecordFirstWeek = Number(ownerRecord[0]);
     const addr1RecordFirstWeek = Number(addr1Record[0]);
 
     // Making sure the mappings were all updated (total pts, record)
-    if (ownerPtVal === 0) {
+    if (addr1Wins) {
       // addr 1 wins
       expect(addr1PtVal).to.equal(1);
       expect(addr1RecordFirstWeek).to.equal(1);
@@ -258,6 +265,45 @@ describe("LeagueProxy.test", async () => {
       // owner wins
       expect(ownerPtVal).to.equal(1);
       expect(ownerRecordFirstWeek).to.equal(1);
+    }
+  });
+
+  // Testing prize pool functionality
+  it("Delegates the prize pool to the winner of the league", async () => {
+    // Getting prev balance of owner and addr1
+    const oldOwnerBalance = Number(
+      await testUsdcContract.balanceOf(owner.address)
+    );
+    const oldAddr1Balance = Number(
+      await testUsdcContract.balanceOf(addr1.address)
+    );
+
+    // First approve allowance for league to xfer the money out
+    const prizePoolAmount = Number(await proxyContract.getTotalPrizePot());
+    let approval = await testUsdcContract.approve(
+      proxyContract.address,
+      prizePoolAmount
+    );
+    await approval.wait();
+
+    // Now delegating the prize pool to the winner
+    const delegatePool = await proxyContract.onLeagueEnd();
+    await delegatePool.wait();
+
+    // Making sure balances are correct! -- whoever wins is given the prize pool
+    if (ownerWins) {
+      expect(
+        Number(await testUsdcContract.balanceOf(owner.address)) -
+          oldOwnerBalance ==
+          prizePoolAmount
+      );
+    }
+    if (addr1Wins) {
+      expect(
+        Number(await testUsdcContract.balanceOf(addr1.address)) -
+          oldAddr1Balance ==
+          prizePoolAmount
+      );
     }
   });
 });

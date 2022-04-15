@@ -277,9 +277,9 @@ contract LeagueOfLegendsLogic is
         return testUSDC.balanceOf(msg.sender);
     }
 
-    // // Delegates the prize pool for the league (for now, entire stake amount goes to the winner but we can change that)
+    // Delegates the prize pool for the league (for now, entire stake amount goes to the winner but we can change that)
     function onLeagueEnd() public {
-        uint256 contractBalance = testUSDC.balanceOf(address(this));
+        uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner;
         // Calculating the winner (may want to just update each week instead of doing this way...)
         for (uint256 i = 0; i < leagueMembers.length; i++) {
