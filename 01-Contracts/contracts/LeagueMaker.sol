@@ -72,35 +72,6 @@ contract LeagueMaker is Ownable {
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
         address _athletesContractAddress
     ) external returns (address) {
-        // parameters = Parameters({
-        //     name: _name,
-        //     version: _version,
-        //     numWeeks: _numWeeks,
-        //     stakeAmount: _stakeAmount,
-        //     isPublic: _isPublic,
-        //     athletesDataStorageAddress: address(athletesDataStorage),
-        //     owner: address(this),
-        //     admin: _adminAddress,
-        //     polygonUSDCAddress: _polygonUSDCAddress,
-        //     rinkebyUSDCAddress: _rinkebyUSDCAddress,
-        //     testUSDCAddress: _testUSDCAddress
-        // });
-        // //TODO memory clean-up should be done
-        // bytes memory delegateCallData = abi.encodeWithSignature(
-        //     "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
-        //     parameters.name,
-        //     parameters.version,
-        //     //parameters.numWeeks,
-        //     parameters.stakeAmount,
-        //     parameters.isPublic,
-        //     parameters.athletesDataStorageAddress,
-        //     //parameters.owner,
-        //     parameters.admin,
-        //     parameters.polygonUSDCAddress,
-        //     parameters.rinkebyUSDCAddress,
-        //     parameters.testUSDCAddress,
-        //     address(this)
-        // );
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
             _name,
@@ -130,6 +101,7 @@ contract LeagueMaker is Ownable {
 
     //Create onlyOwner function to update week
     function incrementCurrentWeek() public onlyOwner {
+        //TODO Must update the current week for all proxys
         currentWeek += 1;
     }
 
@@ -202,11 +174,12 @@ contract LeagueMaker is Ownable {
         userToLeagueMap[user].push(msg.sender);
     }
 
-    function setBeacon(address logic) external returns (address) {
-        //parameters = Parameters({name: _name});
-        UpgradeableBeacon newBeacon = new UpgradeableBeacon(logic);
-        //delete parameters;
-        beaconAddress = address(newBeacon);
-        return address(newBeacon);
-    }
+    //TODO remove for prod
+    // function setBeacon(address logic) external returns (address) {
+    //     //parameters = Parameters({name: _name});
+    //     UpgradeableBeacon newBeacon = new UpgradeableBeacon(logic);
+    //     //delete parameters;
+    //     beaconAddress = address(newBeacon);
+    //     return address(newBeacon);
+    // }
 }

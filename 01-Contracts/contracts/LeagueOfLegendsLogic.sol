@@ -24,6 +24,7 @@ contract LeagueOfLegendsLogic is
     //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
+    //TODO get rid of this state var, and instead read the currentWeekNum from LeagueMaker.sol
     uint256 public currentWeekNum; // Keeping track of week number
     // Amount that will be staked (in USDC) for each league
     uint256 public stakeAmount;
@@ -195,22 +196,23 @@ contract LeagueOfLegendsLogic is
     }
 
     // Evaluates match between two users
-    function evaluateMatch(address addr1, address addr2)
-        public
-        returns (address)
-    {
-        return
-            MOBALogicLibrary.evaluateMatch(
-                addr1,
-                addr2,
-                currentWeekNum,
-                athletesContract,
-                userLineup[addr1],
-                userLineup[addr2],
-                userToRecord,
-                userToTotalWins
-            );
-    }
+    //TODO remove this function, we should need it
+    // function evaluateMatch(address addr1, address addr2)
+    //     public
+    //     returns (address)
+    // {
+    //     return
+    //         MOBALogicLibrary.evaluateMatch(
+    //             addr1,
+    //             addr2,
+    //             currentWeekNum,
+    //             athletesContract,
+    //             userLineup[addr1],
+    //             userLineup[addr2],
+    //             userToRecord,
+    //             userToTotalWins
+    //         );
+    // }
 
     /************************************************/
     /***************** GETTERS **********************/
@@ -243,16 +245,19 @@ contract LeagueOfLegendsLogic is
     }
 
     // Getting the admin address to make sure it was set correctly
+    //TODO remove for prod
     function getAdmin() public view returns (address) {
         return admin;
     }
 
     // Getting the athletes contract address
+    //TODO remove for prod
     function getAthleteContractAddress() public view returns (address) {
         return address(athletesContract);
     }
 
     // Gets the current week #
+    //TODO remove for prod
     function getCurrentWeekNum() public view returns (uint256) {
         return currentWeekNum;
     }
@@ -318,6 +323,7 @@ contract LeagueOfLegendsLogic is
     }
 
     // For testing if join league function Works
+    //TODO remove for prod
     function getUsersLength() public view returns (uint256) {
         return leagueMembers.length;
     }
@@ -344,21 +350,22 @@ contract LeagueOfLegendsLogic is
     /*****************************************************************/
     // Add user to league
     //for testing only
-    function addUserToLeague(address user) public {
-        require(!leagueEntryIsClosed, "League Entry is Closed!");
-        if (leagueMembers.length < 8) {
-            leagueMembers.push(user);
-            leagueMakerContract.updateUserToLeagueMapping(user);
-        } else {
-            console.log("too many users in league to add new user");
-        }
-    }
+    //TODO remove for prod
+    // function addUserToLeague(address user) public {
+    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
+    //     if (leagueMembers.length < 8) {
+    //         leagueMembers.push(user);
+    //         leagueMakerContract.updateUserToLeagueMapping(user);
+    //     } else {
+    //         console.log("too many users in league to add new user");
+    //     }
+    // }
 
     // User joining the league
     // I think this means they won't be able to stake decimal amounts
     function joinLeague() public onlyWhitelisted {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
-
+        //TODO require that league size is under 8
         //TODO check leagueSize on frontend instead to ensure this operation is valid
         leagueMembers.push(msg.sender); // Maybe change this later to a map if it's gas inefficient as an array/list
 
