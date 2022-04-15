@@ -235,12 +235,29 @@ describe("LeagueProxy.test", async () => {
       .connect(owner)
       .evaluateMatch(owner.address, addr1.address);
     await evalMatch.wait();
-    console.log("Winner of the match is ", evalMatch);
+    // console.log("Winner of the match is ", evalMatch);
+  });
 
+  it("Updates the mappings for owner and addr1 after match is evaluated", async () => {
     // Making sure the state variables were updated in LeagueOfLegendsLogic
     const ownerPts = await proxyContract.connect(owner).getUserTotalPts();
-    console.log("Weekly pts fow owner ", Number(ownerPts));
     const addr1Pts = await proxyContract.connect(addr1).getUserTotalPts();
-    console.log("Weekly pts for addr1 ", Number(addr1Pts));
+    const ownerPtVal = Number(ownerPts);
+    const addr1PtVal = Number(addr1Pts);
+    const ownerRecord = await proxyContract.connect(owner).getUserRecord();
+    const addr1Record = await proxyContract.connect(addr1).getUserRecord();
+    const ownerRecordFirstWeek = Number(ownerRecord[0]);
+    const addr1RecordFirstWeek = Number(addr1Record[0]);
+
+    // Making sure the mappings were all updated (total pts, record)
+    if (ownerPtVal === 0) {
+      // addr 1 wins
+      expect(addr1PtVal).to.equal(1);
+      expect(addr1RecordFirstWeek).to.equal(1);
+    } else {
+      // owner wins
+      expect(ownerPtVal).to.equal(1);
+      expect(ownerRecordFirstWeek).to.equal(1);
+    }
   });
 });

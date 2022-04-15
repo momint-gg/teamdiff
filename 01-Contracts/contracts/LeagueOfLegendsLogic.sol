@@ -317,11 +317,6 @@ contract LeagueOfLegendsLogic is
         return userToRecord[msg.sender];
     }
 
-    // Getter for user to weekly pts
-    function getUserWeeklypts() public view returns (uint256[8] memory) {
-        return userToRecord[msg.sender];
-    }
-
     // For testing if join league function Works
     function getUsersLength() public view returns (uint256) {
         return leagueMembers.length;
