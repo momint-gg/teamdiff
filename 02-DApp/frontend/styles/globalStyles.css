@@ -1,10 +1,15 @@
 /*Global Styles imported in _app.js */
-@import url('https://fonts.googleapis.com/css?family=Exo+2');
+@import url("https://fonts.googleapis.com/css?family=Exo+2");
 /*Element styles*/
-h1, h2, h3, h4, h5, h6, h7 {
-    font-family: 'Exo+2', 'normal';
-    weight: 400;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h7 {
+  font-family: "Exo+2", "normal";
+  weight: 400;
 }
-
 
 /*class styles*/

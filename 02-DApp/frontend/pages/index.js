@@ -1,45 +1,44 @@
-import React from 'react'
+import React from "react";
 import Footer from "../components/Footer";
-import { Provider, chain, defaultChains } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import { WalletLinkConnector } from 'wagmi/connectors/walletLink'
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import TabPanel from '@mui/lab/TabPanel'
-import TabList from '@mui/lab/TabList';
-import TabContext from '@mui/lab/TabContext'
-import Typography from '@mui/material/Typography';
-import logo from '../assets/images/logo.png';
-import Image from 'next/image';
+import { Provider, chain, defaultChains } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { WalletLinkConnector } from "wagmi/connectors/walletLink";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import TabPanel from "@mui/lab/TabPanel";
+import TabList from "@mui/lab/TabList";
+import TabContext from "@mui/lab/TabContext";
+import Typography from "@mui/material/Typography";
+import logo from "../assets/images/logo.png";
+import Image from "next/image";
 
-//************* */
+//* ************ */
 // Custom Page Imports
-//********************** */
-import About from './about';
-import MintPack from './mintPack';
-import Collection from './collection';
-import MintHome from './mintHome';
+//* ********************* */
+import About from "./about";
+import MintPack from "./mintPack";
+import Collection from "./collection";
+import MintHome from "./mintHome";
 
-//******************* */
+//* ****************** */
 //  Component Imports */
-//******************* */
-import ConnectWallet from './connectWallet';
+//* ****************** */
+import ConnectWallet from "./connectWallet";
 import BurnPack from "./burnPack";
-import WalletLogin from '../components/WalletLogin';
-
+import WalletLogin from "../components/WalletLogin";
 
 // API key for Ethereum node
-const infuraId = process.env.INFURA_ID
+const infuraId = process.env.INFURA_ID;
 
 // Chains for connectors to support
-const chains = defaultChains
+const chains = defaultChains;
 
 // Set up connectors
 const connectors = ({ chainId }) => {
   const rpcUrl =
     chains.find((x) => x.id === chainId)?.rpcUrls?.[0] ??
-    chain.mainnet.rpcUrls[0]
+    chain.mainnet.rpcUrls[0];
   return [
     new InjectedConnector({
       chains,
@@ -53,15 +52,15 @@ const connectors = ({ chainId }) => {
     }),
     new WalletLinkConnector({
       options: {
-        appName: 'Momint',
+        appName: "Momint",
         jsonRpcUrl: `${rpcUrl}/${infuraId}`,
       },
     }),
-  ]
-}
+  ];
+};
 
 export default function Index(props) {
-  const [value, setValue] = React.useState('0');
+  const [value, setValue] = React.useState("0");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -72,26 +71,24 @@ export default function Index(props) {
       <Provider autoConnect connectors={connectors}>
         <Box>
           <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            p: 1,
-            m: 1,
-            borderRadius: 1,
-            alignItems: 'center',
-          }}>
-          <Image
-            src={logo}
-            alt="TeamDiff logo"
-          />
-          <WalletLogin/>           
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              p: 1,
+              m: 1,
+              borderRadius: 1,
+              alignItems: "center",
+            }}
+          >
+            <Image src={logo} alt="TeamDiff logo" />
+            <WalletLogin />
           </Box>
           <TabContext value={value}>
             <Box>
               {/* //Do we want to have this be a SPA with all tabs?
               This might be an issue when certain tabs are fetching data, but maybe not */}
-              <TabList 
-                onChange={handleChange} 
+              <TabList
+                onChange={handleChange}
                 indicatorColor="secondary"
                 textColor="white"
               >
@@ -120,10 +117,10 @@ export default function Index(props) {
               <ConnectWallet />
             </TabPanel>
           </TabContext>
-          <Footer/>
+          <Footer />
         </Box>
       </Provider>
     );
-}
-return null;
+  }
+  return null;
 }
