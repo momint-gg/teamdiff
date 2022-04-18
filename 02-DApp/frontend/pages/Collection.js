@@ -4,7 +4,7 @@ import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
 import constants from "../Constants";
-import ConnectWallet from "./ConnectWallet";
+import ConnectWallet from "./connectWallet";
 import AthleteCardModal from "../components/AthleteCardModal";
 
 export default function Collection() {

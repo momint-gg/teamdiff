@@ -50,19 +50,19 @@ const connectors = ({ chainId }) => {
 function MyApp({ Component, pageProps }) {
   return (
     <Provider autoConnect connectors={connectors}>
-    <ThemeProvider theme={theme}>
-    <Layout>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2" />
+      <ThemeProvider theme={theme}>
+        <Layout>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2" />
 
-      <Head>
-      <title>Play TeamDiff</title>
-      <meta name="description" content="Play TeamDiff and Earn Today" />
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
-      <CssBaseline />
-      <Component {...pageProps} />
-    </Layout>
-    </ThemeProvider>
+          <Head>
+            <title>Play TeamDiff</title>
+            <meta name="description" content="Play TeamDiff and Earn Today" />
+            <link rel="icon" href="/favicon.ico" />
+          </Head>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </Layout>
+      </ThemeProvider>
     </Provider>
   );
 }
