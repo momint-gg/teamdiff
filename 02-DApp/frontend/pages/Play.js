@@ -79,37 +79,36 @@ export default function Play() {
 
 
     return (
-        <div>fuck YOU</div>
-        // <Box>
-        // {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && 
-        // <Grid container spacing={3}>
-        //     <Grid item xs={4}>
-        //         <Card variant="outlined" onClick={() => setDisplayMyLeagues(true)}>{myLeagues}</Card>
-        //     </Grid>
-        //     <Grid item xs={4}>
-        //         <Card variant="outlined" onClick={() => setDisplayJoinLeague(true)}>{joinLeague}</Card>
-        //     </Grid>
-        //     <Grid item xs={4}>
-        //         <Card variant="outlined" onClick={() => setDisplayCreateLeague(true)}>{createLeague}</Card>
-        //     </Grid>
-        // </Grid>
-        // }
-        // {displayMyLeagues && 
-        // <Box>
-        //     <MyLeagues setDisplay={setDisplayMyLeagues} />
-        // </Box>
-        // }
-        // {displayJoinLeague && 
-        // <Box>
-        //     <JoinLeague setDisplay={setDisplayJoinLeague} />
-        // </Box>
-        // }
-        // {displayCreateLeague && 
-        // <Box>
-        //     <CreateLeague setDisplay={setDisplayCreateLeague} />
-        // </Box>
-        // }
-        // </Box>
+        <Box>
+        {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && 
+        <Grid container spacing={3}>
+            <Grid item xs={4}>
+                <Card variant="outlined" onClick={() => setDisplayMyLeagues(true)}>{myLeagues}</Card>
+            </Grid>
+            <Grid item xs={4}>
+                <Card variant="outlined" onClick={() => setDisplayJoinLeague(true)}>{joinLeague}</Card>
+            </Grid>
+            <Grid item xs={4}>
+                <Card variant="outlined" onClick={() => setDisplayCreateLeague(true)}>{createLeague}</Card>
+            </Grid>
+        </Grid>
+        }
+        {displayMyLeagues && 
+        <Box>
+            <MyLeagues setDisplay={setDisplayMyLeagues} />
+        </Box>
+        }
+        {displayJoinLeague && 
+        <Box>
+            <JoinLeague setDisplay={setDisplayJoinLeague} />
+        </Box>
+        }
+        {displayCreateLeague && 
+        <Box>
+            <CreateLeague setDisplay={setDisplayCreateLeague} />
+        </Box>
+        }
+        </Box>
     ); 
 
 }

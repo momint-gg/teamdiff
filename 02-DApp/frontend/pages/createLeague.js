@@ -8,6 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useTheme } from '@material-ui/core/styles';
 
 export default function CreateLeague({setDisplay}) {
     const defaultValues = {
@@ -20,6 +21,8 @@ export default function CreateLeague({setDisplay}) {
 
     const [formValues, setFormValues] = useState(defaultValues)
 
+    const theme = useTheme()
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormValues({
@@ -29,7 +32,7 @@ export default function CreateLeague({setDisplay}) {
       };
 
     return (
-        <Box>
+        <Box sx={{backgroundColor: theme.palette.primary.main}}>
           <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
             &#60; BACK
           </Fab>
