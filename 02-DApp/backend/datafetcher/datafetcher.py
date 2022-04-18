@@ -283,7 +283,9 @@ class Datafetcher():
                     self.athlete_game_stats[current_summoner_id][game_id][stat] = int(
                         value)
 
-        self._convert_to_json(self.athlete_game_stats, "game_stats.json")
+        date = dt.date.today()
+        self._convert_to_json(self.athlete_game_stats, "game_stats/" +
+                              date.strftime("%m-%d-%Y") + "-game_stats.json")
 
         print("\nDone!\n")
 
@@ -336,8 +338,9 @@ class Datafetcher():
 
         self.aggregated_athlete_game_stats = agg_game_stats
 
+        date = dt.date.today()
         self._convert_to_json(self.aggregated_athlete_game_stats,
-                              "aggregated_stats.json")
+                              "agg_stats/" + date.strftime("%m-%d-%Y") + "-aggregated_stats.json")
 
         print("\nDone!\n")
 
