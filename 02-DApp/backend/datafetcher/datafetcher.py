@@ -290,12 +290,14 @@ class Datafetcher():
     def aggregate_athlete_game_stats(self):
         print("(Step 3/7) Aggregating athlete game stats...\n")
         agg_game_stats = {}
+        athlete_points = 0
         for current_summoner_id, games in self.athlete_game_stats.items():
             if current_summoner_id not in agg_game_stats:
                 agg_game_stats[current_summoner_id] = {}
 
             for _, game in games.items():
                 for stat, value in game.items():
+                    # TODO: in this loop sum up points
                     stat = stat if stat != "player_win" else "wins"
 
                     if stat not in agg_game_stats[current_summoner_id]:
