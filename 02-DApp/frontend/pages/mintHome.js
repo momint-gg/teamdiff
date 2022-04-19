@@ -23,42 +23,56 @@ export default function MintHome() {
           }}
         >
           <Container
-            maxWidth="sm"
             sx={{
               display: "flex",
               alignItems: "center",
             }}
           >
             <Box>
-              <h2>Starter Pack</h2>
-              <h5>
+              <Typography variant="h3" color="white" component="div">
+                Starter Pack
+              </Typography>
+              <Typography variant="h6" color="white" component="div">
                 The starter pack is the perfect pack for a beginner. Minting
                 this pack will provide 6 unique NFT cards, which will allow you
                 to get right into the action.
-              </h5>
-              {/* TODO: Only show this mint button if user is logged in */}
+              </Typography>
+              {/*TODO: Only show this mint button if user is logged in*/}
               <Fab
                 variant="extended"
-                size="small"
-                color="primary"
+                size="large"
                 aria-label="add"
                 onClick={() => setDisplayMint(true)}
+                sx={{
+                  marginTop: 5,
+                  marginRight: 1,
+                  background:
+                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                  color: "white",
+                  fontSize: 20,
+                }}
               >
                 Mint
               </Fab>
               <Fab
                 variant="extended"
-                size="small"
+                size="large"
                 color="white"
                 aria-label="add"
                 onClick={() => setDisplayCollection(true)}
+                sx={{ marginTop: 5, fontSize: 20 }}
               >
-                View Collection
+                CONTENTS
               </Fab>
             </Box>
           </Container>
-          <Container maxWidth="sm">
-            <Image src={profilePic} alt="Picture of the author" />
+          <Container sx={{ marginRight: -50 }}>
+            <Image
+              src={profilePic}
+              alt="Picture of the author"
+              width="310px"
+              height="450px"
+            />
           </Container>
         </Box>
       )}

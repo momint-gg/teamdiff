@@ -5,13 +5,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint", 
+    "lint": "next lint",
     "test": "prettier-check **/*.js"
   },
   "dependencies": {
     "@alch/alchemy-web3": "^1.2.3",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@fontsource/exo": "^4.5.7",
     "@material-ui/core": "^4.12.3",
     "@mui/lab": "^5.0.0-alpha.69",
     "@mui/material": "^5.4.2",
@@ -23,8 +24,11 @@
     "react": "17.0.2",
     "react-bootstrap": "^2.1.1",
     "react-dom": "17.0.2",
+    "react-icons": "^4.3.1",
     "react-router-dom": "^6.2.1",
     "styled-components": "^5.3.3",
+    "typeface-cormorant": "^1.1.13",
+    "typeface-exo": "^1.1.13",
     "wagmi": "^0.2.6"
   },
   "devDependencies": {

@@ -53,7 +53,7 @@ export default function WalletLogin() {
               }
               label={
                 accountData.ens?.name
-                  ? `${accountData.ens?.name} (${shortenedAddress})`
+                  ? `${accountData.ens?.name}`
                   : shortenedAddress
               }
               variant="outlined"

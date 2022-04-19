@@ -19,10 +19,12 @@ import {
   Paper,
   Fab,
 } from "@mui/material";
+import Image from "next/image";
 import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
+import profilePic from "../assets/images/starter-pack.png";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
@@ -136,7 +138,15 @@ export default function MintPack({ setDisplay }) {
                 filter: "blur(35px)",
               }}
             />
-            <img src="/starterPack.png" style={{ position: "absolute" }} />
+            <Container sx={{ position: "absolute" }}>
+              <Image
+                src={profilePic}
+                alt="Picture of the author"
+                width="310px"
+                height="450px"
+                position="absolute"
+              />
+            </Container>
           </Box>
 
           <Box
@@ -151,9 +161,9 @@ export default function MintPack({ setDisplay }) {
               Mint Starter Pack
             </Typography>
             {packsAvailable != null && (
-              <h3>
+              <Typography variant="h4" color="white" component="div">
                 {"There are " + packsAvailable + " packs still available"}
-              </h3>
+              </Typography>
             )}
           </Box>
           <Box
