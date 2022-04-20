@@ -10,8 +10,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-//import "./VRFv2Consumer.sol";
-
+// Contains the logic for minting / burning our 1155s
 contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
     using SafeMath for uint256;
@@ -45,24 +44,16 @@ contract GameItems is ERC1155, Ownable {
     uint256 private startingIndexBlock;
     uint256 private startingIndex;
 
-    //Provenance hash
+    // Provenance hash
     string provenance = "";
 
     // Random indices for minting packs
     uint256[5] private starterPackIndices;
     uint256[3] private boosterPackIndices;
 
-    // VRF:
-    // VRFv2Consumer public vrf =
-    //     VRFv2Consumer(0xce33C9b8d69Fb99a715279503980Cf54f9A57218);
-    // address vrfAddress = 0xce33C9b8d69Fb99a715279503980Cf54f9A57218;
-
-    // ======= Events ==========
+    // Events
     event packMinted(address signer, uint256 id);
     event packBurned(uint256[5], address signer);
-
-    // event VRFConsumerCreated(address a);
-    // event Response(bool success, bytes data);
 
     struct Parameters {
         uint256 _numAthletes;
@@ -104,29 +95,57 @@ contract GameItems is ERC1155, Ownable {
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
         packsAvailable = MAX_PACKS;
-        // vrf = new VRFv2Consumer(params.chainlinkSubId); //chainlink
     }
-
-    // Note: the contract needs to be added as a consumer before we can call this
-    // New contract flow for random #:
-    //1. We deploy a VRFv2Consumer contract
-    //2. When opening on the frontend, we call this function and extract 5 random #s from it
-    //3. We then pass these into the
-    // function generateRandomNum() public onlyOwner {
-    //     //TODO bit shift the random num by the number of bits of the max value of random number that we want
-    //     //Does this need to be async? --> Henry: No, solidity is async by default
-    //     console.log("Requesting random words...");
-    //     vrf.requestRandomWords();
-    // }
-
-    // // Note: can only call this if contract has already called generateRandomNum()
-    // function returnRandomNum() public onlyOwner returns (uint256) {
-    //     return (vrf.s_randomWords(0));
-    // }
 
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {
         packsReadyToOpen = !packsReadyToOpen;
+    }
+
+    /*****************************************************/
+    /************ STARTER PACK MINTING/BURNING ***********/
+    /*****************************************************/
+
+    // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
+    function mintStarterPack() public {
+        uint256 starterPackId = NUM_ATHLETES;
+        require(
+            starterPacksMinted < MAX_PACKS,
+            "All packs have already been minted!"
+        );
+        require(
+            balanceOf(msg.sender, starterPackId) < 1,
+            "Can only mint one starter pack per account"
+        );
+
+        // Making the index 1 after the athletes end
+        _mint(msg.sender, starterPackId, 1, "0x00");
+
+        starterPacksMinted += 1;
+        packsAvailable -= 1;
+        emit packMinted(msg.sender, starterPacksMinted);
+    }
+
+    // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
+    // Passing in random indices here!
+    function burnStarterPack() public {
+        uint256 starterPackId = NUM_ATHLETES;
+        require(packsReadyToOpen, "Packs aren't ready to open yet!");
+        require(
+            balanceOf(address(msg.sender), starterPackId) == 1,
+            "Pack has already been burned or does not exist."
+        );
+
+        // Indices for players in the pack, 1 of each position
+        uint256[5] memory indices = generateStarterPackIndices();
+
+        // Assigning the user their athletes
+        for (uint8 i = 0; i < indices.length; i++) {
+            mintAthlete(indices[i]);
+        }
+        emit packBurned(indices, msg.sender);
+        // Burning the starter pack
+        _burn(msg.sender, starterPackId, 1);
     }
 
     // Mints an athlete -- called when someone "burns" a pack
@@ -146,84 +165,9 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
-    function mintStarterPack() public {
-        uint256 starterPackId = NUM_ATHLETES;
-        //        require(
-        //            starterPacksMinted < MAX_PACKS,
-        //            "All packs have already been minted!"
-        //        );
-        //        require(
-        //            balanceOf(msg.sender, starterPackId) < 1,
-        //            "Can only mint one starter pack per account"
-        //        );
-
-        // Making the index 1 after the athletes end
-        _mint(msg.sender, starterPackId, 1, "0x00");
-
-        starterPacksMinted += 1;
-        packsAvailable -= 1;
-        emit packMinted(msg.sender, starterPacksMinted);
-    }
-
-    function mintBoosterPack() public {
-        uint256 boosterPackId = NUM_ATHLETES + 1;
-        require(
-            boosterPacksMinted < MAX_PACKS,
-            "All packs have already been minted!"
-        );
-        require(
-            balanceOf(msg.sender, boosterPackId) < 2,
-            "Can only mint two booster packs per account"
-        );
-
-        _mint(msg.sender, boosterPackId, 1, "");
-
-        boosterPacksMinted += 1;
-        emit packMinted(msg.sender, boosterPacksMinted);
-    }
-
-    // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
-    // Passing in random indices here!
-
-    function burnStarterPack() public {
-        uint256 starterPackId = NUM_ATHLETES;
-
-        //        require(packsReadyToOpen, "Packs aren't ready to open yet!");
-        //        require(
-        //            balanceOf(address(msg.sender), starterPackId) == 1,
-        //            "Pack has already been burned or does not exist."
-        //        );
-
-        // Indices for players in the pack, 1 of each position
-        uint256[5] memory indices = generateStarterPackIndices();
-
-        // Assigning the user their athletes
-        for (uint8 i = 0; i < indices.length; i++) {
-            mintAthlete(indices[i]);
-        }
-        emit packBurned(indices, msg.sender);
-        // Burning the starter pack
-        _burn(msg.sender, starterPackId, 1);
-    }
-
-    function burnBoosterPack() public {
-        uint256 boosterPackId = NUM_ATHLETES + 1;
-
-        require(packsReadyToOpen, "Packs aren't ready to open yet!");
-        require(
-            balanceOf(address(msg.sender), boosterPackId) > 0,
-            "No remaining booster packs!"
-        );
-
-        uint256[3] memory indices = generateBoosterPackIndices();
-
-        for (uint8 i = 0; i < indices.length; i++) {
-            mintAthlete(indices[i]);
-        }
-
-        _burn(address(msg.sender), boosterPackId, 1);
-    }
+    /**********************************************/
+    /************ SETTING URIS, INDICES ***********/
+    /**********************************************/
 
     // Setting starting Index -- will do every time?
     function setStartingIndex() public onlyOwner {
@@ -251,7 +195,6 @@ contract GameItems is ERC1155, Ownable {
 
     // Setting base URIs for the Athletes
     function setURIs() public onlyOwner {
-        //Setting athlete URIs
         for (uint256 i = 0; i < NUM_ATHLETES; i++) {
             uint256 mintIndex = (startingIndex + i) % NUM_ATHLETES;
 
@@ -271,7 +214,7 @@ contract GameItems is ERC1155, Ownable {
         setTokenUri(NUM_ATHLETES, string(abi.encodePacked(starterPackURI)));
     }
 
-    //Generate pseudo random starter pack indices
+    // Generate pseudo random starter pack indices (randomness not super important here)
     function generateStarterPackIndices()
         public
         view
@@ -296,52 +239,93 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
-    //Generate pseudo random booster pack indices
-    function generateBoosterPackIndices()
-        public
-        view
-        returns (uint256[3] memory)
-    {
-        uint256[3] memory indices;
-        uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
+    /*************************************************/
+    /************ FUNCTIONS NOT BEING USED ***********/
+    /*************************************************/
 
-        for (uint256 i = 0; i < 3; i++) {
-            startI = startI % 5;
-            uint256 start = startI * 10;
-            uint256 end = startI * 10 + 9;
+    // // If setting a provenance hash, set with: (tokenId + startingIndex) % # of tokens
+    // function setProvenanceHash(string memory provenanceHash) public onlyOwner {
+    //     provenance = provenanceHash;
+    // }
 
-            indices[i] = ((uint256(
-                keccak256(
-                    abi.encodePacked(
-                        block.timestamp,
-                        msg.sender,
-                        block.difficulty,
-                        i,
-                        boosterPacksMinted
-                    )
-                )
-            ) % (end - start + 1)) + start);
+    // function getNFTPerAthlete() public view onlyOwner returns (uint256) {
+    //     return NFT_PER_ATHLETE;
+    // }
 
-            startI += 1;
-        }
-        return indices;
-    }
+    // // Setting starting index block
+    // function emergencySetStartingIndexBlock() public onlyOwner {
+    //     require(startingIndex == 0, "Starting index is already set");
 
-    // Setting starting index block
-    function emergencySetStartingIndexBlock() public onlyOwner {
-        require(startingIndex == 0, "Starting index is already set");
+    //     startingIndexBlock = block.number;
+    // }
 
-        startingIndexBlock = block.number;
-    }
+    /*************************************************************/
+    /************ BOOSTER PACK FUNCTIONS (not used rn) ***********/
+    /*************************************************************/
 
-    // Setting provenance once it is calculated
-    // Set with: (tokenId + startingIndex) % # of tokens
-    // Probably won't need this anymore
-    function setProvenanceHash(string memory provenanceHash) public onlyOwner {
-        provenance = provenanceHash;
-    }
+    //  function mintBoosterPack() public {
+    //         uint256 boosterPackId = NUM_ATHLETES + 1;
+    //         require(
+    //             boosterPacksMinted < MAX_PACKS,
+    //             "All packs have already been minted!"
+    //         );
+    //         require(
+    //             balanceOf(msg.sender, boosterPackId) < 2,
+    //             "Can only mint two booster packs per account"
+    //         );
 
-    function getNFTPerAthlete() public view onlyOwner returns (uint256) {
-        return NFT_PER_ATHLETE;
-    }
+    //         _mint(msg.sender, boosterPackId, 1, "");
+
+    //         boosterPacksMinted += 1;
+    //         emit packMinted(msg.sender, boosterPacksMinted);
+    //     }
+
+    // function burnBoosterPack() public {
+    //     uint256 boosterPackId = NUM_ATHLETES + 1;
+
+    //     require(packsReadyToOpen, "Packs aren't ready to open yet!");
+    //     require(
+    //         balanceOf(address(msg.sender), boosterPackId) > 0,
+    //         "No remaining booster packs!"
+    //     );
+
+    //     uint256[3] memory indices = generateBoosterPackIndices();
+
+    //     for (uint8 i = 0; i < indices.length; i++) {
+    //         mintAthlete(indices[i]);
+    //     }
+
+    //     _burn(address(msg.sender), boosterPackId, 1);
+    // }
+
+    // //Generate pseudo random booster pack indices
+    // function generateBoosterPackIndices()
+    //     public
+    //     view
+    //     returns (uint256[3] memory)
+    // {
+    //     uint256[3] memory indices;
+    //     uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
+
+    //     for (uint256 i = 0; i < 3; i++) {
+    //         startI = startI % 5;
+    //         uint256 start = startI * 10;
+    //         uint256 end = startI * 10 + 9;
+
+    //         indices[i] = ((uint256(
+    //             keccak256(
+    //                 abi.encodePacked(
+    //                     block.timestamp,
+    //                     msg.sender,
+    //                     block.difficulty,
+    //                     i,
+    //                     boosterPacksMinted
+    //                 )
+    //             )
+    //         ) % (end - start + 1)) + start);
+
+    //         startI += 1;
+    //     }
+    //     return indices;
+    // }
 }
