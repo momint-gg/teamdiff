@@ -60,7 +60,7 @@ contract LeagueMaker is Ownable {
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
         // athletesDataStorage = new Athletes(); // Moved to pass this in the create league function
-        testUSDC = new TestUSDC(); //will take this out for mainnet, but need for staking
+        // testUSDC = new TestUSDC(); //will take this out for mainnet, but need for staking
     }
 
     // ======== Deploy New League Proxy ========

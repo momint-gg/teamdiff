@@ -68,10 +68,12 @@ contract LeagueOfLegendsLogic is
     Whitelist whitelistContract;
     // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
-    //Our MOBALogicHElper contract
-    //MOBALogicHelper mobaLogicHelper;
-    // Test USDC contract
-    TestUSDC testUSDC;
+    // Our MOBALogicHElper contract
+    // MOBALogicHelper mobaLogicHelper;
+    // Test USDC contract (old way)
+    // TestUSDC testUSDC;
+    // New way for ERC20
+    IERC20 testUSDC;
 
     //**************/
     //*** Events ***/
@@ -135,8 +137,8 @@ contract LeagueOfLegendsLogic is
         whitelistContract = new Whitelist(); // Initializing our whitelist
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
-        testUSDC = TestUSDC(_testUSDCAddress);
-
+        // testUSDC = TestUSDC(_testUSDCAddress);
+        testUSDC = IERC20(_testUSDCAddress);
         console.log("Proxy initialized!");
     }
 
