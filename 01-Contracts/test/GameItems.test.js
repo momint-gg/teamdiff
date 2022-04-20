@@ -196,6 +196,8 @@ describe("GameItems.test", async () => {
   //   txn = await GameItem.generateBoosterPackIndices();
   // });
 
+  // -------------- // Basically the whole test // -------------- //
+  // Test on Rinkeby!
   // Testing to see if a pack is given to the caller
   it("Burns a pack successfully and mints 5 athletes in a random order", async () => {
     let txn = await GameItem.setStartingIndex();

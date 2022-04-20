@@ -54,7 +54,7 @@ module.exports = {
     rinkeby: {
       url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
       accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key,
-      gas: 2100000, // fixing cannot estimate gas error in League test
+      // gas: 2100000, // fixing cannot estimate gas error in League test
       // gasPrice: 8000000000,
     },
     // localhost: {

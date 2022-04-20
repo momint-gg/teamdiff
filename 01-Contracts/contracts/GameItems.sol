@@ -82,7 +82,6 @@ contract GameItems is ERC1155, Ownable {
         string memory _starterPackURI,
         string memory _boosterPackURI
     ) ERC1155("") {
-        console.log("Making contract...");
         NUM_ATHLETES = params._numAthletes;
         NFT_PER_ATHLETE = params._nftPerAthlete;
         STARTER_PACK_SIZE = params._starterPackSize;
@@ -143,15 +142,15 @@ contract GameItems is ERC1155, Ownable {
         for (uint8 i = 0; i < indices.length; i++) {
             mintAthlete(indices[i]);
         }
-        emit packBurned(indices, msg.sender);
-        // Burning the starter pack
+
         _burn(msg.sender, starterPackId, 1);
+
+        emit packBurned(indices, msg.sender);
     }
 
     // Mints an athlete -- called when someone "burns" a pack
     function mintAthlete(uint256 index) private {
         // Log for debugging
-        // console.log("Mint index ", index);
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
                 supplyOfToken[index] < NFT_PER_ATHLETE,
@@ -210,7 +209,7 @@ contract GameItems is ERC1155, Ownable {
             );
         }
 
-        //Setting pack URIs after the athletes (i.e. 50.json, 51.json)
+        //Setting pack URIs after the athletes (i.e. 49.json = last athlete, 50.json = starter pack)
         setTokenUri(NUM_ATHLETES, string(abi.encodePacked(starterPackURI)));
     }
 
@@ -239,6 +238,10 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
+    function getNFTPerAthlete() public view onlyOwner returns (uint256) {
+        return NFT_PER_ATHLETE;
+    }
+
     /*************************************************/
     /************ FUNCTIONS NOT BEING USED ***********/
     /*************************************************/
@@ -246,10 +249,6 @@ contract GameItems is ERC1155, Ownable {
     // // If setting a provenance hash, set with: (tokenId + startingIndex) % # of tokens
     // function setProvenanceHash(string memory provenanceHash) public onlyOwner {
     //     provenance = provenanceHash;
-    // }
-
-    // function getNFTPerAthlete() public view onlyOwner returns (uint256) {
-    //     return NFT_PER_ATHLETE;
     // }
 
     // // Setting starting index block
