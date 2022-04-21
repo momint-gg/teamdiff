@@ -71,7 +71,7 @@ describe("LeagueProxyRinkeby.test", async () => {
     console.log("Beacon deployed to:", BeaconInstance.address);
 
     //Signers
-    [owner, testingAcct, addr2, addr3, addr4, addr5, addr6] =
+    [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
       await ethers.getSigners();
     const testingAcct = process.env.PRIVATE_KEY_2; // Another acct for testing on rinkeby
 

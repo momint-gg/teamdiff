@@ -289,7 +289,7 @@ describe("LeagueProxy.test", async () => {
     await approval.wait();
 
     // Now delegating the prize pool to the winner
-    const delegatePool = await proxyContract.onLeagueEnd();
+    const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
     await delegatePool.wait();
 
     // Making sure balances are correct! -- whoever wins is given the prize pool

@@ -202,7 +202,7 @@ contract LeagueOfLegendsLogic is
     }
 
     // Delegates the prize pool for the league (for now, entire stake amount goes to the winner but we can change that)
-    function onLeagueEnd() external onlyOwner {
+    function onLeagueEnd() external onlyAdmin {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner;
         // Calculating the winner (may want to just update each week instead of doing this way...)
