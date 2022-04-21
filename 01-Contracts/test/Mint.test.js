@@ -1,5 +1,6 @@
 // Testing the mint / burn flow for starter packs
 // Test this on rinkeby to see actual NFTs in your wallet
+// IMPORTANT NOTE: You need to REMOVE manual gas in hardhat config for this test to run correctly
 
 const { expect } = require("chai");
 const hre = require("hardhat");

@@ -4,7 +4,8 @@ const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfL
 const TestUSDCJSON = artifacts.require("TestUSDC.sol");
 const AthletesJSON = artifacts.require("Athletes.sol");
 
-// NOTE: For now, proxy tests must be run on rinkeby (hardhat doesn't support yet)
+// IMPORTANT NOTE: You need to SET manual gas in hardhat config for this test to run correctly
+// ALSO NOTE: STAKING TESTS WILL NOT WORK ON RINKEBY BC ADDR1 WILL BE UNDEFINED (need to test on etherscan)
 // Make sure youre wallet has a lot of rinkey eth!
 describe("LeagueProxy.test", async () => {
   // Setting up a proxy to test, deploying contracts
@@ -143,6 +144,7 @@ describe("LeagueProxy.test", async () => {
   });
 
   // TESTING STAKING
+  // NOTE: THESE TESTS WILL NOT WORK ON RINKEBY, AS ADDR1 WILL BE UNDEFINED. CAN TEST ON HARDHAT
   it("Gives the sender 10, transfer 10 from sender to other wallet", async () => {
     //Since the TestUSDC contract was deployed by LeagueOfLegends.sol, that contract should have the initial balance
     const initialLOLTUSDCBalance = await testUsdcContract.balanceOf(

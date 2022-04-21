@@ -70,9 +70,7 @@ contract LeagueOfLegendsLogic is
     LeagueMaker leagueMakerContract;
     // Our MOBALogicHElper contract
     // MOBALogicHelper mobaLogicHelper;
-    // Test USDC contract (old way)
-    // TestUSDC testUSDC;
-    // New way for ERC20
+    // Our USDC
     IERC20 testUSDC;
 
     //**************/
@@ -150,9 +148,8 @@ contract LeagueOfLegendsLogic is
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
-    //TODO set to only owner, hoever, the library needs to also be an owner :/
-    //Only set to public for testing purposes for now
-    function setLeagueSchedule() external {
+
+    function setLeagueSchedule() external onlyOwner {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -174,18 +171,8 @@ contract LeagueOfLegendsLogic is
         lineupIsLocked = false;
     }
 
-    // Setting the address for our athlete contract
-    //TODO do we need this?
-    // Maybe
-    // function setAthleteContractAddress(address _athleteContractAddress)
-    //     public
-    //     onlyOwner
-    // {
-    //     athletesContract = Athletes(_athleteContractAddress);
-    // }
-
     //Evalautes all matchups for a given week
-    function evaluateWeek() public onlyOwner {
+    function evaluateWeek() external onlyOwner {
         MOBALogicLibrary.evaluateWeek(
             schedule,
             currentWeekNum,
@@ -198,7 +185,7 @@ contract LeagueOfLegendsLogic is
 
     // Evaluates match between two users
     function evaluateMatch(address addr1, address addr2)
-        public
+        external
         returns (address)
     {
         return
@@ -214,73 +201,8 @@ contract LeagueOfLegendsLogic is
             );
     }
 
-    /************************************************/
-    /***************** GETTERS **********************/
-    /************************************************/
-    function getVersion() public view returns (uint256 version) {
-        return version;
-    }
-
-    function getLeagueName() public view returns (string memory) {
-        return leagueName;
-    }
-
-    function getStakeAmount() public view returns (uint256) {
-        return stakeAmount;
-    }
-
-    //Returns total pot of the league
-    function getTotalPrizePot() public view returns (uint256) {
-        return stakeAmount * leagueMembers.length;
-    }
-
-    // Returning the lineup for a user
-    function getLineup() public view returns (uint256[] memory) {
-        return userLineup[msg.sender];
-    }
-
-    // Getting the test usdc contract address (for testing)
-    function getTestUSDCAddress() public view returns (address) {
-        return address(testUSDC);
-    }
-
-    // Getting the admin address to make sure it was set correctly
-    function getAdmin() public view returns (address) {
-        return admin;
-    }
-
-    // Getting the athletes contract address
-    function getAthleteContractAddress() public view returns (address) {
-        return address(athletesContract);
-    }
-
-    // Gets the current week #
-    function getCurrentWeekNum() public view returns (uint256) {
-        return currentWeekNum;
-    }
-
-    /******************************************************/
-    /***************** STAKING FUNCTIONS ******************/
-    /******************************************************/
-
-    // Returning the contracts USDC balance
-    function getUSDCBalance() public view returns (uint256) {
-        // Todo for mainnet: replace return statement with the commented out statement
-        // return IERC20(polygonUSDCAddress).balanceOf(address(this));
-
-        return testUSDC.balanceOf(address(this));
-    }
-
-    // Returning the sender's USDC balance (testing)
-    function getUserUSDCBalance() public view returns (uint256) {
-        // Todo for mainnet: replace return statement with the commented out statement
-        // return IERC20(polygonUSDCAddress).balanceOf(msg.sender);
-
-        return testUSDC.balanceOf(msg.sender);
-    }
-
     // Delegates the prize pool for the league (for now, entire stake amount goes to the winner but we can change that)
-    function onLeagueEnd() public {
+    function onLeagueEnd() external onlyOwner {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner;
         // Calculating the winner (may want to just update each week instead of doing this way...)
@@ -293,12 +215,77 @@ contract LeagueOfLegendsLogic is
         testUSDC.transferFrom(msg.sender, address(this), contractBalance);
     }
 
+    /************************************************/
+    /***************** GETTERS **********************/
+    /************************************************/
+    function getVersion() external pure returns (uint256 version) {
+        return version;
+    }
+
+    function getLeagueName() external view returns (string memory) {
+        return leagueName;
+    }
+
+    function getStakeAmount() external view returns (uint256) {
+        return stakeAmount;
+    }
+
+    //Returns total pot of the league
+    function getTotalPrizePot() external view returns (uint256) {
+        return stakeAmount * leagueMembers.length;
+    }
+
+    // Returning the lineup for a user
+    function getLineup() external view returns (uint256[] memory) {
+        return userLineup[msg.sender];
+    }
+
+    // Getting the test usdc contract address (for testing)
+    function getTestUSDCAddress() external view returns (address) {
+        return address(testUSDC);
+    }
+
+    // Getting the admin address to make sure it was set correctly
+    function getAdmin() external view returns (address) {
+        return admin;
+    }
+
+    // Getting the athletes contract address
+    function getAthleteContractAddress() external view returns (address) {
+        return address(athletesContract);
+    }
+
+    // Gets the current week #
+    function getCurrentWeekNum() external view returns (uint256) {
+        return currentWeekNum;
+    }
+
+    /******************************************************/
+    /***************** STAKING FUNCTIONS ******************/
+    /******************************************************/
+
+    // Returning the contracts USDC balance
+    function getUSDCBalance() external view returns (uint256) {
+        // Todo for mainnet: replace return statement with the commented out statement
+        // return IERC20(polygonUSDCAddress).balanceOf(address(this));
+
+        return testUSDC.balanceOf(address(this));
+    }
+
+    // Returning the sender's USDC balance (testing)
+    function getUserUSDCBalance() external view returns (uint256) {
+        // Todo for mainnet: replace return statement with the commented out statement
+        // return IERC20(polygonUSDCAddress).balanceOf(msg.sender);
+
+        return testUSDC.balanceOf(msg.sender);
+    }
+
     //***************************************************/
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
     //Lineup must not be locked
-    function setLineup(uint256[] memory athleteIds) public {
+    function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         userLineup[msg.sender] = athleteIds;
     }
@@ -315,17 +302,17 @@ contract LeagueOfLegendsLogic is
     // }
 
     // Getter for user to weekly pts
-    function getUserRecord() public view returns (uint256[8] memory) {
+    function getUserRecord() external view returns (uint256[8] memory) {
         return userToRecord[msg.sender];
     }
 
     // For testing if join league function Works
-    function getUsersLength() public view returns (uint256) {
+    function getUsersLength() external view returns (uint256) {
         return leagueMembers.length;
     }
 
     // Getter for user to total pts
-    function getUserTotalPts() public view returns (uint256) {
+    function getUserTotalPts() external view returns (uint256) {
         return userToTotalWins[msg.sender];
     }
 
@@ -346,19 +333,19 @@ contract LeagueOfLegendsLogic is
     /*****************************************************************/
     // Add user to league
     //for testing only
-    function addUserToLeague(address user) public {
+    function addUserToLeague(address user) external onlyOwner {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
+
         if (leagueMembers.length < 8) {
             leagueMembers.push(user);
             leagueMakerContract.updateUserToLeagueMapping(user);
         } else {
-            console.log("too many users in league to add new user");
+            console.log("Too many users in league to add new user.");
         }
     }
 
     // User joining the league
-    // I think this means they won't be able to stake decimal amounts
-    function joinLeague() public onlyWhitelisted {
+    function joinLeague() external onlyWhitelisted {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
 
         //TODO check leagueSize on frontend instead to ensure this operation is valid
@@ -370,19 +357,19 @@ contract LeagueOfLegendsLogic is
         emit Staked(msg.sender, stakeAmount);
     }
 
-    // TODO: Should we write this or just make it so that you can't leave once you join?
-    // function removeFromLeague() public onlyWhitelisted {}
+    // Removing a user from the league
+    function removeFromLeague(address _userToRemove) external onlyAdmin {
+        require(
+            !leagueEntryIsClosed,
+            "Nobody can enter/exit the league anymore. The season has started!"
+        );
+
+        whitelistContract.removeAddressFromWhitelist(_userToRemove);
+    }
 
     // Add user to whitelist
-    function addUserToWhitelist(address _userToAdd) public onlyAdmin {
+    function addUserToWhitelist(address _userToAdd) external onlyAdmin {
         whitelistContract.addAddressToWhitelist(_userToAdd);
         // whitelist[_userToAdd] = true;
     }
-
-    //TODO
-    //1.) View function to calculate score on-chain for a given line-up and week (not started)
-    //2.) Pool Prize mechanics (in progress)
-    //3.) League membership mechanics (testing)
-    //4.) League schedule creation mechanics (testing)
-    //5.) lock set line-up with onlyOwner function (testing)
 }

@@ -35,7 +35,7 @@ contract LeagueMaker is Ownable {
     uint256 version;
     uint256 numWeeks;
 
-    //Proxy Constructor Parameters
+    // Proxy Constructor Parameters
     // struct Parameters {
     //     string name;
     //     uint256 version;
@@ -50,6 +50,7 @@ contract LeagueMaker is Ownable {
     //     address testUSDCAddress;
     // }
     // Parameters public parameters;
+
     uint256 _numWeeks = 8;
     uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
@@ -72,35 +73,6 @@ contract LeagueMaker is Ownable {
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
         address _athletesContractAddress
     ) external returns (address) {
-        // parameters = Parameters({
-        //     name: _name,
-        //     version: _version,
-        //     numWeeks: _numWeeks,
-        //     stakeAmount: _stakeAmount,
-        //     isPublic: _isPublic,
-        //     athletesDataStorageAddress: address(athletesDataStorage),
-        //     owner: address(this),
-        //     admin: _adminAddress,
-        //     polygonUSDCAddress: _polygonUSDCAddress,
-        //     rinkebyUSDCAddress: _rinkebyUSDCAddress,
-        //     testUSDCAddress: _testUSDCAddress
-        // });
-        // //TODO memory clean-up should be done
-        // bytes memory delegateCallData = abi.encodeWithSignature(
-        //     "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
-        //     parameters.name,
-        //     parameters.version,
-        //     //parameters.numWeeks,
-        //     parameters.stakeAmount,
-        //     parameters.isPublic,
-        //     parameters.athletesDataStorageAddress,
-        //     //parameters.owner,
-        //     parameters.admin,
-        //     parameters.polygonUSDCAddress,
-        //     parameters.rinkebyUSDCAddress,
-        //     parameters.testUSDCAddress,
-        //     address(this)
-        // );
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
             _name,
@@ -169,17 +141,6 @@ contract LeagueMaker is Ownable {
     function lockLeagueLineups() public onlyOwner {
         LeagueMakerLibrary.lockLeagueLineups(leagueAddresses);
     }
-
-    // function lockLeagueLineups() public onlyOwner {
-    //     bool success;
-    //     bytes memory data;
-    //     for (uint256 i = 0; i < leagueAddresses.length; i++) {
-    //         (success, data) = leagueAddresses[i].call(
-    //             abi.encodeWithSignature("lockLineup()")
-    //         );
-    //         emit Response(success, data);
-    //     }
-    // }
 
     //Unlocking lineups for all leagues
     //TODO set to only owner
