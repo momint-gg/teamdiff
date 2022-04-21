@@ -150,7 +150,6 @@ contract GameItems is ERC1155, Ownable {
 
     // Mints an athlete -- called when someone "burns" a pack
     function mintAthlete(uint256 index) private {
-        // Log for debugging
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
                 supplyOfToken[index] < NFT_PER_ATHLETE,

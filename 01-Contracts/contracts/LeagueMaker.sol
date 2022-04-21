@@ -154,11 +154,13 @@ contract LeagueMaker is Ownable {
             leagueAddresses,
             currentWeek
         );
+        currentWeek++;
     }
 
-    //TODO set to onlyProxy
-    //May need to create new access control privilege here
-    //Add or update userToLeagueMapping with additional pairs
+    // TODO set to onlyProxy
+    // May need to create new access control privilege here
+    // Add or update userToLeagueMapping with additional pairs
+    // Add a require that says only proxies can call
     function updateUserToLeagueMapping(address user) external {
         userToLeagueMap[user].push(msg.sender);
     }

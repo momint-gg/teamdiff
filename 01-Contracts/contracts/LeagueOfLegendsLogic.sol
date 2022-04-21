@@ -62,15 +62,13 @@ contract LeagueOfLegendsLogic is
     }
     address public polygonUSDCAddress; // When we deploy to mainnet
     address public rinkebyUSDCAddress;
-    // Our Athletes.sol contract
+
+    // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
+    // Won't want to make whitelist immutable
     Athletes athletesContract;
-    // Our Whitelist contract
     Whitelist whitelistContract;
-    // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
-    // Our MOBALogicHElper contract
     // MOBALogicHelper mobaLogicHelper;
-    // Our USDC
     IERC20 testUSDC;
 
     //**************/
@@ -201,12 +199,16 @@ contract LeagueOfLegendsLogic is
             );
     }
 
+    // On security:
+    // Add a reentrancy guard -- use nonreentrant modifier (should have for staking)
+    // OpenZeppelin has library for this
     // Delegates the prize pool for the league (for now, entire stake amount goes to the winner but we can change that)
     function onLeagueEnd() external onlyAdmin {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner;
         // Calculating the winner (may want to just update each week instead of doing this way...)
-        for (uint256 i = 0; i < leagueMembers.length; i++) {
+        // Save gas: don't say i = 0
+        for (uint256 i; i < leagueMembers.length; i++) {
             if (userToTotalWins[leagueMembers[i]] > userToTotalWins[winner]) {
                 winner = leagueMembers[i];
             }
@@ -284,7 +286,7 @@ contract LeagueOfLegendsLogic is
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
-    //Lineup must not be locked
+    // Lineup must not be locked
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         userLineup[msg.sender] = athleteIds;
