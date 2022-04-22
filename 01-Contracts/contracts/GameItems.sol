@@ -159,7 +159,7 @@ contract GameItems is ERC1155, Ownable {
             _mint(msg.sender, index, 1, "0x00");
 
             supplyOfToken[index] += 1;
-            numAthletes += 1; // BAYC had a func for total supply (b/c ERC721). Just incrementing a state variable here
+            numAthletes += 1;
         }
     }
 
@@ -214,7 +214,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Generate pseudo random starter pack indices (randomness not super important here)
     function generateStarterPackIndices()
-        public
+        private
         view
         returns (uint256[5] memory)
     {
@@ -298,7 +298,7 @@ contract GameItems is ERC1155, Ownable {
 
     // //Generate pseudo random booster pack indices
     // function generateBoosterPackIndices()
-    //     public
+    //     private
     //     view
     //     returns (uint256[3] memory)
     // {
