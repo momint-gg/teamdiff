@@ -83,7 +83,10 @@ contract LeagueOfLegendsLogic is
 
     // Only our wallet can call, need this because the "owner" of the proxy contract isn't us
     modifier onlyTeamDiff() {
-        require(msg.sender == teamDiffAddress, "Caller is not TeamDiff!");
+        require(
+            msg.sender == 0x3736306384bd666D6166e639Cf1b36EBaa818875,
+            "Caller is not TeamDiff"
+        );
         _;
     }
 
@@ -100,7 +103,6 @@ contract LeagueOfLegendsLogic is
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
         address _testUSDCAddress,
-        address _teamDiffAddress,
         address leagueMakerContractAddress
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
@@ -119,7 +121,6 @@ contract LeagueOfLegendsLogic is
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
-        teamDiffAddress = _teamDiffAddress;
         console.log("Proxy initialized!");
     }
 
@@ -131,8 +132,9 @@ contract LeagueOfLegendsLogic is
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
+    //TODO: Change functions to onlyTeamDiff for deployment (when testing on Rinkeby, only Admin for hardhat)
 
-    function setLeagueSchedule() external onlyTeamDiff {
+    function setLeagueSchedule() external onlyAdmin {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -142,20 +144,20 @@ contract LeagueOfLegendsLogic is
         );
     }
 
-    function setLeagueEntryIsClosed() external onlyTeamDiff {
+    function setLeagueEntryIsClosed() external onlyAdmin {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup() external onlyTeamDiff {
+    function lockLineup() external onlyAdmin {
         lineupIsLocked = true;
     }
 
-    function unlockLineup() external onlyTeamDiff {
+    function unlockLineup() external onlyAdmin {
         lineupIsLocked = false;
     }
 
     //Evalautes all matchups for a given week
-    function evaluateWeek() external onlyTeamDiff {
+    function evaluateWeek() external onlyAdmin {
         MOBALogicLibrary.evaluateWeek(
             schedule,
             currentWeekNum,
@@ -169,7 +171,7 @@ contract LeagueOfLegendsLogic is
     // Evaluates match between two users, only we can call
     function evaluateMatch(address addr1, address addr2)
         external
-        onlyTeamDiff
+        onlyAdmin
         returns (address)
     {
         return

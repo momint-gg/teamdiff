@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
@@ -220,6 +221,9 @@ describe("LeagueProxy.test", async () => {
     expect(lineup).to.not.equal(lineup2);
   });
 
+  // Setting what the teamdiff wallet is first
+  // const teamDiffWallet = new ethers.Wallet(process.env.PRIVATE_KEY, "hardhat");
+
   // Correctly evaluates the matchup between two users
   it("Correctly appends stats for athletes and evaluates a matchup", async () => {
     // Adding random stats for first 10 athletes (0-9)
@@ -233,6 +237,7 @@ describe("LeagueProxy.test", async () => {
     }
 
     // Calling evaluateMatch from LeagueOfLegendsLogic
+    console.log("OWNER ADD", owner.address);
     const evalMatch = await proxyContract
       .connect(owner)
       .evaluateMatch(owner.address, addr1.address);

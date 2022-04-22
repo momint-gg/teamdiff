@@ -55,14 +55,13 @@ contract LeagueMaker is Ownable {
     uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
-    address _teamDiffAddress = 0x3736306384bd666D6166e639Cf1b36EBaa818875; // What wallet address we're going to have
+
+    // address _teamDiffAddress = 0x3736306384bd666D6166e639Cf1b36EBaa818875; // What wallet address we're going to have
 
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
-        // athletesDataStorage = new Athletes(); // Moved to pass this in the create league function
-        // testUSDC = new TestUSDC(); //will take this out for mainnet, but need for staking
     }
 
     // ======== Deploy New League Proxy ========
@@ -75,7 +74,7 @@ contract LeagueMaker is Ownable {
         address _athletesContractAddress
     ) external returns (address) {
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,bool,address,address,address,address,address,address,address)",
+            "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
             _name,
             //_version,
             _numWeeks,
@@ -86,7 +85,7 @@ contract LeagueMaker is Ownable {
             _polygonUSDCAddress,
             _rinkebyUSDCAddress,
             _testUSDCAddress,
-            _teamDiffAddress,
+            // _teamDiffAddress,
             address(this)
         );
 
