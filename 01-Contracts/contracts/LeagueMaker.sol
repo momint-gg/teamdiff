@@ -32,6 +32,7 @@ contract LeagueMaker is Ownable {
     address[] public leagueAddresses; //list of all deployed leagueAddresses
     //Maps Users to all the leagues they are a member of
     mapping(address => address[]) public userToLeagueMap;
+    mapping(address => bool) public isProxyMap;
     uint256 version;
     uint256 numWeeks;
 
@@ -95,6 +96,7 @@ contract LeagueMaker is Ownable {
         );
 
         leagueAddresses.push(address(proxy));
+        isProxyMap[address(proxy)] = true;
 
         emit LeagueCreated(_name, address(proxy));
         // delete parameters;
@@ -163,6 +165,7 @@ contract LeagueMaker is Ownable {
     // Add or update userToLeagueMapping with additional pairs
     // Add a require that says only proxies can call
     function updateUserToLeagueMapping(address user) external {
+        require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
         userToLeagueMap[user].push(msg.sender);
     }
 

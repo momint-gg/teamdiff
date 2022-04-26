@@ -1,5 +1,5 @@
 const hre = require("hardhat");
-const constructorArgs = require("../constructorArgs");
+const constructorArgs = require("../../constructorArgs");
 
 const main = async () => {
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
