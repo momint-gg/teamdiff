@@ -160,10 +160,6 @@ contract LeagueMaker is Ownable {
         currentWeek++;
     }
 
-    // TODO set to onlyProxy
-    // May need to create new access control privilege here
-    // Add or update userToLeagueMapping with additional pairs
-    // Add a require that says only proxies can call
     function updateUserToLeagueMapping(address user) external {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
         userToLeagueMap[user].push(msg.sender);

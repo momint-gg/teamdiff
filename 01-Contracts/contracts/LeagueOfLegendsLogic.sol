@@ -134,7 +134,7 @@ contract LeagueOfLegendsLogic is
     /*************************************************/
     //TODO: Change functions to onlyTeamDiff for deployment (when testing on Rinkeby, only Admin for hardhat)
 
-    function setLeagueSchedule() external onlyAdmin {
+    function setLeagueSchedule() external onlyOwner {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -144,20 +144,20 @@ contract LeagueOfLegendsLogic is
         );
     }
 
-    function setLeagueEntryIsClosed() external onlyAdmin {
+    function setLeagueEntryIsClosed() external onlyOwner {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup() external onlyAdmin {
+    function lockLineup() external onlyOwner {
         lineupIsLocked = true;
     }
 
-    function unlockLineup() external onlyAdmin {
+    function unlockLineup() external onlyOwner {
         lineupIsLocked = false;
     }
 
     //Evalautes all matchups for a given week
-    function evaluateWeek() external onlyAdmin {
+    function evaluateWeek() external onlyOwner {
         MOBALogicLibrary.evaluateWeek(
             schedule,
             currentWeekNum,
@@ -169,9 +169,10 @@ contract LeagueOfLegendsLogic is
     }
 
     // Evaluates match between two users, only we can call
+    // TODO: Comment out for prod
     function evaluateMatch(address addr1, address addr2)
         external
-        onlyAdmin
+        onlyOwner
         returns (address)
     {
         return
@@ -187,7 +188,7 @@ contract LeagueOfLegendsLogic is
             );
     }
 
-    function onLeagueEnd() external onlyAdmin nonReentrant {
+    function onLeagueEnd() external onlyOwner nonReentrant {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner;
         // Calculating the winner (may want to just update each week instead of doing this way...)
