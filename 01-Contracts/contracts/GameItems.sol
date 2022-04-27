@@ -9,9 +9,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./Whitelist.sol";
 
 // Contains the logic for minting / burning our 1155s
-contract GameItems is ERC1155, Ownable {
+contract GameItems is ERC1155, Ownable, Whitelist {
     using Counters for Counters.Counter;
     using SafeMath for uint256;
 
@@ -71,6 +72,9 @@ contract GameItems is ERC1155, Ownable {
     // TODO add boolean to show if packs are available.
     uint256 public packsAvailable;
 
+    // Our whitelist
+    Whitelist whitelistContract;
+
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
@@ -81,7 +85,7 @@ contract GameItems is ERC1155, Ownable {
         string memory _athleteURI,
         string memory _starterPackURI,
         string memory _boosterPackURI
-    ) ERC1155("") {
+    ) ERC1155("TD") {
         NUM_ATHLETES = params._numAthletes;
         NFT_PER_ATHLETE = params._nftPerAthlete;
         STARTER_PACK_SIZE = params._starterPackSize;
@@ -94,6 +98,7 @@ contract GameItems is ERC1155, Ownable {
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
         packsAvailable = MAX_PACKS;
+        whitelistContract = new Whitelist();
     }
 
     // Athletes can only be minted once our "switch" has been flipped
@@ -102,11 +107,22 @@ contract GameItems is ERC1155, Ownable {
     }
 
     /*****************************************************/
+    /******************* WHITELIST ***********************/
+    /*****************************************************/
+    function addUserToWhitelist(address _user) public onlyOwner {
+        whitelistContract.addAddressToWhitelist(_user);
+    }
+
+    function removeUserFromWhitelist(address _user) public onlyOwner {
+        whitelistContract.removeAddressFromWhitelist(_user);
+    }
+
+    /*****************************************************/
     /************ STARTER PACK MINTING/BURNING ***********/
     /*****************************************************/
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
-    function mintStarterPack() public {
+    function mintStarterPack() public onlyWhitelisted {
         uint256 starterPackId = NUM_ATHLETES;
         require(
             starterPacksMinted < MAX_PACKS,
@@ -127,7 +143,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
-    function burnStarterPack() public {
+    function burnStarterPack() public onlyWhitelisted {
         uint256 starterPackId = NUM_ATHLETES;
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
