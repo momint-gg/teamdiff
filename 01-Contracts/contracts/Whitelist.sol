@@ -15,7 +15,7 @@ contract Whitelist is Ownable {
     mapping(address => bool) public whitelist;
     //address leagueCreator;
     uint256 numWhitelisted; // Keeping track of the number of users whitelisted (slight modification to code)
-    bool public isPublic;
+    bool public isPublic; // Should be false by default
     event WhitelistedAddressAdded(address addr);
     event WhitelistedAddressRemoved(address addr);
 
@@ -28,7 +28,10 @@ contract Whitelist is Ownable {
      */
     modifier onlyWhitelisted() {
         // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
-        require(whitelist[msg.sender] || isPublic);
+        require(
+            whitelist[msg.sender] || isPublic,
+            "User is not whitelisted :("
+        );
         _;
     }
 
@@ -111,5 +114,9 @@ contract Whitelist is Ownable {
                 success = true;
             }
         }
+    }
+
+    function getNumWhitelisted() public view returns (uint256) {
+        return numWhitelisted;
     }
 }

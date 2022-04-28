@@ -117,6 +117,15 @@ contract GameItems is ERC1155, Ownable, Whitelist {
         whitelistContract.removeAddressFromWhitelist(_user);
     }
 
+    function getWhitelistedUsers()
+        public
+        view
+        onlyWhitelisted
+        returns (uint256)
+    {
+        return whitelistContract.getNumWhitelisted();
+    }
+
     /*****************************************************/
     /************ STARTER PACK MINTING/BURNING ***********/
     /*****************************************************/
