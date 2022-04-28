@@ -22,7 +22,6 @@ contract LeagueMaker is Ownable {
 
     // ======== Immutable storage ========
     UpgradeableBeacon immutable upgradeableBeacon;
-    // Athletes immutable athletesDataStorage;
 
     // For staking
     TestUSDC testUSDC;
@@ -33,24 +32,8 @@ contract LeagueMaker is Ownable {
     //Maps Users to all the leagues they are a member of
     mapping(address => address[]) public userToLeagueMap;
     mapping(address => bool) public isProxyMap;
-    uint256 version;
     uint256 numWeeks;
 
-    // Proxy Constructor Parameters
-    // struct Parameters {
-    //     string name;
-    //     uint256 version;
-    //     uint256 numWeeks;
-    //     uint256 stakeAmount;
-    //     bool isPublic;
-    //     address athletesDataStorageAddress;
-    //     address owner;
-    //     address admin;
-    //     address polygonUSDCAddress;
-    //     address rinkebyUSDCAddress;
-    //     address testUSDCAddress;
-    // }
-    // Parameters public parameters;
 
     uint256 _numWeeks = 8;
     uint256 public currentWeek = 0;
@@ -72,13 +55,14 @@ contract LeagueMaker is Ownable {
         bool _isPublic,
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
-        address _athletesContractAddress
+        address _athletesContractAddress,
+        address _gameItemsAddress
     ) external returns (address) {
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,uint256,bool,address,address,address,address,address,address)",
+            "initialize(string,uint256,bool,address,address,address,address,address,address,address)",
             _name,
             //_version,
-            _numWeeks,
+            //_numWeeks,
             _stakeAmount,
             _isPublic,
             _athletesContractAddress,
@@ -87,7 +71,8 @@ contract LeagueMaker is Ownable {
             _rinkebyUSDCAddress,
             _testUSDCAddress,
             // _teamDiffAddress,
-            address(this)
+            address(this),
+            _gameItemsAddress
         );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
@@ -103,10 +88,6 @@ contract LeagueMaker is Ownable {
         return address(proxy);
     }
 
-    //Create onlyOwner function to update week
-    function incrementCurrentWeek() public onlyOwner {
-        currentWeek += 1;
-    }
 
     //TODO set to only owner,
     //owner will be our Team Diff wallet
@@ -150,6 +131,11 @@ contract LeagueMaker is Ownable {
     function unlockLeagueLineups() public onlyOwner {
         LeagueMakerLibrary.unlockLeagueLineups(leagueAddresses);
     }
+
+        //Create onlyOwner function to update week
+    // function incrementCurrentWeek() public onlyOwner {
+    //     currentWeek += 1;
+    // }
 
     //Evaluates weekly scores for all matchups in all leagues
     function evaluateWeekForAllLeagues() public onlyOwner {
