@@ -16,17 +16,20 @@ describe("Testing whitelist for GameItems", async () => {
 
   //Ran before every unit test
   //used to reset state or prepare test
-  beforeEach(async () => {});
+  // beforeEach(async () => {});
 
   it("Correctly sets up GameItems", async () => {
     expect(await GameItem.getNFTPerAthlete()).to.equal(10);
   });
 
+  // This will throw an error -- for some reason having trouble getting Chai expect an error to work, but this is working
   it("Doesnt let a non-whitelised user call mint pack", async () => {
-    expect(await GameItem.connect(owner).mintStarterPack()).to.be.reverted;
+    await GameItem.connect(owner).mintStarterPack();
+    expect.fail(
+      "Error: VM Exception while processing transaction: reverted with reason string 'User is not whitelisted.'"
+    );
   });
 
-  // This should throw an error
   it("Adds addr1 to the whitelist", async () => {
     const addUser = await GameItem.connect(owner).addUserToWhitelist(
       addr1.address
@@ -34,13 +37,11 @@ describe("Testing whitelist for GameItems", async () => {
     await addUser.wait();
   });
 
-  // This is working though...
   it("Num of whitelisted users is correct", async () => {
     // We should have ~1~ whitelisted user now!
-    expect(Number(await GameItem.getWhitelistedUsers())).to.equal(1);
+    expect(Number(await GameItem.getNumWhitelisted())).to.equal(1);
   });
 
-  // WHY ISN'T THIS WORKING ???
   it("Correctly allows a whitelisted user to mint a starter pack", async () => {
     let txn = await GameItem.connect(addr1).mintStarterPack();
     await txn.wait();
