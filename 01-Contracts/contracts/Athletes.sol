@@ -59,12 +59,18 @@ contract Athletes is Ownable {
         return athleteToScores[index];
     }
 
+    // Getting the total # of athletes - should be 50 when we deploy
+    function getNumAthletes() external view returns (uint256) {
+        return athletes.length;
+    }
+
     //TODO calculate score for an athlete entirely on-chain
     // //Allows verification of our off-chain calculations
     function calculateScoreOnChain(Stats calldata athleteStats)
-        pure
         public
-        returns (uint256 score)  {
+        pure
+        returns (uint256 score)
+    {
         //calculate score with given stats
         //placeholder lol
         return athleteStats.kills * 2;
