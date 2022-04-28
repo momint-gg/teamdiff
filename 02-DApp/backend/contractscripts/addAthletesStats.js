@@ -1,28 +1,25 @@
-// Script for appending athletes stats to the contract
-// Env file should have correct private key to add stats (bc onlyOwner)
+// Appending athletes stats to the contract
 
 require('dotenv').config();
 const { ethers } = require('ethers');
 const abi = require('./abis/Athletes.json');
 const sampleAthleteData = require('./sampleAthleteData');
-
-// Sample contract address (on Rinkeby)
-const sampleContractAddress = '0x57a45Bfd7C5E53ac0FbF73Bc4b916B0F49b0fE94';
+const { athletesContract } = require('./contractAddresses');
 
 async function main() {
-  // Test vars for now
-
+  // Constructing our contract
   const provider = new ethers.providers.AlchemyProvider(
     'rinkeby',
     process.env.ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
   const contract = new ethers.Contract(
-    sampleContractAddress,
+    athletesContract,
     abi.abi,
     rinkebySigner
   );
 
+  // Adding stats
   for (let i = 0; i < sampleAthleteData.length; i++) {
     console.log('Adding athletes stats for ', i);
     const addAthletesStatsTxn = await contract.appendStats(
@@ -30,6 +27,7 @@ async function main() {
       sampleAthleteData[i].points // their points for the week
     );
     console.log('Adding points: ', sampleAthleteData[i].points);
+    // Waiting for txn to mine
     await addAthletesStatsTxn.wait();
   }
 }
