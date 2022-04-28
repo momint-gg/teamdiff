@@ -109,20 +109,21 @@ contract GameItems is ERC1155, Ownable, Whitelist {
     /*****************************************************/
     /******************* WHITELIST ***********************/
     /*****************************************************/
-    function addUserToWhitelist(address _user) public onlyOwner {
-        whitelistContract.addAddressToWhitelist(_user);
+    function addUserToWhitelist(address _userToAdd) external onlyOwner {
+        require(
+            whitelistContract.addAddressToWhitelist(_userToAdd),
+            "Failed to add to whitelist"
+        );
     }
 
-    function removeUserFromWhitelist(address _user) public onlyOwner {
-        whitelistContract.removeAddressFromWhitelist(_user);
+    function removeUserFromWhitelist(address _userToAdd) external onlyOwner {
+        require(
+            whitelistContract.removeAddressFromWhitelist(_userToAdd),
+            "Failed to remove from whitelist"
+        );
     }
 
-    function getWhitelistedUsers()
-        public
-        view
-        onlyWhitelisted
-        returns (uint256)
-    {
+    function getWhitelistedUsers() public view returns (uint256) {
         return whitelistContract.getNumWhitelisted();
     }
 

@@ -8,7 +8,7 @@ describe("Testing whitelist for GameItems", async () => {
   before(async () => {
     GameItemFactory = await ethers.getContractFactory("GameItems");
     GameItem = await GameItemFactory.deploy(...constructorArgs);
-    [owner, addr1] = await ethers.getSigners();
+    [owner, addr1, addr2] = await ethers.getSigners();
     await GameItem.deployed();
     GameItem.connect(owner);
     console.log("GameItems.sol deployed to: " + GameItem.address);
@@ -23,25 +23,26 @@ describe("Testing whitelist for GameItems", async () => {
   });
 
   it("Doesnt let a non-whitelised user call mint pack", async () => {
-    expect(await GameItem.mintStarterPack()).to.be.revertedWith(
-      "Error: Transaction reverted without a reason string"
-    );
+    expect(await GameItem.connect(owner).mintStarterPack()).to.be.reverted;
   });
 
+  // This should throw an error
   it("Adds addr1 to the whitelist", async () => {
     const addUser = await GameItem.connect(owner).addUserToWhitelist(
-      owner.address
+      addr1.address
     );
     await addUser.wait();
   });
 
-  it("Lets addr1 mint a pack now that they're whitelisted", async () => {
-    let txn = await GameItem.connect(owner).mintStarterPack();
-    await txn.wait();
-
+  // This is working though...
+  it("Num of whitelisted users is correct", async () => {
     // We should have ~1~ whitelisted user now!
-    expect(
-      Number(await GameItem.connect(owner).getWhitelistedUsers())
-    ).to.equal(1);
+    expect(Number(await GameItem.getWhitelistedUsers())).to.equal(1);
+  });
+
+  // WHY ISN'T THIS WORKING ???
+  it("Correctly allows a whitelisted user to mint a starter pack", async () => {
+    let txn = await GameItem.connect(addr1).mintStarterPack();
+    await txn.wait();
   });
 });
