@@ -81,6 +81,17 @@ describe("LeagueProxy.test", async () => {
     [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
       await ethers.getSigners();
 
+          //Minting athlete to addr1
+    // txn = await GameItemInstance.connect(addr1).mintAthlete(1);
+    // //txn = await gameItemsContract.mintAthlete(id);
+    // await txn.wait();
+    // txn = await GameItemInstance.connect(addr1).mintAthlete(2);
+    // //txn = await gameItemsContract.mintAthlete(id);
+    // await txn.wait();
+    // console.log("balance: " + await GameItemInstance.connect(addr1).balanceOf(addr1.address, 1));
+
+
+
     // Deploying test USDC contract
     TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
     testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
@@ -123,9 +134,13 @@ describe("LeagueProxy.test", async () => {
       LeagueOfLegendsLogicJSON.abi,
       provider
     );
-    proxyContract = LeagueProxyInstance.connect(owner);
-  });
 
+    //Create interactable contract instances
+    proxyContract = LeagueProxyInstance.connect(owner);
+    leaugeMaker = LeagueMakerInstance.connect(owner);
+    gameItems = GameItemInstance.connect(addr1);
+  });
+  
   // MAKING SURE LEAGUE WAS SETUP CORRECTLY
   it("Successfully gets stake amount for the proxy", async () => {
     const testStakeAmount = await proxyContract.getStakeAmount();
@@ -178,7 +193,7 @@ describe("LeagueProxy.test", async () => {
       80
     );
   });
-
+  
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
     // TODO: Add addr1 to whitelist before prompting approval/joining the league
     // Adding addr1 to whitelist so they can join the league
@@ -209,52 +224,108 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
-  // Setting athletes and getting user's lineup
-  // it("Correctly sets athlete IDs and gets a user's lineup", async () => {
-  //   const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
-  //   const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
+  it("Schedule is set correctly", async () => {
+    let additionalLeagueMembers = [addr2.address, addr3.address, addr4.address];
+    await additionalLeagueMembers.forEach(async (signer, index) => {
+      //console.log("signer: " + signer + " index: " + index);
+      txn = await proxyContract.addUserToLeague(signer);
+      receipt = await txn.wait();
+      // console.log(
+      //   "\n\tleagueMember #" + index + ": " +
+      //   (await LeagueProxyInstanceWithSigner.leagueMembers(index + 1))
+      // )
+    });
+    let txn = await proxyContract.setLeagueSchedule();
+    await txn.wait();
+    let schedule = proxyContract.schedule();
+    schedule.forEach((week) => {
+      console.log("week: " + week);
+      week.forEach((matchup) => {
+        expect(matchup[0]).to.not.be.equal(matchup[1]);
+      })
+    });
+  });
 
-  //   let txn = await proxyContract.connect(owner).setLineup(athleteIds);
-  //   await txn.wait();
+  /*
+  Setting athletes and getting user's lineup
+  it("Correctly sets athlete IDs and gets a user's lineup", async () => {
+    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
+    const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
 
-  //   txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
-  //   await txn.wait();
+    let txn = await proxyContract.connect(owner).setLineup(athleteIds);
+    await txn.wait();
 
-  //   const lineup = await proxyContract.connect(owner).getLineup(); // Getting the caller's lineup
-  //   // console.log("Lineup for owner is ", lineup);
-  //   await proxyContract.connect(addr1);
-  //   const lineup2 = await proxyContract.connect(addr1).getLineup();
-  //   // console.log("Lineup for addr1 is ", lineup2);
-  //   expect(lineup).to.not.equal(lineup2);
-  // });
+    txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
+    await txn.wait();
+
+    const lineup = await proxyContract.connect(owner).getLineup(); // Getting the caller's lineup
+    // console.log("Lineup for owner is ", lineup);
+    await proxyContract.connect(addr1);
+    const lineup2 = await proxyContract.connect(addr1).getLineup();
+    // console.log("Lineup for addr1 is ", lineup2);
+    expect(lineup).to.not.equal(lineup2);
+  });
+  */
 
   it("User can setLineup of athleteIds of their owned athletes", async () => {
-    // const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
-    // const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
+    const athleteIds = [1, 2, 3]; // Athlete IDs belonging to addr1
+    let txn;
+    // athleteIds.forEach(async (id) => {
+    //     txn = await gameItems.mintAthlete(id);
+    //     await txn.wait();
+    //     console.log("balance in test: " + await GameItemInstance.connect(addr1).balanceOf(addr1, id));
+    // })
+    txn = await gameItems.mintAthlete(1);
+    await txn.wait();
+    txn = await gameItems.mintAthlete(2);
+    await txn.wait();
+    txn = await gameItems.mintAthlete(3);
+    await txn.wait();
 
 
-    // let txn = await proxyContract.connect(owner).setLineup(athleteIds);
-    // await txn.wait();
+    txn = await proxyContract.connect(addr1).setLineup(athleteIds);
+    await txn.wait();
 
-    // txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
-    // await txn.wait();
-
-    // const lineup = await proxyContract.connect(owner).getLineup(); // Getting the caller's lineup
-    // // console.log("Lineup for owner is ", lineup);
-    // await proxyContract.connect(addr1);
-    // const lineup2 = await proxyContract.connect(addr1).getLineup();
-    // // console.log("Lineup for addr1 is ", lineup2);
-    // expect(lineup).to.not.equal(lineup2);
+    const lineup2 = await proxyContract.connect(addr1).getLineup();
+    expect(lineup2[0]).to.equal(athleteIds[0]) && expect(lineup2[1]).to.equal(athleteIds[1]);
   });
 
-  //Setting lineup require tests
+  
+
+  //Setting lineup tests
   it("User cannot set lineup of athleteIds that they don't own", async () => {
-    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
-    let txn = proxyContract.connect(owner).setLineup(athleteIds);
+    const athleteIds = [1, 2, 3, 4]; // Athlete IDs for user 1 (owner)
+    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
     //await txn.wait();    
-    expect(txn).to.be.reverted;//With("Caller does not own given athleteIds");
+    expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
   });
 
+  it("User cannot set duplicate athlete id in lineup", async () => {
+    const athleteIds = [1, 1, 2]; // Athlete IDs for user 1 (owner)
+    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("Duplicate athleteIDs are not allowed.");
+  });
+
+
+  it("User cannot set lineup in a league they don't belong to", async () => {
+    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
+    let txn = proxyContract.connect(addr3).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("user is not in League");
+  });
+
+  it("User cannot set lineup if line up is locked for the week", async () => {
+    const athleteIds = [1, 2]; // Athlete IDs for user 1 (owner)
+    //LeagueMakerInstance is undefined for some reason
+    let txn = leaugeMaker.lockLeagueLineups();
+    //await txn.wait();
+    txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("lineup is locked for the week!");
+  });
+
+  
   // Correctly evaluates the matchup between two users
   // it("Correctly appends stats for athletes and evaluates a matchup", async () => {
   //   // Adding random stats for first 10 athletes (0-9)

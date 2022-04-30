@@ -141,8 +141,8 @@ contract LeagueOfLegendsLogic is
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     //TODO: Change functions to onlyTeamDiff for deployment (when testing on Rinkeby, only Admin for hardhat)
-
-    function setLeagueSchedule() external onlyOwner {
+    //TODO change to only owner for prod
+    function setLeagueSchedule() external  {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -280,7 +280,7 @@ contract LeagueOfLegendsLogic is
     // How do we check that the user owners the athletiIds??
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
-        require(inLeague[msg.sender]);
+        require(inLeague[msg.sender], "user is not in League");
         uint256 currentWeek = leagueMakerContract.currentWeek();
         //TODO move the following checks into a library somehow, cost about 1 kb of contract space :/
         //Decrement all athleteToLineup Occurences from previous lineup
@@ -290,6 +290,9 @@ contract LeagueOfLegendsLogic is
         //require ownership of all athleteIds + update athleteToLineOccurencesMapping
         for(uint256 i; i < athleteIds.length; i++) {
             athleteToLineupOccurencesPerWeek[i][currentWeek]++;
+            //gameItemsContract.mintAthlete(athleteIds[i]);
+            // console.log("in set lineup");
+            // console.log(gameItemsContract.balanceOf(msg.sender, athleteIds[i]));
             require(gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0, "Caller does not own given athleteIds");
         }
         //require non-duplicate IDs
@@ -342,16 +345,16 @@ contract LeagueOfLegendsLogic is
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
     // Add user to league -- only testing, not using this
-    // function addUserToLeague(address user) external onlyOwner {
-    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
+    function addUserToLeague(address user) public {
+        require(!leagueEntryIsClosed, "League Entry is Closed!");
 
-    //     if (leagueMembers.length < 8) {
-    //         leagueMembers.push(user);
-    //         leagueMakerContract.updateUserToLeagueMapping(user);
-    //     } else {
-    //         console.log("Too many users in league to add new user.");
-    //     }
-    // }
+        if (leagueMembers.length < 8) {
+            leagueMembers.push(user);
+            leagueMakerContract.updateUserToLeagueMapping(user);
+        } else {
+            console.log("Too many users in league to add new user.");
+        }
+    }
 
     // User joining the league
     function joinLeague() external onlyWhitelisted nonReentrant {
