@@ -1,10 +1,10 @@
 // Testing to make sure athletes stats were added correctly
 
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' }); // Put env file in contractscripts main folder
 const { ethers } = require('ethers');
-const abi = require('./abis/Athletes.json');
-const sampleAthleteData = require('./sampleAthleteData');
-const { athletesContract } = require('./contractAddresses');
+const abi = require('../contract_info/abis/Athletes.json');
+const sampleAthleteData = require('../sampleAthleteData');
+const { Athletes } = require('../contract_info/contractAddresses');
 
 async function main() {
   // Constructing our contract
@@ -13,11 +13,7 @@ async function main() {
     process.env.ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  const contract = new ethers.Contract(
-    athletesContract,
-    abi.abi,
-    rinkebySigner
-  );
+  const contract = new ethers.Contract(Athletes, abi.abi, rinkebySigner);
   console.log('Starting txn test');
 
   // Getting the total # athletes
