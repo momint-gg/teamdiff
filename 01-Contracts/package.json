@@ -28,6 +28,6 @@
     "dotenv": "^14.3.2",
     "hardhat-contract-sizer": "^2.4.0",
     "hardhat-gas-reporter": "^1.0.8",
-    "mocha": "^9.2.0"
+    "mocha": "^9.2.2"
   }
 }

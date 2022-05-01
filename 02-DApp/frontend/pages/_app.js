@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
 import Head from "next/head";
-import theme from '../styles/theme'
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-//@import url('https://fonts.googleapis.com/css?family=Exo+2');
+import theme from "../styles/theme";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import "@fontsource/exo";
 import '../styles/globalStyles.css';
 import { Provider, chain, defaultChains } from 'wagmi'
@@ -67,4 +66,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-export default MyApp
+export default MyApp;

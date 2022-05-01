@@ -8,4 +8,6 @@ hardhat.config.js
 #Hardhat files
 cache
 artifacts
+*.dbg.json
 
+buil\contracts\contracts

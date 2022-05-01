@@ -97,9 +97,9 @@ async function main() {
   //     + "\n\tleagueName: " + (await LeagueProxyInstance.leagueName())
   // );
 
-  
+  var signers =  [owner.address, addr1.address, addr2.address, addr3.address];
   txn = await LeagueMakerInstance.addUsersToLeagueHelper(
-    [owner.address, addr1.address, addr2.address, addr3.address],
+    signers, 
     LeagueProxyInstance.address
   );
   receipt = await txn.wait();
@@ -109,20 +109,30 @@ async function main() {
       //GameLogicCloneAddress = event.args;
     }
   }
-  txn = await LeagueMakerInstance.testCallDoesNotExist(
-    LeagueProxyInstance.address
-  );
-  receipt = await txn.wait();
-  for (const event of receipt.events) {
-    if (event.event != null) {
-      console.log(`Event ${event.event} with args ${event.args}`);
-      //GameLogicCloneAddress = event.args;
-    }
-  }
-  console.log(
-    "League Proxy updated state: " 
-      + "\n\tVersion: " + (await LeagueProxyInstance.version())
-  );
+  // txn = await LeagueMakerInstance.testCallDoesNotExist(
+  //   LeagueProxyInstance.address
+  // );
+  // txn = await LeagueMakerInstance.setLeagueSchedules();
+  // receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     //GameLogicCloneAddress = event.args;
+  //   }
+  // }
+  //await LeagueMakerInstance.leagueAddresses();
+  signers.forEach(async (signer, index) => {
+    console.log(
+       "Signer: " + signer 
+        + "\n\tLeague 0: " + (await LeagueMakerInstance.leagueAddresses(0))
+    );
+  });
+
+
+  // console.log(
+  //   "League Proxy updated state: " 
+  //     + "\n\tVersion: " + (await LeagueProxyInstance.version())
+  // );
 
     //*******************
   // Testing delegate call functionality within contract

@@ -5,10 +5,10 @@ import {
   useProvider,
   useContract,
   useEnsLookup,
-} from 'wagmi';
-import { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
-import 'bootstrap/dist/css/bootstrap.css';
+} from "wagmi";
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import "bootstrap/dist/css/bootstrap.css";
 import {
   Box,
   CircularProgress,
@@ -18,36 +18,36 @@ import {
   Container,
   Paper,
   Fab,
-} from '@mui/material';
-import Image from 'next/image';
-import CONSTANTS from '../Constants.js';
-import GameItemsJSON from '../utils/GameItems.json';
-import * as utils from '@ethersproject/hash';
-import { hexZeroPad } from '@ethersproject/bytes';
-import profilePic from '../assets/images/starter-pack.png';
+} from "@mui/material";
+import Image from "next/image";
+import CONSTANTS from "../Constants.js";
+import GameItemsJSON from "../utils/GameItems.json";
+import * as utils from "@ethersproject/hash";
+import { hexZeroPad } from "@ethersproject/bytes";
+import profilePic from "../assets/images/starter-pack.png";
 
 export default function MintPack({ setDisplay }) {
-  //WAGMI Hooks
+  // WAGMI Hooks
   const [{ data: connectData, error: connectError }, connect] = useConnect();
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
   const provider = new ethers.providers.AlchemyProvider(
-    'rinkeby',
+    "rinkeby",
     process.env.ALCHEMY_KEY
   );
   const [{ data: signerData, error, loading }, getSigner] = useSigner();
 
-  //State Variables
+  // State Variables
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [packsAvailable, setPacksAvailable] = useState(null);
 
-  //Use Effect for component mount
+  // Use Effect for component mount
   useEffect(async () => {
     if (accountData) {
-      //Initialize connections to GameItems contract
+      // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONSTANTS.CONTRACT_ADDR,
         GameItemsJSON.abi,
@@ -55,11 +55,11 @@ export default function MintPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
-      //Grab packs available
+      // Grab packs available
       const packsAvail = await GameItemsContract.packsAvailable();
       setPacksAvailable(packsAvail);
 
-      //Callback for when packMinted Events is fired from contract
+      // Callback for when packMinted Events is fired from contract
       const signerAddress = accountData.address;
       const packMintedCallback = (signer, packID) => {
         if (signer == signerAddress) {
@@ -71,17 +71,17 @@ export default function MintPack({ setDisplay }) {
       // A filter that matches my address as the signer of the contract call
       // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
       console.log(hexZeroPad(signerAddress, 32));
-      let filter = {
+      const filter = {
         address: GameItemsContract.address,
         topics: [
-          utils.id('packMinted(address,uint256)'),
-          //TODO something wrong with this line
-          //hexZeroPad(signerAddress, 32)
+          utils.id("packMinted(address,uint256)"),
+          // TODO something wrong with this line
+          // hexZeroPad(signerAddress, 32)
         ],
       };
       GameItemsContract.on(filter, packMintedCallback);
     } else {
-      console.log('no account data found!');
+      console.log("no account data found!");
     }
   }, []);
 
@@ -89,17 +89,17 @@ export default function MintPack({ setDisplay }) {
     if (gameItemsContract) {
       // Create a new instance of the Contract with a Signer, which allows
       // update methods
-      let gameItemsContractWithSigner = gameItemsContract.connect(signerData);
+      const gameItemsContractWithSigner = gameItemsContract.connect(signerData);
 
       const mintTxn = await gameItemsContractWithSigner
         .mintStarterPack()
         .then((res) => {
-          console.log('txn result: ' + JSON.stringify(res, null, 2));
+          console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsMinting(true);
-          console.log('Minting pack in progress...');
+          console.log("Minting pack in progress...");
         })
         .catch((error) => {
-          alert('error: ' + error.message);
+          alert("error: " + error.message);
         });
     }
   };
@@ -107,23 +107,23 @@ export default function MintPack({ setDisplay }) {
   return (
     <Box>
       <Fab
-        variant='extended'
-        size='small'
-        color='primary'
-        aria-label='add'
+        variant="extended"
+        size="small"
+        color="primary"
+        aria-label="add"
         onClick={() => setDisplay(false)}
       >
         &#60; BACK
       </Fab>
       {accountData && !(isMinting || hasMinted) && packsAvailable != 0 && (
-        <Container maxWidth='lg' justifyContent='center' alignItems='center'>
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
-            justifyContent='center'
-            alignItems='center'
+            justifyContent="center"
+            alignItems="center"
             sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              '& > :not(style)': {
+              display: "flex",
+              flexWrap: "wrap",
+              "& > :not(style)": {
                 m: 1,
                 width: 260,
                 height: 350,
@@ -134,54 +134,54 @@ export default function MintPack({ setDisplay }) {
               elevation={0}
               style={{
                 background:
-                  'linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)',
-                filter: 'blur(35px)',
+                  "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                filter: "blur(35px)",
               }}
             />
-            <Container sx={{position:"absolute"}}>
-                    <Image
-                        src={profilePic}
-                        alt="Picture of the author"
-                        width="310px"
-                        height="450px"
-                        position="absolute"
-                    />
+            <Container sx={{ position: "absolute" }}>
+              <Image
+                src={profilePic}
+                alt="Picture of the author"
+                width="310px"
+                height="450px"
+                position="absolute"
+              />
             </Container>
           </Box>
 
           <Box
-            justifyContent='center'
-            alignItems='center'
-            flexDirection='column'
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column"
             sx={{
-              display: 'flex',
+              display: "flex",
             }}
           >
-            <Typography variant='h2' color='white' component='div'>
+            <Typography variant="h2" color="white" component="div">
               Mint Starter Pack
             </Typography>
             {packsAvailable != null && (
-              <Typography variant='h4' color='white' component='div'>
-                {'There are ' + packsAvailable + ' packs still available'}
+              <Typography variant="h4" color="white" component="div">
+                {"There are " + packsAvailable + " packs still available"}
               </Typography>
             )}
           </Box>
           <Box
-            justifyContent='center'
-            alignItems='center'
+            justifyContent="center"
+            alignItems="center"
             sx={{
-              display: 'flex',
-              paddingTop: '20px',
+              display: "flex",
+              paddingTop: "20px",
             }}
           >
             <Button
               onClick={mintStarterPack}
-              variant='contained'
-              color='inherit'
+              variant="contained"
+              color="inherit"
               style={{
-                color: 'black',
-                borderRadius: '40px',
-                width: '10%',
+                color: "black",
+                borderRadius: "40px",
+                width: "10%",
                 fontSize: 20,
               }}
             >
@@ -203,11 +203,12 @@ export default function MintPack({ setDisplay }) {
           </Typography>
           <a
             href={
-              'https://testnets.opensea.io/assets/' +
+              "https://testnets.opensea.io/assets/" +
               gameItemsContract.address +
-              '/50' //the pack Id is after the athletes (not 0)
+              "/50" // the pack Id is after the athletes (not 0)
             }
-            target={'_blank'}
+            target={"_blank"}
+            rel="noreferrer"
           >
             View on OpenSea.
           </a>

@@ -1,12 +1,12 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
-    type: 'dark',
-    mode: 'dark',
+    type: "dark",
+    mode: "dark",
     background: {
-      dark: '#2E0744',
-      default: '#2E0744'
+      dark: "#2E0744",
+      default: "#2E0744",
     },
     primary: {
       main: '#fafafa',
@@ -17,24 +17,21 @@ const theme = createTheme({
       mainGradient: 'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
     },
     secondary: {
-      main: '#00FFFF',
-      light: 'white',
-      contrastText: '#40fff2',
+      main: "#00FFFF",
+      light: "white",
+      contrastText: "#40fff2",
     },
   },
   typography: {
-    fontFamily: [
-      'Exo',
-      'sans-serif',
-    ].join(','),
+    fontFamily: ["Exo", "sans-serif"].join(","),
   },
   overrides: {
     Button: {
       label: {
-        color: '#2E0744',
+        color: "#2E0744",
       },
     },
-  }
+  },
 });
 
 export default theme;

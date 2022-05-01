@@ -15,16 +15,16 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Welcome to the internal API!");
+    res.send("Welcome to the teamdiff internal API!");
 });
 
-app.get("/stats/aggregated_stats", (req, res) => {
+app.get("/aggregated_stats", (req, res) => {
     const rawAggStats = fs.readFileSync("../datafetcher/aggregated_stats.json");
     const aggStats = JSON.parse(rawAggStats);
     res.send(aggStats);
 });
 
-app.get("/stats/game_stats", (req, res) => {
+app.get("/game_stats", (req, res) => {
     const rawGameStats = fs.readFileSync("../datafetcher/game_stats.json");
     const gameStats = JSON.parse(rawGameStats);
     res.send(gameStats);
