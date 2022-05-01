@@ -45,6 +45,7 @@ contract LeagueOfLegendsLogic is
     struct Matchup {
         address[2] players;
     }
+    ////TODO change to private 
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
@@ -142,7 +143,7 @@ contract LeagueOfLegendsLogic is
     /*************************************************/
     //TODO: Change functions to onlyTeamDiff for deployment (when testing on Rinkeby, only Admin for hardhat)
     //TODO change to only owner for prod
-    function setLeagueSchedule() external  {
+    function setLeagueSchedule() external {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -218,6 +219,10 @@ contract LeagueOfLegendsLogic is
     //     return version;
     // }
 
+    // function getWeekSchedule(uint256 week) public returns (Matchup[] memory) {
+    //     return schedule[week];
+    // }
+
     function getLeagueName() external view returns (string memory) {
         return leagueName;
     }
@@ -247,9 +252,9 @@ contract LeagueOfLegendsLogic is
     }
 
     // Getting the athletes contract address
-    function getAthleteContractAddress() external view returns (address) {
-        return address(athletesContract);
-    }
+    // function getAthleteContractAddress() external view returns (address) {
+    //     return address(athletesContract);
+    // }
 
     // Gets the current week #
     // function getCurrentWeekNum() external view returns (uint256) {
@@ -261,10 +266,10 @@ contract LeagueOfLegendsLogic is
     /******************************************************/
 
     // Returning the contracts USDC balance
-    function getUSDCBalance() external view returns (uint256) {
-        require(inLeague[msg.sender]);
-        return testUSDC.balanceOf(address(this));
-    }
+    // function getUSDCBalance() external view returns (uint256) {
+    //     require(inLeague[msg.sender]);
+    //     return testUSDC.balanceOf(address(this));
+    // }
 
     // Returning the sender's USDC balance (testing)
     function getUserUSDCBalance() external view returns (uint256) {
@@ -345,16 +350,17 @@ contract LeagueOfLegendsLogic is
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
     // Add user to league -- only testing, not using this
-    function addUserToLeague(address user) public {
-        require(!leagueEntryIsClosed, "League Entry is Closed!");
+    //TODO comment out for prod
+    // function addUserToLeague(address user) public {
+    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
 
-        if (leagueMembers.length < 8) {
-            leagueMembers.push(user);
-            leagueMakerContract.updateUserToLeagueMapping(user);
-        } else {
-            console.log("Too many users in league to add new user.");
-        }
-    }
+    //     if (leagueMembers.length < 8) {
+    //         leagueMembers.push(user);
+    //         leagueMakerContract.updateUserToLeagueMapping(user);
+    //     } else {
+    //         console.log("Too many users in league to add new user.");
+    //     }
+    // }
 
     // User joining the league
     function joinLeague() external onlyWhitelisted nonReentrant {

@@ -224,27 +224,30 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
-  it("Schedule is set correctly", async () => {
-    let additionalLeagueMembers = [addr2.address, addr3.address, addr4.address];
-    await additionalLeagueMembers.forEach(async (signer, index) => {
-      //console.log("signer: " + signer + " index: " + index);
-      txn = await proxyContract.addUserToLeague(signer);
-      receipt = await txn.wait();
-      // console.log(
-      //   "\n\tleagueMember #" + index + ": " +
-      //   (await LeagueProxyInstanceWithSigner.leagueMembers(index + 1))
-      // )
-    });
-    let txn = await proxyContract.setLeagueSchedule();
-    await txn.wait();
-    let schedule = proxyContract.schedule();
-    schedule.forEach((week) => {
-      console.log("week: " + week);
-      week.forEach((matchup) => {
-        expect(matchup[0]).to.not.be.equal(matchup[1]);
-      })
-    });
-  });
+  // it("Schedule is set correctly", async () => {
+  //   let additionalLeagueMembers = [addr2.address, addr3.address, addr4.address];
+  //   await additionalLeagueMembers.forEach(async (signer, index) => {
+  //     console.log("signer: " + signer + " index: " + index);
+  //     txn = await proxyContract.addUserToLeague(signer);
+  //     receipt = await txn.wait();
+  //     // console.log(
+  //     //   "\n\tleagueMember #" + index + ": " +
+  //     //   (await LeagueProxyInstanceWithSigner.leagueMembers(index + 1))
+  //     // )
+  //   });
+
+  //   console.log("league members:" + proxyContract.leagueMembers(0));
+  //   let txn = await proxyContract.setLeagueSchedule({ gasLimit: 30000000 });
+  //   await txn.wait();
+  //   // for(var i = 0; i < 8; i++) {
+  //   //   txn  = await proxyContract.getWeekSchedule(i);
+  //   //   weekSchedule = await txn.wait();
+  //   //   console.log("week: " + JSON.stringify(weekSchedule, null, 2));
+  //   //   // weekSchedule.forEach((matchup) => {
+  //   //   //   expect(matchup[0]).to.not.be.equal(matchup[1]);
+  //   //   // })
+  //   // };
+  // });
 
   /*
   Setting athletes and getting user's lineup
