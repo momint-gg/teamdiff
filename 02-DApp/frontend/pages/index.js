@@ -1,26 +1,28 @@
 import React from "react";
 import Footer from "../components/Footer";
-import { Provider, chain, defaultChains } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { WalletLinkConnector } from "wagmi/connectors/walletLink";
-import Tab from "@mui/material/Tab";
-import Box from "@mui/material/Box";
-import TabPanel from "@mui/lab/TabPanel";
-import TabList from "@mui/lab/TabList";
-import TabContext from "@mui/lab/TabContext";
-import Typography from "@mui/material/Typography";
-import logo from "../assets/images/logo-horizontal.png";
-import Image from "next/image";
+import { Provider, chain, defaultChains } from 'wagmi'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { WalletLinkConnector } from 'wagmi/connectors/walletLink'
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import TabPanel from '@mui/lab/TabPanel'
+import TabList from '@mui/lab/TabList';
+import Link from 'next/link';
+import TabContext from '@mui/lab/TabContext';
+import Typography from '@mui/material/Typography';
+import logo from '../assets/images/logo-horizontal.png';
+import Image from 'next/image';
+// import '../assets/fonts/Exo/Exo-VariableFont_wght.ttf';
 
 //* ************ */
 // Custom Page Imports
 //********************** */
-import About from "./about";
-import MintPack from "./mintPack";
-import Collection from "./collection";
-import MintHome from "./mintHome";
-import Play from "./Play";
+import About from './about';
+import MintPack from './mintPack';
+import Collection from './collection';
+import MintHome from './mintHome';
+import Play from './play';
 
 //* ****************** */
 //  Component Imports */
@@ -69,50 +71,31 @@ export default function Index(props) {
 
   if (typeof window !== "undefined") {
     return (
-      <Provider autoConnect connectors={connectors}>
-        <Box sx={{ paddingLeft: 5, paddingRight: 5 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              p: 1,
-              m: 1,
-              borderRadius: 1,
-              alignItems: "center",
-            }}
-          >
-            <Image src={logo} alt="TeamDiff logo" width="300px" height="75px" />
-            <WalletLogin />
-          </Box>
-          <TabContext value={value}>
-            <Box
-              sx={{
-                marginLeft: -5,
-                marginRight: -5,
-                borderBottom: 1,
-                borderColor: "white",
-              }}
-            >
+      <Box>
+        <Box sx={{paddingLeft: 5, paddingRight: 5}}>
+          
+          {/* <TabContext value={value}> */}
+            <Box sx={{marginLeft:-5, marginRight: -5, borderBottom: 1, borderColor: 'white'}}>
               {/* //Do we want to have this be a SPA with all tabs?
               This might be an issue when certain tabs are fetching data, but maybe not */}
-              <TabList
-                onChange={handleChange}
+              {/* <TabList 
+                onChange={handleChange} 
                 indicatorColor="secondary"
                 textColor="white"
-                sx={{ marginLeft: 5 }}
-              >
-                <Tab label="PLAY" value="0" sx={{ fontSize: 30 }} />
-                <Tab label="COLLECTION" value="1" sx={{ fontSize: 30 }} />
-                <Tab label="MINT" value="2" sx={{ fontSize: 30 }} />
-                <Tab label="BURN" value="3" sx={{ fontSize: 30 }} />
-              </TabList>
+                sx= {{marginLeft: 5}}
+              > */}
+                {/* <Link label="PLAY" sx={{fontSize: 30}} href="/play">PLAY</Link>
+                <Link label="COLLECTION" sx={{fontSize: 30}} href="/collection">COLLECTION</Link>
+                <Link label="MINT" value="2" sx={{fontSize: 30}} href="/mintHome">MINT</Link>
+                <Link label="BURN" value="3" sx={{fontSize: 30}} href="/burnPack">BURN</Link> */}
+              {/* </TabList> */}
             </Box>
-            <TabPanel value="0">
+            {/* <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 <Play />
               </Typography>
-            </TabPanel>
-            <TabPanel value="1">
+            </TabPanel> */}
+            {/* <TabPanel value="1">
               <Collection />
             </TabPanel>
 
@@ -124,13 +107,13 @@ export default function Index(props) {
             </TabPanel>
             <TabPanel value="4">
               <ConnectWallet />
-            </TabPanel>
-          </TabContext>
+            </TabPanel> */}
+          {/* </TabContext> */}
         </Box>
         <Box>
           <Footer />
         </Box>
-      </Provider>
+        </Box>
     );
   }
   return null;
