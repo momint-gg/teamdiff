@@ -417,37 +417,21 @@ export default function CreateLeague({ setDisplay }) {
                 autoComplete="off"
               >
 
-//               <FormControlLabel 
-//                 label="Make League Private"
-
-              {/* <Typography variant="h6" color="white" component="div">
-                Invite List (optional)
-              </Typography> */}
-              {/* <FormControlLabel 
-                label="Enable Invite List"
-
-                control={
-                <Checkbox 
-                  checked={inviteListIsEnabled}
-                  onChange={handleInviteListCheckbox}
-
-                />
-              }
-              />
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {!formValues.inviteListStatus === "closed"? (
+              {!formValues.inviteListStatus === "closed" ? (
                 <Typography variant="h7" color="lightgrey">
                     Anybody with a wallet address can search and join this league.
                 </Typography>
                 ) : (
+                <>
                 <Typography variant="h7" color="lightgrey">
                   Only users added to this leagues whitelist can join.
                 </Typography>
                 <Typography variant="h6" color="white" component="div">
                   Invite list:
                 </Typography>
+                
 
-                />
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
                 <Typography variant="h6" color="white" component="div">
                   Invite List (Private/Closed Leagues)
@@ -491,8 +475,10 @@ export default function CreateLeague({ setDisplay }) {
 
 
                 </>
-              )}
+                
+                )}
             </Box>
+            
           </Grid>
         </Grid>
       )}
