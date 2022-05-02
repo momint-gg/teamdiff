@@ -418,7 +418,7 @@ export default function CreateLeague({ setDisplay }) {
               >
 
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {!formValues.inviteListStatus === "closed" ? (
+              {!(formValues.inviteListStatus === "closed") ? (
                 <Typography variant="h7" color="lightgrey">
                     Anybody with a wallet address can search and join this league.
                 </Typography>
