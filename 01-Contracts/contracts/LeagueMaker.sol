@@ -17,7 +17,7 @@ contract LeagueMaker is Ownable {
     //using Clones for address;
 
     // ======= Events ==========
-    event LeagueCreated(string name, address a);
+    event LeagueCreated(string name, address proxyAddress, address proxyAdminAddress);
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
@@ -96,9 +96,10 @@ contract LeagueMaker is Ownable {
         );
 
         leagueAddresses.push(address(proxy));
+        userToLeagueMap[_adminAddress].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 
-        emit LeagueCreated(_name, address(proxy));
+        emit LeagueCreated(_name, address(proxy), _adminAddress);
         // delete parameters;
         return address(proxy);
     }
@@ -166,6 +167,8 @@ contract LeagueMaker is Ownable {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
         userToLeagueMap[user].push(msg.sender);
     }
+
+    //function 
 
     function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});

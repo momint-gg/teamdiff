@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
 import { Box, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from '@mui/material/TextField';
@@ -8,8 +8,26 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
-import Grid from '@material-ui/core/Grid'
+import Grid from '@material-ui/core/Grid';
+//Web3 Imports
 
+import { ethers } from "ethers";
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import * as utils from "@ethersproject/hash";
+import { hexZeroPad } from "@ethersproject/bytes";
+
+//Wagmi imports
+import {
+  useAccount,
+  useConnect,
+  useSigner,
+  useProvider,
+  useContract,
+  useEnsLookup,
+} from "wagmi";
+//Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 // const StyledOutlinedInput = styled(OutlinedInput)({
 //   [`&$focused .${outlinedInputClasses.input}`]: {
 //     borderColor: "green"
@@ -64,9 +82,26 @@ export default function CreateLeague({ setDisplay }) {
     whitelistedAddresses: [],
   };
 
+  //WAGMI Hooks
+  const [{ data: accountData }, disconnect] = useAccount({
+    fetchEns: true,
+  });
+  //TODO change to matic network for prod
+  const provider = new ethers.providers.AlchemyProvider(
+    "rinkeby",
+    process.env.ALCHEMY_KEY
+  );
+  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+
+  //Contract State Hooks
+  const [leagueMakerContract, setLeagueMakerContract] = useState(null);
+  const [isCreatingLeague, setIsCreatingLeague] = useState(false);
+  const [hasCreatedLeague, setHasCreatedLeague] = useState(false);
+  const [newLeagueName, setNewLeagueName] = useState(null);
+
   const [formValues, setFormValues] = useState(defaultValues)
 
-  const [inviteListStatus, setInviteListStatus] = useState(false)
+  const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
 
   const [inviteListValues, setInviteListValues] = useState(["trey's private key"])
   // TODO: automatically set the first value to be user that's logged in
@@ -74,6 +109,86 @@ export default function CreateLeague({ setDisplay }) {
   const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
 
   const [showForm, setShowForm] = useState(false)
+
+
+  // Use Effect for component mount
+  useEffect(() => {
+    if (accountData) {
+      // Initialize connections to GameItems contract
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+      setLeagueMakerContract(LeagueMakerContract);
+
+      // Callback for when pack burned function is called from GameItems contracts
+      const leagueCreatedCallback = (newLeagueName, newLeagueProxyAddress, leagueAdminAddress) => {
+        //TODO create a proxy instance from emitted address
+        //then check the admin of that proxy to filter events?
+        //if (true) {
+          setIsCreatingLeague(false);
+          setHasCreatedLeague(true);
+          console.log("Finsihed creating league: " 
+                      + "\n\tname: " + newLeagueName
+                      + "\n\tproxy address: " + newLeagueProxyAddress
+                      + "\n\tadmin address: " + leagueAdminAddress);
+          setNewLeagueName(newLeagueName);
+        //}
+      };
+      // const filter = {
+      //   address: LeagueMakerContract.address,
+      //   topics: [
+      //     utils.id("leagueCreated(string,address,address)"),
+      //     //The below lines indicate what the returned event values should be filtered to
+      //     formValues.leagueName,
+      //     null,
+      //     hexZeroPad(accountData.address, 32),
+      //     //TODO add a signer field to leagueCreated Event
+      //     // hexZeroPad(signerAddress, 32)
+      //   ],
+      // };
+      // LeagueMakerContract.on(filter, leagueCreatedCallback);
+      // Listen to event for when pack burn function is called
+      LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
+    } else {
+      console.log("no account data found!");
+    }
+  }, []);
+
+  //Hanlder for form submit
+  const createLeagueSubmitHandler = async () => {
+    console.log("submitting values: " + JSON.stringify(formValues, null, 2));
+    if(leagueMakerContract && accountData) {
+      const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
+
+      const createLeagueTxn = await leagueMakerContractWithSigner
+        .createLeague(
+            formValues.leagueName,
+            formValues.buyInCost,
+            //TODO where do i get the ispublic?
+            !inviteListIsEnabled,
+            accountData.address,
+            CONTRACT_ADDRESSES.TestUSDC,
+            CONTRACT_ADDRESSES.Athletes,
+        {
+          gasLimit: 10000000,
+          // nonce: nonce || undefined,
+        })
+        .then((res) => {
+          console.log("txn result: " + JSON.stringify(res, null, 2));
+          setIsCreatingLeague(true);
+          console.log("League Creation in progress...");
+        })
+        .catch((error) => {
+          alert("error: " + error.message);
+        });
+    }
+    else {
+      console.log("Account data not set or LeagueMaker contract unitiliazed!");
+    }
+  }
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +201,7 @@ export default function CreateLeague({ setDisplay }) {
   };
 
   const handleInviteListCheckbox = () => {
-    setInviteListStatus(!inviteListStatus)
+    setInviteListIsEnabled(!inviteListIsEnabled)
   }
 
   const handlePlayerInviteInput = (e, i) => {
@@ -242,7 +357,7 @@ export default function CreateLeague({ setDisplay }) {
                 </StyledSelect>
               </FormControl>
               
-              <StyledButton variant="contained" size="small">Submit</StyledButton>
+              <StyledButton onClick={()=>{createLeagueSubmitHandler()}} variant="contained" size="small">Submit</StyledButton>
               {/* <Button variant="contained" size="small" sx={{backgroundColor: "primary.light"}}>Submit</Button> */}
             </Box>
           </Grid>
@@ -263,12 +378,12 @@ export default function CreateLeague({ setDisplay }) {
                 label="Enable Invite List"
                 control={
                 <Checkbox 
-                  checked={inviteListStatus}
+                  checked={inviteListIsEnabled}
                   onChange={handleInviteListCheckbox}
                 />}
               />
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {inviteListStatus && (
+              {inviteListIsEnabled && (
                 <>
                 {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
                   {inviteListValues.map((element, index) => (

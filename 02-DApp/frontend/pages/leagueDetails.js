@@ -10,9 +10,65 @@ import {
   Box,
   Grid,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+//Web3 Imports
+import { ethers } from "ethers";
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import * as utils from "@ethersproject/hash";
 
-export default function LeagueDetails({ leagueData, setLeagueOpen }) {
+//Wagmi imports
+import {
+  useAccount,
+  useConnect,
+  useSigner,
+  useProvider,
+  useContract,
+  useEnsLookup,
+} from "wagmi";
+//Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
+
+
+export default function LeagueDetails({ leagueData, leagueAddress, setLeagueOpen }) {
+   //WAGMI Hooks
+   const [{ data: accountData }, disconnect] = useAccount({
+    fetchEns: true,
+  });
+  //TODO change to matic network for prod
+  const provider = new ethers.providers.AlchemyProvider(
+    "rinkeby",
+    process.env.ALCHEMY_KEY
+  );
+  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const [leagueProxyContract, setLeagueProxyContract] = useState(null);
+  const [leagueName, setLeagueName] = useState(null);
+
+
+  
+  useEffect(() => {
+    console.log("leagueADdy: " + leagueAddress)
+    if (accountData && leagueAddress) {
+      // Initialize connections to GameItems contract
+      const LeagueProxyContract = new ethers.Contract(
+        leagueAddress,
+        LeagueOfLegendsLogicJSON.abi,
+        provider
+      );
+      console.log("in useEFfect");
+      setLeagueProxyContract(LeagueProxyContract);
+      async function fetchData() {
+        const leagueName = await LeagueProxyContract.leagueName();
+        setLeagueName(leagueName);
+        //setActiveLeagueList(activeLeagues);
+      }
+      fetchData();
+    }
+    else {
+      console.log("no account data or league Address found");
+    }
+  }, []);
+  
   return (
     <Box>
       <Fab
@@ -33,7 +89,7 @@ export default function LeagueDetails({ leagueData, setLeagueOpen }) {
       />
       <Box sx={{ marginLeft: 6 }}>
         <Typography variant="h2" color="secondary" component="div">
-          {leagueData?.leagueName}
+          {leagueName && leagueName}
         </Typography>
 
         <Typography variant="body1" color="white">

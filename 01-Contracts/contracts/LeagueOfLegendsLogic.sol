@@ -209,7 +209,7 @@ contract LeagueOfLegendsLogic is
         return version;
     }
 
-    function getLeagueName() external view returns (string memory) {
+    function getLeagueName() public view returns (string memory) {
         return leagueName;
     }
 
