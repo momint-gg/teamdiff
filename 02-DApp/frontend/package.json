@@ -29,7 +29,8 @@
     "styled-components": "^5.3.3",
     "typeface-cormorant": "^1.1.13",
     "typeface-exo": "^1.1.13",
-    "wagmi": "^0.2.6"
+    "wagmi": "^0.2.6",
+    "wallet-address-validator": "^0.2.4"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
