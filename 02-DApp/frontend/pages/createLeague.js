@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
 import { Box, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from '@mui/material/TextField';
@@ -9,6 +9,9 @@ import Select from '@mui/material/Select';
 import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@material-ui/core/Grid'
+// import wallet_address_validator from 'wallet-address-validator';
+// https://www.npmjs.com/package/wallet-address-validator
+import WAValidator from 'wallet-address-validator'; 
 
 // const StyledOutlinedInput = styled(OutlinedInput)({
 //   [`&$focused .${outlinedInputClasses.input}`]: {
@@ -62,16 +65,19 @@ export default function CreateLeague({ setDisplay }) {
     buyInCost: 0,
     payoutSplit: "default",
     whitelistedAddresses: [],
+    inviteListStatus: "open"
   };
 
   const [formValues, setFormValues] = useState(defaultValues)
 
-  const [inviteListStatus, setInviteListStatus] = useState(false)
+  // const [inviteListStatus, setInviteListStatus] = useState(false)
 
   const [inviteListValues, setInviteListValues] = useState(["trey's private key"])
   // TODO: automatically set the first value to be user that's logged in
 
   const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
+
+  const [validAddressesStatus, setValidAddressesStatus] = useState(true)
 
   const [showForm, setShowForm] = useState(false)
 
@@ -85,14 +91,30 @@ export default function CreateLeague({ setDisplay }) {
     // console.log(formValues)
   };
 
-  const handleInviteListCheckbox = () => {
-    setInviteListStatus(!inviteListStatus)
-  }
+  // const handleInviteListChange = (e) => {
+  //   if (e.target.value === )
+  //   setInviteListStatus(!inviteListStatus)
+  // }
+
+  useEffect(() => {
+    let flag = true
+    inviteListValues.forEach((e) => {
+      if (WAValidator.validate(e, "ETH")) {
+        console.log("validated")
+      } else {
+        console.log("invalid")
+        flag = false
+        setValidAddressesStatus(false)
+      }
+    })
+    if (flag) {
+      setValidAddressesStatus(true) 
+    }
+  }, [inviteListValues])
 
   const handlePlayerInviteInput = (e, i) => {
     let inviteListValuesNew = [...inviteListValues]
     inviteListValuesNew[i] = e.target.value
-    console.log(inviteListValuesNew)
     setInviteListValues(inviteListValuesNew)
   }
 
@@ -241,6 +263,21 @@ export default function CreateLeague({ setDisplay }) {
                   <MenuItem key="default" value="default">default</MenuItem>
                 </StyledSelect>
               </FormControl>
+
+              <FormControl sx={{ marginLeft: 3 }}>
+                <StyledInputLabel id="open-closed-toggle">League Status</StyledInputLabel>
+                <StyledSelect
+                  labelId="open-closed-toggle"
+                  id="open-closed-toggle-select"
+                  value={formValues.inviteListStatus}
+                  label="inviteListStatus"
+                  name="inviteListStatus"
+                  onChange={handleInputChange}
+                >
+                  <MenuItem key="open" value="open">open</MenuItem>
+                  <MenuItem key="closed" value="closed">closed</MenuItem>
+                </StyledSelect>
+              </FormControl>
               
               <StyledButton variant="contained" size="small">Submit</StyledButton>
               {/* <Button variant="contained" size="small" sx={{backgroundColor: "primary.light"}}>Submit</Button> */}
@@ -256,20 +293,28 @@ export default function CreateLeague({ setDisplay }) {
                 noValidate
                 autoComplete="off"
               >
-              <Typography variant="h6" color="white" component="div">
+              {/* <Typography variant="h6" color="white" component="div">
                 Invite List (optional)
-              </Typography>
-              <FormControlLabel 
+              </Typography> */}
+              {/* <FormControlLabel 
                 label="Enable Invite List"
                 control={
                 <Checkbox 
                   checked={inviteListStatus}
                   onChange={handleInviteListCheckbox}
                 />}
-              />
+              /> */}
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {inviteListStatus && (
+              {formValues.inviteListStatus === "closed" && (
                 <>
+                <Typography variant="h6" color="white" component="div">
+                  Invite List (Private/Closed Leagues)
+                </Typography>
+                {!validAddressesStatus && ( 
+                  <p>
+                    There are invalid addresses.
+                  </p> 
+                )}
                 {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
                   {inviteListValues.map((element, index) => (
                     <>
