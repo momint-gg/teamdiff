@@ -120,6 +120,7 @@ const main = async () => {
 
 };
 
+//https://stackoverflow.com/questions/17645478/node-js-how-to-read-a-file-and-then-write-the-same-file-with-two-separate-functi
 function readFile (srcPath) {
   return new Promise(function (resolve, reject) {
     fs.readFile(srcPath, 'utf8', function (err, data) {

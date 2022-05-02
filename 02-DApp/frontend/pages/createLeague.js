@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
-import { Box, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -98,12 +98,13 @@ export default function CreateLeague({ setDisplay }) {
   const [isCreatingLeague, setIsCreatingLeague] = useState(false);
   const [hasCreatedLeague, setHasCreatedLeague] = useState(false);
   const [newLeagueName, setNewLeagueName] = useState(null);
+  const [newLeagueAddress, setNewLeagueAddress] = useState(null);
 
   const [formValues, setFormValues] = useState(defaultValues)
 
   const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
 
-  const [inviteListValues, setInviteListValues] = useState(["trey's private key"])
+  const [inviteListValues, setInviteListValues] = useState([])
   // TODO: automatically set the first value to be user that's logged in
 
   const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
@@ -134,6 +135,7 @@ export default function CreateLeague({ setDisplay }) {
                       + "\n\tproxy address: " + newLeagueProxyAddress
                       + "\n\tadmin address: " + leagueAdminAddress);
           setNewLeagueName(newLeagueName);
+          setNewLeagueAddress(newLeagueProxyAddress);
         //}
       };
       // const filter = {
@@ -185,6 +187,7 @@ export default function CreateLeague({ setDisplay }) {
         });
     }
     else {
+      alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Please refresh.");
       console.log("Account data not set or LeagueMaker contract unitiliazed!");
     }
   }
@@ -237,7 +240,8 @@ export default function CreateLeague({ setDisplay }) {
       <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
         &#60; BACK
       </Fab>
-
+      
+      
       <Typography variant="h3" color="secondary" component="div">
         CREATE A LEAGUE
       </Typography>
@@ -272,7 +276,7 @@ export default function CreateLeague({ setDisplay }) {
         </>
       )}
 
-      {showForm && (
+      {showForm && accountData && !(isCreatingLeague || hasCreatedLeague) && (
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Box
@@ -371,26 +375,35 @@ export default function CreateLeague({ setDisplay }) {
                 noValidate
                 autoComplete="off"
               >
-              <Typography variant="h6" color="white" component="div">
-                Invite List (optional)
-              </Typography>
+
               <FormControlLabel 
-                label="Enable Invite List"
+                label="Make League Private"
                 control={
                 <Checkbox 
                   checked={inviteListIsEnabled}
                   onChange={handleInviteListCheckbox}
-                />}
+                />
+              }
               />
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {inviteListIsEnabled && (
+              {!inviteListIsEnabled ? (
+                <Typography variant="h7" color="lightgrey">
+                    Anybody with a wallet address can search and join this league.
+                </Typography>
+                ) : (
                 <>
+                <Typography variant="h7" color="lightgrey">
+                  Only users added to this leagues whitelist can join.
+                </Typography>
+                <Typography variant="h6" color="white" component="div">
+                  Invite list:
+                </Typography>
                 {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
                   {inviteListValues.map((element, index) => (
                     <>
                     <TextField
                       variant="standard"
-                      label={"Player " + (index + 1) + (index === 0 ? " (League Admin)" : "")} 
+                      label={"Whitelisted Address " + (index + 1)} 
                       onChange={e => handlePlayerInviteInput(e, index)}
                       value={element}
                       key={index}
@@ -413,7 +426,7 @@ export default function CreateLeague({ setDisplay }) {
                     size="small"
                     disabled={!addPlayerBtnEnabled}
                   >
-                    Add Another Player
+                    Add Another Address to Whitelist
                   </Button>
 
 
@@ -423,6 +436,41 @@ export default function CreateLeague({ setDisplay }) {
           </Grid>
         </Grid>
       )}
+      {isCreatingLeague && (
+        <Container>
+          <Typography>Your Leauge is being Created...</Typography>
+          <CircularProgress />
+        </Container>
+      )}
+      {hasCreatedLeague && (
+        <Box>
+          <Typography>
+            {"Your Team Diff League \"" + newLeagueName + "\" has been created!"}
+          </Typography>
+          <a
+            href={
+              "https://rinkeby.etherscan.io/address/"
+              + newLeagueAddress
+              + "#internaltx"
+            }
+            target={"_blank"}
+            rel="noreferrer"
+          >
+            View League on Etherscan
+          </a>
+          <Button
+            onClick={() => {
+              setHasCreatedLeague(false);
+            }}
+          >
+            Create Another League
+          </Button>
+        </Box>
+      )}
+      {!accountData && !hasCreatedLeague && !isCreatingLeague && (
+        <div> Please connect your wallet to create a league </div>
+      )}
+      
     </Box>
   )
 }
