@@ -1,7 +1,9 @@
 const { ethers } = require("hardhat");
-const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
+const LeagueOfLegendsLogicJSON = require("../../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
+const fs = require('fs');
 
 const main = async () => {
+  let textData = "";
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
     "MOBALogicLibrary"
@@ -12,6 +14,7 @@ const main = async () => {
     "MOBALogicLibrary deployed to:",
     MOBALogicLibraryInstance.address
   );
+  textData += "exports.MOBALogicLibrary = \'" + MOBALogicLibraryInstance.address + "\';\n";
 
   //Create League Maker Library Instance
   const LeagueMakerLibraryFactory = await ethers.getContractFactory(
@@ -23,6 +26,8 @@ const main = async () => {
     "LeagueMakerLibrary deployed to:",
     LeagueMakerLibraryInstance.address
   );
+  textData += "exports.LeagueMakerLibrary = \'" + LeagueMakerLibraryInstance.address + "\';\n";
+
 
   //Create Game Logic Instance
   const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
@@ -40,6 +45,8 @@ const main = async () => {
     "LeagueOfLegendsLogic deployed to:",
     LeagueOfLegendsLogicInstance.address
   );
+  textData += "exports.LeagueOfLegendsLogic = \'" + LeagueOfLegendsLogicInstance.address + "\';\n";
+
 
   //Create League Maker Instance
   const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker", {
@@ -53,6 +60,8 @@ const main = async () => {
   );
   await LeagueMakerInstance.deployed();
   console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
+  textData += "exports.LeagueMaker = \'" + LeagueMakerInstance.address + "\';\n";
+
 
   //Create Beacon Instance
   const BeaconFactory = await ethers.getContractFactory("UpgradeableBeacon");
@@ -61,6 +70,7 @@ const main = async () => {
   );
   await BeaconInstance.deployed();
   console.log("Beacon deployed to:", BeaconInstance.address);
+  textData += "exports.Beacon = \'" + BeaconInstance.address + "\';\n";
 
   //Signers
   [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
@@ -71,18 +81,75 @@ const main = async () => {
   await testUsdcContract.deployed();
   testUsdcContract.connect(owner);
   console.log("Test USDC Deployed to: " + testUsdcContract.address);
+  textData += "exports.TestUSDC = \'" + testUsdcContract.address + "\';\n";
 
   // Deploying athletes contract
   AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
   AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
   await AthletesContractInstance.deployed();
   AthletesContractInstance.connect(owner);
-  console.log("Test USDC Deployed to: " + AthletesContractInstance.address);
+  console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
+  textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  
+  //Adding polygonUSDC and rinkebyUSDC to contract addresses file
+  textData += "exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';" + // When we deploy to mainnet
+  "\nexports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';";
+  
+  
+  // Write data in 'Output.txt' .
+  fs.writeFileSync('../02-DApp/backend/contractscripts/contract_info/contractAddresses.js', textData, (err) => {
+    // In case of a error throw err.
+    if (err) {
+      console.log("bad");
+      throw err;
+    };
+    console.log("done writing to file");
+
+  })
+
+  //Note this isn't tested but should work
+  let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic']
+  contractNames.forEach((contractName) => {
+    path = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
+    readFile(path).then(function (results) {
+      return writeFile(path, results)
+    }).then(function () {
+      //done writing file, can do other things
+    })
+  })
+
 };
+
+//https://stackoverflow.com/questions/17645478/node-js-how-to-read-a-file-and-then-write-the-same-file-with-two-separate-functi
+function readFile (srcPath) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(srcPath, 'utf8', function (err, data) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
+    })
+  })
+}
+
+function writeFile (savPath, data) {
+  return new Promise(function (resolve, reject) {
+    fs.writeFile(savPath, data, function (err) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve()
+      }
+    })
+  })
+}
 
 const runMain = async () => {
   try {
     await main();
+    fs.writeFileSync('testing.js', "test")
+
     process.exit(0);
   } catch (error) {
     console.log(error);
