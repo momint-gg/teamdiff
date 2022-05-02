@@ -72,11 +72,12 @@ export default function Index(props) {
 
   if (typeof window !== "undefined") {
     return (
-      <Box>
-        <Box sx={{paddingLeft: 5, paddingRight: 5}}>
+      <Box sx={{backgroundColor: '#2E0744', height: '100%'}}>
+        
+        {/* <Box sx={{paddingLeft: 5, paddingRight: 5}}> */}
           
           {/* <TabContext value={value}> */}
-            <Box sx={{marginLeft:-5, marginRight: -5, borderBottom: 1, borderColor: 'white'}}>
+            {/* <Box sx={{marginLeft:-5, marginRight: -5, borderBottom: 1, borderColor: 'white'}}> */}
               {/* //Do we want to have this be a SPA with all tabs?
               This might be an issue when certain tabs are fetching data, but maybe not */}
               {/* <TabList 
@@ -90,7 +91,7 @@ export default function Index(props) {
                 <Link label="MINT" value="2" sx={{fontSize: 30}} href="/mintHome">MINT</Link>
                 <Link label="BURN" value="3" sx={{fontSize: 30}} href="/burnPack">BURN</Link> */}
               {/* </TabList> */}
-            </Box>
+            {/* </Box> */}
             {/* <TabPanel value="0">
               <Typography variant="h2" color="secondary" component="div">
                 <Play />
@@ -110,10 +111,10 @@ export default function Index(props) {
               <ConnectWallet />
             </TabPanel> */}
           {/* </TabContext> */}
-        </Box>
-        <Box>
+        {/* </Box> */}
+        {/* <Box> */}
           <Footer />
-        </Box>
+        {/* </Box> */}
         </Box>
     );
 }

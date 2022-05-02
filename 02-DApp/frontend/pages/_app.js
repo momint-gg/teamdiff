@@ -49,6 +49,7 @@ const connectors = ({ chainId }) => {
 
 function MyApp({ Component, pageProps }) {
   return (
+    <Box sx={{backgroundColor: '#2E0744', height: '100%'}}> 
     <Provider autoConnect connectors={connectors}>
       <ThemeProvider theme={theme}>
         <Layout>
@@ -64,6 +65,7 @@ function MyApp({ Component, pageProps }) {
         </Layout>
       </ThemeProvider>
     </Provider>
+    </Box>
   );
 }
 

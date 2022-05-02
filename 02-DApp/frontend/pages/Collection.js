@@ -65,14 +65,14 @@ export default function Collection() {
 
     if (accountData && nftResp) {
         return (
-            <Box>
+            <Box backgroundColor='primary.dark'>
             <Typography variant="h2" color="secondary" component="div">
                PACKS
             </Typography>
             <hr
                 style={{
-                    color: "secondary",
-                    backgroundColor: "secondary",
+                    color: "white",
+                    backgroundColor: "white",
                     height: 5,
                 }}
             />
@@ -88,8 +88,8 @@ export default function Collection() {
             </Typography>
             <hr
                 style={{
-                    color: "secondary",
-                    backgroundColor: "secondary",
+                    color: "white",
+                    backgroundColor: "white",
                     height: 5
                 }}
             />
@@ -105,7 +105,7 @@ export default function Collection() {
         );
     } else if (accountData) {
         return (
-            <Box>
+            <Box backgroundColor='primary.dark'>
                 <Typography variant="h2" color="secondary" component="div">
                     Loading...
                 </Typography>
@@ -114,7 +114,7 @@ export default function Collection() {
     }
 
     return (
-        <Box>
+        <Box backgroundColor='primary.dark'>
             <Typography variant="h2" color="secondary" component="div">
                 Please connect your wallet to get started.
             </Typography>
