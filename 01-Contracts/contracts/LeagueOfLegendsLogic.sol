@@ -22,27 +22,27 @@ contract LeagueOfLegendsLogic is
     //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
-    uint256 public currentWeekNum; // Keeping track of week number
+    //uint256 public currentWeekNum; // Keeping track of week number
     // Amount that will be staked (in USDC) for each league
     uint256 public stakeAmount;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
-    address admin;
+    address public admin;
     address teamDiffAddress;
     bool leagueEntryIsClosed;
     bool lineupIsLocked;
 
     // Mappings
-    mapping(address => uint256) userToTotalWins;
+    mapping(address => uint256) public userToTotalWins;
     mapping(address => uint256[8]) public userToRecord; // User to their record
-    mapping(address => uint256[]) userLineup; // User to their lineup
-    mapping(address => bool) inLeague; // Checking if a user is in the league
+    mapping(address => uint256[]) public userLineup; // User to their lineup
+    mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
 
     // League schedule
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    mapping(uint256 => Matchup[]) public schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
     /* IMMUTABLE STORAGE  */
@@ -205,46 +205,10 @@ contract LeagueOfLegendsLogic is
     /************************************************/
     /***************** GETTERS **********************/
     /************************************************/
-    function getVersion() external pure returns (uint256 version) {
-        return version;
-    }
-
-    function getLeagueName() public view returns (string memory) {
-        return leagueName;
-    }
-
-    function getStakeAmount() external view returns (uint256) {
-        return stakeAmount;
-    }
 
     //Returns total pot of the league
     function getTotalPrizePot() external view returns (uint256) {
         return stakeAmount * leagueMembers.length;
-    }
-
-    // Returning the lineup for a user
-    function getLineup() external view returns (uint256[] memory) {
-        return userLineup[msg.sender];
-    }
-
-    // Getting the test usdc contract address (for testing)
-    function getTestUSDCAddress() external view returns (address) {
-        return address(testUSDC);
-    }
-
-    // Getting the admin address to make sure it was set correctly
-    function getAdmin() external view returns (address) {
-        return admin;
-    }
-
-    // Getting the athletes contract address
-    function getAthleteContractAddress() external view returns (address) {
-        return address(athletesContract);
-    }
-
-    // Gets the current week #
-    function getCurrentWeekNum() external view returns (uint256) {
-        return currentWeekNum;
     }
 
     /******************************************************/
@@ -275,16 +239,6 @@ contract LeagueOfLegendsLogic is
         userLineup[msg.sender] = athleteIds;
     }
 
-    // Getter for user to total pts
-    // function getUserTotalWins()   public view returns (uint256) {
-    //     //return userToTotalWins[msg.sender];
-    //     uint256 winSum = 0;
-    //     uint256 currentWeekNum = leagueMakerContract.currentWeek();
-    //     for(uint256 i = 0; i <= currentWeekNum; i++) {
-    //         winSum += userToRecord[msg.sender][i];
-    //     }
-    //     return winSum;
-    // }
 
     // Getter for user to weekly pts
     function getUserRecord() external view returns (uint256[8] memory) {

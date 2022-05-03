@@ -31,6 +31,8 @@ import {
 //Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
+
 // const StyledOutlinedInput = styled(OutlinedInput)({
 //   [`&$focused .${outlinedInputClasses.input}`]: {
 //     borderColor: "green"
@@ -131,16 +133,23 @@ export default function CreateLeague({ setDisplay }) {
       setLeagueMakerContract(LeagueMakerContract);
 
       // Callback for when pack burned function is called from GameItems contracts
-      const leagueCreatedCallback = (newLeagueName, newLeagueProxyAddress, leagueAdminAddress) => {
+      const leagueCreatedCallback = (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
         //TODO create a proxy instance from emitted address
         //then check the admin of that proxy to filter events?
+        const LeagueProxyContract = new ethers.Contract(
+          leagueAddress,
+          LeagueOfLegendsLogicJSON.abi,
+          provider
+        );
+
+        const 
         //if (true) {
           setIsCreatingLeague(false);
           setHasCreatedLeague(true);
           console.log("Finsihed creating league: " 
                       + "\n\tname: " + newLeagueName
                       + "\n\tproxy address: " + newLeagueProxyAddress
-                      + "\n\tadmin address: " + leagueAdminAddress);
+                      + "\n\tadmin address: " + newLeagueAdminAddress);
           setNewLeagueName(newLeagueName);
           setNewLeagueAddress(newLeagueProxyAddress);
         //}
