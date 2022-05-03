@@ -325,16 +325,16 @@ contract LeagueOfLegendsLogic is
     /*****************************************************************/
     // Add user to league -- only testing, not using this
     //TODO comment out for prod
-    // function addUserToLeague(address user) public {
-    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
+    function addUserToLeague(address user) public {
+        require(!leagueEntryIsClosed, "League Entry is Closed!");
 
-    //     if (leagueMembers.length < 8) {
-    //         leagueMembers.push(user);
-    //         leagueMakerContract.updateUserToLeagueMapping(user);
-    //     } else {
-    //         console.log("Too many users in league to add new user.");
-    //     }
-    // }
+        if (leagueMembers.length < 8) {
+            leagueMembers.push(user);
+            leagueMakerContract.updateUserToLeagueMapping(user);
+        } else {
+            console.log("Too many users in league to add new user.");
+        }
+    }
 
     // User joining the league
     function joinLeague() external onlyWhitelisted nonReentrant {

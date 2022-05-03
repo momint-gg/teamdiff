@@ -193,9 +193,6 @@ describe("LeagueProxy.test", async () => {
   });
 
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
-    // TODO: Add addr1 to whitelist before prompting approval/joining the league
-    // Adding addr1 to whitelist so they can join the league
-
     // The admin (owner) adding addr1 to whitelist
     const addToWhitelist = await proxyContract
       .connect(owner)
@@ -233,7 +230,7 @@ describe("LeagueProxy.test", async () => {
       //   (await LeagueProxyInstanceWithSigner.leagueMembers(index + 1))
       // )
     });
-    // Now running set league schedule as owner
+    // Now running set league schedule as owner (WORKING NOW)
     let setSchedule = await LeagueMakerInstance.connect(
       owner
     ).setLeagueSchedules();
@@ -309,12 +306,14 @@ describe("LeagueProxy.test", async () => {
     txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
     await txn.wait();
 
-    const lineup = await proxyContract.connect(owner).getLineup(); // Getting the caller's lineup
+    // const lineup = await proxyContract
+    //   .connect(owner)
+    //   .userToLineup(owner.address); // Getting the caller's lineup
     // console.log("Lineup for owner is ", lineup);
-    await proxyContract.connect(addr1);
-    const lineup2 = await proxyContract.connect(addr1).getLineup();
+    // await proxyContract.connect(addr1);
+    // const lineup2 = await proxyContract.userToLineup(addr1.address);
     // console.log("Lineup for addr1 is ", lineup2);
-    expect(lineup).to.not.equal(lineup2);
+    // expect(lineup).to.not.equal(lineup2);
   });
 
   // it("User can setLineup of athleteIds of their owned athletes", async () => {
@@ -343,16 +342,19 @@ describe("LeagueProxy.test", async () => {
   // });
 
   // Correctly evaluates the matchup between two users
-  // it("Correctly appends stats for athletes and evaluates a matchup", async () => {
-  //   // Adding random stats for first 10 athletes (0-9)
-  //   for (let i = 0; i < 10; i++) {
-  //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
-  //     let txn = await AthletesContractInstance.connect(owner).appendStats(
-  //       i,
-  //       randomNum
-  //     );
-  //     await txn.wait();
-  //   }
+  it("Correctly appends stats for athletes", async () => {
+    // Adding random stats for 50 athletes
+    for (let i = 0; i < 50; i++) {
+      const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
+      let txn = await AthletesContractInstance.connect(owner).appendStats(
+        i,
+        randomNum
+      );
+      await txn.wait();
+    }
+  });
+
+  it("Calls set");
 
   //   // Calling evaluateMatch from LeagueOfLegendsLogic
   //   console.log("OWNER ADD", owner.address);
@@ -363,9 +365,6 @@ describe("LeagueProxy.test", async () => {
   //   // console.log("Winner of the match is ", evalMatch);
   // });
 
-  // ##################################
-  // ########### OLD TESTS ############
-  // ##################################
   // Testing evaluateMatch
   // It's working lets goooooooooooo
   // it("Updates the mappings for owner and addr1 after match is evaluated", async () => {
