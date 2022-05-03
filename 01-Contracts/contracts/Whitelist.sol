@@ -116,7 +116,12 @@ contract Whitelist is Ownable {
         }
     }
 
+    // FUNCTIONS FOR TESTING
     function getNumWhitelisted() public view returns (uint256) {
         return numWhitelisted;
+    }
+
+    function getUserIsWhitelisted(address _user) public view returns (bool) {
+        return whitelist[_user];
     }
 }

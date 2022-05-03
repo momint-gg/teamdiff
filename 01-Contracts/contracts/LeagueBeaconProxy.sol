@@ -23,110 +23,57 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whitelist {
-     // Vars
-    uint256 public version; // tsting
+       // Vars
+    //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
-    uint256 public currentWeekNum; // Keeping track of week number
-    address[] public leagueMembers;
+    //uint256 public currentWeekNum; // Keeping track of week number
+    // Amount that will be staked (in USDC) for each league
+    uint256 public stakeAmount;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
-    address admin;
-    //Maps each league member to the running count of their total wins
-    //TODO, do we need this data structure?
-    mapping(address => uint256) userToTotalWins;
-    //Maps each league member to an array that represents a win or loss for each week
-    //TODO add logic for bye week?
-        //bye = 2?
-        //win = 1?
-        //loss = 0
-    mapping(address => uint256[8]) public userToRecord;
-    //TODO how should we lock this lineUp?
+    address public admin;
+    address teamDiffAddress;
     bool leagueEntryIsClosed;
     bool lineupIsLocked;
-    //bool isPublic;
-    //TODO can we set this to a fixed size line up array of size 5?
-    mapping(address => uint256[]) userLineup;
-    //uint256 private totalSupply;// Total supply of USDC
-    uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    
+
+    // Mappings
+    mapping(address => uint256) public userToTotalWins;
+    mapping(address => uint256[8]) public userToRecord; // User to their record
+    mapping(address => uint256[]) public userLineup; // User to their lineup
+    mapping(address => bool) public inLeague; // Checking if a user is in the league
+    address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
+
+    // League schedule
     struct Matchup {
         address[2] players;
     }
-     mapping(uint256 => Matchup[])  schedule; // Schedule for the league (generated before), maps week # => [matchups]
-    
+    mapping(uint256 => Matchup[]) public schedule; // Schedule for the league (generated before), maps week # => [matchups]
+
     /**********************/
     /* IMMUTABLE STORAGE  */
     /**********************/
     struct Stats {
         uint256 kills;
+        uint256 deaths;
+        uint256 assists;
+        uint256 minionScore;
     }
-
     address public polygonUSDCAddress; // When we deploy to mainnet
     address public rinkebyUSDCAddress;
-    // Our Athletes.sol contract
+// TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
+    // Won't want to make whitelist immutable
+    // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
     Athletes athletesContract;
-    // Our Whitelist contract
     Whitelist whitelistContract;
-    // Our LeagueMaker contract
     LeagueMaker leagueMakerContract;
-    //Our MOBALogicHElper contract
-    //MOBALogicHelper mobaLogicHelper;
+    IERC20 testUSDC;
 
-    //Events
+    //**************/
+    //*** Events ***/
+    /***************/
     event Staked(address sender, uint256 amount);
-    
+    event testUSDCDeployed(address sender, address contractAddress);
 
-    /**********************/
-    /* IMMUTABLE STORAGE  */
-    /**********************/
-    // struct Stats {
-    //     uint256 kills;
-    // }
-
-    // address public polygonUSDCAddress; // When we deploy to mainnet
-    // address public rinkebyUSDCAddress;
-    // // Our Athletes.sol contract
-    // Athletes athletesContract;
-    // // Our Whitelist contract
-    // Whitelist whitelistContract;
-    // // Our LeagueMaker contract
-    // LeagueMaker leagueMakerContract;
-
-    // Vars
-    //Hmmm when I uncomment the below, some of the storage slots are correctly initialized
-        //but I can't figure out why, so I'll just use getters in the gamelogic contract for now
-    // uint256 public version; // tsting
-    // string public leagueName;
-    // uint256 public numWeeks; // Length of a split
-    // uint256 public currentWeekNum; // Keeping track of week number
-    // address[] public leagueMembers;
-    // //address[] whitelist;
-    // //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
-    // //address owner;
-    // // address admin;
-    // mapping(address => uint256) userToTotalPts;
-    // mapping(address => uint256[]) userToWeeklyPts;
-    // mapping(address => uint256[]) userLineup;
-    // uint256 private totalSupply;// Total supply of USDC
-    // uint256 public stakeAmount; // Amount that will be staked (in USDC) for each league
-    // address public polygonUSDCAddress; // When we deploy to mainnet
-    // address public rinkebyUSDCAddress;
-
-    // // Our Athletes.sol contract
-    // Athletes athletesContract;
-    // // Our Whitelist contract
-    // Whitelist whitelistContract;
-    // // Our LeagueMaker contract
-    // LeagueMaker leagueMakerContract;
-
-    // struct Matchup {
-    //     address[2] players;
-    // }
-    // mapping(uint256 => Matchup[8]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
-
-    //Events
-    //event Staked(address sender, uint256 amount);
-    
     /**
      * @dev Initializes the proxy with `beacon`.
      *

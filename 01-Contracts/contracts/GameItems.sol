@@ -9,10 +9,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./Whitelist.sol";
 
 // Contains the logic for minting / burning our 1155s
-contract GameItems is ERC1155, Ownable, Whitelist {
+contract GameItems is ERC1155, Ownable {
     using Counters for Counters.Counter;
     using SafeMath for uint256;
 
@@ -73,7 +72,8 @@ contract GameItems is ERC1155, Ownable, Whitelist {
     uint256 public packsAvailable;
 
     // Our whitelist
-    Whitelist whitelistContract;
+    mapping(address => bool) public whitelist;
+    uint256 public numWhitelisted;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -98,7 +98,6 @@ contract GameItems is ERC1155, Ownable, Whitelist {
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
         packsAvailable = MAX_PACKS;
-        whitelistContract = new Whitelist();
     }
 
     // Athletes can only be minted once our "switch" has been flipped
@@ -109,21 +108,38 @@ contract GameItems is ERC1155, Ownable, Whitelist {
     /*****************************************************/
     /******************* WHITELIST ***********************/
     /*****************************************************/
-    function addUserToWhitelist(address _user) public onlyOwner {
-        whitelistContract.addAddressToWhitelist(_user);
-    }
-
-    function removeUserFromWhitelist(address _user) public onlyOwner {
-        whitelistContract.removeAddressFromWhitelist(_user);
-    }
-
-    function getWhitelistedUsers()
-        public
-        view
-        onlyWhitelisted
-        returns (uint256)
+    function addUserToWhitelist(address _userToAdd)
+        external
+        onlyOwner
+        returns (bool success)
     {
-        return whitelistContract.getNumWhitelisted();
+        if (!whitelist[_userToAdd]) {
+            whitelist[_userToAdd] = true;
+            numWhitelisted += 1;
+            success = true;
+        }
+    }
+
+    function removeAddressFromWhitelist(address _userToRemove)
+        external
+        onlyOwner
+        returns (bool success)
+    {
+        if (whitelist[_userToRemove]) {
+            whitelist[_userToRemove] = false;
+            numWhitelisted -= 1;
+            success = true;
+        }
+    }
+
+    function getNumWhitelisted() public view returns (uint256) {
+        return numWhitelisted;
+    }
+
+    modifier onlyWhitelisted() {
+        // In our case, whitelisted can also mean nobody has been added to the whitelist and nobody besides the league creator
+        require(whitelist[msg.sender], "User is not whitelisted.");
+        _;
     }
 
     /*****************************************************/
