@@ -1,11 +1,9 @@
-// Update newest contract addresses here
-// Remember to update each time you deploy AND update the ABI in the abis folder
-
-exports.Athletes = '0x57a45Bfd7C5E53ac0FbF73Bc4b916B0F49b0fE94';
-exports.MOBALogicLibrary = '0x6Fa921E21ae352d9ba3daF528B4dD02B7a999b4e';
-exports.LeagueMakerLibrary = '0x74b82e2e9Dc52b512B8F570DE1213DF5BDceAf69';
-exports.LeagueOfLegendsLogic = '0x2329821fDf0303A05Cb3Cb6763f8984CBdAa3fe4';
-exports.LeagueMaker = '0xC98f0CBa17c087732c8af609b8d50948474FcFf8';
-exports.Beacon = '0x8C360fb033fF5DDC3e100F56a2A89ed41D816Ef8';
-exports.TestUSDC = '0xEDb00d8e7B5BdADA40e4B81284DAA43Af1c557FB';
-exports.SampleLeagueProxy = '0x515AEc97f679CEe607d0D88cEcf4C94E77A52208';
+exports.MOBALogicLibrary = '0x1cf3763e9708ff864f87E6d671faBF9D2d8dEFaB';
+exports.LeagueMakerLibrary = '0x0e0d0b6e0cF6C57448A988E9C106739fa0e42590';
+exports.LeagueOfLegendsLogic = '0x48C9fdf868a74aa9968b01fbdC5f7db3D1f51Da2';
+exports.LeagueMaker = '0x009506139125732C4decb7Df9ECE4b2759221d96';
+exports.Beacon = '0x13125118BCd55E067F935129002610a4a336F12A';
+exports.TestUSDC = '0x9883CBA99757C37d6f99e934508150Cb9d8aDAde';
+exports.Athletes = '0x55a9818a8a4076f081b8BfB9A252e60bd1288Ff4';
+exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+exports.GameItems = '';

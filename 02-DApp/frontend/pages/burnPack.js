@@ -33,6 +33,7 @@ export default function BurnPack({ setDisplay }) {
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
+  //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
