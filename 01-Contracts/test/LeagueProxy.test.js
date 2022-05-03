@@ -354,7 +354,20 @@ describe("LeagueProxy.test", async () => {
     }
   });
 
-  it("Calls set");
+  // The big kahuna
+  // For some reason, mappings aren't being updated for the league
+  it("Calls evaluateWeekForAllLeagues() successfully, updates mappings in the proxy contract", async () => {
+    console.log("Evaluating matches");
+    let txn = await LeagueMakerInstance.connect(
+      owner
+    ).evaluateWeekForAllLeagues();
+    await txn.wait();
+
+    // Getting week 0 results -- not being updated
+    const ownerPts = await proxyContract.connect(owner).getUserRecord();
+    const addr1Pts = await proxyContract.connect(addr1).getUserRecord();
+    console.log("owner record is ", ownerPts, " addr1 record is ", addr1Pts);
+  });
 
   //   // Calling evaluateMatch from LeagueOfLegendsLogic
   //   console.log("OWNER ADD", owner.address);
@@ -365,8 +378,7 @@ describe("LeagueProxy.test", async () => {
   //   // console.log("Winner of the match is ", evalMatch);
   // });
 
-  // Testing evaluateMatch
-  // It's working lets goooooooooooo
+  // OLD Evaluate match test
   // it("Updates the mappings for owner and addr1 after match is evaluated", async () => {
   //   // Making sure the state variables were updated in LeagueOfLegendsLogic
 
