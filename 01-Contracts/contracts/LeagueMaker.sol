@@ -139,8 +139,8 @@ contract LeagueMaker is Ownable {
         }
     }
 
-// TODO: Add return statements (e.g. true) after successs (so put function in a require) so we know if we succeeded in our scripts
-    // Do the above ^ 
+    // TODO: Add return statements (e.g. true) after successs (so put function in a require) so we know if we succeeded in our scripts
+    // Do the above ^ for all funcs being called on backend
     //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
     //TODO set to only owner
     function lockLeagueLineups() public onlyOwner {
