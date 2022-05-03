@@ -4,6 +4,7 @@ const { ethers } = require("hardhat");
 const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
 const TestUSDCJSON = artifacts.require("TestUSDC.sol");
 const AthletesJSON = artifacts.require("Athletes.sol");
+const constructorArgs = require("../constructorArgs");
 
 // IMPORTANT NOTE: You need to SET manual gas in hardhat config for this test to run correctly
 // ALSO NOTE: STAKING TESTS WILL NOT WORK ON RINKEBY BC ADDR1 WILL BE UNDEFINED (need to test on etherscan)
@@ -32,6 +33,11 @@ describe("LeagueProxy.test", async () => {
       "LeagueMakerLibrary deployed to:",
       LeagueMakerLibraryInstance.address
     );
+
+    //Create GameItems instance
+    GameItemFactory = await hre.ethers.getContractFactory("GameItems");
+    GameItemInstance = await GameItemFactory.deploy(...constructorArgs);
+    await GameItemInstance.deployed();
 
     //Create Game Logic Instance
     const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
@@ -75,6 +81,17 @@ describe("LeagueProxy.test", async () => {
     [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
       await ethers.getSigners();
 
+          //Minting athlete to addr1
+    // txn = await GameItemInstance.connect(addr1).mintAthlete(1);
+    // //txn = await gameItemsContract.mintAthlete(id);
+    // await txn.wait();
+    // txn = await GameItemInstance.connect(addr1).mintAthlete(2);
+    // //txn = await gameItemsContract.mintAthlete(id);
+    // await txn.wait();
+    // console.log("balance: " + await GameItemInstance.connect(addr1).balanceOf(addr1.address, 1));
+
+
+
     // Deploying test USDC contract
     TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
     testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
@@ -97,7 +114,8 @@ describe("LeagueProxy.test", async () => {
       true,
       owner.address, // Admin for proxy contract (league)
       testUsdcContract.address,
-      AthletesContractInstance.address
+      AthletesContractInstance.address,
+      GameItemInstance.address
     );
     var leagueProxyContractAddress;
     receipt = await txn.wait();
@@ -116,9 +134,13 @@ describe("LeagueProxy.test", async () => {
       LeagueOfLegendsLogicJSON.abi,
       provider
     );
-    proxyContract = LeagueProxyInstance.connect(owner);
-  });
 
+    //Create interactable contract instances
+    proxyContract = LeagueProxyInstance.connect(owner);
+    leaugeMaker = LeagueMakerInstance.connect(owner);
+    gameItems = GameItemInstance.connect(addr1);
+  });
+  
   // MAKING SURE LEAGUE WAS SETUP CORRECTLY
   it("Successfully gets stake amount for the proxy", async () => {
     const testStakeAmount = await proxyContract.getStakeAmount();
@@ -171,7 +193,7 @@ describe("LeagueProxy.test", async () => {
       80
     );
   });
-
+  
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
     // TODO: Add addr1 to whitelist before prompting approval/joining the league
     // Adding addr1 to whitelist so they can join the league
@@ -202,7 +224,33 @@ describe("LeagueProxy.test", async () => {
     );
   });
 
-  // Setting athletes and getting user's lineup
+  // it("Schedule is set correctly", async () => {
+  //   let additionalLeagueMembers = [addr2.address, addr3.address, addr4.address];
+  //   await additionalLeagueMembers.forEach(async (signer, index) => {
+  //     console.log("signer: " + signer + " index: " + index);
+  //     txn = await proxyContract.addUserToLeague(signer);
+  //     receipt = await txn.wait();
+  //     // console.log(
+  //     //   "\n\tleagueMember #" + index + ": " +
+  //     //   (await LeagueProxyInstanceWithSigner.leagueMembers(index + 1))
+  //     // )
+  //   });
+
+  //   console.log("league members:" + proxyContract.leagueMembers(0));
+  //   let txn = await proxyContract.setLeagueSchedule({ gasLimit: 30000000 });
+  //   await txn.wait();
+  //   // for(var i = 0; i < 8; i++) {
+  //   //   txn  = await proxyContract.getWeekSchedule(i);
+  //   //   weekSchedule = await txn.wait();
+  //   //   console.log("week: " + JSON.stringify(weekSchedule, null, 2));
+  //   //   // weekSchedule.forEach((matchup) => {
+  //   //   //   expect(matchup[0]).to.not.be.equal(matchup[1]);
+  //   //   // })
+  //   // };
+  // });
+
+  /*
+  Setting athletes and getting user's lineup
   it("Correctly sets athlete IDs and gets a user's lineup", async () => {
     const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
     const athleteIds2 = [2, 4, 6, 8, 9]; // Athlete IDs for user 2 (addr1)
@@ -220,97 +268,154 @@ describe("LeagueProxy.test", async () => {
     // console.log("Lineup for addr1 is ", lineup2);
     expect(lineup).to.not.equal(lineup2);
   });
+  */
 
-  // Setting what the teamdiff wallet is first
-  // const teamDiffWallet = new ethers.Wallet(process.env.PRIVATE_KEY, "hardhat");
+  it("User can setLineup of athleteIds of their owned athletes", async () => {
+    const athleteIds = [1, 2, 3]; // Athlete IDs belonging to addr1
+    let txn;
+    // athleteIds.forEach(async (id) => {
+    //     txn = await gameItems.mintAthlete(id);
+    //     await txn.wait();
+    //     console.log("balance in test: " + await GameItemInstance.connect(addr1).balanceOf(addr1, id));
+    // })
+    txn = await gameItems.mintAthlete(1);
+    await txn.wait();
+    txn = await gameItems.mintAthlete(2);
+    await txn.wait();
+    txn = await gameItems.mintAthlete(3);
+    await txn.wait();
 
-  // Correctly evaluates the matchup between two users
-  it("Correctly appends stats for athletes and evaluates a matchup", async () => {
-    // Adding random stats for first 10 athletes (0-9)
-    for (let i = 0; i < 10; i++) {
-      const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
-      let txn = await AthletesContractInstance.connect(owner).appendStats(
-        i,
-        randomNum
-      );
-      await txn.wait();
-    }
 
-    // Calling evaluateMatch from LeagueOfLegendsLogic
-    console.log("OWNER ADD", owner.address);
-    const evalMatch = await proxyContract
-      .connect(owner)
-      .evaluateMatch(owner.address, addr1.address);
-    await evalMatch.wait();
-    // console.log("Winner of the match is ", evalMatch);
+    txn = await proxyContract.connect(addr1).setLineup(athleteIds);
+    await txn.wait();
+
+    const lineup2 = await proxyContract.connect(addr1).getLineup();
+    expect(lineup2[0]).to.equal(athleteIds[0]) && expect(lineup2[1]).to.equal(athleteIds[1]);
   });
+
+  
+
+  //Setting lineup tests
+  it("User cannot set lineup of athleteIds that they don't own", async () => {
+    const athleteIds = [1, 2, 3, 4]; // Athlete IDs for user 1 (owner)
+    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
+  });
+
+  it("User cannot set duplicate athlete id in lineup", async () => {
+    const athleteIds = [1, 1, 2]; // Athlete IDs for user 1 (owner)
+    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("Duplicate athleteIDs are not allowed.");
+  });
+
+
+  it("User cannot set lineup in a league they don't belong to", async () => {
+    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
+    let txn = proxyContract.connect(addr3).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("user is not in League");
+  });
+
+  it("User cannot set lineup if line up is locked for the week", async () => {
+    const athleteIds = [1, 2]; // Athlete IDs for user 1 (owner)
+    //LeagueMakerInstance is undefined for some reason
+    let txn = leaugeMaker.lockLeagueLineups();
+    //await txn.wait();
+    txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    //await txn.wait();    
+    expect(txn).to.be.revertedWith("lineup is locked for the week!");
+  });
+
+  
+  // Correctly evaluates the matchup between two users
+  // it("Correctly appends stats for athletes and evaluates a matchup", async () => {
+  //   // Adding random stats for first 10 athletes (0-9)
+  //   for (let i = 0; i < 10; i++) {
+  //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
+  //     let txn = await AthletesContractInstance.connect(owner).appendStats(
+  //       i,
+  //       randomNum
+  //     );
+  //     await txn.wait();
+  //   }
+
+  //   // Calling evaluateMatch from LeagueOfLegendsLogic
+  //   console.log("OWNER ADD", owner.address);
+  //   const evalMatch = await proxyContract
+  //     .connect(owner)
+  //     .evaluateMatch(owner.address, addr1.address);
+  //   await evalMatch.wait();
+  //   // console.log("Winner of the match is ", evalMatch);
+  // });
 
   // Testing evaluateMatch
   // It's working lets goooooooooooo
-  it("Updates the mappings for owner and addr1 after match is evaluated", async () => {
-    // Making sure the state variables were updated in LeagueOfLegendsLogic
+  // it("Updates the mappings for owner and addr1 after match is evaluated", async () => {
+  //   // Making sure the state variables were updated in LeagueOfLegendsLogic
 
-    const ownerPts = await proxyContract.connect(owner).getUserTotalPts();
-    const addr1Pts = await proxyContract.connect(addr1).getUserTotalPts();
-    const ownerPtVal = Number(ownerPts);
-    const addr1PtVal = Number(addr1Pts);
+  //   const ownerPts = await proxyContract.connect(owner).getUserTotalPts();
+  //   const addr1Pts = await proxyContract.connect(addr1).getUserTotalPts();
+  //   const ownerPtVal = Number(ownerPts);
+  //   const addr1PtVal = Number(addr1Pts);
 
-    ownerWins = ownerPtVal === 1;
-    addr1Wins = addr1PtVal === 1;
+  //   ownerWins = ownerPtVal === 1;
+  //   addr1Wins = addr1PtVal === 1;
 
-    const ownerRecord = await proxyContract.connect(owner).getUserRecord();
-    const addr1Record = await proxyContract.connect(addr1).getUserRecord();
-    const ownerRecordFirstWeek = Number(ownerRecord[0]);
-    const addr1RecordFirstWeek = Number(addr1Record[0]);
+  //   const ownerRecord = await proxyContract.connect(owner).getUserRecord();
+  //   const addr1Record = await proxyContract.connect(addr1).getUserRecord();
+  //   const ownerRecordFirstWeek = Number(ownerRecord[0]);
+  //   const addr1RecordFirstWeek = Number(addr1Record[0]);
 
-    // Making sure the mappings were all updated (total pts, record)
-    if (addr1Wins) {
-      // addr 1 wins
-      expect(addr1PtVal).to.equal(1);
-      expect(addr1RecordFirstWeek).to.equal(1);
-    } else {
-      // owner wins
-      expect(ownerPtVal).to.equal(1);
-      expect(ownerRecordFirstWeek).to.equal(1);
-    }
-  });
+  //   // Making sure the mappings were all updated (total pts, record)
+  //   if (addr1Wins) {
+  //     // addr 1 wins
+  //     expect(addr1PtVal).to.equal(1);
+  //     expect(addr1RecordFirstWeek).to.equal(1);
+  //   } else {
+  //     // owner wins
+  //     expect(ownerPtVal).to.equal(1);
+  //     expect(ownerRecordFirstWeek).to.equal(1);
+  //   }
+  // });
 
   // Testing prize pool functionality
-  it("Delegates the prize pool to the winner of the league", async () => {
-    // Getting prev balance of owner and addr1
-    const oldOwnerBalance = Number(
-      await testUsdcContract.balanceOf(owner.address)
-    );
-    const oldAddr1Balance = Number(
-      await testUsdcContract.balanceOf(addr1.address)
-    );
+  // it("Delegates the prize pool to the winner of the league", async () => {
+  //   // Getting prev balance of owner and addr1
+  //   const oldOwnerBalance = Number(
+  //     await testUsdcContract.balanceOf(owner.address)
+  //   );
+  //   const oldAddr1Balance = Number(
+  //     await testUsdcContract.balanceOf(addr1.address)
+  //   );
 
-    // First approve allowance for league to xfer the money out
-    const prizePoolAmount = Number(await proxyContract.getTotalPrizePot());
-    let approval = await testUsdcContract.approve(
-      proxyContract.address,
-      prizePoolAmount
-    );
-    await approval.wait();
+  //   // First approve allowance for league to xfer the money out
+  //   const prizePoolAmount = Number(await proxyContract.getTotalPrizePot());
+  //   let approval = await testUsdcContract.approve(
+  //     proxyContract.address,
+  //     prizePoolAmount
+  //   );
+  //   await approval.wait();
 
-    // Now delegating the prize pool to the winner
-    const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
-    await delegatePool.wait();
+  //   // Now delegating the prize pool to the winner
+  //   const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
+  //   await delegatePool.wait();
 
-    // Making sure balances are correct! -- whoever wins is given the prize pool
-    if (ownerWins) {
-      expect(
-        Number(await testUsdcContract.balanceOf(owner.address)) -
-          oldOwnerBalance ==
-          prizePoolAmount
-      );
-    }
-    if (addr1Wins) {
-      expect(
-        Number(await testUsdcContract.balanceOf(addr1.address)) -
-          oldAddr1Balance ==
-          prizePoolAmount
-      );
-    }
-  });
+  //   // Making sure balances are correct! -- whoever wins is given the prize pool
+  //   if (ownerWins) {
+  //     expect(
+  //       Number(await testUsdcContract.balanceOf(owner.address)) -
+  //         oldOwnerBalance ==
+  //         prizePoolAmount
+  //     );
+  //   }
+  //   if (addr1Wins) {
+  //     expect(
+  //       Number(await testUsdcContract.balanceOf(addr1.address)) -
+  //         oldAddr1Balance ==
+  //         prizePoolAmount
+  //     );
+  //   }
+  // });
 });
