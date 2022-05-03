@@ -350,7 +350,7 @@ class Datafetcher():
             }
             try:
                 self.athletes[athlete]["ipfs"] = self.ipfs.add("../pinata/headshots/" +
-                                                               athlete + ".png")[0]
+                                                               i + ".png")[0]
             except:
                 print("ERROR: Headshot of athlete",
                       athlete, "couldn't be retrieved")
