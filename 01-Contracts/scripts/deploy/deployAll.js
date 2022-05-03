@@ -1,9 +1,31 @@
 const { ethers } = require("hardhat");
 const LeagueOfLegendsLogicJSON = require("../../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
 const fs = require('fs');
+const constructorArgs = require("../../constructorArgs");
+
 
 const main = async () => {
   let textData = "";
+
+  //Create GameItems Instance
+  // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
+  //   //overriding gas bc transaction was stuck
+  //   gasPrice: 203000000000,
+  // });
+  // await gameContract.deployed();
+
+  // //Initial functions that need to be run
+  // console.log("First setting starting index...");
+  // let txn = await gameContract.setStartingIndex();
+  // await txn.wait();
+  // console.log("Now setting token URIs...");
+  // txn = await gameContract.setURIs();
+  // await txn.wait();
+
+  // textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
+
+
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
     "MOBALogicLibrary"
@@ -109,47 +131,28 @@ const main = async () => {
 
   //Note this isn't tested but should work
   let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic']
-  contractNames.forEach((contractName) => {
-    path = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
-    readFile(path).then(function (results) {
-      return writeFile(path, results)
-    }).then(function () {
-      //done writing file, can do other things
+  contractNames.forEach(async (contractName) => {
+    srcPath = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
+    backendPath = "../02-DApp/backend/contractscripts/contract_info/abis/" + contractName + ".json";
+    const abiData = fs.readFileSync(srcPath)
+    fs.writeFileSync(backendPath, abiData, (err) => {
+      // In case of a error throw err.
+      if (err) {
+        console.log("bad");
+        throw err;
+      };
+      console.log("done writing to file");
+  
     })
+
   })
 
 };
 
-//https://stackoverflow.com/questions/17645478/node-js-how-to-read-a-file-and-then-write-the-same-file-with-two-separate-functi
-function readFile (srcPath) {
-  return new Promise(function (resolve, reject) {
-    fs.readFile(srcPath, 'utf8', function (err, data) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(data)
-      }
-    })
-  })
-}
-
-function writeFile (savPath, data) {
-  return new Promise(function (resolve, reject) {
-    fs.writeFile(savPath, data, function (err) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
-  })
-}
 
 const runMain = async () => {
   try {
     await main();
-    fs.writeFileSync('testing.js', "test")
-
     process.exit(0);
   } catch (error) {
     console.log(error);

@@ -31,7 +31,7 @@ import {
 //Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 
 // const StyledOutlinedInput = styled(OutlinedInput)({
 //   [`&$focused .${outlinedInputClasses.input}`]: {
@@ -133,17 +133,32 @@ export default function CreateLeague({ setDisplay }) {
       setLeagueMakerContract(LeagueMakerContract);
 
       // Callback for when pack burned function is called from GameItems contracts
-      const leagueCreatedCallback = (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
+      const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
         //TODO create a proxy instance from emitted address
         //then check the admin of that proxy to filter events?
+        
         const LeagueProxyContract = new ethers.Contract(
-          leagueAddress,
+          newLeagueProxyAddress,
           LeagueOfLegendsLogicJSON.abi,
           provider
         );
 
-        const 
-        //if (true) {
+        inviteListValues.forEach(async (whitelistAddress) => {
+          //Add all set whitelisted users to newly deployed league Proxy
+          console.log("adding " + whitelistAddress + " to whitelist");
+          const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
+                                                                  .addUserToWhitelist(whitelistAddress)
+                                                                  .then(
+                                                                    console.log("Added userr to whitelist success")
+                                                                  )
+                                                                  .catch((error) => {
+                                                                    //console.log("")
+                                                                    alert("Add User To WhiteList error: " + error.message);
+                                                                  });;
+        })
+        //const leagueAdminAddress = LeagueProxyContract.admin();
+        // if (accountData.address == newLeagueAdminAddress && formValues.leagueName == newLeagueName) {
+        if (true) {
           setIsCreatingLeague(false);
           setHasCreatedLeague(true);
           console.log("Finsihed creating league: " 
@@ -152,7 +167,7 @@ export default function CreateLeague({ setDisplay }) {
                       + "\n\tadmin address: " + newLeagueAdminAddress);
           setNewLeagueName(newLeagueName);
           setNewLeagueAddress(newLeagueProxyAddress);
-        //}
+        }
       };
       // const filter = {
       //   address: LeagueMakerContract.address,
@@ -184,12 +199,12 @@ export default function CreateLeague({ setDisplay }) {
         .createLeague(
             formValues.leagueName,
             formValues.buyInCost,
-            //TODO where do i get the ispublic?
-            !inviteListIsEnabled,
+            (formValues.inviteListStatus == "open"),
             accountData.address,
             CONTRACT_ADDRESSES.TestUSDC,
             CONTRACT_ADDRESSES.Athletes,
-        {
+            //CONTRACT_ADDRESSES.Athletes,
+          {
           gasLimit: 10000000,
           // nonce: nonce || undefined,
         })
@@ -199,7 +214,7 @@ export default function CreateLeague({ setDisplay }) {
           console.log("League Creation in progress...");
         })
         .catch((error) => {
-          alert("error: " + error.message);
+          alert("Create League error: " + error.message);
         });
     }
     else {
@@ -493,7 +508,7 @@ export default function CreateLeague({ setDisplay }) {
       )}
       {isCreatingLeague && (
         <Container>
-          <Typography>Your Leauge is being Created...</Typography>
+          <Typography>Your League is being Created...</Typography>
           <CircularProgress />
         </Container>
       )}

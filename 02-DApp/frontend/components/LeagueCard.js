@@ -46,7 +46,7 @@ export default function LeagueCard({ leagueData, leagueAddress, setLeague, setLe
 
   
   useEffect(() => {
-    console.log("leagueADdy: " + leagueAddress)
+    //console.log("leagueADdy: " + leagueAddress)
     if (accountData && leagueAddress) {
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -57,9 +57,9 @@ export default function LeagueCard({ leagueData, leagueAddress, setLeague, setLe
       console.log("in useEFfect");
       setLeagueProxyContract(LeagueProxyContract);
       async function fetchData() {
-        const leagueName = await LeagueProxyContract.getLeagueName();
+        const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        console.log("leagueNamer: " + leagueName);
+        //console.log("leagueNamer: " + leagueName);
         //setActiveLeagueList(activeLeagues);
       }
       fetchData();

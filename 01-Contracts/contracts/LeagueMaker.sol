@@ -55,11 +55,11 @@ contract LeagueMaker is Ownable {
         bool _isPublic,
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
-        address _athletesContractAddress,
-        address _gameItemsAddress
+        address _athletesContractAddress
+        //address _gameItemsAddress
     ) external returns (address) {
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,bool,address,address,address,address,address,address,address)",
+            "initialize(string,uint256,bool,address,address,address,address,address,address)",
             _name,
             //_version,
             //_numWeeks,
@@ -71,8 +71,8 @@ contract LeagueMaker is Ownable {
             _rinkebyUSDCAddress,
             _testUSDCAddress,
             // _teamDiffAddress,
-            address(this),
-            _gameItemsAddress
+            address(this)
+           // _gameItemsAddress
         );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(

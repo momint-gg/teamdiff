@@ -37,19 +37,16 @@ contract LeagueOfLegendsLogic is
     mapping(address => uint256[8]) public userToRecord; // User to their record
 
     mapping(uint256 => uint256[8])  athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
-    mapping(address => uint256[]) public userLineup; // User to their lineup
+    mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
 
-
-    address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
-    
     // League schedule
     struct Matchup {
         address[2] players;
     }
 
-    mapping(uint256 => Matchup[]) public schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
     /* IMMUTABLE STORAGE  */
@@ -111,8 +108,8 @@ contract LeagueOfLegendsLogic is
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
         address _testUSDCAddress,
-        address leagueMakerContractAddress,
-        address gameItemsContractAddress
+        address leagueMakerContractAddress
+        // address gameItemsContractAddress
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
@@ -131,7 +128,7 @@ contract LeagueOfLegendsLogic is
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
-        gameItemsContract = GameItems(gameItemsContractAddress);
+        //gameItemsContract = GameItems(gameItemsContractAddress);
         //gameItemsContract = address(0);
         console.log("Proxy initialized!");
     }
@@ -341,7 +338,7 @@ contract LeagueOfLegendsLogic is
     }
 
     // Add user to whitelist
-    function addUserToWhitelist(address _userToAdd) external onlyAdmin {
+    function addUserToWhitelist(address _userToAdd) public onlyAdmin {
         whitelistContract.addAddressToWhitelist(_userToAdd);
         // whitelist[_userToAdd] = true;
     }

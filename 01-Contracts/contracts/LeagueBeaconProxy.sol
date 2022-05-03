@@ -23,7 +23,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whitelist {
-       // Vars
+    // Vars
     //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
@@ -39,7 +39,9 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whi
     // Mappings
     mapping(address => uint256) public userToTotalWins;
     mapping(address => uint256[8]) public userToRecord; // User to their record
-    mapping(address => uint256[]) public userLineup; // User to their lineup
+
+    mapping(uint256 => uint256[8])  athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
+    mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
 
@@ -47,7 +49,8 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whi
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[]) public schedule; // Schedule for the league (generated before), maps week # => [matchups]
+
+    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
     /* IMMUTABLE STORAGE  */
@@ -60,13 +63,15 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whi
     }
     address public polygonUSDCAddress; // When we deploy to mainnet
     address public rinkebyUSDCAddress;
-// TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
+
+    // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
     // Won't want to make whitelist immutable
     // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
     Athletes athletesContract;
     Whitelist whitelistContract;
     LeagueMaker leagueMakerContract;
     IERC20 testUSDC;
+    GameItems gameItemsContract;
 
     //**************/
     //*** Events ***/
