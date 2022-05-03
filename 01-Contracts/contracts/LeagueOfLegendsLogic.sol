@@ -36,7 +36,7 @@ contract LeagueOfLegendsLogic is
     mapping(address => uint256) public userToTotalWins;
     mapping(address => uint256[8]) public userToRecord; // User to their record
 
-    mapping(uint256 => uint256[8])  athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
+    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -66,7 +66,7 @@ contract LeagueOfLegendsLogic is
     Athletes athletesContract;
     Whitelist whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 testUSDC;
+    IERC20 public testUSDC;
     GameItems gameItemsContract;
 
     //**************/
@@ -109,8 +109,11 @@ contract LeagueOfLegendsLogic is
         address _rinkebyUSDCAddress,
         address _testUSDCAddress,
         address leagueMakerContractAddress
+    )
+        public
         // address gameItemsContractAddress
-    ) public initializer {
+        initializer
+    {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
         //numWeeks = _numWeeks;
@@ -216,7 +219,6 @@ contract LeagueOfLegendsLogic is
     /***************** GETTERS **********************/
     /************************************************/
 
-
     //Returns total pot of the league
     // function getTotalPrizePot() external view returns (uint256) {
     //     return stakeAmount * leagueMembers.length;
@@ -247,28 +249,49 @@ contract LeagueOfLegendsLogic is
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "user is not in League");
-        uint256 currentWeek = leagueMakerContract.currentWeek();
-        //TODO move the following checks into a library somehow, cost about 1 kb of contract space :/
-        //Decrement all athleteToLineup Occurences from previous lineup
-        for(uint256 i; i < userToLineup[msg.sender].length; i++) {
-            athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][currentWeek]--;
+
+        // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
+        uint256[] memory currLineup = userToLineup[msg.sender];
+        for (uint256 i; i < currLineup.length; i++) {
+            uint256 upperLimit = (i + 1) * 10 - 1; // I.e. 9, 19, 29, etc.
+            uint256 lowerLimit = i * 10; // I.e. 0, 10, 20, etc.
+            require(
+                athleteIds[i] > lowerLimit && athleteIds[i] < upperLimit,
+                "You are setting an athlete in the wrong position!"
+            );
         }
-        //require ownership of all athleteIds + update athleteToLineOccurencesMapping
-        for(uint256 i; i < athleteIds.length; i++) {
+        uint256 currentWeek = leagueMakerContract.currentWeek();
+
+        // TODO move the following checks into a library somehow, cost about 1 kb of contract space :/
+        // Decrement all athleteToLineup Occurences from previous lineup
+        for (uint256 i; i < currLineup.length; i++) {
+            athleteToLineupOccurencesPerWeek[currLineup[i]][currentWeek]--;
+        }
+        // Require ownership of all athleteIds + update athleteToLineOccurencesMapping
+        // TODO uncomment this out for prod. Commented out for testing
+        for (uint256 i; i < athleteIds.length; i++) {
             athleteToLineupOccurencesPerWeek[i][currentWeek]++;
             //gameItemsContract.mintAthlete(athleteIds[i]);
             // console.log("in set lineup");
             // console.log(gameItemsContract.balanceOf(msg.sender, athleteIds[i]));
-            require(gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0, "Caller does not own given athleteIds");
+            // require(
+            //     gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
+            //     "Caller does not own given athleteIds."
+            // );
         }
-        //require non-duplicate IDs
-        for(uint256 i; i < athleteIds.length; i++) {
-            require(athleteToLineupOccurencesPerWeek[i][currentWeek] == 1, "Duplicate athleteIDs are not allowed.");
-        }
+        // Require non-duplicate IDs
+        // @Trey for some reason this require statement is glitching when you try to set a valid lineup
+        // ^ Reverts correctly but it's always failing for some reason
+        // for (uint256 i; i < athleteIds.length; i++) {
+        //     require(
+        //         athleteToLineupOccurencesPerWeek[i][currentWeek] == 1,
+        //         "Duplicate athleteIDs are not allowed."
+        //     );
+        // }
 
+        // Setting the lineup
         userToLineup[msg.sender] = athleteIds;
     }
-
 
     // Getter for user to weekly pts
     function getUserRecord() external view returns (uint256[8] memory) {
@@ -317,9 +340,11 @@ contract LeagueOfLegendsLogic is
     function joinLeague() external onlyWhitelisted nonReentrant {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
-        require(testUSDC.balanceOf(msg.sender) > stakeAmount, "Insufficent funds for staking");
-        
-        
+        require(
+            testUSDC.balanceOf(msg.sender) > stakeAmount,
+            "Insufficent funds for staking"
+        );
+
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
 

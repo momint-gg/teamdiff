@@ -190,7 +190,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    //TODO switch back to private for rpod
+    // TODO switch back to private for rpod
     function mintAthlete(uint256 index) public {
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
