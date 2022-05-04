@@ -176,6 +176,7 @@ library MOBALogicLibrary {
         mapping(address => uint256) storage userToTotalWins,
         mapping(address => uint256[]) storage userLineup
     ) public {
+        console.log("IN THE MOBA LOGIC LIBRARY EVAL WEEK FUNCTION");
         //call evaulte match for each match in this weeks schedule
         for (uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
             //call evaulate match between members of Match

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
 import "./Whitelist.sol";
@@ -13,24 +13,19 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./TestUSDC.sol";
 
-contract LeagueOfLegendsLogic is
-    Initializable,
-    Ownable,
-    Whitelist,
-    ReentrancyGuard
-{
+contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // Vars
     //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
-    //uint256 public currentWeekNum; // Keeping track of week number
+    // uint256 public currentWeekNum; // Keeping track of week number
     // Amount that will be staked (in USDC) for each league
     uint256 public stakeAmount;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     address public admin;
     address teamDiffAddress;
-    bool leagueEntryIsClosed;
-    bool lineupIsLocked;
+    bool public leagueEntryIsClosed;
+    bool public lineupIsLocked;
 
     // Mappings
     mapping(address => uint256) public userToTotalWins;
@@ -68,6 +63,7 @@ contract LeagueOfLegendsLogic is
     LeagueMaker leagueMakerContract;
     IERC20 public testUSDC;
     GameItems gameItemsContract;
+    address leagueMakerLibraryAddress;
 
     //**************/
     //*** Events ***/
@@ -83,6 +79,15 @@ contract LeagueOfLegendsLogic is
     // Only the admin (whoever created the league) can call
     modifier onlyAdmin() {
         require(msg.sender == admin, "Caller is not the admin");
+        _;
+    }
+
+    // the fuctions only the league maker library should be able to call
+    modifier onlyLeagueMakerLibrary() {
+        require(
+            msg.sender == leagueMakerLibraryAddress,
+            "Caller is not the League Maker Library"
+        );
         _;
     }
 
@@ -108,7 +113,8 @@ contract LeagueOfLegendsLogic is
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
         address _testUSDCAddress,
-        address leagueMakerContractAddress
+        address _leagueMakerLibraryAddress,
+        address _leagueMakerContractAddress
     )
         public
         // address gameItemsContractAddress
@@ -123,14 +129,14 @@ contract LeagueOfLegendsLogic is
         admin = _admin;
         stakeAmount = _stakeAmount;
         isPublic = _isPublic;
-        lineupIsLocked = false;
         leagueEntryIsClosed = false;
         athletesContract = Athletes(athletesDataStorageAddress);
-        leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
+        leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
+        leagueMakerLibraryAddress = _leagueMakerLibraryAddress;
         //gameItemsContract = GameItems(gameItemsContractAddress);
         //gameItemsContract = address(0);
         console.log("Proxy initialized!");
@@ -144,9 +150,8 @@ contract LeagueOfLegendsLogic is
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
-    //TODO: Change functions to onlyTeamDiff for deployment (when testing on Rinkeby, only Admin for hardhat)
-    //TODO change to only owner for prod
-    function setLeagueSchedule() external {
+    // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
+    function setLeagueSchedule() external onlyLeagueMakerLibrary {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -156,24 +161,25 @@ contract LeagueOfLegendsLogic is
         );
     }
 
-    function setLeagueEntryIsClosed() external onlyOwner {
+    function setLeagueEntryIsClosed() external onlyLeagueMakerLibrary {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup() external onlyOwner {
+    function lockLineup() external onlyLeagueMakerLibrary {
+        console.log("IN LOCK LINEUP FUNCTION IN LOL LOGIC");
         lineupIsLocked = true;
     }
 
-    function unlockLineup() external onlyOwner {
+    function unlockLineup() external onlyLeagueMakerLibrary {
         lineupIsLocked = false;
     }
 
-    //Evalautes all matchups for a given week
-    function evaluateWeek(uint256 currentWeekNum) external onlyOwner {
-        //uint256 currentWeekNum = leagueMakerContract.currentWeek();
+    // Evalautes all matchups for a given week
+    function evaluateWeek() external onlyLeagueMakerLibrary {
+        uint256 currWeekNum = leagueMakerContract.currentWeek();
         MOBALogicLibrary.evaluateWeek(
             schedule,
-            currentWeekNum,
+            currWeekNum,
             athletesContract,
             userToRecord,
             userToTotalWins,
@@ -188,11 +194,12 @@ contract LeagueOfLegendsLogic is
     //     onlyOwner
     //     returns (address)
     // {
+    //     uint256 currWeekNum = leagueMakerContract.currentWeek();
     //     return
     //         MOBALogicLibrary.evaluateMatch(
     //             addr1,
     //             addr2,
-    //             currentWeekNum,
+    //             currWeekNum,
     //             athletesContract,
     //             userToLineup[addr1],
     //             userToLineup[addr2],
@@ -201,7 +208,8 @@ contract LeagueOfLegendsLogic is
     //         );
     // }
 
-    function onLeagueEnd() external onlyOwner nonReentrant {
+    // TODO: Add modifier (or will this just be called internally? if so just change to private/internal or whatev)
+    function onLeagueEnd() external nonReentrant {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner = leagueMembers[0];
         // Calculating the winner (may want to just update each week instead of doing this way...)
@@ -214,15 +222,6 @@ contract LeagueOfLegendsLogic is
         // Approval on front end first, then transfer with the below
         testUSDC.transferFrom(address(this), winner, contractBalance);
     }
-
-    /************************************************/
-    /***************** GETTERS **********************/
-    /************************************************/
-
-    //Returns total pot of the league
-    // function getTotalPrizePot() external view returns (uint256) {
-    //     return stakeAmount * leagueMembers.length;
-    // }
 
     /******************************************************/
     /***************** STAKING FUNCTIONS ******************/
@@ -248,19 +247,30 @@ contract LeagueOfLegendsLogic is
     // How do we check that the user owners the athletiIds??
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
-        require(inLeague[msg.sender], "user is not in League");
+        require(inLeague[msg.sender], "User is not in League.");
+
+        uint256[] memory currLineup = userToLineup[msg.sender];
+        uint256 currentWeek = leagueMakerContract.currentWeek();
+
+        // Require non-duplicate IDs
+        for (uint256 i; i < athleteIds.length; i++) {
+            require(
+                athleteToLineupOccurencesPerWeek[i][currentWeek] == 1,
+                "Duplicate athleteIDs are not allowed."
+            );
+        }
 
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
-        uint256[] memory currLineup = userToLineup[msg.sender];
-        for (uint256 i; i < currLineup.length; i++) {
+        for (uint256 i; i < athleteIds.length; i++) {
             uint256 upperLimit = (i + 1) * 10 - 1; // I.e. 9, 19, 29, etc.
+            console.log("Upper limit is ", upperLimit);
             uint256 lowerLimit = i * 10; // I.e. 0, 10, 20, etc.
+            console.log("Lower limit is ", lowerLimit);
             require(
                 athleteIds[i] > lowerLimit && athleteIds[i] < upperLimit,
                 "You are setting an athlete in the wrong position!"
             );
         }
-        uint256 currentWeek = leagueMakerContract.currentWeek();
 
         // TODO move the following checks into a library somehow, cost about 1 kb of contract space :/
         // Decrement all athleteToLineup Occurences from previous lineup
@@ -279,15 +289,6 @@ contract LeagueOfLegendsLogic is
             //     "Caller does not own given athleteIds."
             // );
         }
-        // Require non-duplicate IDs
-        // @Trey for some reason this require statement is glitching when you try to set a valid lineup
-        // ^ Reverts correctly but it's always failing for some reason
-        // for (uint256 i; i < athleteIds.length; i++) {
-        //     require(
-        //         athleteToLineupOccurencesPerWeek[i][currentWeek] == 1,
-        //         "Duplicate athleteIDs are not allowed."
-        //     );
-        // }
 
         // Setting the lineup
         userToLineup[msg.sender] = athleteIds;
@@ -323,19 +324,6 @@ contract LeagueOfLegendsLogic is
     /*****************************************************************/
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
-    // Add user to league -- only testing, not using this
-    //TODO comment out for prod
-    function addUserToLeague(address user) public {
-        require(!leagueEntryIsClosed, "League Entry is Closed!");
-
-        if (leagueMembers.length < 8) {
-            leagueMembers.push(user);
-            leagueMakerContract.updateUserToLeagueMapping(user);
-        } else {
-            console.log("Too many users in league to add new user.");
-        }
-    }
-
     // User joining the league
     function joinLeague() external onlyWhitelisted nonReentrant {
         require(!leagueEntryIsClosed, "League Entry is Closed!");
@@ -351,6 +339,19 @@ contract LeagueOfLegendsLogic is
         testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
     }
+
+    // Add user to league -- only testing, not using this
+    // TODO comment out for prod
+    // function addUserToLeague(address user) public {
+    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
+
+    //     if (leagueMembers.length < 8) {
+    //         leagueMembers.push(user);
+    //         leagueMakerContract.updateUserToLeagueMapping(user);
+    //     } else {
+    //         console.log("Too many users in league to add new user.");
+    //     }
+    // }
 
     // Removing a user from the whitelist before the season starts
     function removeFromWhitelist(address _userToRemove) external onlyAdmin {

@@ -17,7 +17,11 @@ contract LeagueMaker is Ownable {
     //using Clones for address;
 
     // ======= Events ==========
-    event LeagueCreated(string name, address proxyAddress, address proxyAdminAddress);
+    event LeagueCreated(
+        string name,
+        address proxyAddress,
+        address proxyAdminAddress
+    );
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
@@ -34,18 +38,20 @@ contract LeagueMaker is Ownable {
     mapping(address => bool) public isProxyMap;
     uint256 numWeeks;
 
-
     uint256 _numWeeks = 8;
     uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
+    address leagueMakerLibraryAddress; // Our LeagueMakerLibrary CONTRACT
+
     // address _teamDiffAddress = 0x3736306384bd666D6166e639Cf1b36EBaa818875; // What wallet address we're going to have
 
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
-    constructor(address _logic) {
+    constructor(address _logic, address _leagueMakerLibrary) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
+        leagueMakerLibraryAddress = _leagueMakerLibrary;
     }
 
     // ======== Deploy New League Proxy ========
@@ -56,10 +62,15 @@ contract LeagueMaker is Ownable {
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
         address _athletesContractAddress
-        //address _gameItemsAddress
-    ) external returns (address) {
+    )
+        external
+        returns (
+            //address _gameItemsAddress
+            address
+        )
+    {
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,bool,address,address,address,address,address,address)",
+            "initialize(string,uint256,bool,address,address,address,address,address,address,address)",
             _name,
             //_version,
             //_numWeeks,
@@ -70,9 +81,9 @@ contract LeagueMaker is Ownable {
             _polygonUSDCAddress,
             _rinkebyUSDCAddress,
             _testUSDCAddress,
-            // _teamDiffAddress,
+            leagueMakerLibraryAddress, // Adding in library address
             address(this)
-           // _gameItemsAddress
+            // _gameItemsAddress
         );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
@@ -89,13 +100,12 @@ contract LeagueMaker is Ownable {
         return address(proxy);
     }
 
-
     //TODO set to only owner,
     //owner will be our Team Diff wallet
     //Set all schedules for all leagues
     function setLeagueSchedules() public onlyOwner {
         console.log("setting league schedule in leaguemaker");
-        LeagueMakerLibrary.setLeagueSchedules(leagueAddresses);
+        // LeagueMakerLibrary.setLeagueSchedules(leagueAddresses); // This isn't doing anything
         bool success;
         bytes memory data;
         for (uint256 i = 0; i < leagueAddresses.length; i++) {
@@ -110,7 +120,7 @@ contract LeagueMaker is Ownable {
     //TODO set to only owner
     //Locks the league Members for all leagues, so nobody new can join or leave
     function lockLeagueMembership() public onlyOwner {
-        LeagueMakerLibrary.lockLeagueMembership(leagueAddresses);
+        // LeagueMakerLibrary.lockLeagueMembership(leagueAddresses);
         bool success;
         bytes memory data;
         for (uint256 i = 0; i < leagueAddresses.length; i++) {
@@ -121,40 +131,85 @@ contract LeagueMaker is Ownable {
         }
     }
 
-    // TODO: Add return statements (e.g. true) after successs (so put function in a require) so we know if we succeeded in our scripts
-    // Do the above ^ for all funcs being called on backend
-    //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
-    //TODO set to only owner
+    // Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
     function lockLeagueLineups() public onlyOwner {
-        LeagueMakerLibrary.lockLeagueLineups(leagueAddresses);
+        // LeagueMakerLibrary.lockLeagueLineups(leagueAddresses);
+        // Instead of above, call this way:
+        bool success;
+        bytes memory data;
+        (success, data) = leagueMakerLibraryAddress.call(
+            abi.encodeWithSignature(
+                "lockLeagueLineups(address[])",
+                leagueAddresses
+            )
+        );
+        require(success, "Failed to call lockLeagueLineups() from library");
+
+        // The below works but takes up too much space
+        // bool success;
+        // bytes memory data;
+        // for (uint256 i = 0; i < leagueAddresses.length; i++) {
+        //     (success, data) = leagueAddresses[i].call(
+        //         abi.encodeWithSignature("lockLineup()")
+        //     );
+        //     emit Response(success, data);
+        // }
+    }
+
+    // TODO: comment out for prod
+    function testLeagueMaker() public onlyOwner {
+        console.log("TESTING LEAGUE MAKER");
+        bool success;
+        bytes memory data;
+        (success, data) = leagueMakerLibraryAddress.call(
+            abi.encodeWithSignature("test(address[])", leagueAddresses)
+        );
+        require(success, "Failed to call test() from library");
     }
 
     //Unlocking lineups for all leagues
     //TODO set to only owner
     function unlockLeagueLineups() public onlyOwner {
-        LeagueMakerLibrary.unlockLeagueLineups(leagueAddresses);
+        // LeagueMakerLibrary.unlockLeagueLineups(leagueAddresses);
+        // bool success;
+        // bytes memory data;
+        // for (uint256 i = 0; i < leagueAddresses.length; i++) {
+        //     (success, data) = leagueAddresses[i].call(
+        //         abi.encodeWithSignature("unlockLineup()")
+        //     );
+        //     emit Response(success, data);
+        // }
     }
 
-        //Create onlyOwner function to update week
+    //Create onlyOwner function to update week
     // function incrementCurrentWeek() public onlyOwner {
     //     currentWeek += 1;
     // }
 
     //Evaluates weekly scores for all matchups in all leagues
-    function evaluateWeekForAllLeagues() public onlyOwner {
-        LeagueMakerLibrary.evaluateWeekForAllLeagues(
-            leagueAddresses,
-            currentWeek
-        );
-        currentWeek++;
-    }
+    // function evaluateWeekForAllLeagues() public onlyOwner {
+    //     LeagueMakerLibrary.evaluateWeekForAllLeagues(
+    //         leagueAddresses,
+    //         currentWeek
+    //     );
+    //     bool success;
+    //     bytes memory data;
+    //     for (uint256 i = 0; i < leagueAddresses.length; i++) {
+    //         (success, data) = leagueAddresses[i].call(
+    //             abi.encodeWithSignature(
+    //                 "evaluateWeek(uint256)",
+    //                 currentWeek + 1
+    //             )
+    //         );
+    //         emit Response(success, data);
+    //     }
+    //     currentWeek++;
+    // }
 
     function updateUserToLeagueMapping(address user) external {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
         userToLeagueMap[user].push(msg.sender);
     }
-
-    //function 
 
     function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});
