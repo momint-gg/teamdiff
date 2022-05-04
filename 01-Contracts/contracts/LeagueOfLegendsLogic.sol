@@ -167,6 +167,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     function lockLineup() external onlyLeagueMakerLibrary {
         console.log("IN LOCK LINEUP FUNCTION IN LOL LOGIC");
+        // Why is this logging but the var isn't being changed?
         lineupIsLocked = true;
     }
 

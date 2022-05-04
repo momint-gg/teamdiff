@@ -104,16 +104,16 @@ contract LeagueMaker is Ownable {
     //owner will be our Team Diff wallet
     //Set all schedules for all leagues
     function setLeagueSchedules() public onlyOwner {
-        console.log("setting league schedule in leaguemaker");
         // LeagueMakerLibrary.setLeagueSchedules(leagueAddresses); // This isn't doing anything
         bool success;
         bytes memory data;
-        for (uint256 i = 0; i < leagueAddresses.length; i++) {
-            (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("setLeagueSchedule()")
-            );
-            emit Response(success, data);
-        }
+        (success, data) = leagueMakerLibraryAddress.call(
+            abi.encodeWithSignature(
+                "setLeagueSchedules(address[])",
+                leagueAddresses
+            )
+        );
+        require(success, "Failed to call setLeagueSchedules() from library");
     }
 
     //Locking lineups for all leagues
@@ -144,27 +144,6 @@ contract LeagueMaker is Ownable {
             )
         );
         require(success, "Failed to call lockLeagueLineups() from library");
-
-        // The below works but takes up too much space
-        // bool success;
-        // bytes memory data;
-        // for (uint256 i = 0; i < leagueAddresses.length; i++) {
-        //     (success, data) = leagueAddresses[i].call(
-        //         abi.encodeWithSignature("lockLineup()")
-        //     );
-        //     emit Response(success, data);
-        // }
-    }
-
-    // TODO: comment out for prod
-    function testLeagueMaker() public onlyOwner {
-        console.log("TESTING LEAGUE MAKER");
-        bool success;
-        bytes memory data;
-        (success, data) = leagueMakerLibraryAddress.call(
-            abi.encodeWithSignature("test(address[])", leagueAddresses)
-        );
-        require(success, "Failed to call test() from library");
     }
 
     //Unlocking lineups for all leagues

@@ -9,6 +9,7 @@ import "./LeagueBeaconProxy.sol";
 import "./LeagueMaker.sol";
 import "./LeagueOfLegendsLogic.sol";
 
+// Basically a helper contract for leaguemaker to reduce gas
 contract LeagueMakerLibrary {
     // TODO: Add modifier so only LeagueMaker can call (onlyOwner w league maker as owner)
 
@@ -83,17 +84,17 @@ contract LeagueMakerLibrary {
         }
     }
 
-    //TODO: Comment out for prod
-    //Test function
-    function test(address[] memory leagueAddresses) public {
-        console.log("IN LEAGUE MAKER LIBRARY TEST FUNCTION");
-        bool success;
-        bytes memory data;
-        for (uint256 i = 0; i < leagueAddresses.length; i++) {
-            (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("testLibrarySender()")
-            );
-            //emit LeagueMaker.Response(success, data);
-        }
-    }
+    // //TODO: Comment out for prod
+    // //Test function
+    // function test(address[] memory leagueAddresses) public {
+    //     console.log("IN LEAGUE MAKER LIBRARY TEST FUNCTION");
+    //     bool success;
+    //     bytes memory data;
+    //     for (uint256 i = 0; i < leagueAddresses.length; i++) {
+    //         (success, data) = leagueAddresses[i].call(
+    //             abi.encodeWithSignature("testLibrarySender()")
+    //         );
+    //         //emit LeagueMaker.Response(success, data);
+    //     }
+    // }
 }

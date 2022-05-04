@@ -243,11 +243,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     await setSchedule.wait();
   });
 
-  it("calls the leagueMaker test function and the sender in LOL logic is the library", async () => {
-    let txn = await LeagueMakerInstance.connect(owner).testLeagueMaker();
-    await txn.wait();
-  });
-
   // Fixed lock and unlock league lineups (wasn't updating proxy state)
   it("Locks and unlocks league lineups for the proxies", async () => {
     let txn = await LeagueMakerInstance.connect(owner).lockLeagueLineups();
@@ -261,7 +256,10 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   // TODO: Add test
-  it("Doesn't let anyone else (including proxy owner) run an onlyLeagueMakerLibrary function", async () => {});
+  it("Doesn't let anyone else (including proxy owner) run an onlyLeagueMakerLibrary function", async () => {
+    const txn = await LeagueProxyInstance.connect(owner).lockLineup();
+    await txn.wait();
+  });
 
   // 4. Testing out evaluate match flow
   // Temporarily putting this test out since I commented out require
