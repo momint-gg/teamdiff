@@ -46,6 +46,7 @@ contract LeagueMakerLibrary {
     //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
     //TODO set to only owner
     function lockLeagueLineups(address[] memory leagueAddresses) public {
+        console.log("Locking league lineups in LeagueMakerLibrary");
         bool success;
         bytes memory data;
         for (uint256 i = 0; i < leagueAddresses.length; i++) {

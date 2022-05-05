@@ -44,14 +44,14 @@ contract LeagueMaker is Ownable {
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
     address leagueMakerLibraryAddress; // Our LeagueMakerLibrary CONTRACT
-
-    // address _teamDiffAddress = 0x3736306384bd666D6166e639Cf1b36EBaa818875; // What wallet address we're going to have
+    LeagueMakerLibrary leagueMakerLibrary; // Tring another method -- calling directly from LeagueMakerLibrary (enough storage?)
 
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
     constructor(address _logic, address _leagueMakerLibrary) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
         leagueMakerLibraryAddress = _leagueMakerLibrary;
+        leagueMakerLibrary = LeagueMakerLibrary(_leagueMakerLibrary);
     }
 
     // ======== Deploy New League Proxy ========
@@ -129,11 +129,12 @@ contract LeagueMaker is Ownable {
             );
             emit Response(success, data);
         }
+        require(success, "Failed to call lockLeagueMembership() from library");
     }
 
     // Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
     function lockLeagueLineups() public onlyOwner {
-        // LeagueMakerLibrary.lockLeagueLineups(leagueAddresses);
+        // leagueMakerLibrary.lockLeagueLineups(leagueAddresses);
         // Instead of above, call this way:
         bool success;
         bytes memory data;

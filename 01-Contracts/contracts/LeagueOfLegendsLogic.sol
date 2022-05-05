@@ -130,6 +130,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         stakeAmount = _stakeAmount;
         isPublic = _isPublic;
         leagueEntryIsClosed = false;
+        lineupIsLocked = false;
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
@@ -165,9 +166,9 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup() external onlyLeagueMakerLibrary {
-        console.log("IN LOCK LINEUP FUNCTION IN LOL LOGIC");
+    function lockLineup() external {
         // Why is this logging but the var isn't being changed?
+        console.log("IN LOCK LINEUP FUNCTION IN LOL LOGIC");
         lineupIsLocked = true;
     }
 

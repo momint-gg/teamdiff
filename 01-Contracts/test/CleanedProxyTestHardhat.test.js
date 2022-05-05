@@ -243,6 +243,17 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     await setSchedule.wait();
   });
 
+  // Testing to see if you can update state for individual proxy
+  // it("Locks lineup for individual proxy", async () => {
+  //   let txn = await proxyContract.connect(owner).lockLineup();
+  //   await txn.wait();
+
+  //   const lineupIsLocked = await proxyContract.connect(owner).lineupIsLocked();
+  //   // Seeing if the state was updated in the proxy
+  //   expect(lineupIsLocked).to.equal(true);
+
+  // });
+
   // Fixed lock and unlock league lineups (wasn't updating proxy state)
   it("Locks and unlocks league lineups for the proxies", async () => {
     let txn = await LeagueMakerInstance.connect(owner).lockLeagueLineups();
