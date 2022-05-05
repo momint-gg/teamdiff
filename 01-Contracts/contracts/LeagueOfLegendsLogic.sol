@@ -23,7 +23,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     uint256 public stakeAmount;
     //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     address public admin;
-    address teamDiffAddress;
+    address public teamDiffAddress;
     bool public leagueEntryIsClosed;
     bool public lineupIsLocked;
 
@@ -93,10 +93,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // Only our wallet can call, need this because the "owner" of the proxy contract isn't us
     modifier onlyTeamDiff() {
-        require(
-            msg.sender == 0x3736306384bd666D6166e639Cf1b36EBaa818875,
-            "Caller is not TeamDiff"
-        );
+        require(msg.sender == teamDiffAddress, "Caller is not TeamDiff");
         _;
     }
 
@@ -113,7 +110,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         address _polygonUSDCAddress,
         address _rinkebyUSDCAddress,
         address _testUSDCAddress,
-        address _leagueMakerLibraryAddress,
+        // address _leagueMakerLibraryAddress,
+        address _teamDiffAddress,
         address _leagueMakerContractAddress
     )
         public
@@ -137,7 +135,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
-        leagueMakerLibraryAddress = _leagueMakerLibraryAddress;
+        // leagueMakerLibraryAddress = _leagueMakerLibraryAddress;
+        teamDiffAddress = _teamDiffAddress;
         //gameItemsContract = GameItems(gameItemsContractAddress);
         //gameItemsContract = address(0);
         console.log("Proxy initialized!");
@@ -296,6 +295,10 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         userToLineup[msg.sender] = athleteIds;
     }
 
+    /*****************************************************/
+    /***************** GETTER FUNCTIONS ******************/
+    /*****************************************************/
+
     // Getter for user to weekly pts
     function getUserRecord() external view returns (uint256[8] memory) {
         return userToRecord[msg.sender];
@@ -309,6 +312,11 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // Getter for user to total pts
     function getUserTotalPts() external view returns (uint256) {
         return userToTotalWins[msg.sender];
+    }
+
+    // Getting lineupIsLocked
+    function getLineupIsLocked() external view returns (bool) {
+        return lineupIsLocked;
     }
 
     //Given manually inputted athlete stats, return the calculated

@@ -150,13 +150,17 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       provider
     );
 
-    // Creating a list of all of our proxy contracts (so we can call functions at once for all proxies)
-    const leagueAddresses = await LeagueMakerInstance.connect(
-      owner
-    ).leagueAddresses();
-    console.log("League addresses", leagueAddresses);
+    // Create interactable contract instances
+    proxyContract = LeagueProxyInstance.connect(owner);
+    leaugeMaker = LeagueMakerInstance.connect(owner);
+    gameItems = GameItemInstance.connect(addr1);
 
-    allLeagues = []; // all of our leagues (as CONTRACTS) so we can interact with them
+    // Creating a list of all of our proxy contracts (so we can call functions at once for all proxies)
+    const leagueAddresses = await leaugeMaker
+      .connect(owner)
+      .getLeagueAddresses();
+
+    AllLeagueInstances = []; // all of our leagues (as CONTRACTS) so we can interact with them
     let currProxy;
     for (let i = 0; i < leagueAddresses.length; i++) {
       currProxy = new ethers.Contract(
@@ -164,13 +168,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
-      allLeagues.push(currProxy);
+      AllLeagueInstances.push(currProxy);
     }
-
-    // Create interactable contract instances
-    proxyContract = LeagueProxyInstance.connect(owner);
-    leaugeMaker = LeagueMakerInstance.connect(owner);
-    gameItems = GameItemInstance.connect(addr1);
   });
 
   // 1. Testing proxy setup
@@ -251,59 +250,36 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // NOTE: Now the league has owner and addr1 in it
 
-  // 3. Testing out LeagueMaker functions -- changed structure (ask me for more details)
-  it("Schedule is set correctly", async () => {
-    // Now running set league schedule as owner
-    let setSchedule = await LeagueMakerInstance.connect(
-      owner
-    ).setLeagueSchedules();
-    await setSchedule.wait();
-  });
+  // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once --changed structure
+  // *These functions are now called in loops as follows*
+  // LETS FUCKING GO IT WORKS NOW. Yeah.
+  it("Sets league schedules for the proxies AND UPDATES STATE", async () => {});
 
-  it("Calls lock lineups for all proxies the new way", async () => {
+  // NOTE: Don't want to call expect statements in a loop like this or hardhat will freak out
+  it("Calls lock/unlock lineups for all proxies AND UPDATES STATE", async () => {
+    let currLeague;
     let txn;
-    for (let i = 0; i < allLeagues.length; i++) {
-      txn = await allLeagues[i].connect(owner).lockLineup();
-      console.log("Locked lineup txn:", txn);
+    for (let i = 0; i < AllLeagueInstances.length; i++) {
+      currLeague = AllLeagueInstances[i].connect(owner);
+      txn = await currLeague.lockLineup();
+      await txn.wait();
+    }
+    for (let i = 0; i < AllLeagueInstances.length; i++) {
+      expect(await currLeague.lineupIsLocked()).to.equal(true);
+    }
+    for (let i = 0; i < AllLeagueInstances.length; i++) {
+      currLeague = AllLeagueInstances[i].connect(owner);
+      txn = await currLeague.unlockLineup();
+      await txn.wait();
+    }
+    for (let i = 0; i < AllLeagueInstances.length; i++) {
+      expect(await currLeague.getLineupIsLocked()).to.equal(false);
     }
   });
 
-  // Testing to see if you can update state for individual proxy
-  it("Locks lineup for individual proxy", async () => {
-    let txn = await proxyContract.connect(owner).lockLineup();
-    await txn.wait();
-
-    const lineupIsLocked = await proxyContract.connect(owner).lineupIsLocked();
-    // Seeing if the state was updated in the proxy
-    expect(lineupIsLocked).to.equal(true);
-  });
-
-  it("Locks lineups in JS using LeagueMaker function with ANOTHER ADDRESS", async () => {
-    // Want to test non-owner addr
-    let txn = await proxyContract.connect(addr1).lockLineup();
-    await txn.wait();
-
-    const lineupIsLocked = await proxyContract.lineupIsLocked();
-    // Seeing if the state was updated in the proxy
-    expect(lineupIsLocked).to.equal(true);
-  });
-
-  // Fixed lock and unlock league lineups (wasn't updating proxy state)
-  it("Locks and unlocks league lineups for the proxies", async () => {
-    let txn = await LeagueMakerInstance.connect(owner).lockLeagueLineups();
-    await txn.wait();
-
-    const lineupIsLocked = await LeagueProxyInstance.connect(
-      owner
-    ).lineupIsLocked();
-    // Seeing if the state was updated in the proxy
-    expect(lineupIsLocked).to.equal(true);
-  });
-
-  // TODO: Add test
-  it("Doesn't let anyone else (including proxy owner) run an onlyLeagueMakerLibrary function", async () => {
-    const txn = await LeagueProxyInstance.connect(owner).lockLineup();
-    await txn.wait();
+  it("Doesn't let non-teamdiff wallet call onlyTeamDiff functions in LeagueOfLegendsLogic", async () => {
+    const sampleProxy = AllLeagueInstances[0].connect(addr1); // addr1 is not owner
+    expect(sampleProxy.lockLineup()).to.be.reverted;
   });
 
   // 4. Testing out evaluate match flow
