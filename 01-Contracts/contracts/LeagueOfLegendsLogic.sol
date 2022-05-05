@@ -92,13 +92,13 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     }
 
     // Only our wallet can call, need this because the "owner" of the proxy contract isn't us
-    // modifier onlyTeamDiff() {
-    //     require(
-    //         msg.sender == 0x3736306384bd666D6166e639Cf1b36EBaa818875,
-    //         "Caller is not TeamDiff"
-    //     );
-    //     _;
-    // }
+    modifier onlyTeamDiff() {
+        require(
+            msg.sender == 0x3736306384bd666D6166e639Cf1b36EBaa818875,
+            "Caller is not TeamDiff"
+        );
+        _;
+    }
 
     //Initialize all parameters of proxy
     function initialize(
@@ -152,7 +152,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
-    function setLeagueSchedule() external onlyLeagueMakerLibrary {
+    function setLeagueSchedule() external onlyTeamDiff {
         console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
@@ -162,22 +162,22 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         );
     }
 
-    function setLeagueEntryIsClosed() external onlyLeagueMakerLibrary {
+    function setLeagueEntryIsClosed() external onlyTeamDiff {
         leagueEntryIsClosed = true;
     }
 
-    function lockLineup() external {
+    function lockLineup() external onlyTeamDiff {
         // Why is this logging but the var isn't being changed?
         console.log("IN LOCK LINEUP FUNCTION IN LOL LOGIC");
         lineupIsLocked = true;
     }
 
-    function unlockLineup() external onlyLeagueMakerLibrary {
+    function unlockLineup() external onlyTeamDiff {
         lineupIsLocked = false;
     }
 
     // Evalautes all matchups for a given week
-    function evaluateWeek() external onlyLeagueMakerLibrary {
+    function evaluateWeek() external onlyTeamDiff {
         uint256 currWeekNum = leagueMakerContract.currentWeek();
         MOBALogicLibrary.evaluateWeek(
             schedule,
