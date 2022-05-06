@@ -48,17 +48,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       MOBALogicLibraryInstance.address
     );
 
-    //Create League Maker Library Instance
-    LeagueMakerLibraryFactory = await ethers.getContractFactory(
-      "LeagueMakerLibrary"
-    );
-    LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
-    await LeagueMakerLibraryInstance.deployed();
-    console.log(
-      "LeagueMakerLibrary deployed to:",
-      LeagueMakerLibraryInstance.address
-    );
-
     //Create GameItems instance
     GameItemFactory = await hre.ethers.getContractFactory("GameItems");
     GameItemInstance = await GameItemFactory.deploy(...constructorArgs);
@@ -80,21 +69,13 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       LeagueOfLegendsLogicInstance.address
     );
 
-    //Create League Maker Instance
-    LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker", {
-      // libraries: {
-      //   LeagueMakerLibrary: LeagueMakerLibraryInstance.address,
-      // },
-    });
-
+    //Create League Maker Instance (no library needed anymore)
+    LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
     LeagueMakerInstance = await LeagueMakerFactory.deploy(
-      LeagueOfLegendsLogicInstance.address,
-      LeagueMakerLibraryInstance.address // We need to pass leaguemaker library in, because we don't want to declare a whole library in the contract -- if we just store an address and use call() it should work without taking up space
+      LeagueOfLegendsLogicInstance.address
     );
     await LeagueMakerInstance.deployed();
     console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
-
-    // Todo: Add modifier in LeagueMakerLibrary that ONLY league maker can call the functions
 
     //Create Beacon Instance
     BeaconFactory = await ethers.getContractFactory("UpgradeableBeacon");
@@ -333,6 +314,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     let txn = await proxyContract.connect(owner).setLineup(athleteIds);
     txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
 
+    // TODO fix mapping default getter (call correctly below)
     // const lineup = await proxyContract
     //   .connect(owner)
     //   .userToLineup(owner.address); // Getting the caller's lineup

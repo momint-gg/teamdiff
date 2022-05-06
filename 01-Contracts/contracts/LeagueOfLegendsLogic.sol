@@ -240,27 +240,47 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
         uint256 currentWeek = leagueMakerContract.currentWeek();
 
-        // Require non-duplicate IDs (this way is better now, saves space and doesn't glitch (old way with mapping glitched in certain edge cases))
-        bool noDups = MOBALogicLibrary.checkDuplicate(athleteIds);
-        require(noDups, "Duplicate athleteIDs are not allowed.");
-
+        //Decrement all athleteToLineup Occurences from previous lineup
+        if (userToLineup[msg.sender].length > 0) {
+            for (uint256 i; i < userToLineup[msg.sender].length; i++) {
+                athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
+                    currentWeek
+                ]--;
+            }
+        }
+        // Require ownership of all athleteIds + update mapping
+        for (uint256 i; i < athleteIds.length; i++) {
+            athleteToLineupOccurencesPerWeek[i][currentWeek]++;
+            //gameItemsContract.mintAthlete(athleteIds[i]);
+            // console.log("in set lineup");
+            // console.log(gameItemsContract.balanceOf(msg.sender, athleteIds[i]));
+            // require(
+            //     gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
+            //     "Caller does not own given athleteIds"
+            // );
+        }
+        // Require non-duplicate athlete IDs in league
+        for (uint256 i; i < athleteIds.length; i++) {
+            require(
+                athleteToLineupOccurencesPerWeek[i][currentWeek] == 1,
+                "Duplicate athleteIDs are not allowed."
+            );
+        }
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
         for (uint256 i; i < athleteIds.length; i++) {
             require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
-                athleteIds[i] > (i * 10) && athleteIds[i] < ((i + 1) * 10 - 1),
+                athleteIds[i] >= (i * 10) &&
+                    athleteIds[i] <= ((i + 1) * 10 - 1),
                 "You are setting an athlete in the wrong position!"
             );
         }
-
-        console.log("About to set athlete lineup!");
-        // Setting the lineup
+        console.log("Setting lineup now baby");
         userToLineup[msg.sender] = athleteIds;
     }
 
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
-
     // Getter for user to weekly pts
     function getUserRecord() external view returns (uint256[8] memory) {
         return userToRecord[msg.sender];

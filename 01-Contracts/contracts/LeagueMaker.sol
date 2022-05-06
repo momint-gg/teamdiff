@@ -2,15 +2,14 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-
-// import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-
 import "./LeagueBeaconProxy.sol";
 import "./Athletes.sol";
-import "./LeagueMakerLibrary.sol";
 import "./TestUSDC.sol";
+
+// import "@openzeppelin/contracts/access/Ownable.sol";
+// import "./LeagueMakerLibrary.sol";
 
 contract LeagueMaker is Ownable {
     //To use Clone library
@@ -43,15 +42,10 @@ contract LeagueMaker is Ownable {
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
-    address leagueMakerLibraryAddress; // Our LeagueMakerLibrary CONTRACT
-    LeagueMakerLibrary leagueMakerLibrary; // Tring another method -- calling directly from LeagueMakerLibrary (enough storage?)
-
     // ======== Constructor ========
     // the constructor deploys an initial version that will act as a template
-    constructor(address _logic, address _leagueMakerLibrary) {
+    constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
-        leagueMakerLibraryAddress = _leagueMakerLibrary;
-        leagueMakerLibrary = LeagueMakerLibrary(_leagueMakerLibrary);
     }
 
     // ======== Deploy New League Proxy ========
