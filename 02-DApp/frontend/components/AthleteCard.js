@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { Card, CardContent, CardMedia, Typography, CardActions, Button } from "@mui/material"
-import { useState } from 'react';
 
 export default function AthleteCard({athleteData, setAthlete, setModalOpen}) {
   console.log(athleteData?.metadata.image)

@@ -2,12 +2,10 @@ import { useAccount, useConnect, useSigner, useProvider, useContract, useEnsLook
 import {useEffect, useState} from 'react';
 import { ethers } from 'ethers';
 import 'bootstrap/dist/css/bootstrap.css'
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import Image from 'next/image';
 import {Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, Grid} from "@mui/material";
 import CONSTANTS from "../Constants.js";
 import GameItemsJSON from "../utils/GameItems.json";
-import AthleteCard from "../components/AthleteCard";
 import profilePic from '../assets/images/starter-pack.png';
 
 export default function BurnPack({setDisplay}) {

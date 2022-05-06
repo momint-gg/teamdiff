@@ -1,6 +1,5 @@
 import { useAccount, useConnect } from 'wagmi'
 import { Box, Button, Modal, Typography, } from '@mui/material'
-import { useState } from 'react';
 
 export default function ConnectWalletModal({modalOpen, handleClickAway, setModalOpen}) {
     const [{ data: connectData, error: connectError }, connect] = useConnect()

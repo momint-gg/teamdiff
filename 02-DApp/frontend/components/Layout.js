@@ -1,18 +1,19 @@
 import React from 'react';
-import { Provider, chain, defaultChains } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import { WalletLinkConnector } from 'wagmi/connectors/walletLink'
 import { Box } from '@mui/material';
 import Image from 'next/image';
 import WalletLogin from '../components/WalletLogin';
 import logo from '../assets/images/logo-horizontal.png';
-import Link from 'next/link';
-import theme from '../styles/theme';
-import { ThemeProvider } from '@mui/material/styles';
 import Footer from './Footer';
+import NavLink from './NavLink';
 
 const Layout = ({children}) => {
+    const pages = [
+        { name: "PLAY", href: "/play" },
+        { name: "COLLECTION", href: "/collection" },
+        { name: "MINT", href: "/mintHome" },
+        { name: "BURN", href: "/burnPack" },
+      ];
+      
     return (
         <>
         <Box component="div" height='100%' backgroundColor='primary.dark'>
@@ -39,25 +40,34 @@ const Layout = ({children}) => {
         <Box
             sx={{
                 display: 'flex',
-                p: 1,
-                m: 1,
+                paddingRight: 1,
+                paddingLeft: 1,
+                paddingTop: 1,
+                marginRight: 1,
+                marginLeft: 1,
+                marginTop: 1,
                 borderRadius: 1,
-                alignItems: 'center',
                 backgroundColor: 'primary.dark',
                 display: 'flex',
-                justifyContent: 'space-around'
             }}
             >
-        <Link label="PLAY" sx={{ fontSize: 30 }} href="/play">PLAY</Link>
-        <Link label="COLLECTION" sx={{ fontSize: 30 }} href="/collection">COLLECTION</Link>
-        <Link label="MINT" value="2" sx={{ fontSize: 30 }} href="/mintHome">MINT</Link>
-        <Link label="BURN" value="3" sx={{ fontSize: 30 }} href="/burnPack">BURN</Link>
+        {pages.map((page) => (
+        <NavLink href={page.href}>{page.name}</NavLink>
+        ))}
         </Box>
-        {/* <Box backgroundColor='primary.dark'> */}
+        <hr
+                style={{
+                    color: "white",
+                    backgroundColor: "white",
+                    height: 4,
+                    marginTop: -4,
+                }}
+            />
+        <Box sx={{paddingLeft: 5, paddingRight: 5}}>
         <div>
             {children}
         </div>
-        {/* </Box> */}
+        </Box>
         <Footer />
         </Box>
         </Box>

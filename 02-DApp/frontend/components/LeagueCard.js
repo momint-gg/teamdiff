@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { Card, CardContent, CardMedia, Typography, CardActions, Button, Avatar, Box } from "@mui/material"
-import { useState } from 'react';
 
 export default function LeagueCard({leagueData, setLeague, setLeagueOpen}) {
     const card = (
