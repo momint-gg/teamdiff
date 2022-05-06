@@ -213,4 +213,17 @@ library MOBALogicLibrary {
         //returns the score * 100, can scale down on frontend to enable floats
         return score;
     }
+
+    // Seeing if there is a duplicate or not
+    function checkDuplicate(uint256[] memory arr) public pure returns (bool) {
+        for (uint256 i; i < arr.length; i++) {
+            arr[arr[i] % arr.length] = arr[arr[i] % arr.length] + arr.length;
+        }
+        for (uint256 i; i < arr.length; i++) {
+            if (arr[i] >= arr.length * 2) {
+                return false; // Duplicate
+            }
+        }
+        return true; // No duplicate
+    }
 }

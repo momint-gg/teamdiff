@@ -1,5 +1,6 @@
 // New test file where I'm making it simple...... old one was getting a bit cluttered
 // Note: This test should be run on hardhat network (tailored to that)
+// Again: Do NOT run on Rinkeby as it will not work
 
 // GENERAL FLOW OF THIS TEST FILE:
 // 1. Testing to make sure a proxy is setup correctly
@@ -250,9 +251,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // NOTE: Now the league has owner and addr1 in it
 
-  // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once --changed structure
-  // *These functions are now called in loops as follows*
-  // LETS FUCKING GO IT WORKS NOW. Yeah.
+  // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once -- changed structure (not in LeagueMaker anymore)
+  // LETS FUCKING GO IT WORKS NOW
   it("Sets league schedules for the proxies AND UPDATES STATE", async () => {});
 
   // NOTE: Don't want to call expect statements in a loop like this or hardhat will freak out
@@ -277,9 +277,12 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     }
   });
 
+  // Figured out why expects aren't working.. in hardhat want to await before expect and not in it (can explain more if you ask me @henry)
   it("Doesn't let non-teamdiff wallet call onlyTeamDiff functions in LeagueOfLegendsLogic", async () => {
     const sampleProxy = AllLeagueInstances[0].connect(addr1); // addr1 is not owner
-    expect(sampleProxy.lockLineup()).to.be.reverted;
+    await expect(sampleProxy.lockLineup()).to.be.revertedWith(
+      "Caller is not TeamDiff"
+    );
   });
 
   // 4. Testing out evaluate match flow
@@ -287,51 +290,38 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // it("User cannot set lineup of athleteIds that they don't own", async () => {
   //   const athleteIds = [1, 2, 3, 4]; // Athlete IDs for user 1 (owner)
   //   let txn = proxyContract.connect(addr1).setLineup(athleteIds);
-  //   //await txn.wait();
   //   expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
   // });
 
   it("User cannot set duplicate athlete id in lineup", async () => {
     const athleteIds = [1, 1, 2]; // Athlete IDs for user 1 (owner)
-    let txn = await proxyContract.connect(addr1).setLineup(athleteIds);
-    await txn.wait();
+    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
     // For some reason these reverted statements aren't working... but all tests are "passing" (correct errors) so we good
-    expect(txn).to.be.reverted;
-  });
-
-  it("User cannot set lineup in a league they don't belong to", async () => {
-    const athleteIds = [0, 1, 3, 5, 7]; // Athlete IDs for user 1 (owner)
-    let txn = await proxyContract.connect(addr3).setLineup(athleteIds);
-    // await txn.wait();
-    expect(txn).to.be.reverted;
-  });
-
-  it("User cannot set lineup if line up is locked for the week", async () => {
-    const athleteIds = [1, 2]; // Athlete IDs for user 1 (owner)
-    // LeagueMakerInstance is undefined for some reason
-    // @TREY I fixed this ^, was the way that I set it initially (const isn't global)
-    // If not working out in future, take out const/let of global var
-    let txn = await LeagueMakerInstance.connect(owner).lockLeagueLineups();
-    await txn.wait();
-    txn = await proxyContract.connect(addr1).setLineup(athleteIds);
-    // await txn.wait();
-    expect(txn).to.be.reverted;
+    await expect(txn).to.be.revertedWith(
+      "Duplicate athleteIDs are not allowed."
+    );
   });
 
   it("Doesn't let a user that's not in the league set a lineup", async () => {
     const athleteIds = [1, 2];
-    let txn = await proxyContract.connect(addr3).setLineup(athleteIds);
-    // await txn.wait();
-    expect(txn).to.be.reverted;
+    let txn = proxyContract.connect(addr3).setLineup(athleteIds);
+    await expect(txn).to.be.revertedWith("User is not in League.");
+  });
+
+  it("User cannot set lineup if line up is locked for the week", async () => {
+    const athleteIds = [1, 2]; // Athlete IDs for user 1 (owner)
+    let txn = await proxyContract.connect(owner).lockLineup();
+    txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    await expect(txn).to.be.revertedWith("lineup is locked for the week!");
+    await proxyContract.connect(owner).unlockLineup();
   });
 
   it("User cannot set IDs in the same 0-9, 9-19 etc. range (position range)", async () => {
     const athleteIds = [1, 8];
-    let txn = await proxyContract.connect(addr1).setLineup(athleteIds);
-    await txn.wait();
-    // Why isn't this test working? Is reverting correctly but not passing in hardhat lol
-    // This works though... after some googling looks like something may be wrong with my hardhat environment, if this is working for u @Trey
-    expect(txn).to.be.reverted;
+    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    await expect(txn).to.be.revertedWith(
+      "You are setting an athlete in the wrong position!"
+    );
   });
 
   // Setting athletes and getting user's lineup -- inputting valid IDs
@@ -341,10 +331,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
     // Need to remember to have a check also that IDs must be in range (0-9, 10-19, etc.) so we don't have the bug where people can set wrong positions
     let txn = await proxyContract.connect(owner).setLineup(athleteIds);
-    await txn.wait();
-
     txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
-    await txn.wait();
 
     // const lineup = await proxyContract
     //   .connect(owner)

@@ -14,24 +14,19 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./TestUSDC.sol";
 
 contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
-    // Vars
-    //uint256 public version; // tsting
+    using SafeMath for uint256;
+
     string public leagueName;
     uint256 public numWeeks; // Length of a split
-    // uint256 public currentWeekNum; // Keeping track of week number
-    // Amount that will be staked (in USDC) for each league
     uint256 public stakeAmount;
-    //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
     address public admin;
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
     bool public lineupIsLocked;
 
-    // Mappings
+    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256) public userToTotalWins;
     mapping(address => uint256[8]) public userToRecord; // User to their record
-
-    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -57,7 +52,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
     // Won't want to make whitelist immutable
-    // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
     Athletes athletesContract;
     Whitelist whitelistContract;
     LeagueMaker leagueMakerContract;
@@ -74,7 +68,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //*****************/
     //*** Modifiers ***/
     /******************/
-    using SafeMath for uint256;
 
     // Only the admin (whoever created the league) can call
     modifier onlyAdmin() {
@@ -113,11 +106,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         // address _leagueMakerLibraryAddress,
         address _teamDiffAddress,
         address _leagueMakerContractAddress
-    )
-        public
-        // address gameItemsContractAddress
-        initializer
-    {
+    ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
         //numWeeks = _numWeeks;
@@ -135,7 +124,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
-        // leagueMakerLibraryAddress = _leagueMakerLibraryAddress;
         teamDiffAddress = _teamDiffAddress;
         //gameItemsContract = GameItems(gameItemsContractAddress);
         //gameItemsContract = address(0);
@@ -152,7 +140,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /*************************************************/
     // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
     function setLeagueSchedule() external onlyTeamDiff {
-        console.log("setting schedule");
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
             leagueMembers,
@@ -166,8 +153,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     }
 
     function lockLineup() external onlyTeamDiff {
-        // Why is this logging but the var isn't being changed?
-        console.log("IN LOCK LINEUP FUNCTION IN LOL LOGIC");
         lineupIsLocked = true;
     }
 
@@ -176,7 +161,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     }
 
     // Evalautes all matchups for a given week
-    function evaluateWeek() external onlyTeamDiff {
+    // TODO: Remove nonreentrant modifier if not needed
+    function evaluateWeek() external onlyTeamDiff nonReentrant {
         uint256 currWeekNum = leagueMakerContract.currentWeek();
         MOBALogicLibrary.evaluateWeek(
             schedule,
@@ -186,6 +172,10 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
             userToTotalWins,
             userToLineup
         );
+        // League is over, give payout to winner
+        if (currWeekNum == 8) {
+            onLeagueEnd();
+        }
     }
 
     // Evaluates match between two users, only we can call
@@ -209,8 +199,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //         );
     // }
 
-    // TODO: Add modifier (or will this just be called internally? if so just change to private/internal or whatev)
-    function onLeagueEnd() external nonReentrant {
+    function onLeagueEnd() private {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner = leagueMembers[0];
         // Calculating the winner (may want to just update each week instead of doing this way...)
@@ -244,53 +233,26 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
-    // Lineup must not be locked
-    // How do we check that the user owners the athletiIds??
+    // We don't need to check athlete to lineup occurrences -- won't be the case that that can happen
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
 
-        uint256[] memory currLineup = userToLineup[msg.sender];
         uint256 currentWeek = leagueMakerContract.currentWeek();
 
-        // Require non-duplicate IDs
-        for (uint256 i; i < athleteIds.length; i++) {
-            require(
-                athleteToLineupOccurencesPerWeek[i][currentWeek] == 1,
-                "Duplicate athleteIDs are not allowed."
-            );
-        }
+        // Require non-duplicate IDs (this way is better now, saves space and doesn't glitch (old way with mapping glitched in certain edge cases))
+        bool noDups = MOBALogicLibrary.checkDuplicate(athleteIds);
+        require(noDups, "Duplicate athleteIDs are not allowed.");
 
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
         for (uint256 i; i < athleteIds.length; i++) {
-            uint256 upperLimit = (i + 1) * 10 - 1; // I.e. 9, 19, 29, etc.
-            console.log("Upper limit is ", upperLimit);
-            uint256 lowerLimit = i * 10; // I.e. 0, 10, 20, etc.
-            console.log("Lower limit is ", lowerLimit);
-            require(
-                athleteIds[i] > lowerLimit && athleteIds[i] < upperLimit,
+            require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
+                athleteIds[i] > (i * 10) && athleteIds[i] < ((i + 1) * 10 - 1),
                 "You are setting an athlete in the wrong position!"
             );
         }
 
-        // TODO move the following checks into a library somehow, cost about 1 kb of contract space :/
-        // Decrement all athleteToLineup Occurences from previous lineup
-        for (uint256 i; i < currLineup.length; i++) {
-            athleteToLineupOccurencesPerWeek[currLineup[i]][currentWeek]--;
-        }
-        // Require ownership of all athleteIds + update athleteToLineOccurencesMapping
-        // TODO uncomment this out for prod. Commented out for testing
-        for (uint256 i; i < athleteIds.length; i++) {
-            athleteToLineupOccurencesPerWeek[i][currentWeek]++;
-            //gameItemsContract.mintAthlete(athleteIds[i]);
-            // console.log("in set lineup");
-            // console.log(gameItemsContract.balanceOf(msg.sender, athleteIds[i]));
-            // require(
-            //     gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
-            //     "Caller does not own given athleteIds."
-            // );
-        }
-
+        console.log("About to set athlete lineup!");
         // Setting the lineup
         userToLineup[msg.sender] = athleteIds;
     }
@@ -314,7 +276,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         return userToTotalWins[msg.sender];
     }
 
-    // Getting lineupIsLocked
+    // Getting lineupIsLocked (TODO: Comment out for prod)
     function getLineupIsLocked() external view returns (bool) {
         return lineupIsLocked;
     }
@@ -349,19 +311,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
     }
-
-    // Add user to league -- only testing, not using this
-    // TODO comment out for prod
-    // function addUserToLeague(address user) public {
-    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
-
-    //     if (leagueMembers.length < 8) {
-    //         leagueMembers.push(user);
-    //         leagueMakerContract.updateUserToLeagueMapping(user);
-    //     } else {
-    //         console.log("Too many users in league to add new user.");
-    //     }
-    // }
 
     // Removing a user from the whitelist before the season starts
     function removeFromWhitelist(address _userToRemove) external onlyAdmin {
