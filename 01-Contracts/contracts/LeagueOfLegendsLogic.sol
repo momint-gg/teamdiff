@@ -274,7 +274,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
                 "You are setting an athlete in the wrong position!"
             );
         }
-        console.log("Setting lineup now baby");
+
         userToLineup[msg.sender] = athleteIds;
     }
 
@@ -299,6 +299,11 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // Getting lineupIsLocked (TODO: Comment out for prod)
     function getLineupIsLocked() external view returns (bool) {
         return lineupIsLocked;
+    }
+
+    // You need to call an index when getting a mapping. More convenient to have a getter so we can return whole lineup
+    function getLineup(address _user) public view returns (uint256[] memory) {
+        return userToLineup[_user];
     }
 
     //Given manually inputted athlete stats, return the calculated

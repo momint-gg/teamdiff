@@ -314,15 +314,16 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     let txn = await proxyContract.connect(owner).setLineup(athleteIds);
     txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
 
-    // TODO fix mapping default getter (call correctly below)
-    const lineup = await proxyContract
-      .connect(owner)
-      .userToLineup(owner.address); // Getting the caller's lineup
-    console.log("Lineup for owner is ", lineup);
-    await proxyContract.connect(addr1);
-    const lineup2 = await proxyContract.userToLineup(addr1.address);
-    console.log("Lineup for addr1 is ", lineup2);
-    expect(lineup).to.not.equal(lineup2);
+    // Making sure state was updated correctly
+    let lineup = await proxyContract.connect(owner).getLineup(owner.address); // Getting the caller's lineup
+    lineup = lineup.map((player) => Number(player));
+    let lineup2 = await proxyContract.getLineup(addr1.address);
+    lineup2 = lineup2.map((player) => Number(player));
+
+    for (let i = 0; i < athleteIds.length; i++) {
+      expect(lineup[i]).to.equal(athleteIds[i]);
+      expect(lineup2[i]).to.equal(athleteIds2[i]);
+    }
   });
 
   // Testing out eval match function in League Proxy (NOT HOW WILL WE DO IN PROD)
