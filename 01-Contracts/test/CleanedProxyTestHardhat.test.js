@@ -320,29 +320,39 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     let lineup2 = await proxyContract.getLineup(addr1.address);
     lineup2 = lineup2.map((player) => Number(player));
 
-    for (let i = 0; i < athleteIds.length; i++) {
-      expect(lineup[i]).to.equal(athleteIds[i]);
-      expect(lineup2[i]).to.equal(athleteIds2[i]);
-    }
+    expect(lineup).to.eql(athleteIds); // Note: eql is diff from equal as is does a deep comparison
+    expect(lineup2).to.eql(athleteIds2);
   });
 
-  // Testing out eval match function in League Proxy (NOT HOW WILL WE DO IN PROD)
   // Delete this test when we comment out evaluateMatch in LeagueProxy
   // Correctly evaluates the matchup between two users
-  // it("Correctly appends stats for athletes", async () => {
-  //   // Adding random stats for 50 athletes
-  //   for (let i = 0; i < 50; i++) {
-  //     const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
-  //     let txn = await AthletesContractInstance.connect(owner).appendStats(
-  //       i,
-  //       randomNum
-  //     );
-  //     await txn.wait();
-  //   }
-  // });
+  // Simulates what we'll be doing from our backend after we pull API data
+  it("Correctly appends stats for athletes", async () => {
+    // Adding random stats for 50 athletes
+    for (let i = 0; i < 50; i++) {
+      const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
+      let txn = await AthletesContractInstance.connect(owner).appendStats(
+        i,
+        randomNum
+      );
+      await txn.wait();
+    }
+
+    const statsArr = [];
+    for (let i = 0; i < 50; i++) {
+      const athleteStats = await AthletesContractInstance.getAthleteScores(i);
+      statsArr.push(athleteStats);
+    }
+    // Comment out below to see stats arr (is being updated correctly right now!)
+    // console.log("Athlete stats ", statsArr);
+  });
+
+  // Testing eval match and state update for a single proxy
+  it("Evaluates a match and updates state correctly for a single proxy", async () => {});
 
   // The big kahuna - testing out LeagueMaker evaluatematch -- if this works we chillin
-  // TODO: For some reason, mappings aren't being updated for the league, fix this
+  // Changed this to new method: calls directly from each of the proxies as an "onlyTeamDiff" function
+  it("Evaltes matches for all proxies and updates state correctly", async () => {});
   // it("Calls evaluateWeekForAllLeagues() successfully, updates mappings in the proxy contract", async () => {
   //   console.log("Evaluating matches");
   //   let txn = await LeagueMakerInstance.connect(
