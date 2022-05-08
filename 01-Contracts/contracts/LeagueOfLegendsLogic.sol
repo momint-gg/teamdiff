@@ -241,16 +241,15 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         uint256 currentWeek = leagueMakerContract.currentWeek();
 
         //Decrement all athleteToLineup Occurences from previous lineup
-        if (userToLineup[msg.sender].length > 0) {
-            for (uint256 i; i < userToLineup[msg.sender].length; i++) {
-                athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
-                    currentWeek
-                ]--;
-            }
+        for (uint256 i; i < userToLineup[msg.sender].length; i++) {
+            athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
+                currentWeek
+            ]--;
         }
+
         // Require ownership of all athleteIds + update mapping
         for (uint256 i; i < athleteIds.length; i++) {
-            athleteToLineupOccurencesPerWeek[i][currentWeek]++;
+            athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek]++;
             //gameItemsContract.mintAthlete(athleteIds[i]);
             // console.log("in set lineup");
             // console.log(gameItemsContract.balanceOf(msg.sender, athleteIds[i]));
@@ -262,7 +261,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         // Require non-duplicate athlete IDs in league
         for (uint256 i; i < athleteIds.length; i++) {
             require(
-                athleteToLineupOccurencesPerWeek[i][currentWeek] == 1,
+                athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek] ==
+                    1,
                 "Duplicate athleteIDs are not allowed."
             );
         }
