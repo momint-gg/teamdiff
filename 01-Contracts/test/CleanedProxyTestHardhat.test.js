@@ -212,6 +212,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     // Amount of athletes they have should equal the starter pack size (5)
     expect(ownerAthletes.length).to.equal(5);
     expect(addr1Athletes.length).to.equal(5);
+    console.log("Owner's athletes are ", ownerAthletes);
+    console.log("Addr1's athletes are ", addr1Athletes);
   });
 
   // 1. Testing proxy setup
@@ -327,21 +329,22 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   // 4. Testing out evaluate match flow
+  // NOTE: OWNER AND ADDR1 MINTED STARTER PACKS ABOVE: ARRAYS OF THE ATHLETE IDS ARE: "ownerAthletes" and "addr1Athletes"
   // Temporarily putting this test out since I commented out require
-  // it("User cannot set lineup of athleteIds that they don't own", async () => {
-  //   const athleteIds = [1, 2, 3, 4]; // Athlete IDs for user 1 (owner)
-  //   let txn = proxyContract.connect(addr1).setLineup(athleteIds);
-  //   expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
-  // });
-
-  it("User cannot set duplicate athlete id in lineup", async () => {
-    const athleteIds = [1, 1, 2]; // Athlete IDs for user 1 (owner)
+  it("User cannot set lineup of athleteIds that they don't own", async () => {
+    const athleteIds = [1, 2, 3, 4]; // Athlete IDs for user 1 (owner)
     let txn = proxyContract.connect(addr1).setLineup(athleteIds);
-    // For some reason these reverted statements aren't working... but all tests are "passing" (correct errors) so we good
-    await expect(txn).to.be.revertedWith(
-      "Duplicate athleteIDs are not allowed."
-    );
+    expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
   });
+
+  // it("User cannot set duplicate athlete id in lineup", async () => {
+  //   const athleteIds = [1, 1, 2]; // Athlete IDs for user 1 (owner)
+  //   let txn = proxyContract.connect(addr1).setLineup(athleteIds);
+  //   // For some reason these reverted statements aren't working... but all tests are "passing" (correct errors) so we good
+  //   await expect(txn).to.be.revertedWith(
+  //     "Duplicate athleteIDs are not allowed."
+  //   );
+  // });
 
   it("Doesn't let a user that's not in the league set a lineup", async () => {
     const athleteIds = [1, 2];

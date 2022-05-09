@@ -250,20 +250,24 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         for (uint256 i; i < athleteIds.length; i++) {
             athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek]++;
         }
+        // The below check won't work because there's no way to make sure athletes aren't repeated in each league (as of now)
         // Require non-duplicate athlete IDs in league
-        for (uint256 i; i < athleteIds.length; i++) {
-            require(
-                athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek] ==
-                    1,
-                "Duplicate athleteIDs are not allowed."
-            );
-        }
+        // for (uint256 i; i < athleteIds.length; i++) {
+        //     require(
+        //         athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek] ==
+        //             1,
+        //         "Duplicate athleteIDs are not allowed."
+        //     );
+        // }
+
+        // Requiring the user has ownership of the athletes
         for (uint256 i; i < athleteIds.length; i++) {
             require(
                 gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
                 "Caller does not own given athleteIds"
             );
         }
+
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
         for (uint256 i; i < athleteIds.length; i++) {
             require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
@@ -272,7 +276,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
                 "You are setting an athlete in the wrong position!"
             );
         }
-
         userToLineup[msg.sender] = athleteIds;
     }
 
