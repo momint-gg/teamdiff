@@ -232,7 +232,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
-    // We don't need to check athlete to lineup occurrences -- won't be the case that that can happen
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
@@ -276,6 +275,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
                 "You are setting an athlete in the wrong position!"
             );
         }
+
         userToLineup[msg.sender] = athleteIds;
     }
 
@@ -306,6 +306,11 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     function getLineup(address _user) public view returns (uint256[] memory) {
         return userToLineup[_user];
     }
+
+    // // For testing -- returns matchups for a given week
+    // function getScheduleForWeek(uint256 _week) public returns (Matchup memory) {
+    //     return schedule[_week];
+    // }
 
     //Given manually inputted athlete stats, return the calculated
     //athleteScores.

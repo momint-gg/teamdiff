@@ -10,12 +10,11 @@
 // 2. Testing out league join flow -- make sure user can join, staking works correctly
 //      For now testing all on hardhat so using test USDC, will eventually use polygon USDC address
 
-// 3. Testing out LeagueMaker functions -- making sure the owner of LeagueMaker can call
+// 3. Testing out proxy wide functions (what used to be in LeagueMaker) -- making sure the owner of LeagueMaker can call
 //      These will be the functions called from the backend, so need to make sure they work in hardhat tests first
-//      setLeagueSchedules()
-//      lockLeagueLineups()
-//      unlockLeagueLineups()
-//      evaluateWeekForAllLeagues() -- note: will test this in step 4
+//      setting league schedules for all proxies
+//      lockLeagueLineups & unlockLeagueLIneups for all proxies
+//      evaluateWeek for all proxies -- note: will test this in step 4
 
 // 4. Testing out evaluating match flow.
 //      1. Users can set their lineups correctly (requires are all working, can't set duplicates etc.)
@@ -201,7 +200,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       const currNumAddr1 = Number(
         await GameItemInstance.connect(addr1).balanceOf(addr1.address, i)
       );
-
+      // Adding athlete IDs to arrays for users
       if (currNumOwner === 1) {
         ownerAthletes.push(i);
       }
@@ -296,7 +295,16 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once -- changed structure (not in LeagueMaker anymore)
   // LETS FUCKING GO IT WORKS NOW
-  it("Sets league schedules for the proxies AND UPDATES STATE", async () => {});
+  it("Sets league schedules for all proxies AND UPDATES STATE", async () => {
+    let currLeague;
+    let txn;
+    for (let i = 0; i < AllLeagueInstances.length; i++) {
+      currLeague = AllLeagueInstances[i].connect(owner);
+      txn = await currLeague.setLeagueSchedule();
+    }
+
+    // Checking state for a proxy
+  });
 
   // NOTE: Don't want to call expect statements in a loop like this or hardhat will freak out
   it("Calls lock/unlock lineups for all proxies AND UPDATES STATE", async () => {
@@ -410,44 +418,10 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     // console.log("Athlete stats ", statsArr);
   });
 
-  // Testing eval match and state update for a single proxy
-  it("Evaluates a match and updates state correctly for a single proxy", async () => {});
-
   // The big kahuna - testing out LeagueMaker evaluatematch -- if this works we chillin
   // Changed this to new method: calls directly from each of the proxies as an "onlyTeamDiff" function
-  it("Evaltes matches for all proxies and updates state correctly", async () => {});
-  // it("Calls evaluateWeekForAllLeagues() successfully, updates mappings in the proxy contract", async () => {
-  //   console.log("Evaluating matches");
-  //   let txn = await LeagueMakerInstance.connect(
-  //     owner
-  //   ).evaluateWeekForAllLeagues();
-  //   await txn.wait();
+  it("Evaluates matches for all proxies and updates state correctly", async () => {});
 
-  //   // Getting week 0 results -- not being updated
-  //   const ownerPts = await proxyContract.connect(owner).getUserRecord();
-  //   const addr1Pts = await proxyContract.connect(addr1).getUserRecord();
-  //   console.log("owner record is ", ownerPts, " addr1 record is ", addr1Pts);
-  // });
-
-  // Testing prize pool functionality - winner should get the prize pot
-  // it("Delegates the prize pool to the winner of the league", async () => {
-  //   // Getting prev balance of owner and addr1
-  //   const oldOwnerBalance = Number(
-  //     await testUsdcContract.balanceOf(owner.address)
-  //   );
-  //   const oldAddr1Balance = Number(
-  //     await testUsdcContract.balanceOf(addr1.address)
-  //   );
-
-  //   // First approve allowance for league to xfer the money out
-  //   const prizePoolAmount = Number(await proxyContract.getTotalPrizePot());
-  //   let approval = await testUsdcContract.approve(
-  //     proxyContract.address,
-  //     prizePoolAmount
-  //   );
-  //   await approval.wait();
-
-  //   // Now delegating the prize pool to the winner
   //   const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
   //   await delegatePool.wait();
 
@@ -467,4 +441,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   //     );
   //   }
   // });
+
+  it("Now simulating an 8 week split and giving out prize pot", async () => {});
 });
