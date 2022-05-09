@@ -120,21 +120,20 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    function addAddressesToWhitelist(address[] memory addrs)
+    function addUsersToWhitelist(address[] memory addrs)
         public
         onlyOwner
         returns (bool success)
     {
         for (uint256 i = 0; i < addrs.length; i++) {
             if (addUserToWhitelist(addrs[i])) {
-                numWhitelisted += 1;
                 success = true;
             }
         }
     }
 
     function removeUserFromWhitelist(address _userToRemove)
-        external
+        public
         onlyOwner
         returns (bool success)
     {
@@ -152,7 +151,6 @@ contract GameItems is ERC1155, Ownable {
     {
         for (uint256 i = 0; i < addrs.length; i++) {
             if (removeUserFromWhitelist(addrs[i])) {
-                numWhitelisted -= 1;
                 success = true;
             }
         }
@@ -305,7 +303,7 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
-    function getNFTPerAthlete() public view onlyOwner returns (uint256) {
+    function getNFTPerAthlete() public view returns (uint256) {
         return NFT_PER_ATHLETE;
     }
 
