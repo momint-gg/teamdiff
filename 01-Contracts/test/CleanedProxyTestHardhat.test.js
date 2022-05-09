@@ -112,8 +112,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       true, // Is public
       owner.address, // Admin for league proxy
       testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
-      AthletesContractInstance.address // Address of our athletes storage contract
-      // GameItemInstance.address // GameItems contract address
+      AthletesContractInstance.address, // Address of our athletes storage contract
+      GameItemInstance.address // GameItems contract address
     );
     var leagueProxyContractAddress;
     receipt = await txn.wait();
@@ -185,11 +185,33 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // Testing to see if 5 athletes are minted to owner with correct metadata
   it("Burns a pack successfully for owner and mints 5 athletes in a random order", async () => {
-    GameItemInstance.connect(owner);
-    txn = await GameItemInstance.mintStarterPack();
-    console.log("Starter pack minted to owner: ", owner.address);
-    txn = await GameItemInstance.burnStarterPack(); // If we check wallet, should have athlete NFTs now
-    console.log("Burning starter pack");
+    txn = await GameItemInstance.connect(owner).mintStarterPack();
+    txn = await GameItemInstance.connect(owner).burnStarterPack();
+    txn = await GameItemInstance.connect(addr1).mintStarterPack();
+    txn = await GameItemInstance.connect(addr1).burnStarterPack();
+
+    // Making sure owner and addr1 have 5 athletes each, and adding to athletes ID array
+    // ATHLETE ARRAYS TO BE USED IN EVAL MATCH TESTS
+    ownerAthletes = [];
+    addr1Athletes = [];
+    for (let i = 0; i < 50; i++) {
+      const currNumOwner = Number(
+        await GameItemInstance.connect(owner).balanceOf(owner.address, i)
+      );
+      const currNumAddr1 = Number(
+        await GameItemInstance.connect(addr1).balanceOf(addr1.address, i)
+      );
+
+      if (currNumOwner === 1) {
+        ownerAthletes.push(i);
+      }
+      if (currNumAddr1 === 1) {
+        addr1Athletes.push(i);
+      }
+    }
+    // Amount of athletes they have should equal the starter pack size (5)
+    expect(ownerAthletes.length).to.equal(5);
+    expect(addr1Athletes.length).to.equal(5);
   });
 
   // 1. Testing proxy setup
@@ -336,7 +358,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   it("User cannot set IDs in the same 0-9, 9-19 etc. range (position range)", async () => {
-    const athleteIds = [1, 8];
+    const athleteIds = [addr1Athletes[1], addr1Athletes[0]];
     let txn = proxyContract.connect(addr1).setLineup(athleteIds);
     await expect(txn).to.be.revertedWith(
       "You are setting an athlete in the wrong position!"
@@ -345,8 +367,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // Setting athletes and getting user's lineup -- inputting valid IDs
   it("Correctly sets athlete IDs with valid lineup and gets a user's lineup", async () => {
-    const athleteIds = [0, 11, 23, 33, 41]; // Athlete IDs for user 1 (owner)
-    const athleteIds2 = [2, 14, 29, 30, 45]; // Athlete IDs for user 2 (addr1)
+    const athleteIds = ownerAthletes; // Athlete IDs for user 1 (owner)
+    const athleteIds2 = addr1Athletes; // Athlete IDs for user 2 (addr1)
 
     // Need to remember to have a check also that IDs must be in range (0-9, 10-19, etc.) so we don't have the bug where people can set wrong positions
     let txn = await proxyContract.connect(owner).setLineup(athleteIds);

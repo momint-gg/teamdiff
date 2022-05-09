@@ -55,7 +55,8 @@ contract LeagueMaker is Ownable {
         bool _isPublic,
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
-        address _athletesContractAddress
+        address _athletesContractAddress,
+        address _gameItemsContractAddress
     )
         external
         returns (
@@ -70,9 +71,10 @@ contract LeagueMaker is Ownable {
             _isPublic,
             _athletesContractAddress,
             _adminAddress,
-            _polygonUSDCAddress,
+            // _polygonUSDCAddress,
             _rinkebyUSDCAddress,
             _testUSDCAddress,
+            _gameItemsContractAddress,
             // leagueMakerLibraryAddress, // Adding in library address
             msg.sender, //TeamDiff address (deployer of LeagueMaker)
             address(this)

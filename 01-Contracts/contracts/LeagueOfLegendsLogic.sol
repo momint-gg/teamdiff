@@ -47,7 +47,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         uint256 assists;
         uint256 minionScore;
     }
-    address public polygonUSDCAddress; // When we deploy to mainnet
+    // address public polygonUSDCAddress = ; // When we deploy to mainnet
     address public rinkebyUSDCAddress;
 
     // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
@@ -98,12 +98,11 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         uint256 _stakeAmount,
         bool _isPublic,
         address athletesDataStorageAddress,
-        //address _owner,
         address _admin,
-        address _polygonUSDCAddress,
+        // address _polygonUSDCAddress, // This doesn't need to be a parameter passed in
         address _rinkebyUSDCAddress,
         address _testUSDCAddress,
-        // address _leagueMakerLibraryAddress,
+        address _gameItemsContractAddress,
         address _teamDiffAddress,
         address _leagueMakerContractAddress
     ) public initializer {
@@ -121,11 +120,11 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
-        polygonUSDCAddress = _polygonUSDCAddress;
+        // polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
-        //gameItemsContract = GameItems(gameItemsContractAddress);
+        gameItemsContract = GameItems(_gameItemsContractAddress);
         //gameItemsContract = address(0);
         console.log("Proxy initialized!");
     }
@@ -250,13 +249,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         // Require ownership of all athleteIds + update mapping
         for (uint256 i; i < athleteIds.length; i++) {
             athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek]++;
-            //gameItemsContract.mintAthlete(athleteIds[i]);
-            // console.log("in set lineup");
-            // console.log(gameItemsContract.balanceOf(msg.sender, athleteIds[i]));
-            // require(
-            //     gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
-            //     "Caller does not own given athleteIds"
-            // );
         }
         // Require non-duplicate athlete IDs in league
         for (uint256 i; i < athleteIds.length; i++) {
@@ -264,6 +256,12 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
                 athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek] ==
                     1,
                 "Duplicate athleteIDs are not allowed."
+            );
+        }
+        for (uint256 i; i < athleteIds.length; i++) {
+            require(
+                gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
+                "Caller does not own given athleteIds"
             );
         }
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
