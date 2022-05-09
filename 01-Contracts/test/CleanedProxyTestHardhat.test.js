@@ -3,6 +3,8 @@
 // Again: Do NOT run on Rinkeby as it will not work
 
 // GENERAL FLOW OF THIS TEST FILE:
+// Pre proxy testing: Deploy a GameItems contract and mint/burn starter packs for owner and addr1
+
 // 1. Testing to make sure a proxy is setup correctly
 
 // 2. Testing out league join flow -- make sure user can join, staking works correctly
@@ -24,6 +26,7 @@ require("dotenv").config();
 const { expect } = require("chai");
 // Adding new testing library, bc chai error assertion is not working for me
 const { ethers } = require("hardhat");
+const { it } = require("mocha");
 const { connect } = require("mqtt");
 
 const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
@@ -152,6 +155,36 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       );
       AllLeagueInstances.push(currProxy);
     }
+  });
+
+  // Pre proxy tests: Testing GameItems.sol flow
+  // GameItems baseline working
+  it("Receives constructor arguments properly", async () => {
+    const starterPackSize = await GameItemInstance.connect(
+      owner
+    ).getNFTPerAthlete();
+    expect(Number(starterPackSize)).to.equal(10);
+  });
+
+  it("Doesnt let a nonwhitelisted user mint a starter pack", async () => {
+    let txn = GameItemInstance.connect(owner).addUsersToWhitelist([
+      owner.address,
+      addr1.address,
+    ]);
+    expect(txn).to.be.revertedWith("User is not whitelisted.");
+  });
+  // Testing to see if 5 athletes are minted to owner with correct metadata
+  it("Burns a pack successfully for owner and mints 5 athletes in a random order", async () => {
+    await GameItemInstance.connect(owner);
+    let txn = await GameItemInstance.setStartingIndex();
+    console.log("Setting starting indices");
+    txn = await GameItemInstance.setURIs(); // This takes awhile
+    console.log("Setting URIs");
+    txn = await GameItemInstance.mintStarterPack();
+    console.log("Starter pack minted to owner: ", owner.address);
+    txn = await GameItemInstance.burnStarterPack(); // If we check wallet, should have athlete NFTs now
+    console.log("Burning starter pack");
+    // const lineup = await owner
   });
 
   // 1. Testing proxy setup

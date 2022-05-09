@@ -109,7 +109,7 @@ contract GameItems is ERC1155, Ownable {
     /******************* WHITELIST ***********************/
     /*****************************************************/
     function addUserToWhitelist(address _userToAdd)
-        external
+        public
         onlyOwner
         returns (bool success)
     {
@@ -120,7 +120,20 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    function removeAddressFromWhitelist(address _userToRemove)
+    function addAddressesToWhitelist(address[] memory addrs)
+        public
+        onlyOwner
+        returns (bool success)
+    {
+        for (uint256 i = 0; i < addrs.length; i++) {
+            if (addUserToWhitelist(addrs[i])) {
+                numWhitelisted += 1;
+                success = true;
+            }
+        }
+    }
+
+    function removeUserFromWhitelist(address _userToRemove)
         external
         onlyOwner
         returns (bool success)
@@ -129,6 +142,19 @@ contract GameItems is ERC1155, Ownable {
             whitelist[_userToRemove] = false;
             numWhitelisted -= 1;
             success = true;
+        }
+    }
+
+    function removeUsersFromWhitelist(address[] memory addrs)
+        public
+        onlyOwner
+        returns (bool success)
+    {
+        for (uint256 i = 0; i < addrs.length; i++) {
+            if (removeUserFromWhitelist(addrs[i])) {
+                numWhitelisted -= 1;
+                success = true;
+            }
         }
     }
 
