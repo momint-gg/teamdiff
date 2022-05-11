@@ -233,9 +233,15 @@ contract LeagueOfLegendsLogic is
     // }
 
     // Returning the sender's USDC balance (testing)
+    
     function getUserUSDCBalance() external view returns (uint256) {
         require(inLeague[msg.sender]);
         return testUSDC.balanceOf(msg.sender);
+    }
+
+    //Test function
+    function getLeagueMember(uint256 index) public view returns(address) {
+        return leagueMembers[index];
     }
 
     //***************************************************/

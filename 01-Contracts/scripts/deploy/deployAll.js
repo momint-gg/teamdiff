@@ -5,6 +5,7 @@ const constructorArgs = require("../../constructorArgs");
 
 
 const main = async () => {
+  console.log("deploying...");
   let textData = "";
 
   //Create GameItems Instance
@@ -30,7 +31,11 @@ const main = async () => {
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
     "MOBALogicLibrary"
   );
-  MOBALogicLibraryInstance = await MOBALogicLibraryFactory.deploy();
+  MOBALogicLibraryInstance = await MOBALogicLibraryFactory.deploy({
+      //overriding gas bc transaction was stuck
+      //gasPrice: 3730000000,
+      gasLimit: 29900000,
+  });
   await MOBALogicLibraryInstance.deployed();
   console.log(
     "MOBALogicLibrary deployed to:",
@@ -38,6 +43,7 @@ const main = async () => {
   );
   textData += "exports.MOBALogicLibrary = \'" + MOBALogicLibraryInstance.address + "\';\n";
 
+  /*
   //Create League Maker Library Instance
   const LeagueMakerLibraryFactory = await ethers.getContractFactory(
     "LeagueMakerLibrary"
@@ -146,6 +152,7 @@ const main = async () => {
     })
 
   })
+  */
 
 };
 

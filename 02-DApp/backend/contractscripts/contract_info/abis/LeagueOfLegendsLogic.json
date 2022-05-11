@@ -164,6 +164,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getLeagueMember",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "getNumWhitelisted",
       "outputs": [
@@ -649,11 +668,11 @@
       "MOBALogicLibrary": [
         {
           "length": 20,
-          "start": 2309
+          "start": 2375
         },
         {
           "length": 20,
-          "start": 7200
+          "start": 7266
         }
       ]
     }
@@ -663,11 +682,11 @@
       "MOBALogicLibrary": [
         {
           "length": 20,
-          "start": 2024
+          "start": 2090
         },
         {
           "length": 20,
-          "start": 6915
+          "start": 6981
         }
       ]
     }
