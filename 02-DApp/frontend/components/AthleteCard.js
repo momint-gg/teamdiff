@@ -7,7 +7,6 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
-import { useState } from "react";
 
 export default function AthleteCard({ athleteData, setAthlete, setModalOpen }) {
   console.log(athleteData);

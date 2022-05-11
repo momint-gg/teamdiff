@@ -5,7 +5,7 @@ const main = async () => {
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
   const gameContract = await gameContractFactory.deploy(...constructorArgs, {
     //overriding gas bc transaction was stuck
-    gasPrice: 203000000000,
+    //gasPrice: 203000000000,
   });
   await gameContract.deployed();
   

@@ -12,8 +12,6 @@ import {
 import { useState, useEffect } from "react";
 //Web3 Imports
 import { ethers } from "ethers";
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import * as utils from "@ethersproject/hash";
 
 //Wagmi imports
 import {

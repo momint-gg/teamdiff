@@ -1,6 +1,5 @@
-import { useAccount, useConnect } from "wagmi";
-import { Box, Button, Modal, Typography } from "@mui/material";
-import { useState } from "react";
+import { useAccount, useConnect } from 'wagmi'
+import { Box, Button, Modal, Typography, } from '@mui/material'
 
 export default function ConnectWalletModal({
   modalOpen,
