@@ -57,7 +57,7 @@ export default function MintPack({ setDisplay }) {
 
       // Grab packs available
       const packsAvail = await GameItemsContract.packsAvailable();
-      setPacksAvailable(packsAvail);
+      setPacksAvailable(packsAvail.toNumber());
 
       // Callback for when packMinted Events is fired from contract
       const signerAddress = accountData.address;
@@ -162,7 +162,11 @@ export default function MintPack({ setDisplay }) {
             </Typography>
             {packsAvailable != null && (
               <Typography variant="h4" color="white" component="div">
-                {"There are " + packsAvailable + " packs still available"}
+                There are{" "}
+                <Box fontWeight="fontWeightBold" display="inline">
+                  {packsAvailable}
+                </Box>{" "}
+                packs still available
               </Typography>
             )}
           </Box>
