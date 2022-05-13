@@ -120,6 +120,8 @@ export default function CreateLeague({ setDisplay }) {
 
   const [showForm, setShowForm] = useState(false)
 
+  const[validateBuyInCostFlag, setValidateBuyInCostFlag] = useState(true)
+
 
   // Use Effect for component mount
   useEffect(() => {
@@ -189,8 +191,19 @@ export default function CreateLeague({ setDisplay }) {
     }
   }, []);
 
+  const validateFormValues = () => {
+    if (!defaultValues.leagueName || typeof defaultValues.buyInCost !== 'number' || defaultValues.buyInCost <= 0 || defaultValues.buyInCost > 100) {
+      alert("Please ensure input values are valid!")
+      return false
+    }
+    return true
+  }
+
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
+    if (!validateFormValues) {
+      return
+    }
     console.log("submitting values: " + JSON.stringify(formValues, null, 2));
     if(leagueMakerContract && accountData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
@@ -225,14 +238,22 @@ export default function CreateLeague({ setDisplay }) {
   
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     // console.log(name)
     setFormValues({
       ...formValues,
       [name]: value,
-    });
+    })
     // console.log(formValues)
   };
+
+  useEffect(() => {
+    if (isNaN(formValues.buyInCost) || Number(formValues.buyInCost) <= 0 || Number(formValues.buyInCost) > 100) {
+      console.log("uhoh")
+      console.log(typeof formValues.buyInCost, formValues.buyInCost)
+    }
+    console.log("--", parseInt(formValues.buyInCost))
+  }, [formValues.buyInCost])
 
 //   const handleInviteListCheckbox = () => {
 //     setInviteListIsEnabled(!inviteListIsEnabled)
@@ -246,9 +267,9 @@ export default function CreateLeague({ setDisplay }) {
     let flag = true
     inviteListValues.forEach((e) => {
       if (WAValidator.validate(e, "ETH")) {
-        console.log("validated")
+        // console.log("validated")
       } else {
-        console.log("invalid")
+        // console.log("invalid")
         flag = false
         setValidAddressesStatus(false)
       }
@@ -340,7 +361,7 @@ export default function CreateLeague({ setDisplay }) {
               <Typography variant="h6" color="white" component="div">
                 Form
               </Typography>
-              <FormControl>
+              <FormControl required>
                 <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel>
                 <StyledOutlinedInput
                   id="league-name"
@@ -360,7 +381,7 @@ export default function CreateLeague({ setDisplay }) {
                   id='outlined-required'
                   // defaultValue="e.g. TeamDiff"
                 /> */}
-              <FormControl >
+              <FormControl required >
                 <StyledInputLabel htmlFor="token-select">Token</StyledInputLabel>
                 <StyledSelect
                   id="token-select"
@@ -375,7 +396,7 @@ export default function CreateLeague({ setDisplay }) {
                 </StyledSelect>
               </FormControl>
 
-              <FormControl>
+              <FormControl required>
                 <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel>
                 <StyledOutlinedInput
                   id="buy-in"
@@ -384,7 +405,7 @@ export default function CreateLeague({ setDisplay }) {
                   label="Buy-In Cost"
                   name="buyInCost"
                   endAdornment={<InputAdornment position="end">USDC</InputAdornment>}
-
+                  error={true}
                 >
 
                 </StyledOutlinedInput>
@@ -397,7 +418,7 @@ export default function CreateLeague({ setDisplay }) {
                   /> */}
               </FormControl>
 
-              <FormControl sx={{ marginLeft: 3 }}>
+              <FormControl required sx={{ marginLeft: 3 }}>
                 <StyledInputLabel id="demo-simple-select-label">Payout Split</StyledInputLabel>
                 <StyledSelect
                   labelId="demo-simple-select-label"
@@ -411,7 +432,7 @@ export default function CreateLeague({ setDisplay }) {
                 </StyledSelect>
               </FormControl>
 
-              <FormControl sx={{ marginLeft: 3 }}>
+              <FormControl required sx={{ marginLeft: 3 }}>
                 <StyledInputLabel id="open-closed-toggle">League Status</StyledInputLabel>
                 <StyledSelect
                   labelId="open-closed-toggle"
