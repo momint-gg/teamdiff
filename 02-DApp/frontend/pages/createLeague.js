@@ -82,7 +82,7 @@ export default function CreateLeague({ setDisplay }) {
   const defaultValues = {
     leagueName: "",
     token: "usdc",
-    buyInCost: 0,
+    buyInCost: "",
     payoutSplit: "default",
     whitelistedAddresses: [],
     inviteListStatus: "open"
@@ -120,7 +120,9 @@ export default function CreateLeague({ setDisplay }) {
 
   const [showForm, setShowForm] = useState(false)
 
-  const[validateBuyInCostFlag, setValidateBuyInCostFlag] = useState(true)
+  const[isValidBuyInCost, setIsValidBuyInCost] = useState(true)
+
+  const[isValidLeagueName, setIsValidLeagueName] = useState(true)
 
 
   // Use Effect for component mount
@@ -192,16 +194,18 @@ export default function CreateLeague({ setDisplay }) {
   }, []);
 
   const validateFormValues = () => {
-    if (!defaultValues.leagueName || typeof defaultValues.buyInCost !== 'number' || defaultValues.buyInCost <= 0 || defaultValues.buyInCost > 100) {
-      alert("Please ensure input values are valid!")
-      return false
-    }
-    return true
+    return isValidBuyInCost && formValues.buyInCost !== "" && isValidLeagueName && formValues.leagueName !== ""
+    // if (!defaultValues.leagueName || typeof defaultValues.buyInCost !== 'number' || defaultValues.buyInCost <= 0 || defaultValues.buyInCost > 100) {
+    //   alert("Please ensure input values are valid!")
+    //   return false
+    // }
+    // return true
   }
 
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
-    if (!validateFormValues) {
+    if (!validateFormValues()) {
+      alert("Please ensure input values are valid!")
       return
     }
     console.log("submitting values: " + JSON.stringify(formValues, null, 2));
@@ -248,11 +252,24 @@ export default function CreateLeague({ setDisplay }) {
   };
 
   useEffect(() => {
-    if (isNaN(formValues.buyInCost) || Number(formValues.buyInCost) <= 0 || Number(formValues.buyInCost) > 100) {
-      console.log("uhoh")
-      console.log(typeof formValues.buyInCost, formValues.buyInCost)
+    if (formValues.leagueName.length > 100) {
+      setIsValidLeagueName(false)
+    } else if (!isValidLeagueName) {
+      setIsValidLeagueName(true)
     }
-    console.log("--", parseInt(formValues.buyInCost))
+  }, [formValues.leagueName])
+
+  useEffect(() => {
+    if (formValues.buyInCost === "" ) {
+      setIsValidBuyInCost(true)
+    } else if (isNaN(formValues.buyInCost) || Number(formValues.buyInCost) <= 0 || Number(formValues.buyInCost) > 100) {
+      // console.log("uhoh")
+      // console.log(typeof formValues.buyInCost, formValues.buyInCost)
+      setIsValidBuyInCost(false)
+    } else if (!isValidBuyInCost) {
+      setIsValidBuyInCost(true)
+    }
+    // console.log("--", parseInt(formValues.buyInCost))
   }, [formValues.buyInCost])
 
 //   const handleInviteListCheckbox = () => {
@@ -329,7 +346,8 @@ export default function CreateLeague({ setDisplay }) {
 
       {showForm && (
         <Typography variant="p" color="white" component="div">
-          Insert more info about league creation here... Should persist after clicking I understand
+          Insert more info about league creation here... Should persist after clicking I understand ... 
+          Buy in cost must be less than 100 USD. League name must be between 1-100 characters. 
         </Typography>
       )}
       {!showForm && (
@@ -369,6 +387,7 @@ export default function CreateLeague({ setDisplay }) {
                   onChange={handleInputChange}
                   label="League Name"
                   name="leagueName"
+                  error={!isValidLeagueName}
                 />
               </FormControl>
 
@@ -405,7 +424,7 @@ export default function CreateLeague({ setDisplay }) {
                   label="Buy-In Cost"
                   name="buyInCost"
                   endAdornment={<InputAdornment position="end">USDC</InputAdornment>}
-                  error={true}
+                  error={!isValidBuyInCost}
                 >
 
                 </StyledOutlinedInput>
