@@ -13,7 +13,7 @@ import {
 export default function JoinLeague({ setDisplay }) {
   return (
     <Box>
-      <Fab
+      {/* <Fab
         variant="extended"
         size="small"
         color="primary"
@@ -21,7 +21,7 @@ export default function JoinLeague({ setDisplay }) {
         onClick={() => setDisplay(false)}
       >
         &#60; BACK
-      </Fab>
+      </Fab> */}
 
       <Typography variant="h3" color="secondary" component="div">
         YOUR WHITELISTED LEAGUES

@@ -23,7 +23,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * _Available since v3.4._
  */
 contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whitelist {
-    // Vars
+      // Vars
     //uint256 public version; // tsting
     string public leagueName;
     uint256 public numWeeks; // Length of a split
@@ -68,7 +68,7 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whi
     // Won't want to make whitelist immutable
     // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
     Athletes athletesContract;
-    Whitelist whitelistContract;
+    Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
     IERC20 testUSDC;
     GameItems gameItemsContract;

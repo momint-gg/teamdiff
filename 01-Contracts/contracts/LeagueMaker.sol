@@ -21,7 +21,7 @@ contract LeagueMaker is Ownable {
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
-    UpgradeableBeacon immutable upgradeableBeacon;
+    UpgradeableBeacon immutable  upgradeableBeacon;
 
     // For staking
     TestUSDC testUSDC;
@@ -29,7 +29,7 @@ contract LeagueMaker is Ownable {
     // ======== Mutable storage ========
     address beaconAddress;
     address[] public leagueAddresses; //list of all deployed leagueAddresses
-    //Maps Users to all the leagues they are a member of
+    //Maps Users to all the leagues they are a member of or on the whitelist for
     mapping(address => address[]) public userToLeagueMap;
     mapping(address => bool) public isProxyMap;
     uint256 numWeeks;
@@ -155,6 +155,9 @@ contract LeagueMaker is Ownable {
     }
 
     //function 
+    function upgradeBeacon(address newLogicAddress) public {
+        upgradeableBeacon.upgradeTo(newLogicAddress);
+    }
 
     function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});

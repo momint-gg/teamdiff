@@ -132,43 +132,7 @@ export default function CreateLeague({ setDisplay }) {
       );
       setLeagueMakerContract(LeagueMakerContract);
 
-      // Callback for when pack burned function is called from GameItems contracts
-      const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
-        //TODO create a proxy instance from emitted address
-        //then check the admin of that proxy to filter events?
-        
-        const LeagueProxyContract = new ethers.Contract(
-          newLeagueProxyAddress,
-          LeagueOfLegendsLogicJSON.abi,
-          provider
-        );
-
-        inviteListValues.forEach(async (whitelistAddress) => {
-          //Add all set whitelisted users to newly deployed league Proxy
-          console.log("adding " + whitelistAddress + " to whitelist");
-          const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
-                                                                  .addUserToWhitelist(whitelistAddress)
-                                                                  .then(
-                                                                    console.log("Added userr to whitelist success")
-                                                                  )
-                                                                  .catch((error) => {
-                                                                    //console.log("")
-                                                                    alert("Add User To WhiteList error: " + error.message);
-                                                                  });;
-        })
-        //const leagueAdminAddress = LeagueProxyContract.admin();
-        // if (accountData.address == newLeagueAdminAddress && formValues.leagueName == newLeagueName) {
-        if (true) {
-          setIsCreatingLeague(false);
-          setHasCreatedLeague(true);
-          console.log("Finsihed creating league: " 
-                      + "\n\tname: " + newLeagueName
-                      + "\n\tproxy address: " + newLeagueProxyAddress
-                      + "\n\tadmin address: " + newLeagueAdminAddress);
-          setNewLeagueName(newLeagueName);
-          setNewLeagueAddress(newLeagueProxyAddress);
-        }
-      };
+      
       // const filter = {
       //   address: LeagueMakerContract.address,
       //   topics: [
@@ -183,15 +147,56 @@ export default function CreateLeague({ setDisplay }) {
       // };
       // LeagueMakerContract.on(filter, leagueCreatedCallback);
       // Listen to event for when pack burn function is called
-      LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
+      //TODO this doesn't listen after the event has triggered once during the session I think
+      LeagueMakerContract.on("LeagueCreated", leagueCreatedCallback);
     } else {
       console.log("no account data found!");
     }
   }, []);
 
+  // Callback for when pack burned function is called from GameItems contracts
+  const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
+    //TODO create a proxy instance from emitted address
+    //then check the admin of that proxy to filter events?
+    
+    const LeagueProxyContract = new ethers.Contract(
+      newLeagueProxyAddress,
+      LeagueOfLegendsLogicJSON.abi,
+      provider
+    );
+    console.log("inviteLlistValues: " + inviteListValues);
+
+    inviteListValues.forEach(async (whitelistAddress) => {
+      //Add all set whitelisted users to newly deployed league Proxy
+      console.log("adding " + whitelistAddress + " to whitelist");
+      const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
+                                                              .addUserToWhitelist(whitelistAddress)
+                                                              .then(
+                                                                console.log("Added userr to whitelist success")
+                                                              )
+                                                              .catch((error) => {
+                                                                //console.log("")
+                                                                alert("Add User To WhiteList error: " + error.message);
+                                                              });;
+    })
+    //const leagueAdminAddress = LeagueProxyContract.admin();
+    // if (accountData.address == newLeagueAdminAddress && formValues.leagueName == newLeagueName) {
+    if (true) {
+      setIsCreatingLeague(false);
+      setHasCreatedLeague(true);
+      console.log("Finsihed creating league: " 
+                  + "\n\tname: " + newLeagueName
+                  + "\n\tproxy address: " + newLeagueProxyAddress
+                  + "\n\tadmin address: " + newLeagueAdminAddress
+                  + "\n\tstate of invite list: " + inviteListValues);
+      setNewLeagueName(newLeagueName);
+      setNewLeagueAddress(newLeagueProxyAddress);
+    }
+  };
+
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
-    console.log("submitting values: " + JSON.stringify(formValues, null, 2));
+    console.log("submitting values: " + JSON.stringify(formValues, null, 2) + " \nwhitelistAddresses: " + inviteListValues);
     if(leagueMakerContract && accountData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
@@ -261,7 +266,10 @@ export default function CreateLeague({ setDisplay }) {
   const handlePlayerInviteInput = (e, i) => {
     let inviteListValuesNew = [...inviteListValues]
     inviteListValuesNew[i] = e.target.value
+    //setInviteListValues([...inviteListValues], e);
     setInviteListValues(inviteListValuesNew)
+    console.log("short list in func: " + inviteListValues);
+
   }
 
   const addNewPlayerInviteInput = () => {
@@ -287,9 +295,9 @@ export default function CreateLeague({ setDisplay }) {
   return (
     <Box sx={{ backgroundColor: "primary.dark" }}>
      {/* <Box sx={{ backgroundColor: "gray" }}> */}
-      <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
+      {/* <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
         &#60; BACK
-      </Fab>
+      </Fab> */}
       
       
       <Typography variant="h3" color="secondary" component="div">
@@ -472,7 +480,11 @@ export default function CreateLeague({ setDisplay }) {
                     <TextField
                       variant="standard"
                       label={"Whitelisted Address " + (index + 1)} 
-                      onChange={e => handlePlayerInviteInput(e, index)}
+                      onChange={e => {
+                        //This submits null address when I copy and paste
+                        handlePlayerInviteInput(e, index)
+                        console.log("short list outside func: " + inviteListValues);
+                      }}
                       value={element}
                       key={index}
                     />

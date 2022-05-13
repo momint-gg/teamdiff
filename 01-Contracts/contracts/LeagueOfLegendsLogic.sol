@@ -64,7 +64,7 @@ contract LeagueOfLegendsLogic is
     // Won't want to make whitelist immutable
     // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
     Athletes athletesContract;
-    Whitelist whitelistContract;
+    Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
     IERC20 testUSDC;
     GameItems gameItemsContract;
@@ -139,7 +139,7 @@ contract LeagueOfLegendsLogic is
     // }
 
     /*************************************************/
-    /************ TEAM DIFF ONLY FUNCTIONS ***********/
+    /************ TEAM DIFF ONLY FUNCTIONS ******userToLeagueuserToLeague*****/
     /*************************************************/
     //TODO: Change functions to onlyTeamDiff for deployment (when testing on Rinkeby, only Admin for hardhat)
     //TODO change to only owner for prod
@@ -340,6 +340,8 @@ contract LeagueOfLegendsLogic is
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
         whitelistContract.addAddressToWhitelist(_userToAdd);
+        //TODO this mapp contain users to league and whitelisted leagues
+        leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
         // whitelist[_userToAdd] = true;
     }
 }

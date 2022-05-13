@@ -10,6 +10,10 @@ import {
   Box,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+//Router
+import { useRouter } from 'next/router';
+
+
 //Web3 Imports
 import { ethers } from "ethers";
 
@@ -27,7 +31,12 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 
 
-export default function LeagueCard({ leagueData, leagueAddress, setLeague, setLeagueOpen }) {
+// export default function LeagueCard({ leagueAddress, setMountedLeagueAddress, setLeague, setLeagueOpen }) {
+export default function LeagueCard({ leagueAddress }) {
+  //Router
+  const router = useRouter()
+
+
   //WAGMI Hooks
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
@@ -52,12 +61,13 @@ export default function LeagueCard({ leagueData, leagueAddress, setLeague, setLe
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
-      console.log("in useEFfect");
+      // console.log("in useEFfect");
       setLeagueProxyContract(LeagueProxyContract);
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        //console.log("leagueNamer: " + leagueName);
+        //setMountedLeagueAddress(leagueAddress);
+        console.log("leagueAddy: " + leagueAddress);
         //setActiveLeagueList(activeLeagues);
       }
       fetchData();
@@ -70,33 +80,41 @@ export default function LeagueCard({ leagueData, leagueAddress, setLeague, setLe
   const card = (
     <Fragment>
       <CardContent>
-        <Avatar
+        {/* <Avatar
           alt="League Image"
           src={leagueData?.image?.examplePic.src}
           sx={{ bgcolor: "white", position: "absolute" }}
-        />
-        <Box sx={{ marginLeft: 6 }}>
+        /> */}
+        <Box sx={{ marginLeft: 2 }}>
           <Typography variant="h5" color="secondary" component="div">
             {leagueName}
           </Typography>
 
           <Typography variant="body1" color="inherit">
-            Your current standing: {leagueData?.standing}
+            {leagueAddress}
           </Typography>
+          {/* <Typography variant="body1" color="inherit">
+            Your current standing: {leagueData?.standing}
+          </Typography> */}
         </Box>
       </CardContent>
     </Fragment>
   );
 
+  const handleClick = (e) => {
+    e.preventDefault()
+    const href= "/leagues/" + leagueAddress;
+    router.push(href)
+  }
+
   return (
     <Card
       variant="outlined"
-      onClick={() => {
-        setLeague(leagueData);
-        setLeagueOpen(true);
-      }}
+      onClick={handleClick}
     >
-      {card}
+        {/* <Link href= {"/leagues/" + leagueAddress}> */}
+          {card}
+        {/* </Link> */}
     </Card>
   );
 }

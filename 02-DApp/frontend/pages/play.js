@@ -20,17 +20,23 @@ import { Fragment } from "react";
 import { GiPodium } from "react-icons/gi";
 import { MdGroupAdd } from "react-icons/md";
 import { FaCrown } from "react-icons/fa";
+//Router
+import { useRouter } from 'next/router'
+
 
 export default function Play() {
+  //Router
+  const router = useRouter();
+
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
-  const [displayMyLeagues, setDisplayMyLeagues] = useState(false);
-  const [displayJoinLeague, setDisplayJoinLeague] = useState(false);
-  const [displayCreateLeague, setDisplayCreateLeague] = useState(false);
+  // const [displayMyLeagues, setDisplayMyLeagues] = useState(false);
+  // const [displayJoinLeague, setDisplayJoinLeague] = useState(false);
+  // const [displayCreateLeague, setDisplayCreateLeague] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [currAthlete, setCurrAthlete] = useState(null);
@@ -83,45 +89,55 @@ export default function Play() {
     </Fragment>
   );
 
+  // const handleViewLeaguesClick = (e) => {
+  //   e.preventDefault()
+  //   const href= "/leagues/" + leagueAddress;
+  //   router.push(href)
+  // }
+
+  // const handleCreateLeaguClick = (e) => {
+  //   e.preventDefault()
+  //   const href= "/leagues/" + leagueAddress;
+  //   router.push(href)
+  // }
+
+  // const handleClick = (e) => {
+  //   e.preventDefault()
+  //   const href= "/leagues/" + leagueAddress;
+  //   router.push(href)
+  // }
+
   return (
+
     <Box>
-      {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && (
+      {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
+      {accountData ? (
         <Grid container spacing={3}>
           <Grid item xs={4}>
-            <Card variant="outlined" onClick={() => setDisplayMyLeagues(true)}>
+            <Card variant="outlined" onClick={() => router.push("/myLeagues")}>
               {myLeagues}
             </Card>
           </Grid>
           <Grid item xs={4}>
-            <Card variant="outlined" onClick={() => setDisplayJoinLeague(true)}>
+            <Card variant="outlined" onClick={() =>  router.push("/joinLeague")}>
               {joinLeague}
             </Card>
           </Grid>
           <Grid item xs={4}>
             <Card
               variant="outlined"
-              onClick={() => setDisplayCreateLeague(true)}
+              onClick={() =>  router.push("/createLeague")}
             >
               {createLeague}
             </Card>
           </Grid>
         </Grid>
+      ) : (
+        <Typography>
+          Please connect wallet
+        </Typography>
       )}
-      {displayMyLeagues && (
-        <Box>
-          <MyLeagues setDisplay={setDisplayMyLeagues} />
-        </Box>
-      )}
-      {displayJoinLeague && (
-        <Box>
-          <JoinLeague setDisplay={setDisplayJoinLeague} />
-        </Box>
-      )}
-      {displayCreateLeague && (
-        <Box>
-          <CreateLeague setDisplay={setDisplayCreateLeague} />
-        </Box>
-      )}
+
     </Box>
   );
 }
