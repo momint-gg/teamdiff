@@ -283,19 +283,23 @@ class Datafetcher():
                     self.athlete_game_stats[current_summoner_id][game_id][stat] = int(
                         value)
 
-        self._convert_to_json(self.athlete_game_stats, "game_stats.json")
+        date = dt.date.today()
+        self._convert_to_json(self.athlete_game_stats, "game_stats/" +
+                              date.strftime("%m-%d-%Y") + "-game_stats.json")
 
         print("\nDone!\n")
 
     def aggregate_athlete_game_stats(self):
         print("(Step 3/7) Aggregating athlete game stats...\n")
         agg_game_stats = {}
+        athlete_points = 0
         for current_summoner_id, games in self.athlete_game_stats.items():
             if current_summoner_id not in agg_game_stats:
                 agg_game_stats[current_summoner_id] = {}
 
             for _, game in games.items():
                 for stat, value in game.items():
+                    # TODO: in this loop sum up points
                     stat = stat if stat != "player_win" else "wins"
 
                     if stat not in agg_game_stats[current_summoner_id]:
@@ -334,8 +338,9 @@ class Datafetcher():
 
         self.aggregated_athlete_game_stats = agg_game_stats
 
+        date = dt.date.today()
         self._convert_to_json(self.aggregated_athlete_game_stats,
-                              "aggregated_stats.json")
+                              "agg_stats/" + date.strftime("%m-%d-%Y") + "-aggregated_stats.json")
 
         print("\nDone!\n")
 
@@ -440,17 +445,22 @@ class Datafetcher():
 
     def upload_headshots_to_pinata(self):
         print("\n(Step 4/7) Uploading headshots to Pinata...\n")
+        # TODO: Bug - throws an error about missing a pinata key, but it still runs and works
         time.sleep(1)
         subprocess.call(["node", "../pinata/app.js", "-p"])
         print("Done!\n")
 
     def usage():
         print(
-            "\nUSAGE: python3 datafetcher.py -a \"{path/to/athlete_source_file.csv}\" -t \"{Tournament name}\" -d {Number of days in the past to fetch query stats from}\n")
+            "\nUSAGE: python3 datafetcher.py -a \"{path/to/athlete_source_file.csv}\" -t \"{Tournament name}\" -d {Number of days in the past to fetch query stats from}\n (optional) -os")
 
 
 def main():
-    if len(sys.argv) != 7:
+    if len(sys.argv) == 7:
+        only_scrape = False
+    elif len(sys.argv) == 8 and sys.argv[7] == "-os":
+        only_scrape = True
+    else:
         Datafetcher.usage()
         return
 
@@ -479,11 +489,12 @@ def main():
     df.fetch_athlete_game_stats()
     df.aggregate_athlete_game_stats()
 
-    df.upload_headshots_to_pinata()
-    df.fetch_athlete_headshot_data()
+    if not only_scrape:
+        df.upload_headshots_to_pinata()
+        df.fetch_athlete_headshot_data()
 
-    df.create_nft_metadata_ordered()
-    df.create_nft_metadata_random()
+        df.create_nft_metadata_ordered()
+        df.create_nft_metadata_random()
 
     print("\nDatafetch complete!\n")
 
