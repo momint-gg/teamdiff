@@ -4,8 +4,6 @@ import "hardhat/console.sol";
 import "./Athletes.sol";
 import "./LeagueOfLegendsLogic.sol";
 
-// contract GameLogic is OwnableUpgradeable/*, Initializable*/ {
-//TODO create a "LeagueLogic" interface?
 library MOBALogicLibrary {
     event MatchResult(address winner, address loser);
 
@@ -36,6 +34,9 @@ library MOBALogicLibrary {
         uint256[4] memory leftHalf;
         uint256[4] memory rightHalf;
         for (uint256 week = 0; week < numWeeks; week++) {
+            console.log("\n");
+            console.log(week);
+            console.log("************************");
             uint256 matchupSlots;
             //Create matchup slots that represents 2 * (number of matches each week), which includes byes
             (leagueMembers.length % 2 == 0)
@@ -92,11 +93,15 @@ library MOBALogicLibrary {
 
                 //Add matchup to schedule for current week
                 schedule[week].push(matchup);
+                console.log(matchup.players[0]);
+                console.log(" vs ");
+                console.log(matchup.players[1]);
+                console.log("\n");
             }
         }
     }
 
-    //TODO emit event
+    // State isn't updating in LOL logic...
     function evaluateMatch(
         address addr1,
         address addr2,
@@ -115,7 +120,10 @@ library MOBALogicLibrary {
         } else if (addr2 == address(0)) {
             userToRecord[addr1][currentWeekNum] = 2;
             return addr1;
-        } else {
+        }
+        // If not a bye week
+        else {
+            console.log("evaluating the match in MOBA");
             uint256 addr1Score;
             uint256 addr2Score;
             // Calculating users' total scores
@@ -167,10 +175,10 @@ library MOBALogicLibrary {
         mapping(address => uint256) storage userToTotalWins,
         mapping(address => uint256[]) storage userLineup
     ) public {
-        console.log("IN THE MOBA LOGIC LIBRARY EVAL WEEK FUNCTION");
-        //call evaulte match for each match in this weeks schedule
+        // Call evaluate match for each match in this weeks schedule
         for (uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
-            //call evaulate match between members of Match
+            console.log("In eval week for loop for matchup ", i);
+            // Call evaulate match between members of Match
             address competitor1 = schedule[currentWeekNum][i].players[0];
             address competitor2 = schedule[currentWeekNum][i].players[1];
             evaluateMatch(

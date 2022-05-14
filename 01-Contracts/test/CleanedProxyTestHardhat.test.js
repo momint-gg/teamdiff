@@ -305,9 +305,22 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
     // Checking state for a proxy to see if above ^ worked
     let schedule = await proxyContract.getScheduleForWeek(0);
-    const players = schedule[0]["players"]; // Number of players in schedule
+    const players = schedule[0][0]; // Number of players in schedule
     // Since we've added 2 players, should have this for the schedule
     expect(players.length).to.equal(2);
+
+    // Making sure the schedule is set for 8 weeks (weeks 0-7)
+    for (let i = 0; i < 8; i++) {
+      let schedule = await proxyContract.getScheduleForWeek(i);
+      const players = schedule[0][0]; // Number of players in schedule
+      expect(players.length).to.equal(2);
+    }
+  });
+
+  // For testing purposes to see schedule formatting
+  it("Logs the schedule info for testing", async () => {
+    let schedule = await proxyContract.getScheduleForWeek(0);
+    console.log("Full schedule for week 0 is: ", schedule);
   });
 
   // NOTE: Don't want to call expect statements in a loop like this or hardhat will freak out
@@ -435,15 +448,24 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       txn = await currLeague.evaluateWeek();
     }
     // Record for 0th week - one player should have 1
-    const ownerRecord = await proxyContract.userToRecord(owner.address, 0);
-    const addr1Record = await proxyContract.userToRecord(addr1.address, 0);
-    if (Number(ownerRecord) === 1) {
-      // One user should win and one should lose
-      expect(Number(addr1Record)).to.equal(0);
-    } else {
-      expect(Number(ownerRecord)).to.equal(0);
-    }
-    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+    const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
+    const addr1Record = await proxyContract.userToRecord(addr1.address, 1);
+    // if (Number(ownerRecord) === 1) {
+    //   // One user should win and one should lose
+    //   expect(Number(addr1Record)).to.equal(0);
+    // } else {
+    //   expect(Number(ownerRecord)).to.equal(1);
+    // }
+    // console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+
+    const totalWinsOfOwner = await proxyContract.userToTotalWins(owner.address);
+    const totalWinsOfAddr1 = await proxyContract.userToTotalWins(owner.address);
+    console.log(
+      "Total wins: ",
+      Number(totalWinsOfOwner),
+      " ",
+      Number(totalWinsOfAddr1)
+    );
   });
 
   //   const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
@@ -466,5 +488,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   //   }
   // });
 
+  // Doing a full 8 week test with a league of x members, making sure everything works as planned and prize pot is given out
+  // If this works... we ready for some rinkeby shit my dude
   it("Now simulating an 8 week split and giving out prize pot", async () => {});
 });
