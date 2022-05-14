@@ -18,7 +18,6 @@ library MOBALogicLibrary {
         uint256 numWeeks,
         string calldata leagueName
     ) public {
-        console.log("setting schedule in library");
         uint256 randomShifter = (
             (uint256(
                 keccak256(
@@ -31,16 +30,12 @@ library MOBALogicLibrary {
                 )
             ) + leagueMembers.length * leagueMembers.length)
         );
-        //console.log(randomShifter);
-        //mapping(uint256 => uint256[2][]) storage schedule;
+
         //create two arrays of indices that represent indices in leagueMembers
         //essentially splitting the league into two halves, to assign matchups
         uint256[4] memory leftHalf;
         uint256[4] memory rightHalf;
         for (uint256 week = 0; week < numWeeks; week++) {
-            console.log("\n");
-            console.log(week);
-            console.log("************************");
             uint256 matchupSlots;
             //Create matchup slots that represents 2 * (number of matches each week), which includes byes
             (leagueMembers.length % 2 == 0)
@@ -97,10 +92,6 @@ library MOBALogicLibrary {
 
                 //Add matchup to schedule for current week
                 schedule[week].push(matchup);
-                console.log(matchup.players[0]);
-                console.log(" vs ");
-                console.log(matchup.players[1]);
-                console.log("\n");
             }
         }
     }

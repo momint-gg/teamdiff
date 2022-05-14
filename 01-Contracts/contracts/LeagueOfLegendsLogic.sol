@@ -19,6 +19,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     string public leagueName;
     uint256 public numWeeks; // Length of a split
     uint256 public stakeAmount;
+    uint256 public currentWeekNum;
     address public admin;
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
@@ -64,6 +65,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /***************/
     event Staked(address sender, uint256 amount);
     event testUSDCDeployed(address sender, address contractAddress);
+    event leagueEnded(address winner);
 
     //*****************/
     //*** Modifiers ***/
@@ -93,8 +95,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //Initialize all parameters of proxy
     function initialize(
         string calldata _name,
-        //uint256 _version,
-        //uint256 _numWeeks,
         uint256 _stakeAmount,
         bool _isPublic,
         address athletesDataStorageAddress,
@@ -108,8 +108,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
-        //numWeeks = _numWeeks;
         numWeeks = 8;
+        // Setting up the admin role
         inLeague[_admin] = true;
         leagueMembers.push(_admin);
         admin = _admin;
@@ -120,19 +120,12 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
-        // polygonUSDCAddress = _polygonUSDCAddress;
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
-        //gameItemsContract = address(0);
         console.log("Proxy initialized!");
     }
-
-    //event versionIncremented(uint256 newVersion);
-    // function incrementVersion() public {
-    //     version += 1;
-    // }
 
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
@@ -162,43 +155,23 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // Evalautes all matchups for a given week
     // TODO: Remove nonreentrant modifier if not needed
     function evaluateWeek() external onlyTeamDiff nonReentrant {
-        uint256 currWeekNum = leagueMakerContract.currentWeek();
         MOBALogicLibrary.evaluateWeek(
             schedule,
-            currWeekNum,
+            currentWeekNum,
             athletesContract,
             userToRecord,
             userToTotalWins,
             userToLineup
         );
-        // League is over, give payout to winner
-        if (currWeekNum == 8) {
+        // League is over (8 weeks), give payout to winner
+        if (currentWeekNum == 7) {
             onLeagueEnd();
         }
+        currentWeekNum++;
     }
 
-    // Evaluates match between two users, only we can call
-    // TODO: Comment out for prod
-    // function evaluateMatch(address addr1, address addr2)
-    //     external
-    //     onlyOwner
-    //     returns (address)
-    // {
-    //     uint256 currWeekNum = leagueMakerContract.currentWeek();
-    //     return
-    //         MOBALogicLibrary.evaluateMatch(
-    //             addr1,
-    //             addr2,
-    //             currWeekNum,
-    //             athletesContract,
-    //             userToLineup[addr1],
-    //             userToLineup[addr2],
-    //             userToRecord,
-    //             userToTotalWins
-    //         );
-    // }
-
-    function onLeagueEnd() private {
+    // TODO: Change to private/internal
+    function onLeagueEnd() public onlyTeamDiff {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner = leagueMembers[0];
         // Calculating the winner (may want to just update each week instead of doing this way...)
@@ -210,6 +183,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         }
         // Approval on front end first, then transfer with the below
         testUSDC.transferFrom(address(this), winner, contractBalance);
+
+        // emit leagueEnded(winner);
     }
 
     /******************************************************/
@@ -217,10 +192,10 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /******************************************************/
 
     // Returning the contracts USDC balance
-    // function getUSDCBalance() external view returns (uint256) {
-    //     require(inLeague[msg.sender]);
-    //     return testUSDC.balanceOf(address(this));
-    // }
+    function getUSDCBalance() external view returns (uint256) {
+        require(inLeague[msg.sender]);
+        return testUSDC.balanceOf(address(this));
+    }
 
     // Returning the sender's USDC balance (testing)
     function getUserUSDCBalance() external view returns (uint256) {
@@ -307,10 +282,19 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         return userToLineup[_user];
     }
 
-    // // For testing -- returns matchups for a given week
-    // function getScheduleForWeek(uint256 _week) public returns (Matchup memory) {
-    //     return schedule[_week];
-    // }
+    // Getting a schedule for a week
+    function getScheduleForWeek(uint256 _week)
+        external
+        view
+        returns (Matchup[] memory)
+    {
+        return schedule[_week];
+    }
+
+    // Returning the admin for the league (for testing)
+    function getAdmin() public view returns (address) {
+        return admin;
+    }
 
     //Given manually inputted athlete stats, return the calculated
     //athleteScores.
@@ -356,6 +340,5 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
         whitelistContract.addAddressToWhitelist(_userToAdd);
-        // whitelist[_userToAdd] = true;
     }
 }

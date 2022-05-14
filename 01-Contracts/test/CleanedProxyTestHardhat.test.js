@@ -227,7 +227,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   it("Sets the admin role correctly", async () => {
-    const admin = await proxyContract.admin();
+    const admin = await proxyContract.getAdmin();
     expect(admin).to.equal(owner.address);
   });
 
@@ -303,7 +303,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       txn = await currLeague.setLeagueSchedule();
     }
 
-    // Checking state for a proxy
+    // Checking state for a proxy to see if above ^ worked
+    let schedule = await proxyContract.getScheduleForWeek(0);
+    const players = schedule[0]["players"]; // Number of players in schedule
+    // Since we've added 2 players, should have this for the schedule
+    expect(players.length).to.equal(2);
   });
 
   // NOTE: Don't want to call expect statements in a loop like this or hardhat will freak out
@@ -328,7 +332,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     }
   });
 
-  // Figured out why expects aren't working.. in hardhat want to await before expect and not in it (can explain more if you ask me @henry)
+  // Figured out why expects aren't working.. in hardhat want to await before expect and not in it for revertions (can explain more if you ask me @henry)
   it("Doesn't let non-teamdiff wallet call onlyTeamDiff functions in LeagueOfLegendsLogic", async () => {
     const sampleProxy = AllLeagueInstances[0].connect(addr1); // addr1 is not owner
     await expect(sampleProxy.lockLineup()).to.be.revertedWith(
@@ -414,13 +418,33 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       const athleteStats = await AthletesContractInstance.getAthleteScores(i);
       statsArr.push(athleteStats);
     }
+
+    expect(statsArr.length).to.equal(50);
     // Comment out below to see stats arr (is being updated correctly right now!)
-    // console.log("Athlete stats ", statsArr);
+    console.log("Athlete stats ", statsArr);
   });
 
   // The big kahuna - testing out LeagueMaker evaluatematch -- if this works we chillin
   // Changed this to new method: calls directly from each of the proxies as an "onlyTeamDiff" function
-  it("Evaluates matches for all proxies and updates state correctly", async () => {});
+  // evaluateWeek() in the proxy
+  it("Evaluates matches for all proxies and updates state correctly", async () => {
+    let currLeague;
+    let txn;
+    for (let i = 0; i < AllLeagueInstances.length; i++) {
+      currLeague = AllLeagueInstances[i].connect(owner);
+      txn = await currLeague.evaluateWeek();
+    }
+    // Record for 0th week - one player should have 1
+    const ownerRecord = await proxyContract.userToRecord(owner.address, 0);
+    const addr1Record = await proxyContract.userToRecord(addr1.address, 0);
+    if (Number(ownerRecord) === 1) {
+      // One user should win and one should lose
+      expect(Number(addr1Record)).to.equal(0);
+    } else {
+      expect(Number(ownerRecord)).to.equal(0);
+    }
+    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+  });
 
   //   const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
   //   await delegatePool.wait();
