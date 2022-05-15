@@ -445,13 +445,16 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     const athleteStatsNums = statsArr.map((stat) => Number(stat));
     // Arrays for owner and addr1 points (lineup & lineup2)
     const ownerPointsArr = lineup.map((athlete) => athleteStatsNums[athlete]);
+    console.log("owner athlete scores: ", ownerPointsArr);
     const addr1PointsArr = lineup2.map((athlete) => athleteStatsNums[athlete]);
+    console.log("addr1 athlete scores: ", addr1PointsArr);
+
     // Finally, total points for owner and addr1. Setting this so we can see if evaluateMatches function in MOBALogicLibrary is working correctly
     ownerPoints = 0;
     addr1Points = 0;
     for (let i = 0; i < ownerPointsArr.length; i++) {
       if (ownerPointsArr[i] > addr1PointsArr[i]) ownerPoints++;
-      else addr1Points++;
+      else if (addr1PointsArr[i] > ownerPointsArr[i]) addr1Points++;
     }
     console.log(
       "The total points for owner and addr1 calculated in test (before evaluateMatches): "
@@ -474,6 +477,33 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     const ownerRecord = await proxyContract.connect(owner).getUserRecord();
     const addr1Record = await proxyContract.connect(addr1).getUserRecord();
     console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+
+    // Making sure mappings are correct
+    if (Number(ownerRecord[0]) === 1) {
+      // Other user should lose if one wins
+      expect(Number(addr1Record[0])).to.equal(0);
+      expect(
+        Number(
+          await proxyContract.connect(owner).userToTotalWins(owner.address)
+        )
+      ).to.equal(1);
+    }
+    if (Number(addr1Record[0]) === 1) {
+      expect(Number(ownerRecord[0])).to.equal(0);
+      expect(
+        Number(
+          await proxyContract.connect(addr1).userToTotalWins(addr1.address)
+        )
+      ).to.equal(1);
+    }
+    if (Number(addr1Record[0]) === 2) {
+      // Both should have a tie (2)
+      expect(Number(ownerRecord[0])).to.equal(2);
+    }
+    if (Number(addr1Record[0]) === 3) {
+      // Both should have a bye (3)
+      expect(Number(ownerRecord[0])).to.equal(3);
+    }
   });
 
   //   const ownerRecord = await proxyContract.userToRecord(owner.address, 1);

@@ -105,11 +105,11 @@ library MOBALogicLibrary {
 
     // State isn't updating in LOL logic...
     // Moved to one eval matches function instead of splitting it up into two
+    // Important Note: 0 = loss, 1 = win, 2 = tie, 3 = bye
     function evaluateMatches(
         uint256 currentWeekNum,
         Athletes athletesContract,
         mapping(address => uint256[]) storage userToRecord,
-        mapping(address => uint256) storage userToTotalWins,
         mapping(address => uint256[]) storage userLineup,
         mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
     ) public {
@@ -121,9 +121,9 @@ library MOBALogicLibrary {
             // Check to make sure matchup is not a bye week
             // If it is a bye week, assign 2 as result for this week
             if (addr1 == address(0)) {
-                userToRecord[addr2].push(2);
+                userToRecord[addr2].push(3);
             } else if (addr2 == address(0)) {
-                userToRecord[addr1].push(2);
+                userToRecord[addr1].push(3);
             }
             // If not a bye week
             else {
@@ -136,9 +136,9 @@ library MOBALogicLibrary {
                 for (uint256 j; j < lineup1.length; j++) {
                     // Calling the Athletes.sol contract to get the scores of ith athlete
                     uint256[] memory currAthleteScores1 = athletesContract
-                        .getAthleteScores(lineup1[i]);
+                        .getAthleteScores(lineup1[j]);
                     uint256[] memory currAthleteScores2 = athletesContract
-                        .getAthleteScores(lineup2[i]);
+                        .getAthleteScores(lineup2[j]);
                     // Getting the last score in the array
                     uint256 latestScore1 = currAthleteScores1[
                         currAthleteScores1.length - 1
@@ -149,7 +149,7 @@ library MOBALogicLibrary {
                     // Calculating scores for users
                     if (latestScore1 > latestScore2) {
                         addr1Score += 1;
-                    } else {
+                    } else if (latestScore2 > latestScore1) {
                         addr2Score += 1;
                     }
                 }
@@ -158,21 +158,26 @@ library MOBALogicLibrary {
                 console.log("Total points for addr2: ", addr2Score);
 
                 if (addr1Score > addr2Score) {
-                    console.log("Addr 1 wins!");
                     userToRecord[addr1].push(1);
                     userToRecord[addr2].push(0);
-                    userToTotalWins[addr1] += 1; // If this doesn't update, proves we can't update state this way
                     emit MatchResult(addr1, addr2);
-                } else {
-                    console.log("Addr 2 wins!");
+                } else if (addr2Score > addr1Score) {
                     userToRecord[addr2].push(1);
                     userToRecord[addr1].push(0);
-                    userToTotalWins[addr2] += 1;
+                    emit MatchResult(addr2, addr1);
+                } else {
+                    // In the case of a tie
+                    console.log("Tie!");
+                    userToRecord[addr2].push(2);
+                    userToRecord[addr1].push(2);
                     emit MatchResult(addr2, addr1);
                 }
             }
         }
     }
+
+    // Todo: Write function that calculate league winner
+    function calculateLeagueWinner() external {}
 
     function calculateScoreOnChain(
         LeagueOfLegendsLogic.Stats calldata athleteStats

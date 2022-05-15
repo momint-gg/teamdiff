@@ -26,7 +26,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     bool public lineupIsLocked;
 
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
-    mapping(address => uint256) public userToTotalWins;
     mapping(address => uint256[]) public userToRecord; // User to their record
     mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
