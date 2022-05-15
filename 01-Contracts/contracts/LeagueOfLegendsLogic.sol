@@ -27,7 +27,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256) public userToTotalWins;
-    mapping(address => uint256[8]) public userToRecord; // User to their record
+    mapping(address => uint256[]) public userToRecord; // User to their record
     mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -163,6 +163,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //         userToTotalWins,
     //         userToLineup
     //     );
+
     //     // League is over (8 weeks), give payout to winner
     //     if (currentWeekNum == 7) {
     //         onLeagueEnd();
@@ -172,9 +173,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
-    function evaluateMatches() external onlyTeamDiff nonReentrant {
+    function evaluateMatches() external onlyTeamDiff {
         MOBALogicLibrary.evaluateMatches(
-            schedule,
             currentWeekNum,
             athletesContract,
             userToRecord,
@@ -182,6 +182,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
             userToLineup,
             schedule
         );
+
         // League is over (8 weeks), give payout to winner
         if (currentWeekNum == 7) {
             onLeagueEnd();
@@ -277,7 +278,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
     // Getter for user to weekly pts
-    function getUserRecord() external view returns (uint256[8] memory) {
+    function getUserRecord() external view returns (uint256[] memory) {
         return userToRecord[msg.sender];
     }
 

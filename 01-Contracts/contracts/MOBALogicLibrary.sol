@@ -16,6 +16,7 @@ library MOBALogicLibrary {
         uint256 numWeeks,
         string calldata leagueName
     ) public {
+        console.log("setting schedule in library");
         uint256 randomShifter = (
             (uint256(
                 keccak256(
@@ -28,7 +29,8 @@ library MOBALogicLibrary {
                 )
             ) + leagueMembers.length * leagueMembers.length)
         );
-
+        //console.log(randomShifter);
+        //mapping(uint256 => uint256[2][]) storage schedule;
         //create two arrays of indices that represent indices in leagueMembers
         //essentially splitting the league into two halves, to assign matchups
         uint256[4] memory leftHalf;
@@ -106,28 +108,26 @@ library MOBALogicLibrary {
     function evaluateMatches(
         uint256 currentWeekNum,
         Athletes athletesContract,
-        mapping(address => uint256[8]) storage userToRecord,
+        mapping(address => uint256[]) storage userToRecord,
         mapping(address => uint256) storage userToTotalWins,
         mapping(address => uint256[]) storage userLineup,
         mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
-    ) public returns (address) {
+    ) public {
         for (uint256 i; i < schedule[currentWeekNum].length; i++) {
             // Addresses of the players who's match is being evaluated
             address addr1 = schedule[currentWeekNum][i].players[0];
             address addr2 = schedule[currentWeekNum][i].players[1];
 
-            //Check to make sure matchup is not a bye week
-            //If it is a bye week, assign 2 as result for this week
+            // Check to make sure matchup is not a bye week
+            // If it is a bye week, assign 2 as result for this week
             if (addr1 == address(0)) {
-                userToRecord[addr2][currentWeekNum] = 2;
-                return addr2;
+                userToRecord[addr2].push(2);
             } else if (addr2 == address(0)) {
-                userToRecord[addr1][currentWeekNum] = 2;
-                return addr1;
+                userToRecord[addr1].push(2);
             }
             // If not a bye week
             else {
-                console.log("evaluating the match in MOBALogicLibrary");
+                console.log("evaluateMatches() called in MOBALogicLibrary");
                 uint256 addr1Score;
                 uint256 addr2Score;
                 uint256[] memory lineup1 = userLineup[addr1];
@@ -153,121 +153,115 @@ library MOBALogicLibrary {
                         addr2Score += 1;
                     }
                 }
-                // Updating mappings and returning the winner
-                if (addr1Score > addr2Score) {
-                    userToRecord[addr1][currentWeekNum] = 1;
-                    userToRecord[addr2][currentWeekNum] = 0;
-                    userToTotalWins[addr1] += 1;
-                    emit MatchResult(addr1, addr2);
+                // Updating mappings, no need to return the winner here
+                console.log("Total points for addr1: ", addr1Score);
+                console.log("Total points for addr2: ", addr2Score);
 
-                    return addr1;
+                if (addr1Score > addr2Score) {
+                    console.log("Addr 1 wins!");
+                    userToRecord[addr1].push(1);
+                    userToRecord[addr2].push(0);
+                    userToTotalWins[addr1] += 1; // If this doesn't update, proves we can't update state this way
+                    emit MatchResult(addr1, addr2);
                 } else {
-                    userToRecord[addr2][currentWeekNum] = 1;
-                    userToRecord[addr1][currentWeekNum] = 0;
+                    console.log("Addr 2 wins!");
+                    userToRecord[addr2].push(1);
+                    userToRecord[addr1].push(0);
                     userToTotalWins[addr2] += 1;
                     emit MatchResult(addr2, addr1);
-
-                    return addr2;
                 }
             }
         }
     }
 
-    // Old evaluateMatch function
-    // function evaluateMatch(
-    //     address addr1,
-    //     address addr2,
-    //     uint256 currentWeekNum,
-    //     Athletes athletesContract,
-    //     uint256[] memory lineup1,
-    //     uint256[] memory lineup2,
-    //     mapping(address => uint256[8]) storage userToRecord,
-    //     mapping(address => uint256) storage userToTotalWins,
-    //     mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
-    // ) public returns (address) {
-    //     for (uint256 i; i < schedule[currentWeekNum].length; i++) {
-    //         //Check to make sure matchup is not a bye week
-    //         //If it is a bye week, assign 2 as result for this week
-    //         if (addr1 == address(0)) {
-    //             userToRecord[addr2][currentWeekNum] = 2;
-    //             return addr2;
-    //         } else if (addr2 == address(0)) {
-    //             userToRecord[addr1][currentWeekNum] = 2;
-    //             return addr1;
-    //         }
-    //         // If not a bye week
-    //         else {
-    //             console.log("evaluating the match in MOBALogicLibrary");
-    //             uint256 addr1Score;
-    //             uint256 addr2Score;
-    //             // Calculating users' total scores
-    //             for (uint256 j; j < lineup1.length; j++) {
-    //                 // Calling the Athletes.sol contract to get the scores of ith athlete
-    //                 uint256[] memory currAthleteScores1 = athletesContract
-    //                     .getAthleteScores(lineup1[i]);
-    //                 uint256[] memory currAthleteScores2 = athletesContract
-    //                     .getAthleteScores(lineup2[i]);
-    //                 // Getting the last score in the array
-    //                 uint256 latestScore1 = currAthleteScores1[
-    //                     currAthleteScores1.length - 1
-    //                 ];
-    //                 uint256 latestScore2 = currAthleteScores2[
-    //                     currAthleteScores2.length - 1
-    //                 ];
-    //                 // Calculating scores for users
-    //                 if (latestScore1 > latestScore2) {
-    //                     addr1Score += 1;
-    //                 } else {
-    //                     addr2Score += 1;
-    //                 }
-    //             }
-    //             // Updating mappings and returning the winner
-    //             if (addr1Score > addr2Score) {
-    //                 userToRecord[addr1][currentWeekNum] = 1;
-    //                 userToRecord[addr2][currentWeekNum] = 0;
-    //                 userToTotalWins[addr1] += 1;
-    //                 emit MatchResult(addr1, addr2);
+    //TODO emit event
+    function evaluateMatch(
+        address addr1,
+        address addr2,
+        uint256 currentWeekNum,
+        Athletes athletesContract,
+        uint256[] memory lineup1,
+        uint256[] memory lineup2,
+        mapping(address => uint256[]) storage userToRecord,
+        mapping(address => uint256) storage userToTotalWins
+    ) public returns (address) {
+        //Check to make sure matchup is not a bye week
+        //If it is a bye week, assign 2 as result for this week
+        if (addr1 == address(0)) {
+            userToRecord[addr2][currentWeekNum] = 2;
+            return addr2;
+        } else if (addr2 == address(0)) {
+            userToRecord[addr1][currentWeekNum] = 2;
+            return addr1;
+        } else {
+            uint256 addr1Score;
+            uint256 addr2Score;
+            // Calculating users' total scores
+            for (uint256 i = 0; i < lineup1.length; i++) {
+                // Calling the Athletes.sol contract to get the scores of ith athlete
+                uint256[] memory currAthleteScores1 = athletesContract
+                    .getAthleteScores(lineup1[i]);
+                uint256[] memory currAthleteScores2 = athletesContract
+                    .getAthleteScores(lineup2[i]);
+                // Getting the last score in the array
+                uint256 latestScore1 = currAthleteScores1[
+                    currAthleteScores1.length - 1
+                ];
+                uint256 latestScore2 = currAthleteScores2[
+                    currAthleteScores2.length - 1
+                ];
+                // Calculating scores for users
+                if (latestScore1 > latestScore2) {
+                    addr1Score += 1;
+                } else {
+                    addr2Score += 1;
+                }
+            }
+            // Updating mappings and returning the winner
+            if (addr1Score > addr2Score) {
+                userToRecord[addr1][currentWeekNum] = 1;
+                userToRecord[addr2][currentWeekNum] = 0;
+                userToTotalWins[addr1] += 1;
+                emit MatchResult(addr1, addr2);
 
-    //                 return addr1;
-    //             } else {
-    //                 userToRecord[addr2][currentWeekNum] = 1;
-    //                 userToRecord[addr1][currentWeekNum] = 0;
-    //                 userToTotalWins[addr2] += 1;
-    //                 emit MatchResult(addr2, addr1);
+                return addr1;
+            } else {
+                userToRecord[addr2][currentWeekNum] = 1;
+                userToRecord[addr1][currentWeekNum] = 0;
+                userToTotalWins[addr2] += 1;
+                emit MatchResult(addr2, addr1);
 
-    //                 return addr2;
-    //             }
-    //         }
-    //     }
-    // }
+                return addr2;
+            }
+        }
+    }
 
     //Evalautes all matchups for a given week
-    // function evaluateWeek(
-    //     mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule,
-    //     uint256 currentWeekNum,
-    //     Athletes athletesContract,
-    //     mapping(address => uint256[8]) storage userToRecord,
-    //     mapping(address => uint256) storage userToTotalWins,
-    //     mapping(address => uint256[]) storage userLineup
-    // ) public {
-    //     // Call evaluate match for each match in this weeks schedule
-    //     for (uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
-    //         console.log("In eval week for loop for matchup ", i);
-    //         // Call evaulate match between members of Match
-    //         address competitor1 = schedule[currentWeekNum][i].players[0];
-    //         address competitor2 = schedule[currentWeekNum][i].players[1];
-    //         evaluateMatch(
-    //             schedule[currentWeekNum][i].players[0],
-    //             schedule[currentWeekNum][i].players[1],
-    //             currentWeekNum,
-    //             athletesContract,
-    //             userLineup[competitor1],
-    //             userLineup[competitor2],
-    //             userToRecord,
-    //             userToTotalWins
-    //         );
-    //     }
-    // }
+    function evaluateWeek(
+        mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule,
+        uint256 currentWeekNum,
+        Athletes athletesContract,
+        mapping(address => uint256[]) storage userToRecord,
+        mapping(address => uint256) storage userToTotalWins,
+        mapping(address => uint256[]) storage userLineup
+    ) public {
+        //call evaulte match for each match in this weeks schedule
+        for (uint256 i = 0; i < schedule[currentWeekNum].length; i++) {
+            //call evaulate match between members of Match
+            address competitor1 = schedule[currentWeekNum][i].players[0];
+            address competitor2 = schedule[currentWeekNum][i].players[1];
+            evaluateMatch(
+                schedule[currentWeekNum][i].players[0],
+                schedule[currentWeekNum][i].players[1],
+                currentWeekNum,
+                athletesContract,
+                userLineup[competitor1],
+                userLineup[competitor2],
+                userToRecord,
+                userToTotalWins
+            );
+        }
+    }
 
     function calculateScoreOnChain(
         LeagueOfLegendsLogic.Stats calldata athleteStats
@@ -286,18 +280,5 @@ library MOBALogicLibrary {
         }
         //returns the score * 100, can scale down on frontend to enable floats
         return score;
-    }
-
-    // Seeing if there is a duplicate or not
-    function checkDuplicate(uint256[] memory arr) public pure returns (bool) {
-        for (uint256 i; i < arr.length; i++) {
-            arr[arr[i] % arr.length] = arr[arr[i] % arr.length] + arr.length;
-        }
-        for (uint256 i; i < arr.length; i++) {
-            if (arr[i] >= arr.length * 2) {
-                return false; // Duplicate
-            }
-        }
-        return true; // No duplicate
     }
 }

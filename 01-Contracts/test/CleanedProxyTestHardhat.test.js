@@ -32,7 +32,7 @@ const LeagueOfLegendsLogicJSON = require("../build/contracts/contracts/LeagueOfL
 const constructorArgs = require("../constructorArgs"); // GameItems constructor
 
 // IMPORTANT NOTE: You need to SET manual gas in hardhat config for this test to run correctly
-// ALSO NOTE: STAKING TESTS WILL NOT WORK ON RINKEBY BC ADDR1 WILL BE UNDEFINED (need to test on etherscan)
+// ALSO NOTE: STAKING TESTS WILL NOT WORK ON RINKEBY BC ADD=R1 WILL BE UNDEFINED (need to test on etherscan)
 // Make sure your wallet has a lot of rinkey eth!
 describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // Setting up a proxy to test, deploying contracts
@@ -295,6 +295,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once -- changed structure (not in LeagueMaker anymore)
   // LETS FUCKING GO IT WORKS NOW
+  it("Makes sure schedules aren't set before calling the function", async () => {
+    let schedule = await proxyContract.getScheduleForWeek(0); // Number of players in schedule
+    expect(schedule.length).to.equal(0); // Schedule shouldn't be set yet
+  });
+
   it("Sets league schedules for all proxies AND UPDATES STATE", async () => {
     let currLeague;
     let txn;
@@ -403,9 +408,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
 
     // Making sure state was updated correctly
-    let lineup = await proxyContract.connect(owner).getLineup(owner.address); // Getting the caller's lineup
+    lineup = await proxyContract.connect(owner).getLineup(owner.address); // Getting the caller's lineup
     lineup = lineup.map((player) => Number(player));
-    let lineup2 = await proxyContract.getLineup(addr1.address);
+    lineup2 = await proxyContract.getLineup(addr1.address);
     lineup2 = lineup2.map((player) => Number(player));
 
     expect(lineup).to.eql(athleteIds); // Note: eql is diff from equal as is does a deep comparison
@@ -426,7 +431,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       await txn.wait();
     }
 
-    const statsArr = [];
+    statsArr = [];
     for (let i = 0; i < 50; i++) {
       const athleteStats = await AthletesContractInstance.getAthleteScores(i);
       statsArr.push(athleteStats);
@@ -434,39 +439,89 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
     expect(statsArr.length).to.equal(50);
     // Comment out below to see stats arr (is being updated correctly right now!)
-    console.log("Athlete stats ", statsArr);
+    // console.log("Athlete stats ", statsArr);
+
+    // Creating points arrays to test out evaluateMatch functions
+    const athleteStatsNums = statsArr.map((stat) => Number(stat));
+    // Arrays for owner and addr1 points (lineup & lineup2)
+    const ownerPointsArr = lineup.map((athlete) => athleteStatsNums[athlete]);
+    const addr1PointsArr = lineup2.map((athlete) => athleteStatsNums[athlete]);
+    // Finally, total points for owner and addr1. Setting this so we can see if evaluateMatches function in MOBALogicLibrary is working correctly
+    ownerPoints = 0;
+    addr1Points = 0;
+    for (let i = 0; i < ownerPointsArr.length; i++) {
+      if (ownerPointsArr[i] > addr1PointsArr[i]) ownerPoints++;
+      else addr1Points++;
+    }
+    console.log(
+      "The total points for owner and addr1 calculated in test (before evaluateMatches): "
+    );
+    console.log("[Owner: ", ownerPoints, "], [Addr1: ", addr1Points, "]");
   });
 
   // The big kahuna - testing out LeagueMaker evaluatematch -- if this works we chillin
   // Changed this to new method: calls directly from each of the proxies as an "onlyTeamDiff" function
   // evaluateWeek() in the proxy
-  it("Evaluates matches for all proxies and updates state correctly", async () => {
+  // it("Evaluates matches for all proxies and updates state correctly", async () => {
+  //   let currLeague;
+  //   let txn;
+  //   for (let i = 0; i < AllLeagueInstances.length; i++) {
+  //     currLeague = AllLeagueInstances[i].connect(owner);
+  //     txn = await currLeague.evaluateWeek();
+  //   }
+  //   // Record for 0th week - one player should have 1
+  //   const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
+  //   const addr1Record = await proxyContract.userToRecord(addr1.address, 1);
+  //   // if (Number(ownerRecord) === 1) {
+  //   //   // One user should win and one should lose
+  //   //   expect(Number(addr1Record)).to.equal(0);
+  //   // } else {
+  //   //   expect(Number(ownerRecord)).to.equal(1);
+  //   // }
+  //   // console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+
+  //   const totalWinsOfOwner = await proxyContract.userToTotalWins(owner.address);
+  //   const totalWinsOfAddr1 = await proxyContract.userToTotalWins(owner.address);
+  //   console.log(
+  //     "Total wins: ",
+  //     Number(totalWinsOfOwner),
+  //     " ",
+  //     Number(totalWinsOfAddr1)
+  //   );
+  //   // TODO Add expect
+  // });
+
+  it("Evaluates matches with evaluateMatches() (new function)", async () => {
+    console.log("Evaluating matches now...");
+
     let currLeague;
     let txn;
     for (let i = 0; i < AllLeagueInstances.length; i++) {
       currLeague = AllLeagueInstances[i].connect(owner);
-      txn = await currLeague.evaluateWeek();
+      txn = await currLeague.evaluateMatches();
     }
-    // Record for 0th week - one player should have 1
-    const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
-    const addr1Record = await proxyContract.userToRecord(addr1.address, 1);
-    // if (Number(ownerRecord) === 1) {
-    //   // One user should win and one should lose
-    //   expect(Number(addr1Record)).to.equal(0);
-    // } else {
-    //   expect(Number(ownerRecord)).to.equal(1);
-    // }
-    // console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+    const ownerRecord = await proxyContract.userToRecord(owner.address, 0);
+    const addr1Record = await proxyContract.userToRecord(addr1.address, 0);
+    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
 
-    const totalWinsOfOwner = await proxyContract.userToTotalWins(owner.address);
-    const totalWinsOfAddr1 = await proxyContract.userToTotalWins(owner.address);
-    console.log(
-      "Total wins: ",
-      Number(totalWinsOfOwner),
-      " ",
-      Number(totalWinsOfAddr1)
-    );
+    if (Number(ownerRecord) === 1) {
+      // One user should win and one should lose
+      expect(Number(addr1Record)).to.equal(0);
+    } else {
+      expect(Number(ownerRecord)).to.equal(1);
+    }
   });
+
+  //   const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
+  //   const addr1Record = await proxyContract.userToRecord(addr1.address, 1);
+  //   if (Number(ownerRecord) === 1) {
+  //     // One user should win and one should lose
+  //     expect(Number(addr1Record)).to.equal(0);
+  //   } else {
+  //     expect(Number(ownerRecord)).to.equal(1);
+  //   }
+  //   console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+  // });
 
   //   const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
   //   await delegatePool.wait();
