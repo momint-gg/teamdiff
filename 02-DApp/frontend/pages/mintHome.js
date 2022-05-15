@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
-import profilePic from "../assets/images/example.png";
+import profilePic from "../assets/images/starter-pack.png";
 import StarterPackContents from "../components/StarterPackContents";
 import MintPack from "./mintPack.js";
 

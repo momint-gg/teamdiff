@@ -1,48 +1,53 @@
-import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import {
   Box,
   Typography,
-  Button,
-  Chip,
-  Container,
-  Paper,
   Fab,
 } from "@mui/material";
+import JoinCard from "../components/JoinCard";
 
 export default function JoinLeague({ setDisplay }) {
+  const exampleWhitelisted = {
+    leagueName: "Friends League",
+    invitedBy: "reggiecai",
+  };
+  const examplePublic = {
+    leagueName: "Fun League",
+    publicOwner: "elon",
+  };
   return (
     <Box>
       <Fab
         variant="extended"
         size="small"
-        color="primary"
         aria-label="add"
         onClick={() => setDisplay(false)}
       >
         &#60; BACK
       </Fab>
 
-      <Typography variant="h3" color="secondary" component="div">
+      <Typography variant="h3" color="secondary" component="div" marginTop={2}>
         YOUR WHITELISTED LEAGUES
       </Typography>
       <hr
         style={{
-          color: "secondary",
+          color: "white",
           backgroundColor: "secondary",
           height: 5,
         }}
       />
-      <Typography variant="h3" color="secondary" component="div">
+      <JoinCard joinData={exampleWhitelisted} />
+      <Typography variant="h3" color="secondary" component="div" marginTop={5}>
         PUBLIC LEAGUES
       </Typography>
       <hr
         style={{
-          color: "secondary",
+          color: "white",
           backgroundColor: "secondary",
           height: 5,
         }}
       />
+      <JoinCard joinData={examplePublic} />
     </Box>
   );
 }

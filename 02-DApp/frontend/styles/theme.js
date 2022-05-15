@@ -30,6 +30,7 @@ const theme = createTheme({
       label: {
         color: "#2E0744",
       },
+      color: "black",
     },
   },
 });

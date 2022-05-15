@@ -287,7 +287,7 @@ export default function CreateLeague({ setDisplay }) {
   return (
     <Box sx={{ backgroundColor: "primary.dark" }}>
      {/* <Box sx={{ backgroundColor: "gray" }}> */}
-      <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
+      <Fab variant="extended" size="small" aria-label="add" onClick={() => setDisplay(false)}>
         &#60; BACK
       </Fab>
       
