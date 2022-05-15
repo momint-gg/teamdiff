@@ -152,25 +152,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         lineupIsLocked = false;
     }
 
-    // Evalautes all matchups for a given week
-    // TODO: Remove nonreentrant modifier if not needed
-    // function evaluateWeek() external onlyTeamDiff nonReentrant {
-    //     MOBALogicLibrary.evaluateWeek(
-    //         schedule,
-    //         currentWeekNum,
-    //         athletesContract,
-    //         userToRecord,
-    //         userToTotalWins,
-    //         userToLineup
-    //     );
-
-    //     // League is over (8 weeks), give payout to winner
-    //     if (currentWeekNum == 7) {
-    //         onLeagueEnd();
-    //     }
-    //     currentWeekNum++;
-    // }
-
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
     function evaluateMatches() external onlyTeamDiff {

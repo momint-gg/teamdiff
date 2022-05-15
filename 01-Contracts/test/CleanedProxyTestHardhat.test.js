@@ -460,6 +460,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   // The big kahuna
+  // Function in MOBALogic isn't working...
   it("Evaluates matches with evaluateMatches() (new function)", async () => {
     console.log("Evaluating matches now...");
 

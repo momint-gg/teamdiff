@@ -10,6 +10,8 @@
 // import "./LeagueOfLegendsLogic.sol";
 
 // // Basically a helper contract for leaguemaker to reduce gas
+// Not using but keeping for now so I know what functions to implement on backend...
+
 // contract LeagueMakerLibrary {
 //     // TODO: Add modifier so only LeagueMaker can call (onlyOwner w league maker as owner)
 
