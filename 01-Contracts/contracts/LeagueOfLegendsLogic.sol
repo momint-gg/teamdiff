@@ -278,6 +278,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
     // Getter for user to weekly pts
+    // When we get the mapping directly, returns incorrectly so we need to keep this!
     function getUserRecord() external view returns (uint256[] memory) {
         return userToRecord[msg.sender];
     }

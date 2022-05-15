@@ -459,38 +459,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     console.log("[Owner: ", ownerPoints, "], [Addr1: ", addr1Points, "]");
   });
 
-  // The big kahuna - testing out LeagueMaker evaluatematch -- if this works we chillin
-  // Changed this to new method: calls directly from each of the proxies as an "onlyTeamDiff" function
-  // evaluateWeek() in the proxy
-  // it("Evaluates matches for all proxies and updates state correctly", async () => {
-  //   let currLeague;
-  //   let txn;
-  //   for (let i = 0; i < AllLeagueInstances.length; i++) {
-  //     currLeague = AllLeagueInstances[i].connect(owner);
-  //     txn = await currLeague.evaluateWeek();
-  //   }
-  //   // Record for 0th week - one player should have 1
-  //   const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
-  //   const addr1Record = await proxyContract.userToRecord(addr1.address, 1);
-  //   // if (Number(ownerRecord) === 1) {
-  //   //   // One user should win and one should lose
-  //   //   expect(Number(addr1Record)).to.equal(0);
-  //   // } else {
-  //   //   expect(Number(ownerRecord)).to.equal(1);
-  //   // }
-  //   // console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
-
-  //   const totalWinsOfOwner = await proxyContract.userToTotalWins(owner.address);
-  //   const totalWinsOfAddr1 = await proxyContract.userToTotalWins(owner.address);
-  //   console.log(
-  //     "Total wins: ",
-  //     Number(totalWinsOfOwner),
-  //     " ",
-  //     Number(totalWinsOfAddr1)
-  //   );
-  //   // TODO Add expect
-  // });
-
+  // The big kahuna
   it("Evaluates matches with evaluateMatches() (new function)", async () => {
     console.log("Evaluating matches now...");
 
@@ -500,16 +469,10 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       currLeague = AllLeagueInstances[i].connect(owner);
       txn = await currLeague.evaluateMatches();
     }
-    const ownerRecord = await proxyContract.userToRecord(owner.address, 0);
-    const addr1Record = await proxyContract.userToRecord(addr1.address, 0);
-    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
 
-    if (Number(ownerRecord) === 1) {
-      // One user should win and one should lose
-      expect(Number(addr1Record)).to.equal(0);
-    } else {
-      expect(Number(ownerRecord)).to.equal(1);
-    }
+    const ownerRecord = await proxyContract.connect(owner).getUserRecord();
+    const addr1Record = await proxyContract.connect(addr1).getUserRecord();
+    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
   });
 
   //   const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
