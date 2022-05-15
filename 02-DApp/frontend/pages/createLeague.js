@@ -132,7 +132,7 @@ export default function CreateLeague({ setDisplay }) {
       );
       setLeagueMakerContract(LeagueMakerContract);
 
-      
+      //TODO add manual filter to event
       // const filter = {
       //   address: LeagueMakerContract.address,
       //   topics: [
@@ -157,13 +157,15 @@ export default function CreateLeague({ setDisplay }) {
   // Callback for when pack burned function is called from GameItems contracts
   const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
     //TODO create a proxy instance from emitted address
-    //then check the admin of that proxy to filter events?
+    //TODO then check the admin of that proxy to filter events?
     
     const LeagueProxyContract = new ethers.Contract(
       newLeagueProxyAddress,
       LeagueOfLegendsLogicJSON.abi,
       provider
     );
+    //TODO sometimes these invviteListValues ar enull???
+
     console.log("inviteLlistValues: " + inviteListValues);
 
     inviteListValues.forEach(async (whitelistAddress) => {
@@ -217,6 +219,7 @@ export default function CreateLeague({ setDisplay }) {
           console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
           console.log("League Creation in progress...");
+          console.log("With invite values: " + inviteListValues);
         })
         .catch((error) => {
           alert("Create League error: " + error.message);

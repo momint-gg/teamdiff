@@ -9,9 +9,11 @@ const main = async () => {
 
   //Create GameItems Instance
   // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  // //const gameContract = await gameContractFactory.deploy(...constructorArgs);
   // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
   //   //overriding gas bc transaction was stuck
-  //   gasPrice: 203000000000,
+  //   //gasPrice: 203000000000,
+  //   gasLimit: 20000000
   // });
   // await gameContract.deployed();
 

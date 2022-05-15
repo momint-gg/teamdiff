@@ -60,6 +60,8 @@ export default function MyLeagues({ setDisplay }) {
 
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {
+    setActiveLeagueList([]);
+    setPendingLeagueList([]);
     if (accountData) {
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
@@ -71,8 +73,8 @@ export default function MyLeagues({ setDisplay }) {
 
       //Fetch League membership data for connected wallet
       async function fetchData() {
-        setActiveLeagueList([]);
-        setPendingLeagueList([]);
+        // setActiveLeagueList([]);
+        // setPendingLeagueList([]);
         // const activeLeagues = await LeagueMakerContract.leagueAddresses(1);
         var i = 0;
         var error = "none";
@@ -116,7 +118,7 @@ export default function MyLeagues({ setDisplay }) {
     else {
       console.log("no account data");
     }
-  }, []);
+  }, [accountData?.address]);
 
   //useEffect to update leagues on accountData change
   // var activeListItems;

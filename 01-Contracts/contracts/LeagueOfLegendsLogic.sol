@@ -314,7 +314,9 @@ contract LeagueOfLegendsLogic is
     // }
 
     // User joining the league
-    function joinLeague() external onlyWhitelisted nonReentrant {
+    function joinLeague() external nonReentrant {
+    // function joinLeague() external onlyWhitelisted nonReentrant {
+        require(whitelistContract.whitelist(msg.sender), "User is not on whitelist bro");
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
         require(testUSDC.balanceOf(msg.sender) > stakeAmount, "Insufficent funds for staking");

@@ -4,6 +4,8 @@ import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
 import constants from "../Constants";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+
 import ConnectWallet from "./connectWallet";
 import AthleteCardModal from "../components/AthleteCardModal";
 
@@ -31,13 +33,15 @@ export default function Collection() {
   };
 
   useEffect(() => {
+    setPackNFTs([]);
+    setAthleteNFTs([]);
     // declare the async data fetching function
     const getNFTData = async () => {
       const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
 
       const nfts = await web3.alchemy.getNfts({
         owner: accountData.address,
-        contractAddresses: [constants.CONTRACT_ADDR],
+        contractAddresses: [CONTRACT_ADDRESSES.GameItems],
       });
 
       setNFTResp(nfts);
@@ -47,6 +51,7 @@ export default function Collection() {
           contractAddress: constants.CONTRACT_ADDR,
           tokenId: token,
         });
+        console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
         if (response.title?.includes("Pack")) {
           setPackNFTs((packNFTs) => [...packNFTs, response]);
         } else {
@@ -56,9 +61,11 @@ export default function Collection() {
     };
 
     if (accountData) {
-      getNFTData().catch(console.error);
+      getNFTData().catch((error) => {
+        console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
+      });
     }
-  }, []);
+  }, [accountData?.address]);
 
   if (accountData && nftResp) {
     return (
