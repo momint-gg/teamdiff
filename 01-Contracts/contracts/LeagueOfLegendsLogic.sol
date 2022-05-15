@@ -165,7 +165,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         // League is over (8 weeks)
         if (currentWeekNum == numWeeks - 1) {
             onLeagueEnd();
-            break;
+            return;
         }
         currentWeekNum++;
     }
@@ -268,11 +268,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // For testing if join league function Works
     function getUsersLength() external view returns (uint256) {
         return leagueMembers.length;
-    }
-
-    // Getter for user to total pts
-    function getUserTotalPts() external view returns (uint256) {
-        return userToTotalWins[msg.sender];
     }
 
     // Getting lineupIsLocked (TODO: Comment out for prod)
