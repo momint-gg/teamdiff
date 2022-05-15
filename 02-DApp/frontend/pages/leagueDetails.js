@@ -115,7 +115,23 @@ export default function LeagueDetails({ leagueData, leagueAddress, setLeagueOpen
                 width: 150,
                 height: 200,
               }}
-            />
+            >
+            <Typography
+              variant="h5"
+              color="secondary"
+              component="div"
+            >
+              Jungler
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                // open modal with list of potential players
+              }}
+            >
+              EDIT
+            </Button>
+            </Paper>
           </Grid>
           <Grid item>
             <Paper
