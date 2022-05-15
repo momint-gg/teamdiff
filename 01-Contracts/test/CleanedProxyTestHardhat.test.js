@@ -482,19 +482,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     if (Number(ownerRecord[0]) === 1) {
       // Other user should lose if one wins
       expect(Number(addr1Record[0])).to.equal(0);
-      expect(
-        Number(
-          await proxyContract.connect(owner).userToTotalWins(owner.address)
-        )
-      ).to.equal(1);
     }
     if (Number(addr1Record[0]) === 1) {
       expect(Number(ownerRecord[0])).to.equal(0);
-      expect(
-        Number(
-          await proxyContract.connect(addr1).userToTotalWins(addr1.address)
-        )
-      ).to.equal(1);
     }
     if (Number(addr1Record[0]) === 2) {
       // Both should have a tie (2)

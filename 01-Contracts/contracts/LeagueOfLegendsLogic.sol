@@ -17,7 +17,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     using SafeMath for uint256;
 
     string public leagueName;
-    uint256 public numWeeks; // Length of a split
+    uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
     uint256 public currentWeekNum;
     address public admin;
@@ -158,29 +158,31 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
             currentWeekNum,
             athletesContract,
             userToRecord,
-            userToTotalWins,
             userToLineup,
             schedule
         );
 
-        // League is over (8 weeks), give payout to winner
-        if (currentWeekNum == 7) {
+        // League is over (8 weeks)
+        if (currentWeekNum == numWeeks - 1) {
             onLeagueEnd();
+            break;
         }
         currentWeekNum++;
     }
 
     // TODO: Change to private/internal
+    // TODO: Add tiebraker logic here (split the pot)
     function onLeagueEnd() public onlyTeamDiff {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
         address winner = leagueMembers[0];
         // Calculating the winner (may want to just update each week instead of doing this way...)
         // Save gas: don't say i = 0
-        for (uint256 i = 1; i < leagueMembers.length; i++) {
-            if (userToTotalWins[leagueMembers[i]] > userToTotalWins[winner]) {
-                winner = leagueMembers[i];
-            }
-        }
+        // Todo: Call MOBALogicLibrary calculateLeagueWinner function
+        // for (uint256 i = 1; i < leagueMembers.length; i++) {
+        //     if (userToTotalWins[leagueMembers[i]] > userToTotalWins[winner]) {
+        //         winner = leagueMembers[i];
+        //     }
+        // }
         // Approval on front end first, then transfer with the below
         testUSDC.transferFrom(address(this), winner, contractBalance);
 
