@@ -11,6 +11,7 @@ import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { WalletLinkConnector } from "wagmi/connectors/walletLink";
 import { Box } from "@mui/material";
 import Layout from "../components/Layout";
+import { useMediaQuery } from 'react-responsive';
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -44,11 +45,17 @@ const connectors = ({ chainId }) => {
 };
 
 function MyApp({ Component, pageProps }) {
+  const isWeb = useMediaQuery({
+    query: '(min-device-width: 1224px)'
+  })
+  const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
+
   return (
     <Box sx={{ backgroundColor: "#2E0744", height: "100%" }}>
       <Provider autoConnect connectors={connectors}>
         <ThemeProvider theme={theme}>
-          <Layout>
+          <Layout isWeb={isWeb} isMobile={isMobile}>
             <link
               rel="stylesheet"
               href="https://fonts.googleapis.com/css?family=Exo+2"

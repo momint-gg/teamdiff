@@ -6,6 +6,7 @@ import { Box, Typography, Grid } from "@mui/material";
 import constants from "../Constants";
 import ConnectWallet from "./connectWallet";
 import AthleteCardModal from "../components/AthleteCardModal";
+import { useMediaQuery } from 'react-responsive';
 
 export default function Collection() {
   const [{ data: accountData }, disconnect] = useAccount({
@@ -29,6 +30,8 @@ export default function Collection() {
   const handleClickAway = () => {
     setMenu(false);
   };
+
+  const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
   useEffect(() => {
     // declare the async data fetching function
@@ -63,19 +66,22 @@ export default function Collection() {
   if (accountData && nftResp) {
     return (
       <Box>
-        <Typography variant="h2" color="secondary" component="div">
+        <Typography 
+          variant={isMobile? "h4" : "h2"} 
+          color="secondary" 
+          component="div">
           PACKS
         </Typography>
         <hr
           style={{
-            color: "secondary",
-            backgroundColor: "secondary",
+            color: "white",
+            backgroundColor: "white",
             height: 5,
           }}
         />
-        <Grid container spacing={3}>
+        <Grid container spacing={isMobile? 1 : 3}>
           {packNFTs?.map((athleteData) => (
-            <Grid item xs={4}>
+            <Grid item xs={isMobile? 12 : 4}>
               <AthleteCard
                 athleteData={athleteData}
                 setAthlete={setCurrAthlete}
@@ -85,7 +91,7 @@ export default function Collection() {
           ))}
         </Grid>
         <Typography
-          variant="h2"
+          variant={isMobile? "h4" : "h2"}
           color="secondary"
           component="div"
           style={{ marginTop: 10 }}
@@ -94,14 +100,14 @@ export default function Collection() {
         </Typography>
         <hr
           style={{
-            color: "secondary",
-            backgroundColor: "secondary",
+            color: "white",
+            backgroundColor: "white",
             height: 5,
           }}
         />
-        <Grid container spacing={3}>
+        <Grid container spacing={isMobile? 1 : 3}>
           {athleteNFTs?.map((athleteData) => (
-            <Grid item xs={4}>
+            <Grid item xs={isMobile? 12 : 4}>
               <AthleteCard
                 athleteData={athleteData}
                 setAthlete={setCurrAthlete}

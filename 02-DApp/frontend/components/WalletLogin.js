@@ -3,7 +3,7 @@ import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
 import { useState } from "react";
 import ConnectWalletModal from "./ConnectWalletModal";
 
-export default function WalletLogin() {
+export default function WalletLogin({isMobile}) {
   const [{ data: connectData, error: connectError }, connect] = useConnect();
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
@@ -40,6 +40,28 @@ export default function WalletLogin() {
       {accountData ? (
         <ClickAwayListener onClickAway={handleClickAway}>
           <Box sx={{ position: "relative" }}>
+            {isMobile?
+            <Chip
+              avatar={
+                <Avatar
+                  alt="Avatar"
+                  src={
+                    accountData.ens?.avatar
+                      ? accountData.ens.avatar
+                      : "avatar.png"
+                  }
+                />
+              }
+              label={
+                accountData.ens?.name
+                  ? `${accountData.ens?.name}`
+                  : shortenedAddress
+              }
+              variant="outlined"
+              clickable={true}
+              onClick={handleClick}
+              sx={{ height: 30, fontSize: 14 }}
+            /> :
             <Chip
               avatar={
                 <Avatar
@@ -61,6 +83,7 @@ export default function WalletLogin() {
               onClick={handleClick}
               sx={{ height: 40, fontSize: 18 }}
             />
+            }
             {menu ? (
               <Box
                 sx={{
@@ -87,19 +110,31 @@ export default function WalletLogin() {
         </ClickAwayListener>
       ) : (
         <div>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={handleModalOpen}
-            style={{ color: "black", borderRadius: "40px", fontSize: 15 }}
-          >
-            CONNECT WALLET
-          </Button>
+          {isMobile? 
+            <Button
+              variant="contained"
+              color="inherit"
+              onClick={handleModalOpen}
+              style={{ color: "black", borderRadius: "40px", fontSize: 14 }}
+            >
+              CONNECT
+            </Button> :
+            <Button
+              variant="contained"
+              color="inherit"
+              onClick={handleModalOpen}
+              style={{ color: "black", borderRadius: "40px", fontSize: 15 }}
+            >
+              CONNECT WALLET
+            </Button>
+          }
+          
           {modalOpen && (
             <ConnectWalletModal
               modalOpen={modalOpen}
               handleClickAway={handleClickAway}
               setModalOpen={setModalOpen}
+              isMobile={isMobile}
             />
           )}
         </div>

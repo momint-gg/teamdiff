@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 
 export default function AthleteCard({ athleteData, setAthlete, setModalOpen }) {
-  console.log(athleteData);
   const card = (
     <Fragment>
       <CardContent>

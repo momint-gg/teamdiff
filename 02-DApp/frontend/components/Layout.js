@@ -1,12 +1,12 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Image from "next/image";
 import WalletLogin from "../components/WalletLogin";
 import logo from "../assets/images/logo-horizontal.png";
 import Footer from "./Footer";
 import NavLink from "./NavLink";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, isMobile }) => {
   const pages = [
     { name: "PLAY", href: "/play" },
     { name: "COLLECTION", href: "/collection" },
@@ -14,6 +14,7 @@ const Layout = ({ children }) => {
     { name: "BURN", href: "/burnPack" },
   ];
 
+  console.log(isMobile);
   return (
     <>
       <Box component="div" height="100%" backgroundColor="primary.dark">
@@ -29,8 +30,11 @@ const Layout = ({ children }) => {
               backgroundColor: "primary.dark",
             }}
           >
+            {/* {isWeb && <Typography>WEB</Typography>} */}
+            {/* {!isMobile && <Typography>MOBILE</Typography>} */}
+            
             <Image src={logo} alt="TeamDiff logo" width="300px" height="75px" />
-            <WalletLogin />
+            <WalletLogin isMobile={isMobile}/>
           </Box>
           <Box
             sx={{
@@ -47,19 +51,29 @@ const Layout = ({ children }) => {
             }}
           >
             {pages.map((page) => (
-              <NavLink key={page.name} href={page.href}>
+              <NavLink key={page.name} href={page.href} isMobile={isMobile}>
                 {page.name}
               </NavLink>
             ))}
           </Box>
-          <hr
-            style={{
-              color: "white",
-              backgroundColor: "white",
-              height: 4,
-              marginTop: -4,
-            }}
-          />
+          {isMobile? 
+            <hr
+              style={{
+                color: "white",
+                backgroundColor: "white",
+                height: 4,
+                marginTop: -0.5,
+              }}
+            /> 
+          : <hr
+              style={{
+                color: "white",
+                backgroundColor: "white",
+                height: 4,
+                marginTop: -4,
+              }}
+            />
+        }
           <Box sx={{ paddingLeft: 5, paddingRight: 5 }}>
             <div>{children}</div>
           </Box>

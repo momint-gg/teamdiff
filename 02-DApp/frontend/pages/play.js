@@ -20,6 +20,7 @@ import { Fragment } from "react";
 import { GiPodium } from "react-icons/gi";
 import { MdGroupAdd } from "react-icons/md";
 import { FaCrown } from "react-icons/fa";
+import { useMediaQuery } from 'react-responsive';
 
 export default function Play() {
   const [{ data: accountData }, disconnect] = useAccount({
@@ -47,62 +48,67 @@ export default function Play() {
     setMenu(false);
   };
 
-  const myLeagues = (
-    <Fragment>
-      <CardContent sx={{ textAlign: "center" }}>
-        <Typography variant="h5" color="secondary" component="div">
-          My Leagues
-        </Typography>
-        <GiPodium />
-      </CardContent>
-      <CardActions></CardActions>
-    </Fragment>
-  );
-
-  const joinLeague = (
-    <Fragment>
-      <CardContent sx={{ textAlign: "center" }}>
-        <Typography variant="h5" color="secondary" component="div">
-          Join League
-        </Typography>
-        <MdGroupAdd />
-      </CardContent>
-      <CardActions></CardActions>
-    </Fragment>
-  );
-
-  const createLeague = (
-    <Fragment>
-      <CardContent sx={{ textAlign: "center" }}>
-        <Typography variant="h5" color="secondary" component="div">
-          Create League
-        </Typography>
-        <FaCrown />
-      </CardContent>
-      <CardActions></CardActions>
-    </Fragment>
-  );
+  const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
   return (
     <Box>
       {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && (
-        <Grid container spacing={3}>
-          <Grid item xs={4}>
+        <Grid container spacing={isMobile? 1 : 3}>
+          <Grid item xs={isMobile? 12 : 4}>
             <Card variant="outlined" onClick={() => setDisplayMyLeagues(true)}>
-              {myLeagues}
+            <Fragment>
+              <CardContent sx={{ textAlign: "center" }}>
+                {isMobile?
+                <Typography color="secondary" component="div" fontSize={18}>
+                  My Leagues
+                </Typography> :
+                <Typography variant="h5" color="secondary" component="div">
+                  My Leagues
+                </Typography>
+                }
+                <GiPodium />
+              </CardContent>
+              <CardActions></CardActions>
+            </Fragment>
             </Card>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isMobile? 12 : 4}>
             <Card variant="outlined" onClick={() => setDisplayJoinLeague(true)}>
-              {joinLeague}
+            <Fragment>
+              <CardContent sx={{ textAlign: "center" }}>
+                {isMobile?
+                  <Typography color="secondary" component="div" fontSize={18}>
+                    Join League
+                  </Typography> :
+                  <Typography variant="h5" color="secondary" component="div">
+                    Join League
+                  </Typography>
+                }
+                <MdGroupAdd />
+              </CardContent>
+              <CardActions></CardActions>
+            </Fragment>
             </Card>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isMobile? 12 : 4}>
             <Card
               variant="outlined"
               onClick={() => setDisplayCreateLeague(true)}
             >
-              {createLeague}
+              <Fragment>
+                <CardContent sx={{ textAlign: "center" }}>
+                  {isMobile?
+                    <Typography color="secondary" component="div" fontSize={18}>
+                      Create League
+                    </Typography> :
+                    <Typography variant="h5" color="secondary" component="div">
+                      Create League
+                    </Typography>
+                  }
+                  <FaCrown />
+                </CardContent>
+                <CardActions></CardActions>
+              </Fragment>
             </Card>
           </Grid>
         </Grid>
