@@ -466,6 +466,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // Function in MOBALogic isn't working...
   it("Evaluates matches with evaluateMatches() (new function)", async () => {
     console.log("Evaluating matches now...");
+    // All possible scenarios for a match
+    ownerWins = false;
+    addr1Wins = false;
+    tie = false;
+    byeWeek = false;
 
     let currLeague;
     let txn;
@@ -476,56 +481,90 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
     const ownerRecord = await proxyContract.connect(owner).getUserRecord();
     const addr1Record = await proxyContract.connect(addr1).getUserRecord();
+    const ownerPoints = await proxyContract
+      .connect(owner)
+      .userToPoints(owner.address);
+    const addr1Points = await proxyContract.userToPoints(addr1.address);
     console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+    console.log(
+      "Owner's points are ",
+      ownerPoints,
+      "addr1 points are ",
+      addr1Points
+    );
 
-    // Making sure mappings are correct
+    // Making sure mappings are correctly updated
     if (Number(ownerRecord[0]) === 1) {
-      // Other user should lose if one wins
+      ownerWins = true;
       expect(Number(addr1Record[0])).to.equal(0);
+      expect(Number(ownerPoints)).to.equal(2);
+      expect(Number(addr1Points)).to.equal(0);
     }
     if (Number(addr1Record[0]) === 1) {
+      addr1Wins = true;
       expect(Number(ownerRecord[0])).to.equal(0);
+      expect(Number(ownerPoints)).to.equal(0);
+      expect(Number(addr1Points)).to.equal(2);
     }
+    // Both should have a tie (2)
     if (Number(addr1Record[0]) === 2) {
-      // Both should have a tie (2)
+      tie = true;
       expect(Number(ownerRecord[0])).to.equal(2);
+      expect(Number(ownerPoints)).to.equal(1);
+      expect(Number(addr1Points)).to.equal(1);
     }
+    // Both should have a bye (3)
     if (Number(addr1Record[0]) === 3) {
-      // Both should have a bye (3)
+      byeWeek = true;
       expect(Number(ownerRecord[0])).to.equal(3);
     }
   });
 
-  //   const ownerRecord = await proxyContract.userToRecord(owner.address, 1);
-  //   const addr1Record = await proxyContract.userToRecord(addr1.address, 1);
-  //   if (Number(ownerRecord) === 1) {
-  //     // One user should win and one should lose
-  //     expect(Number(addr1Record)).to.equal(0);
-  //   } else {
-  //     expect(Number(ownerRecord)).to.equal(1);
-  //   }
-  //   console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
-  // });
+  // Just 2 players so there won't be a bye week in this scenario
+  // In this test entire league is basically 1 match, just testing prize pot
+  it("Correctly delegates the prize pot, with tiebraker logic as well", async () => {
+    const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
+    const prizePoolAmount = Number(
+      await testUsdcContract.balanceOf(proxyContract.address)
+    );
+    const oldOwnerBalance = Number(
+      await testUsdcContract.balanceOf(owner.address)
+    );
+    const oldAddr1Balance = Number(
+      await testUsdcContract.balanceOf(addr1.address)
+    );
 
-  //   const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
-  //   await delegatePool.wait();
-
-  //   // Making sure balances are correct! -- whoever wins is given the prize pool
-  //   if (ownerWins) {
-  //     expect(
-  //       Number(await testUsdcContract.balanceOf(owner.address)) -
-  //         oldOwnerBalance ==
-  //         prizePoolAmount
-  //     );
-  //   }
-  //   if (addr1Wins) {
-  //     expect(
-  //       Number(await testUsdcContract.balanceOf(addr1.address)) -
-  //         oldAddr1Balance ==
-  //         prizePoolAmount
-  //     );
-  //   }
-  // });
+    // Making sure balances are correct
+    if (ownerWins) {
+      // Owner gets entire pot
+      expect(
+        Number(await testUsdcContract.balanceOf(owner.address)) -
+          oldOwnerBalance ==
+          prizePoolAmount
+      );
+    }
+    if (addr1Wins) {
+      // Addr1 gets entire pot
+      expect(
+        Number(await testUsdcContract.balanceOf(addr1.address)) -
+          oldAddr1Balance ==
+          prizePoolAmount
+      );
+    }
+    if (tie) {
+      // Pot is split 50/50 in case of a tie
+      expect(
+        Number(await testUsdcContract.balanceOf(owner.address)) -
+          oldOwnerBalance ==
+          prizePoolAmount / 2
+      );
+      expect(
+        Number(await testUsdcContract.balanceOf(addr1.address)) -
+          oldAddr1Balance ==
+          prizePoolAmount / 2
+      );
+    }
+  });
 
   // Doing a full 8 week test with a league of x members, making sure everything works as planned and prize pot is given out
   // If this works... we ready for some rinkeby shit my dude

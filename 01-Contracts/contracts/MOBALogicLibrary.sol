@@ -111,6 +111,7 @@ library MOBALogicLibrary {
         Athletes athletesContract,
         mapping(address => uint256[]) storage userToRecord,
         mapping(address => uint256[]) storage userLineup,
+        mapping(address => uint256) storage userToPoints,
         mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
     ) public {
         for (uint256 i; i < schedule[currentWeekNum].length; i++) {
@@ -153,31 +154,69 @@ library MOBALogicLibrary {
                         addr2Score += 1;
                     }
                 }
-                // Updating mappings, no need to return the winner here
-                console.log("Total points for addr1: ", addr1Score);
-                console.log("Total points for addr2: ", addr2Score);
+                // Updating mappings
+                // uint256 addr1Points = userToPoints[addr1];
+                // uint256 addr2Points = userToPoints[addr2];
 
                 if (addr1Score > addr2Score) {
                     userToRecord[addr1].push(1);
                     userToRecord[addr2].push(0);
+                    userToPoints[addr1] += 2;
                     emit MatchResult(addr1, addr2);
                 } else if (addr2Score > addr1Score) {
                     userToRecord[addr2].push(1);
                     userToRecord[addr1].push(0);
+                    userToPoints[addr2] += 2;
                     emit MatchResult(addr2, addr1);
                 } else {
                     // In the case of a tie
-                    console.log("Tie!");
                     userToRecord[addr2].push(2);
                     userToRecord[addr1].push(2);
+                    userToPoints[addr1] += 1;
+                    userToPoints[addr2] += 1;
                     emit MatchResult(addr2, addr1);
                 }
             }
         }
     }
 
-    // Todo: Write function that calculate league winner
-    function calculateLeagueWinner() external {}
+    // Calculating league winner(s)
+    // Tie is worth 1 point while a win is worth 2 points
+    function calculateLeagueWinners(
+        mapping(address => uint256[]) storage userToRecord,
+        address[] memory leagueMembers
+    ) external view returns (address[] memory) {
+        // Max points so far
+        uint256 maxPoints;
+        // Array holding the winners of the league (since there can be a tie)
+        address[] memory winners;
+        for (uint256 i; i < leagueMembers.length; i++) {
+            uint256 currPoints;
+            for (uint256 j; j < userToRecord[leagueMembers[i]].length; j++) {
+                if (userToRecord[leagueMembers[i]][j] == 1) {
+                    // Win = 2 points
+                    currPoints += 2;
+                }
+                if (userToRecord[leagueMembers[i]][j] == 2) {
+                    // Tie = 1 point
+                    currPoints += 1;
+                }
+            }
+
+            // New winner: clear array and add winner
+            if (currPoints > maxPoints) {
+                maxPoints = currPoints;
+                winners[0] = leagueMembers[i];
+            }
+
+            // Tie: add new winner to winners array
+            // TODO: Figure out how to add to the array (might need to make total points mapping)
+            if (currPoints == maxPoints) {
+                winners[winners.length] = leagueMembers[i];
+            }
+        }
+        return winners;
+    }
 
     function calculateScoreOnChain(
         LeagueOfLegendsLogic.Stats calldata athleteStats

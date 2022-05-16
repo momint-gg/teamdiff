@@ -28,6 +28,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[]) public userToRecord; // User to their record
     mapping(address => uint256[]) public userToLineup; // User to their lineup
+    mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
 
@@ -159,6 +160,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
             athletesContract,
             userToRecord,
             userToLineup,
+            userToPoints,
             schedule
         );
 
@@ -170,21 +172,22 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         currentWeekNum++;
     }
 
-    // TODO: Change to private/internal
+    // TODO: Change to private/internal (public for testing)
     // TODO: Add tiebraker logic here (split the pot)
     function onLeagueEnd() public onlyTeamDiff {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
-        address winner = leagueMembers[0];
-        // Calculating the winner (may want to just update each week instead of doing this way...)
-        // Save gas: don't say i = 0
-        // Todo: Call MOBALogicLibrary calculateLeagueWinner function
-        // for (uint256 i = 1; i < leagueMembers.length; i++) {
-        //     if (userToTotalWins[leagueMembers[i]] > userToTotalWins[winner]) {
-        //         winner = leagueMembers[i];
-        //     }
-        // }
-        // Approval on front end first, then transfer with the below
-        testUSDC.transferFrom(address(this), winner, contractBalance);
+        // Calculating the winner
+        address[] memory winners = MOBALogicLibrary.calculateLeagueWinners(
+            userToRecord,
+            leagueMembers
+        );
+
+        // Splitting the prize pot in case of a tie
+        uint256 prizePerWinner = contractBalance / winners.length;
+        for (uint256 i; i < winners.length; i++) {
+            // Approval on front end first, then transfer with the below
+            testUSDC.transferFrom(address(this), winners[i], prizePerWinner);
+        }
 
         // emit leagueEnded(winner);
     }
