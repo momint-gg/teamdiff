@@ -31,6 +31,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
+    address[] private leagueWinners;
 
     // League schedule
     struct Matchup {
@@ -74,15 +75,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // Only the admin (whoever created the league) can call
     modifier onlyAdmin() {
         require(msg.sender == admin, "Caller is not the admin");
-        _;
-    }
-
-    // the fuctions only the league maker library should be able to call
-    modifier onlyLeagueMakerLibrary() {
-        require(
-            msg.sender == leagueMakerLibraryAddress,
-            "Caller is not the League Maker Library"
-        );
         _;
     }
 
@@ -173,20 +165,25 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     }
 
     // TODO: Change to private/internal (public for testing)
-    // TODO: Add tiebraker logic here (split the pot)
     function onLeagueEnd() public onlyTeamDiff {
         uint256 contractBalance = stakeAmount * leagueMembers.length;
+
         // Calculating the winner
-        address[] memory winners = MOBALogicLibrary.calculateLeagueWinners(
-            userToRecord,
-            leagueMembers
+        MOBALogicLibrary.calculateLeagueWinners(
+            leagueMembers,
+            userToPoints,
+            leagueWinners
         );
 
         // Splitting the prize pot in case of a tie
-        uint256 prizePerWinner = contractBalance / winners.length;
-        for (uint256 i; i < winners.length; i++) {
+        uint256 prizePerWinner = contractBalance / leagueWinners.length;
+        for (uint256 i; i < leagueWinners.length; i++) {
             // Approval on front end first, then transfer with the below
-            testUSDC.transferFrom(address(this), winners[i], prizePerWinner);
+            testUSDC.transferFrom(
+                address(this),
+                leagueWinners[i],
+                prizePerWinner
+            );
         }
 
         // emit leagueEnded(winner);
@@ -229,7 +226,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         for (uint256 i; i < athleteIds.length; i++) {
             athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek]++;
         }
-        // The below check won't work because there's no way to make sure athletes aren't repeated in each league (as of now)
+        // The below check won't work because there's no way to make sure athletes aren't repeated in each league (as of now). Should we change this?
         // Require non-duplicate athlete IDs in league
         // for (uint256 i; i < athleteIds.length; i++) {
         //     require(
@@ -297,18 +294,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         return admin;
     }
 
-    //Given manually inputted athlete stats, return the calculated
-    //athleteScores.
-    // //Allows verification of our off-chain calculations
-    // function calculateScoreOnChain(Stats calldata athleteStats)
-    //     pure
-    //     public
-    //     returns (uint256 score)  {
-    //     //calculate score with given stats
-    //     //placeholder lol
-    //     return athleteStats.kills * 2;
-    // }
-
     /*****************************************************************/
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
@@ -328,6 +313,9 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         emit Staked(msg.sender, stakeAmount);
     }
 
+    /*****************************************************************/
+    /*******************WHITELIST FUNCTIONS  *************************/
+    /*****************************************************************/
     // Removing a user from the whitelist before the season starts
     function removeFromWhitelist(address _userToRemove) external onlyAdmin {
         require(

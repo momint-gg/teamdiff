@@ -181,41 +181,42 @@ library MOBALogicLibrary {
     }
 
     // Calculating league winner(s)
-    // Tie is worth 1 point while a win is worth 2 points
     function calculateLeagueWinners(
-        mapping(address => uint256[]) storage userToRecord,
-        address[] memory leagueMembers
-    ) external view returns (address[] memory) {
-        // Max points so far
-        uint256 maxPoints;
-        // Array holding the winners of the league (since there can be a tie)
-        address[] memory winners;
+        address[] memory leagueMembers,
+        mapping(address => uint256) storage userToPoints,
+        address[] storage winnersStateArr
+    ) external {
+        uint256 maxPoints; // Max points so far
+        bool[8] memory isWinner; // Seeing if someone is a winner or not, max league size is 8
+
         for (uint256 i; i < leagueMembers.length; i++) {
-            uint256 currPoints;
-            for (uint256 j; j < userToRecord[leagueMembers[i]].length; j++) {
-                if (userToRecord[leagueMembers[i]][j] == 1) {
-                    // Win = 2 points
-                    currPoints += 2;
+            // New winner -- clear array and add new winner
+            if (userToPoints[leagueMembers[i]] > maxPoints) {
+                // Updating max points
+                maxPoints = userToPoints[leagueMembers[i]];
+                // Setting everything except the winner to false
+                for (uint256 j; j < i; j++) {
+                    isWinner[j] = false;
                 }
-                if (userToRecord[leagueMembers[i]][j] == 2) {
-                    // Tie = 1 point
-                    currPoints += 1;
+                isWinner[i] = true;
+                for (uint256 j = i + 1; j < leagueMembers.length; j++) {
+                    isWinner[j] = false;
                 }
             }
-
-            // New winner: clear array and add winner
-            if (currPoints > maxPoints) {
-                maxPoints = currPoints;
-                winners[0] = leagueMembers[i];
-            }
-
-            // Tie: add new winner to winners array
-            // TODO: Figure out how to add to the array (might need to make total points mapping)
-            if (currPoints == maxPoints) {
-                winners[winners.length] = leagueMembers[i];
+            // Tie -- set winner to true
+            if (userToPoints[leagueMembers[i]] == maxPoints) {
+                isWinner[i] = true;
             }
         }
-        return winners;
+
+        // Creating our winners array
+        uint256 count;
+        for (uint256 i; i < isWinner.length; i++) {
+            if (isWinner[i]) {
+                winnersStateArr.push(leagueMembers[i]);
+                count++;
+            }
+        }
     }
 
     function calculateScoreOnChain(
