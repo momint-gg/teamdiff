@@ -1,11 +1,5 @@
 import React from "react";
-
-const container = {
-  maxWidth: "1320px",
-  marginRight: "2rem",
-  marginLeft: "2rem",
-  color: "white",
-};
+import { Box } from "@mui/system";
 
 const marginTop = {
   marginTop: "1rem",
@@ -13,7 +7,14 @@ const marginTop = {
 
 export default function PrivacyPolicy() {
   return (
-    <div style={container}>
+    <Box
+      sx={{
+        maxWidth: "1320px",
+        marginRight: { lg: "2rem", xs: 0 },
+        marginLeft: { lg: "2rem", xs: 0 },
+        color: "white",
+      }}
+    >
       <h1 style={marginTop}>Privacy Policy</h1>
       <p>Last updated: March 21, 2022</p>
       <p>
@@ -189,7 +190,7 @@ export default function PrivacyPolicy() {
             rel="external nofollow noopener"
             target="_blank"
           >
-            https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_
+            Adobe's website.
           </a>
         </li>
         <li>
@@ -499,6 +500,6 @@ export default function PrivacyPolicy() {
           <p>By email: teamdiffgg@gmail.com</p>
         </li>
       </ul>
-    </div>
+    </Box>
   );
 }

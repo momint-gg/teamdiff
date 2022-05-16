@@ -1,11 +1,5 @@
 import React from "react";
-
-const container = {
-  maxWidth: "1320px",
-  marginRight: "2rem",
-  marginLeft: "2rem",
-  color: "white",
-};
+import { Box } from "@mui/system";
 
 const marginTop = {
   marginTop: "1rem",
@@ -17,7 +11,14 @@ const underline = {
 
 export default function TermsOfService() {
   return (
-    <div style={container}>
+    <Box
+      sx={{
+        maxWidth: "1320px",
+        marginRight: { lg: "2rem", xs: 0 },
+        marginLeft: { lg: "2rem", xs: 0 },
+        color: "white",
+      }}
+    >
       <h1 style={marginTop}>Terms of Service</h1>
       <p>Last updated: May 12, 2022</p>
       <p>
@@ -515,6 +516,6 @@ export default function TermsOfService() {
         severable from these Terms and does not affect the validity and
         enforceability of any remaining provisions.
       </p>
-    </div>
+    </Box>
   );
 }

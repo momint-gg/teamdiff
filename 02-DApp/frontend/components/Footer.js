@@ -6,26 +6,37 @@ export default function Footer() {
   return (
     <Box
       backgroundColor="primary.dark"
-      padding={2}
-      marginLeft={5}
-      marginRight={5}
+      sx={{
+        paddingTop: "1rem",
+        paddingBottom: "1rem",
+        marginRight: { lg: "1rem", xs: 0 },
+        marginLeft: { lg: "1rem", xs: 0 },
+        textAlign: "center",
+      }}
     >
       <hr style={{ color: "white", backgroundColor: "white", height: "5px" }} />
       <Box
         sx={{
-          flexDirection: "row",
+          flexDirection: { lg: "row", xs: "column" },
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: { lg: "space-between", xs: "center" },
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: { xs: "center" },
+            marginBottom: "1rem",
+          }}
+        >
           <Typography color="white">
             <Link
               variant="inherit"
               underline="none"
               href="/privacy"
               sx={{
-                marginLeft: "2rem",
+                marginLeft: { lg: "2rem", xs: "1rem" },
                 color: "rgb(214, 214, 214)",
                 opacity: "90%",
                 fontWeight: "900",
@@ -82,7 +93,8 @@ export default function Footer() {
           sx={{
             textAlign: "center",
             color: "rgb(214, 214, 214)",
-            marginRight: "8rem",
+            marginRight: { lg: "8rem", xs: 0 },
+            marginBottom: "1rem",
           }}
         >
           © 2022 TeamDiff LLC
@@ -91,7 +103,7 @@ export default function Footer() {
           sx={{
             flexDirection: "row",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: { lg: "space-between", xs: "center" },
           }}
         >
           <Link
@@ -148,7 +160,7 @@ export default function Footer() {
             href="mailto:teamdiffgg@gmail.com"
             target="_blank"
             sx={{
-              marginRight: "2rem",
+              marginRight: { lg: "2rem", xs: "1.5rem" },
               color: "rgb(214, 214, 214)",
               opacity: "90%",
               fontWeight: "900",
