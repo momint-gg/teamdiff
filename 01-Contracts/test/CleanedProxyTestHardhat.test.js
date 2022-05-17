@@ -97,6 +97,16 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       "Athletes Contract Deployed to: " + AthletesContractInstance.address
     );
 
+    // Need to prompt allowance before making the league (happens after u click "create new league" button on frontend)
+    console.log(
+      "Owner/league creator, ",
+      owner.address,
+      "balance before createLeague(): ",
+      Number(await testUsdcContract.balanceOf(owner.address))
+    );
+    let approval = await testUsdcContract.approve(owner.address, 30); // Insert whatever stake amount they specify
+    await approval.wait();
+
     //Create League Maker Instance (no library needed anymore)
     LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
     LeagueMakerInstance = await LeagueMakerFactory.deploy(
@@ -107,16 +117,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     );
     await LeagueMakerInstance.deployed();
     console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
-
-    // Need to prompt allowance before making the league (happens after u click "create new league" button on frontend)
-    console.log(
-      "Owner/league creator, ",
-      owner.address,
-      "balance before createLeague(): ",
-      Number(await testUsdcContract.balanceOf(owner.address))
-    );
-    let approval = await testUsdcContract.approve(owner.address, 30); // Insert whatever stake amount they specify
-    await approval.wait();
 
     // Making the new proxy league
     var txn = await LeagueMakerInstance.connect(owner).createLeague(
@@ -309,7 +309,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // Owner stakes their currency when they call createLeague(), and addr1 stakes when they joinLeague()
 
   // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once -- changed structure (not in LeagueMaker anymore)
-  // LETS FUCKING GO IT WORKS NOW
   it("Makes sure schedules aren't set before calling the function", async () => {
     let schedule = await proxyContract.getScheduleForWeek(0); // Number of players in schedule
     expect(schedule.length).to.equal(0); // Schedule shouldn't be set yet
