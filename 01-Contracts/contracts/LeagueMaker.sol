@@ -4,8 +4,10 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./LeagueBeaconProxy.sol";
 import "./Athletes.sol";
+import "./GameItems.sol";
 import "./TestUSDC.sol";
 
 // import "@openzeppelin/contracts/access/Ownable.sol";
@@ -25,6 +27,13 @@ contract LeagueMaker is Ownable {
 
     // ======== Immutable storage ========
     UpgradeableBeacon immutable upgradeableBeacon;
+    address immutable teamDiffAddress;
+    // TODO: Make the Athletes and GameItems contracts immutable in LOL Logic, can't get working right now
+    // Issue is that proxy vars are initializes with initialize() function and not a constructor, and you cannot initialize immutable vars unless it's in a constructor. So we're stuck
+    // Unless we just deploy them first, manually put those addresses ^ into our LOL Logic constructor, etc. but that might be bad practice
+    // Might want to discuss the above ^ as a team
+    // Athletes immutable athletesContract;
+    // GameItems immutable gameItemsContract;
 
     // For staking
     TestUSDC testUSDC;
@@ -43,9 +52,9 @@ contract LeagueMaker is Ownable {
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
     // ======== Constructor ========
-    // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
+        teamDiffAddress = msg.sender; // Creating the teamDiffAddress
     }
 
     // ======== Deploy New League Proxy ========
@@ -53,32 +62,29 @@ contract LeagueMaker is Ownable {
         string calldata _name,
         uint256 _stakeAmount,
         bool _isPublic,
-        address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
         address _athletesContractAddress,
         address _gameItemsContractAddress
-    )
-        external
-        returns (
-            //address _gameItemsAddress
-            address
-        )
-    {
+    ) external returns (address) {
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,bool,address,address,address,address,address,address,address)",
             _name,
             _stakeAmount,
             _isPublic,
             _athletesContractAddress,
-            _adminAddress,
-            // _polygonUSDCAddress,
+            msg.sender, // I was wrong before.. msg.sender IS the admin
             _rinkebyUSDCAddress,
             _testUSDCAddress,
             _gameItemsContractAddress,
-            // leagueMakerLibraryAddress, // Adding in library address
-            msg.sender, //TeamDiff address (deployer of LeagueMaker)
+            teamDiffAddress,
             address(this)
-            // _gameItemsAddress
+        );
+
+        // Make sure the creator of the league has enough USDC
+        require(
+            IERC20(_testUSDCAddress).balanceOf(address(msg.sender)) >=
+                _stakeAmount,
+            "Creator of league needs enough USDC (equal to specified stake amount)."
         );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
@@ -86,12 +92,21 @@ contract LeagueMaker is Ownable {
             delegateCallData
         );
 
+        // Creator of the league staking their initial currency
+        // TODO: Test different address that isn't also TeamDiff owner making a league and make sure the owner initial staking works
+        console.log("Msg.sender in createLeague() is ", msg.sender);
+        IERC20(_testUSDCAddress).transferFrom(
+            msg.sender,
+            address(proxy),
+            _stakeAmount
+        );
+
         leagueAddresses.push(address(proxy));
-        userToLeagueMap[_adminAddress].push(address(proxy));
+        userToLeagueMap[msg.sender].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 
-        emit LeagueCreated(_name, address(proxy), _adminAddress);
-        // delete parameters;
+        emit LeagueCreated(_name, address(proxy), msg.sender);
+
         return address(proxy);
     }
 

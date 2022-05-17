@@ -37,7 +37,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     struct Matchup {
         address[2] players;
     }
-
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
@@ -54,19 +53,17 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
     // Won't want to make whitelist immutable
-    Athletes athletesContract;
     Whitelist whitelistContract;
-    LeagueMaker leagueMakerContract;
     IERC20 public testUSDC;
+    Athletes athletesContract;
     GameItems gameItemsContract;
-    address leagueMakerLibraryAddress;
 
     //**************/
     //*** Events ***/
     /***************/
     event Staked(address sender, uint256 amount);
     event testUSDCDeployed(address sender, address contractAddress);
-    event leagueEnded(address winner);
+    event leagueEnded(address[] winner, uint256 prizePotPerWinner);
 
     //*****************/
     //*** Modifiers ***/
@@ -98,7 +95,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         address _teamDiffAddress,
         address _leagueMakerContractAddress
     ) public initializer {
-        //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
         numWeeks = 8;
         // Setting up the admin role
@@ -110,12 +106,13 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         leagueEntryIsClosed = false;
         lineupIsLocked = false;
         athletesContract = Athletes(athletesDataStorageAddress);
-        leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
-        whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
+        // leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
+        whitelistContract = new Whitelist(); // Initializing our whitelist
         rinkebyUSDCAddress = _rinkebyUSDCAddress;
         testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
+        // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
         console.log("Proxy initialized!");
     }
 
@@ -164,77 +161,103 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         currentWeekNum++;
     }
 
-    // TODO: Change to private/internal (public for testing)
-    function onLeagueEnd() public onlyTeamDiff {
-        uint256 contractBalance = stakeAmount * leagueMembers.length;
+    // Creator of the league staking USDC
+    // function adminStake(address _adminAddress) public {
+    //     // console.log("Msg.sender in adminStake() is ", msg.sender);
+    //     require(
+    //         testUSDC.balanceOf(msg.sender) > stakeAmount,
+    //         "Insufficent funds for staking"
+    //     );
+    //     console.log("Creator of league is staking their currency...");
+    //     // Remember to first prompt approval for transfer on frontend
+    //     testUSDC.transferFrom(_adminAddress, address(this), stakeAmount);
+    //     console.log("Creator of league has successfully staked their currency");
+    // }
 
-        // Calculating the winner
+    /******************************************************/
+    /*************** STAKING/LEAGUE FUNCTIONS *************/
+    /******************************************************/
+    // Returning the contracts USDC balance
+    function getContractUSDCBalance() external view returns (uint256) {
+        return testUSDC.balanceOf(address(this));
+    }
+
+    // // Returning the sender's USDC balance (testing)
+    // function getUserUSDCBalance() external view returns (uint256) {
+    //     require(inLeague[msg.sender]);
+    //     return testUSDC.balanceOf(msg.sender);
+    // }
+
+    // User joining the league
+    function joinLeague() external onlyWhitelisted nonReentrant {
+        require(!leagueEntryIsClosed, "League Entry is Closed!");
+        require(!inLeague[msg.sender], "You have already joined this league");
+        require(
+            testUSDC.balanceOf(msg.sender) > stakeAmount,
+            "Insufficent funds for staking"
+        );
+
+        inLeague[msg.sender] = true;
+        leagueMembers.push(msg.sender);
+
+        testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
+        emit Staked(msg.sender, stakeAmount);
+    }
+
+    // // TODO: Change to private/internal (public for testing)
+    function onLeagueEnd() public onlyTeamDiff {
+        uint256 contractBalance = leagueMembers.length * stakeAmount; // TODO change to balance of function? Might be a bit more foolproof...
+
+        // Calculating the winner(s)
         MOBALogicLibrary.calculateLeagueWinners(
             leagueMembers,
             userToPoints,
             leagueWinners
         );
 
+        for (uint256 i; i < leagueWinners.length; i++) {
+            console.log(leagueWinners[i]);
+        }
+
         // Splitting the prize pot in case of a tie
         uint256 prizePerWinner = contractBalance / leagueWinners.length;
+        console.log("League winners len is ", leagueWinners.length);
+        console.log("Prize per winner is : ", prizePerWinner);
+
+        // Emitting event so we can see the winners and how much each should get
+        emit leagueEnded(leagueWinners, prizePerWinner);
+
         for (uint256 i; i < leagueWinners.length; i++) {
-            // Approval on front end first, then transfer with the below
+            // Approval first, then transfer with the below
+            testUSDC.approve(address(this), prizePerWinner);
             testUSDC.transferFrom(
                 address(this),
                 leagueWinners[i],
                 prizePerWinner
             );
         }
-
-        // emit leagueEnded(winner);
-    }
-
-    /******************************************************/
-    /***************** STAKING FUNCTIONS ******************/
-    /******************************************************/
-
-    // Returning the contracts USDC balance
-    function getUSDCBalance() external view returns (uint256) {
-        require(inLeague[msg.sender]);
-        return testUSDC.balanceOf(address(this));
-    }
-
-    // Returning the sender's USDC balance (testing)
-    function getUserUSDCBalance() external view returns (uint256) {
-        require(inLeague[msg.sender]);
-        return testUSDC.balanceOf(msg.sender);
     }
 
     //***************************************************/
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
+    // TODO: Move requires to a library to save space (MOBALogicLibrary)
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
 
-        uint256 currentWeek = leagueMakerContract.currentWeek();
-
         //Decrement all athleteToLineup Occurences from previous lineup
         for (uint256 i; i < userToLineup[msg.sender].length; i++) {
             athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
-                currentWeek
+                currentWeekNum
             ]--;
         }
 
         // Require ownership of all athleteIds + update mapping
         for (uint256 i; i < athleteIds.length; i++) {
-            athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek]++;
+            athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
         }
-        // The below check won't work because there's no way to make sure athletes aren't repeated in each league (as of now). Should we change this?
-        // Require non-duplicate athlete IDs in league
-        // for (uint256 i; i < athleteIds.length; i++) {
-        //     require(
-        //         athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeek] ==
-        //             1,
-        //         "Duplicate athleteIDs are not allowed."
-        //     );
-        // }
 
         // Requiring the user has ownership of the athletes
         for (uint256 i; i < athleteIds.length; i++) {
@@ -266,14 +289,14 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     }
 
     // For testing if join league function Works
-    function getUsersLength() external view returns (uint256) {
-        return leagueMembers.length;
-    }
+    // function getUsersLength() external view returns (uint256) {
+    //     return leagueMembers.length;
+    // }
 
     // Getting lineupIsLocked (TODO: Comment out for prod)
-    function getLineupIsLocked() external view returns (bool) {
-        return lineupIsLocked;
-    }
+    // function getLineupIsLocked() external view returns (bool) {
+    //     return lineupIsLocked;
+    // }
 
     // You need to call an index when getting a mapping. More convenient to have a getter so we can return whole lineup
     function getLineup(address _user) public view returns (uint256[] memory) {
@@ -294,24 +317,12 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         return admin;
     }
 
+    // Necessary: Returning the winners of the league
+    // function getWinners() public view returns(address [] memory)
+
     /*****************************************************************/
     /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
     /*****************************************************************/
-    // User joining the league
-    function joinLeague() external onlyWhitelisted nonReentrant {
-        require(!leagueEntryIsClosed, "League Entry is Closed!");
-        require(!inLeague[msg.sender], "You have already joined this league");
-        require(
-            testUSDC.balanceOf(msg.sender) > stakeAmount,
-            "Insufficent funds for staking"
-        );
-
-        inLeague[msg.sender] = true;
-        leagueMembers.push(msg.sender);
-
-        testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-        emit Staked(msg.sender, stakeAmount);
-    }
 
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
@@ -322,12 +333,15 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
             !leagueEntryIsClosed,
             "Nobody can enter/exit the league anymore. The season has started!"
         );
-
         whitelistContract.removeAddressFromWhitelist(_userToRemove);
     }
 
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
+        require(
+            !leagueEntryIsClosed,
+            "Nobody can enter/exit the league anymore. The season has started!"
+        );
         whitelistContract.addAddressToWhitelist(_userToAdd);
     }
 }

@@ -219,6 +219,9 @@ library MOBALogicLibrary {
         }
     }
 
+    // Making sure a lineup is valid -- moving setLineup requires to external function (TODO)
+    function checkValidLineup() external returns (bool) {}
+
     function calculateScoreOnChain(
         LeagueOfLegendsLogic.Stats calldata athleteStats
     ) public pure returns (uint256) {

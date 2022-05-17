@@ -69,14 +69,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       LeagueOfLegendsLogicInstance.address
     );
 
-    //Create League Maker Instance (no library needed anymore)
-    LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
-    LeagueMakerInstance = await LeagueMakerFactory.deploy(
-      LeagueOfLegendsLogicInstance.address
-    );
-    await LeagueMakerInstance.deployed();
-    console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
-
     //Create Beacon Instance
     BeaconFactory = await ethers.getContractFactory("UpgradeableBeacon");
     BeaconInstance = await BeaconFactory.deploy(
@@ -101,15 +93,37 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
     await AthletesContractInstance.deployed();
     AthletesContractInstance.connect(owner);
-    console.log("Test USDC Deployed to: " + AthletesContractInstance.address);
+    console.log(
+      "Athletes Contract Deployed to: " + AthletesContractInstance.address
+    );
 
-    // User creating a league proxy instance
-    console.log("User address is ", owner.address);
-    var txn = await LeagueMakerInstance.createLeague(
+    //Create League Maker Instance (no library needed anymore)
+    LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
+    LeagueMakerInstance = await LeagueMakerFactory.deploy(
+      LeagueOfLegendsLogicInstance.address
+      // Don't pass these in anymore... when I was trying to initialize as immutable
+      // AthletesContractInstance.address,
+      // GameItemsInstance.address
+    );
+    await LeagueMakerInstance.deployed();
+    console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
+
+    // Need to prompt allowance before making the league (happens after u click "create new league" button on frontend)
+    console.log(
+      "Owner/league creator, ",
+      owner.address,
+      "balance before createLeague(): ",
+      Number(await testUsdcContract.balanceOf(owner.address))
+    );
+    let approval = await testUsdcContract.approve(owner.address, 30); // Insert whatever stake amount they specify
+    await approval.wait();
+
+    // Making the new proxy league
+    var txn = await LeagueMakerInstance.connect(owner).createLeague(
       "best league", // League name
       10, // Stake amount
       true, // Is public
-      owner.address, // Admin for league proxy
+      // owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
       testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
       AthletesContractInstance.address, // Address of our athletes storage contract
       GameItemInstance.address // GameItems contract address
@@ -291,7 +305,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     );
   });
 
-  // NOTE: Now the league has owner and addr1 in it
+  // NOTE: Now the league has owner and addr1 in it, with a total staked amount of 20
+  // Owner stakes their currency when they call createLeague(), and addr1 stakes when they joinLeague()
 
   // 3. Testing out LeagueMaker functions -- AKA functions executed for all proxies at once -- changed structure (not in LeagueMaker anymore)
   // LETS FUCKING GO IT WORKS NOW
@@ -522,19 +537,28 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
 
   // Just 2 players so there won't be a bye week in this scenario
   // In this test entire league is basically 1 match, just testing prize pot
+  // NOTE: On the frontend, we will listen for the event "leagueEnded" which will signal when the league ends and have the prize pot amount per winner (in case of a tie)
   it("Correctly delegates the prize pot, with tiebraker logic as well", async () => {
-    const delegatePool = await proxyContract.connect(owner).onLeagueEnd();
+    // Contract allowance
     const prizePoolAmount = Number(
-      await testUsdcContract.balanceOf(proxyContract.address)
+      await proxyContract.getContractUSDCBalance()
     );
+    console.log("Prize pool amount in test is ", prizePoolAmount);
+    let approval = await testUsdcContract
+      .connect(owner)
+      .approve(proxyContract.address, prizePoolAmount);
+    await approval.wait();
+
+    // League ending
+    const endLeague = await proxyContract.connect(owner).onLeagueEnd();
+
+    // Making sure balances are correct
     const oldOwnerBalance = Number(
       await testUsdcContract.balanceOf(owner.address)
     );
     const oldAddr1Balance = Number(
       await testUsdcContract.balanceOf(addr1.address)
     );
-
-    // Making sure balances are correct
     if (ownerWins) {
       // Owner gets entire pot
       expect(
