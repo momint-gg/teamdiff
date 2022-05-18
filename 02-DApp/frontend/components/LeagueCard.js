@@ -87,7 +87,7 @@ export default function LeagueCard({ leagueAddress }) {
         /> */}
         <Box sx={{ marginLeft: 2 }}>
           <Typography variant="h5" color="secondary" component="div">
-            {leagueName}
+            {leagueName? leagueName : "(Untitled)"}
           </Typography>
 
           <Typography variant="body1" color="inherit">

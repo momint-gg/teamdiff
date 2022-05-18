@@ -72,7 +72,6 @@ contract Whitelist is Ownable {
     {
         for (uint256 i = 0; i < addrs.length; i++) {
             if (addAddressToWhitelist(addrs[i])) {
-                numWhitelisted += 1;
                 success = true;
             }
         }
@@ -110,7 +109,6 @@ contract Whitelist is Ownable {
     {
         for (uint256 i = 0; i < addrs.length; i++) {
             if (removeAddressFromWhitelist(addrs[i])) {
-                numWhitelisted -= 1;
                 success = true;
             }
         }

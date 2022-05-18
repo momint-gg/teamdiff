@@ -23,6 +23,7 @@ import { FaCrown } from "react-icons/fa";
 //Router
 import { useRouter } from 'next/router'
 
+import { useMediaQuery } from "react-responsive";
 
 export default function Play() {
   //Router
@@ -53,41 +54,7 @@ export default function Play() {
     setMenu(false);
   };
 
-  const myLeagues = (
-    <Fragment>
-      <CardContent sx={{ textAlign: "center" }}>
-        <Typography variant="h5" color="secondary" component="div">
-          My Leagues
-        </Typography>
-        <GiPodium />
-      </CardContent>
-      <CardActions></CardActions>
-    </Fragment>
-  );
-
-  const joinLeague = (
-    <Fragment>
-      <CardContent sx={{ textAlign: "center" }}>
-        <Typography variant="h5" color="secondary" component="div">
-          Join League
-        </Typography>
-        <MdGroupAdd />
-      </CardContent>
-      <CardActions></CardActions>
-    </Fragment>
-  );
-
-  const createLeague = (
-    <Fragment>
-      <CardContent sx={{ textAlign: "center" }}>
-        <Typography variant="h5" color="secondary" component="div">
-          Create League
-        </Typography>
-        <FaCrown />
-      </CardContent>
-      <CardActions></CardActions>
-    </Fragment>
-  );
+  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" });
 
   // const handleViewLeaguesClick = (e) => {
   //   e.preventDefault()
@@ -123,12 +90,26 @@ export default function Play() {
               {joinLeague}
             </Card>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isMobile ? 12 : 4}>
             <Card
               variant="outlined"
               onClick={() =>  router.push("/createLeague")}
             >
-              {createLeague}
+              <Fragment>
+                <CardContent sx={{ textAlign: "center" }}>
+                  {isMobile ? (
+                    <Typography color="secondary" component="div" fontSize={18}>
+                      Create League
+                    </Typography>
+                  ) : (
+                    <Typography variant="h5" color="secondary" component="div">
+                      Create League
+                    </Typography>
+                  )}
+                  <FaCrown size={"3rem"} />
+                </CardContent>
+                <CardActions></CardActions>
+              </Fragment>
             </Card>
           </Grid>
         </Grid>

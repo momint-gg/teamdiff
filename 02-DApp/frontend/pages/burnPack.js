@@ -22,8 +22,9 @@ import {
   Fab,
   Grid,
 } from "@mui/material";
-import CONSTANTS from "../Constants.js";
-import GameItemsJSON from "../utils/GameItems.json";
+// import CONSTANTS from "../Constants.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import AthleteCard from "../components/AthleteCard";
 import profilePic from "../assets/images/starter-pack.png";
 
@@ -48,7 +49,7 @@ export default function BurnPack({ setDisplay }) {
     if (accountData) {
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
-        CONSTANTS.CONTRACT_ADDR,
+        CONTRACT_ADDRESSES.GameItems,
         GameItemsJSON.abi,
         provider
       );

@@ -20,8 +20,9 @@ import {
   Fab,
 } from "@mui/material";
 import Image from "next/image";
-import CONSTANTS from "../Constants.js";
-import GameItemsJSON from "../utils/GameItems.json";
+// import CONSTANTS from "../Constants.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
@@ -49,7 +50,7 @@ export default function MintPack({ setDisplay }) {
     if (accountData) {
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
-        CONSTANTS.CONTRACT_ADDR,
+        CONTRACT_ADDRESSES.GameItems,
         GameItemsJSON.abi,
         provider
       );
@@ -57,7 +58,7 @@ export default function MintPack({ setDisplay }) {
 
       // Grab packs available
       const packsAvail = await GameItemsContract.packsAvailable();
-      setPacksAvailable(packsAvail);
+      setPacksAvailable(packsAvail.toNumber());
 
       // Callback for when packMinted Events is fired from contract
       const signerAddress = accountData.address;
@@ -109,7 +110,6 @@ export default function MintPack({ setDisplay }) {
       <Fab
         variant="extended"
         size="small"
-        color="primary"
         aria-label="add"
         onClick={() => setDisplay(false)}
       >
@@ -162,7 +162,11 @@ export default function MintPack({ setDisplay }) {
             </Typography>
             {packsAvailable != null && (
               <Typography variant="h4" color="white" component="div">
-                {"There are " + packsAvailable + " packs still available"}
+                There are{" "}
+                <Box fontWeight="fontWeightBold" display="inline">
+                  {packsAvailable}
+                </Box>{" "}
+                packs still available
               </Typography>
             )}
           </Box>

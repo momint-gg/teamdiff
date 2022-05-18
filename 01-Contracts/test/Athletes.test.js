@@ -1,6 +1,5 @@
 const { expect } = require("chai");
 const hre = require("hardhat");
-const Athletes = artifacts.require("Athletes.sol");
 
 describe("Athletes.test", async () => {
   var owner;

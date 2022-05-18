@@ -5,8 +5,9 @@ const constructorArgs = require("../../constructorArgs");
 
 
 const main = async () => {
+  console.log("deploying...");
   let textData = "";
-
+  
   //Create GameItems Instance
   // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
   // //const gameContract = await gameContractFactory.deploy(...constructorArgs);
@@ -26,8 +27,8 @@ const main = async () => {
   // await txn.wait();
 
   // textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
-
-
+  // consolge.log("exports.GameItems = \'" + gameContract.address + "\';\n");
+  
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
     "MOBALogicLibrary"
@@ -40,17 +41,18 @@ const main = async () => {
   );
   textData += "exports.MOBALogicLibrary = \'" + MOBALogicLibraryInstance.address + "\';\n";
 
+  
   //Create League Maker Library Instance
-  const LeagueMakerLibraryFactory = await ethers.getContractFactory(
-    "LeagueMakerLibrary"
-  );
-  const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
-  await LeagueMakerLibraryInstance.deployed();
-  console.log(
-    "LeagueMakerLibrary deployed to:",
-    LeagueMakerLibraryInstance.address
-  );
-  textData += "exports.LeagueMakerLibrary = \'" + LeagueMakerLibraryInstance.address + "\';\n";
+  // const LeagueMakerLibraryFactory = await ethers.getContractFactory(
+  //   "LeagueMakerLibrary"
+  // );
+  // const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
+  // await LeagueMakerLibraryInstance.deployed();
+  // console.log(
+  //   "LeagueMakerLibrary deployed to:",
+  //   LeagueMakerLibraryInstance.address
+  // );
+  // textData += "exports.LeagueMakerLibrary = \'" + LeagueMakerLibraryInstance.address + "\';\n";
 
 
   //Create Game Logic Instance
@@ -73,11 +75,7 @@ const main = async () => {
 
 
   //Create League Maker Instance
-  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker", {
-    libraries: {
-      LeagueMakerLibrary: LeagueMakerLibraryInstance.address,
-    },
-  });
+  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
 
   const LeagueMakerInstance = await LeagueMakerFactory.deploy(
     LeagueOfLegendsLogicInstance.address
@@ -131,8 +129,8 @@ const main = async () => {
 
   })
 
-  //Note this isn't tested but should work
-  let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic']
+  //This copies the abi from our build folder to a dedicated folder in the backend folder
+  let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic', "GameItems"]
   contractNames.forEach(async (contractName) => {
     srcPath = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
     backendPath = "../02-DApp/backend/contractscripts/contract_info/abis/" + contractName + ".json";
@@ -148,6 +146,7 @@ const main = async () => {
     })
 
   })
+  
 
 };
 

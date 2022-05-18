@@ -3,10 +3,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import {
   Box,
   Typography,
-  Button,
-  Chip,
-  Container,
-  Paper,
   Fab,
 } from "@mui/material";
 //Component Imports
@@ -191,19 +187,18 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
       {/* <Fab
         variant="extended"
         size="small"
-        color="primary"
         aria-label="add"
         onClick={() => setDisplay(false)}
       >
         &#60; BACK
       </Fab> */}
 
-      <Typography variant="h3" color="secondary" component="div">
+      <Typography variant="h3" color="secondary" component="div" marginTop={2}>
         YOUR WHITELISTED LEAGUES
       </Typography>
       <hr
         style={{
-          color: "secondary",
+          color: "white",
           backgroundColor: "secondary",
           height: 5,
         }}
@@ -220,7 +215,7 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
       </Typography>
       <hr
         style={{
-          color: "secondary",
+          color: "white",
           backgroundColor: "secondary",
           height: 5,
         }}
