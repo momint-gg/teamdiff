@@ -68,8 +68,8 @@ contract LeagueMaker is Ownable {
         address _athletesContractAddress,
         address _gameItemsContractAddress
     ) external returns (address) {
-        constructorContractAddresses[2] = _testUSDCAddress;
-        constructorContractAddresses[3] = _athletesContractAddress;
+        // constructorContractAddresses[2] = _testUSDCAddress;
+        // constructorContractAddresses[3] = _athletesContractAddress;
         // constructorContractAddress[4] = address(this);
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,bool,address,address,address,address,address,address,address)",

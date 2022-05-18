@@ -10,4 +10,5 @@ cache
 artifacts
 *.dbg.json
 
-buil\contracts\contracts
+build\contracts\contracts
+01-Contracts\build\contracts\contracts
