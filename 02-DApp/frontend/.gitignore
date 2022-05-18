@@ -26,6 +26,7 @@ yarn-error.log*
 *.dbg.json
 build-info
 /build/contracts/contracts
+01-Contracts\build\contracts\contracts
 
 # local env files
 .env.local
