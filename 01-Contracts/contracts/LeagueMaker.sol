@@ -39,7 +39,7 @@ contract LeagueMaker is Ownable {
     uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
-
+    address[5] constructorContractAddresses = [_polygonUSDCAddress, _rinkebyUSDCAddress, address(0), address(0), address(this)];
     // address _teamDiffAddress = 0x3736306384bd666D6166e639Cf1b36EBaa818875; // What wallet address we're going to have
 
     // ======== Constructor ========
@@ -55,23 +55,30 @@ contract LeagueMaker is Ownable {
         bool _isPublic,
         address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
-        address _athletesContractAddress
+        address _athletesContractAddress,
+        address[] calldata _whitelistUsers
         //address _gameItemsAddress
     ) external returns (address) {
+        constructorContractAddresses[2] = _testUSDCAddress;
+        constructorContractAddresses[3] = _athletesContractAddress;
+        // constructorContractAddress[4] = address(this);
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,bool,address,address,address,address,address,address)",
+            "initialize(string,uint256,bool,address,address[5],address[])",
+            // "initialize(string,uint256,bool,address,address,address,address,address,address,address[])",
             _name,
             //_version,
             //_numWeeks,
             _stakeAmount,
             _isPublic,
-            _athletesContractAddress,
             _adminAddress,
-            _polygonUSDCAddress,
-            _rinkebyUSDCAddress,
-            _testUSDCAddress,
+            constructorContractAddresses,
+            // _athletesContractAddress,
+            // _polygonUSDCAddress,
+            // _rinkebyUSDCAddress,
+            // _testUSDCAddress,
             // _teamDiffAddress,
-            address(this)
+            // address(this)
+           _whitelistUsers
            // _gameItemsAddress
         );
 

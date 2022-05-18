@@ -102,14 +102,16 @@ contract LeagueOfLegendsLogic is
         //uint256 _numWeeks,
         uint256 _stakeAmount,
         bool _isPublic,
-        address athletesDataStorageAddress,
+        // address athletesDataStorageAddress,
         //address _owner,
         address _admin,
-        address _polygonUSDCAddress,
-        address _rinkebyUSDCAddress,
-        address _testUSDCAddress,
-        address leagueMakerContractAddress
+        address[5] calldata constructorContractAddresses,
+        // address _polygonUSDCAddress,
+        // address _rinkebyUSDCAddress,
+        // address _testUSDCAddress,
+        // address leagueMakerContractAddress
         // address gameItemsContractAddress
+        address[] calldata whitelistUsers
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
@@ -122,12 +124,13 @@ contract LeagueOfLegendsLogic is
         isPublic = _isPublic;
         lineupIsLocked = false;
         leagueEntryIsClosed = false;
-        athletesContract = Athletes(athletesDataStorageAddress);
-        leagueMakerContract = LeagueMaker(leagueMakerContractAddress);
+        athletesContract = Athletes(constructorContractAddresses[3]);
+        leagueMakerContract = LeagueMaker(constructorContractAddresses[4]);
         whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
-        polygonUSDCAddress = _polygonUSDCAddress;
-        rinkebyUSDCAddress = _rinkebyUSDCAddress;
-        testUSDC = IERC20(_testUSDCAddress);
+        whitelistContract.addAddressesToWhitelist(whitelistUsers);
+        polygonUSDCAddress = constructorContractAddresses[0];
+        rinkebyUSDCAddress = constructorContractAddresses[1];
+        testUSDC = IERC20(constructorContractAddresses[2]);
         //gameItemsContract = GameItems(gameItemsContractAddress);
         //gameItemsContract = address(0);
         console.log("Proxy initialized!");
