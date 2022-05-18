@@ -9,6 +9,5 @@ hardhat.config.js
 cache
 artifacts
 *.dbg.json
-
-build\contracts\contracts
-01-Contracts\build\contracts\contracts
+build\contracts\contracts\*
+01-Contracts\build\contracts\contracts\*
