@@ -109,7 +109,7 @@ contract GameItems is ERC1155, Ownable {
     /******************* WHITELIST ***********************/
     /*****************************************************/
     function addUserToWhitelist(address _userToAdd)
-        external
+        public
         onlyOwner
         returns (bool success)
     {
@@ -120,8 +120,20 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    function removeAddressFromWhitelist(address _userToRemove)
-        external
+    function addUsersToWhitelist(address[] memory addrs)
+        public
+        onlyOwner
+        returns (bool success)
+    {
+        for (uint256 i = 0; i < addrs.length; i++) {
+            if (addUserToWhitelist(addrs[i])) {
+                success = true;
+            }
+        }
+    }
+
+    function removeUserFromWhitelist(address _userToRemove)
+        public
         onlyOwner
         returns (bool success)
     {
@@ -129,6 +141,18 @@ contract GameItems is ERC1155, Ownable {
             whitelist[_userToRemove] = false;
             numWhitelisted -= 1;
             success = true;
+        }
+    }
+
+    function removeUsersFromWhitelist(address[] memory addrs)
+        public
+        onlyOwner
+        returns (bool success)
+    {
+        for (uint256 i = 0; i < addrs.length; i++) {
+            if (removeUserFromWhitelist(addrs[i])) {
+                success = true;
+            }
         }
     }
 
@@ -190,7 +214,7 @@ contract GameItems is ERC1155, Ownable {
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    //TODO switch back to private for rpod
+    // TODO switch back to private for rpod
     function mintAthlete(uint256 index) public {
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
@@ -279,7 +303,7 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
-    function getNFTPerAthlete() public view onlyOwner returns (uint256) {
+    function getNFTPerAthlete() public view returns (uint256) {
         return NFT_PER_ATHLETE;
     }
 

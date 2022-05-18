@@ -41,7 +41,7 @@ export default function MyLeagues({ setDisplay }) {
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
 
   const exampleData = {
-    leagueName: "Jinxers",
+    leagueName: "Katie's League",
     image: { examplePic },
     standing: "2 of 8",
   };
@@ -160,7 +160,6 @@ export default function MyLeagues({ setDisplay }) {
           <Fab
             variant="extended"
             size="small"
-            color="primary"
             aria-label="add"
             onClick={() => setDisplay(false)}
           >
@@ -184,6 +183,12 @@ export default function MyLeagues({ setDisplay }) {
               (No Active Leagues)
             </Typography>   
           )}
+          <LeagueCard
+                leagueData={exampleData}
+                leagueAddress={exampleData.leagueName}
+                setLeague={setCurrLeague}
+                setLeagueOpen={setLeagueOpen}
+              />
 
           {activeLeagueList.map((leagueAddress, index) => {
               // console.log("league #" + index + ": " + leagueAddress);

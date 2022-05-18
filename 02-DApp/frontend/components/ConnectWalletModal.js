@@ -5,6 +5,7 @@ export default function ConnectWalletModal({
   modalOpen,
   handleClickAway,
   setModalOpen,
+  isMobile,
 }) {
   const [{ data: connectData, error: connectError }, connect] = useConnect();
   const [{ data: accountData }, disconnect] = useAccount({
@@ -37,6 +38,47 @@ export default function ConnectWalletModal({
         justifyContent: "center",
       }}
     >
+      {isMobile?
+      <Box
+        sx={{
+          position: "absolute",
+          borderTop: "50%",
+          borderLeft: "25%",
+          width: "75%",
+          height: "50%",
+          backgroundColor: "primary.charcoal",
+          boxShadow: 24,
+          borderRadius: "10%",
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          padding: 8,
+        }}
+      >
+        <Typography color={"white"} fontSize={30}>CONNECT</Typography>
+        {connectData.connectors.map((x) => (
+          <Button
+            variant="outlined"
+            color="secondary"
+            disabled={!x.ready}
+            key={x.id}
+            onClick={() => {
+              connect(x);
+              handleModalClose();
+              if (handleClickAway) {
+                handleClickAway();
+              }
+            }}
+            sx={{ flexBasis: "100%", marginBottom: 2, borderRadius: "40px" }}
+          >
+            {x.name}
+            {!x.ready && " (unsupported)"}
+          </Button>
+        ))}
+        {connectError && (
+          <div>{connectError?.message ?? "Failed to connect"}</div>
+        )}
+      </Box> :
       <Box
         sx={{
           position: "absolute",
@@ -53,7 +95,7 @@ export default function ConnectWalletModal({
           padding: 8,
         }}
       >
-        <Typography fontSize={30}>CONNECT</Typography>
+        <Typography color={"white"} fontSize={30}>CONNECT</Typography>
         {connectData.connectors.map((x) => (
           <Button
             variant="outlined"
@@ -77,6 +119,7 @@ export default function ConnectWalletModal({
           <div>{connectError?.message ?? "Failed to connect"}</div>
         )}
       </Box>
+      }
     </Modal>
   );
 }

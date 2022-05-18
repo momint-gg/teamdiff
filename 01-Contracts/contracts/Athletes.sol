@@ -64,8 +64,9 @@ contract Athletes is Ownable {
         return athletes.length;
     }
 
-    //TODO calculate score for an athlete entirely on-chain
-    // //Allows verification of our off-chain calculations
+    // TODO: Delete this?
+    // TODO calculate score for an athlete entirely on-chain
+    // Allows verification of our off-chain calculations
     function calculateScoreOnChain(Stats calldata athleteStats)
         public
         pure

@@ -2,7 +2,7 @@
 
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const constructorArgs = require("../constructorArgs");
+const constructorArgs = require("../../constructorArgs");
 
 describe("Testing whitelist for GameItems", async () => {
   before(async () => {

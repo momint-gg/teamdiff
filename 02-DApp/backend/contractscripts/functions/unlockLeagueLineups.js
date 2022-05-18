@@ -1,6 +1,3 @@
-// Calling evaluateWeekForAllLeagues() from LeagueMaker.sol
-// Appending athletes stats to the contract
-
 require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/LeagueMaker.json');
@@ -13,15 +10,37 @@ async function main() {
     process.env.ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  const contract = new ethers.Contract(LeagueMaker, abi.abi, rinkebySigner);
+  const LeagueMakerCntract = new ethers.Contract(
+    LeagueMaker,
+    abi.abi,
+    rinkebySigner
+  );
 
-  // Calling onlyOwner Function
-  let txn = await contract
-    .connect(rinkebySigner)
-    // When finding the gas price and gas limit, check etherscan so you don't set above limit
-    .unlockLeagueLineups({ gasPrice: 1500000000, gasLimit: 29500000 });
-  await txn.wait();
-  console.log('unlockLeagueLineups(): ', txn);
+  // Getting our list of proxies
+  const leagueAddresses = await LeagueMakerCntract.connect(
+    rinkebySigner
+  ).getLeagueAddresses();
+
+  // Creating interactable contract list of proxies
+  AllLeagueInstances = []; // all of our leagues (as CONTRACTS) so we can interact with them
+  let currProxy;
+  for (let i = 0; i < leagueAddresses.length; i++) {
+    currProxy = new ethers.Contract(
+      leagueAddresses[i],
+      LeagueOfLegendsLogicJSON.abi,
+      provider
+    );
+    AllLeagueInstances.push(currProxy);
+  }
+
+  // Looping through all of our proxies
+  let currLeague;
+  let txn;
+  for (let i = 0; i < AllLeagueInstances.length; i++) {
+    currLeague = AllLeagueInstances[i].connect(rinkebySigner);
+    txn = await currLeague.unlockLineup();
+    await txn.wait();
+  }
 }
 
 const runMain = async () => {

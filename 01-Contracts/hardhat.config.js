@@ -46,7 +46,7 @@ module.exports = {
   networks: {
     hardhat: {
       // url: "http://127.0.0.1:8545",
-      gas: "auto",
+      //gas: "auto",
       // chainId: 31337,
       // accounts: [process.env.HARDHAT_PRIVATE_KEY],
     },
