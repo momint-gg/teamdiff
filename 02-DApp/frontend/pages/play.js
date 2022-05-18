@@ -82,12 +82,38 @@ export default function Play() {
         <Grid container spacing={3}>
           <Grid item xs={4}>
             <Card variant="outlined" onClick={() => router.push("/myLeagues")}>
-              {myLeagues}
+            <Fragment>
+                <CardContent sx={{ textAlign: "center" }}>
+                  {isMobile ? (
+                    <Typography color="secondary" component="div" fontSize={18}>
+                      My Leagues
+                    </Typography>
+                  ) : (
+                    <Typography variant="h5" color="secondary" component="div">
+                      My Leagues
+                    </Typography>
+                  )}
+                  <FaCrown size={"3rem"} />
+                </CardContent>
+                </Fragment>
             </Card>
           </Grid>
           <Grid item xs={4}>
             <Card variant="outlined" onClick={() =>  router.push("/joinLeague")}>
-              {joinLeague}
+            <Fragment>
+                <CardContent sx={{ textAlign: "center" }}>
+                  {isMobile ? (
+                    <Typography color="secondary" component="div" fontSize={18}>
+                      Join League
+                    </Typography>
+                  ) : (
+                    <Typography variant="h5" color="secondary" component="div">
+                      Join League
+                    </Typography>
+                  )}
+                  <FaCrown size={"3rem"} />
+                </CardContent>
+                </Fragment>
             </Card>
           </Grid>
           <Grid item xs={isMobile ? 12 : 4}>

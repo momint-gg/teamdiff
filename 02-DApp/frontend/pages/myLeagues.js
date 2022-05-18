@@ -40,11 +40,11 @@ export default function MyLeagues({ setDisplay }) {
   const [pendingLeagueList, setPendingLeagueList] = useState([]);
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
   const [mountedLeagueAddress, setMountedLeagueAddress] = useState(null);
-  const exampleData = {
-    leagueName: "Katie's League",
-    image: { examplePic },
-    standing: "2 of 8",
-  };
+  // const exampleData = {
+  //   leagueName: "Katie's League",
+  //   image: { examplePic },
+  //   standing: "2 of 8",
+  // };
 
   //WAGMI Hooks
   const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
@@ -189,12 +189,12 @@ export default function MyLeagues({ setDisplay }) {
               (No Active Leagues)
             </Typography>   
           )}
-          <LeagueCard
+          {/* <LeagueCard
                 leagueData={exampleData}
                 leagueAddress={exampleData.leagueName}
                 setLeague={setCurrLeague}
                 setLeagueOpen={setLeagueOpen}
-              />
+              /> */}
 
          
           <Typography
