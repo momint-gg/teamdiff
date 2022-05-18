@@ -2,26 +2,38 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-
-// import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./LeagueBeaconProxy.sol";
 import "./Athletes.sol";
-import "./LeagueMakerLibrary.sol";
+import "./GameItems.sol";
 import "./TestUSDC.sol";
+
+// import "@openzeppelin/contracts/access/Ownable.sol";
+// import "./LeagueMakerLibrary.sol";
 
 contract LeagueMaker is Ownable {
     //To use Clone library
     //using Clones for address;
 
     // ======= Events ==========
-    event LeagueCreated(string name, address proxyAddress, address proxyAdminAddress);
+    event LeagueCreated(
+        string name,
+        address proxyAddress,
+        address proxyAdminAddress
+    );
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
     UpgradeableBeacon immutable upgradeableBeacon;
+    address immutable teamDiffAddress;
+    // TODO: Make the Athletes and GameItems contracts immutable in LOL Logic, can't get working right now
+    // Issue is that proxy vars are initializes with initialize() function and not a constructor, and you cannot initialize immutable vars unless it's in a constructor. So we're stuck
+    // Unless we just deploy them first, manually put those addresses ^ into our LOL Logic constructor, etc. but that might be bad practice
+    // Might want to discuss the above ^ as a team
+    // Athletes immutable athletesContract;
+    // GameItems immutable gameItemsContract;
 
     // For staking
     TestUSDC testUSDC;
@@ -34,45 +46,48 @@ contract LeagueMaker is Ownable {
     mapping(address => bool) public isProxyMap;
     uint256 numWeeks;
 
-
     uint256 _numWeeks = 8;
     uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
-    // address _teamDiffAddress = 0x3736306384bd666D6166e639Cf1b36EBaa818875; // What wallet address we're going to have
-
     // ======== Constructor ========
-    // the constructor deploys an initial version that will act as a template
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
+        // Creating the teamDiffAddress (we can hardcode this later if we want to change it)
+        teamDiffAddress = msg.sender;
     }
 
     // ======== Deploy New League Proxy ========
+    // First need to prompt approval before calling this function for the stakeAmount to be spend by league creator
     function createLeague(
         string calldata _name,
         uint256 _stakeAmount,
         bool _isPublic,
-        address _adminAddress, // Need to pass it in here @Trey or it isn't set CORRECTLY
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
-        address _athletesContractAddress
-        //address _gameItemsAddress
+        address _athletesContractAddress,
+        address _gameItemsContractAddress
     ) external returns (address) {
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,bool,address,address,address,address,address,address)",
+            "initialize(string,uint256,bool,address,address,address,address,address,address,address)",
             _name,
-            //_version,
-            //_numWeeks,
             _stakeAmount,
             _isPublic,
             _athletesContractAddress,
-            _adminAddress,
-            _polygonUSDCAddress,
+            msg.sender, // I was wrong before.. msg.sender IS the admin
             _rinkebyUSDCAddress,
             _testUSDCAddress,
-            // _teamDiffAddress,
+            _gameItemsContractAddress,
+            teamDiffAddress,
             address(this)
-           // _gameItemsAddress
+        );
+
+        testUSDC = TestUSDC(_testUSDCAddress);
+
+        // Make sure the creator of the league has enough USDC
+        require(
+            testUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
+            "Creator of league needs enough USDC (equal to specified stake amount)."
         );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
@@ -80,81 +95,29 @@ contract LeagueMaker is Ownable {
             delegateCallData
         );
 
+        // Creator of the league staking their initial currency when they call createLeague()
+        // TODO: Test different address that isn't also TeamDiff owner making a league and make sure the owner initial staking works
+        testUSDC.transferFrom(msg.sender, address(proxy), _stakeAmount);
+
         leagueAddresses.push(address(proxy));
-        userToLeagueMap[_adminAddress].push(address(proxy));
+        userToLeagueMap[msg.sender].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 
-        emit LeagueCreated(_name, address(proxy), _adminAddress);
-        // delete parameters;
+        emit LeagueCreated(_name, address(proxy), msg.sender);
+
         return address(proxy);
     }
 
-
-    //TODO set to only owner,
-    //owner will be our Team Diff wallet
-    //Set all schedules for all leagues
-    function setLeagueSchedules() public onlyOwner {
-        console.log("setting league schedule in leaguemaker");
-        LeagueMakerLibrary.setLeagueSchedules(leagueAddresses);
-        bool success;
-        bytes memory data;
-        for (uint256 i = 0; i < leagueAddresses.length; i++) {
-            (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("setLeagueSchedule()")
-            );
-            emit Response(success, data);
-        }
-    }
-
-    //Locking lineups for all leagues
-    //TODO set to only owner
-    //Locks the league Members for all leagues, so nobody new can join or leave
-    function lockLeagueMembership() public onlyOwner {
-        LeagueMakerLibrary.lockLeagueMembership(leagueAddresses);
-        bool success;
-        bytes memory data;
-        for (uint256 i = 0; i < leagueAddresses.length; i++) {
-            (success, data) = leagueAddresses[i].call(
-                abi.encodeWithSignature("setLeagueEntryIsClosed()")
-            );
-            emit Response(success, data);
-        }
-    }
-
-// TODO: Add return statements (e.g. true) after successs (so put function in a require) so we know if we succeeded in our scripts
-    // Do the above ^ 
-    //Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
-    //TODO set to only owner
-    function lockLeagueLineups() public onlyOwner {
-        LeagueMakerLibrary.lockLeagueLineups(leagueAddresses);
-    }
-
-    //Unlocking lineups for all leagues
-    //TODO set to only owner
-    function unlockLeagueLineups() public onlyOwner {
-        LeagueMakerLibrary.unlockLeagueLineups(leagueAddresses);
-    }
-
-        //Create onlyOwner function to update week
-    // function incrementCurrentWeek() public onlyOwner {
-    //     currentWeek += 1;
-    // }
-
-    //Evaluates weekly scores for all matchups in all leagues
-    function evaluateWeekForAllLeagues() public onlyOwner {
-        LeagueMakerLibrary.evaluateWeekForAllLeagues(
-            leagueAddresses,
-            currentWeek
-        );
-        currentWeek++;
+    // You need a getter for this because Solidity's default getter (AKA contract.leagueAddresses()) needs to be called with an index
+    // ^ And we want the whole list
+    function getLeagueAddresses() public view returns (address[] memory) {
+        return leagueAddresses;
     }
 
     function updateUserToLeagueMapping(address user) external {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
         userToLeagueMap[user].push(msg.sender);
     }
-
-    //function 
 
     function setBeacon(address logic) external returns (address) {
         //parameters = Parameters({name: _name});

@@ -13,7 +13,9 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
 import "./Whitelist.sol";
 import "./LeagueMaker.sol";
+import "./GameItems.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 /**
  * @dev This contract implements a proxy that gets the implementation address for each call from a {UpgradeableBeacon}.
  *
@@ -22,7 +24,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *
  * _Available since v3.4._
  */
-contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whitelist {
+contract LeagueBeaconProxy is
+    Proxy,
+    ERC1967Upgrade,
+    Ownable,
+    AccessControl,
+    Whitelist
+{
     // Vars
     //uint256 public version; // tsting
     string public leagueName;
@@ -40,7 +48,7 @@ contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl, Whi
     mapping(address => uint256) public userToTotalWins;
     mapping(address => uint256[8]) public userToRecord; // User to their record
 
-    mapping(uint256 => uint256[8])  athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
+    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[]) public userToLineup; // User to their lineup
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
