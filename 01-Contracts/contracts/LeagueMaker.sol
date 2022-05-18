@@ -17,7 +17,7 @@ contract LeagueMaker is Ownable {
     //using Clones for address;
 
     // ======= Events ==========
-    event LeagueCreated(string name, address proxyAddress, address proxyAdminAddress);
+    event LeagueCreated(string name, address proxyAddress, address proxyAdminAddress, address[] initialWhitelistAddresses);
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
@@ -63,7 +63,7 @@ contract LeagueMaker is Ownable {
         constructorContractAddresses[3] = _athletesContractAddress;
         // constructorContractAddress[4] = address(this);
         bytes memory delegateCallData = abi.encodeWithSignature(
-            "initialize(string,uint256,bool,address,address[5],address[])",
+            "initialize(string,uint256,bool,address,address[5])",
             // "initialize(string,uint256,bool,address,address,address,address,address,address,address[])",
             _name,
             //_version,
@@ -71,14 +71,14 @@ contract LeagueMaker is Ownable {
             _stakeAmount,
             _isPublic,
             _adminAddress,
-            constructorContractAddresses,
+            constructorContractAddresses
             // _athletesContractAddress,
             // _polygonUSDCAddress,
             // _rinkebyUSDCAddress,
             // _testUSDCAddress,
             // _teamDiffAddress,
             // address(this)
-           _whitelistUsers
+        //    _whitelistUsers
            // _gameItemsAddress
         );
 
@@ -91,7 +91,7 @@ contract LeagueMaker is Ownable {
         userToLeagueMap[_adminAddress].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 
-        emit LeagueCreated(_name, address(proxy), _adminAddress);
+        emit LeagueCreated(_name, address(proxy), _adminAddress, _whitelistUsers);
         // delete parameters;
         return address(proxy);
     }

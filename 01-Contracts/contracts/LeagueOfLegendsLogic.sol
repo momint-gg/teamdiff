@@ -105,13 +105,13 @@ contract LeagueOfLegendsLogic is
         // address athletesDataStorageAddress,
         //address _owner,
         address _admin,
-        address[5] calldata constructorContractAddresses,
+        address[5] calldata constructorContractAddresses
         // address _polygonUSDCAddress,
         // address _rinkebyUSDCAddress,
         // address _testUSDCAddress,
         // address leagueMakerContractAddress
         // address gameItemsContractAddress
-        address[] calldata whitelistUsers
+        //address[] calldata whitelistUsers
     ) public initializer {
         //Any local variables will be ignored, since this contract is only called in context of the proxy state, meaning we never change the state of this GameLogic contract
         leagueName = _name;
@@ -127,7 +127,9 @@ contract LeagueOfLegendsLogic is
         athletesContract = Athletes(constructorContractAddresses[3]);
         leagueMakerContract = LeagueMaker(constructorContractAddresses[4]);
         whitelistContract = new Whitelist(); // Initializing our whitelist (not immutable)
-        whitelistContract.addAddressesToWhitelist(whitelistUsers);
+        // for(uint256 i; i < whitelistUsers.length; i++) {
+        //     addUserToWhitelist(whitelistUsers[i]);
+        // }
         polygonUSDCAddress = constructorContractAddresses[0];
         rinkebyUSDCAddress = constructorContractAddresses[1];
         testUSDC = IERC20(constructorContractAddresses[2]);

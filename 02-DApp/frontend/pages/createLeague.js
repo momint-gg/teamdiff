@@ -155,7 +155,7 @@ export default function CreateLeague({ setDisplay }) {
   }, []);
 
   // Callback for when pack burned function is called from GameItems contracts
-  const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress) => {
+  const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
     //TODO create a proxy instance from emitted address
     //TODO then check the admin of that proxy to filter events?
     
@@ -166,31 +166,31 @@ export default function CreateLeague({ setDisplay }) {
     );
     //TODO sometimes these invviteListValues ar enull???
 
-    console.log("inviteLlistValues: " + inviteListValues);
+    if (accountData.address == newLeagueAdminAddress) {
+      console.log("initial Whitelist: " + initialWhitelistAddresses);
 
-    inviteListValues.forEach(async (whitelistAddress) => {
-      //Add all set whitelisted users to newly deployed league Proxy
-      console.log("adding " + whitelistAddress + " to whitelist");
-      const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
-                                                              .addUserToWhitelist(whitelistAddress)
-                                                              .then(
-                                                                console.log("Added userr to whitelist success")
-                                                              )
-                                                              .catch((error) => {
-                                                                //console.log("")
-                                                                alert("Add User To WhiteList error: " + error.message);
-                                                              });;
-    })
+      initialWhitelistAddresses.forEach(async (whitelistAddress) => {
+        //Add all set whitelisted users to newly deployed league Proxy
+        console.log("adding " + whitelistAddress + " to whitelist");
+        const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
+                                                                .addUserToWhitelist(whitelistAddress)
+                                                                .then(
+                                                                  console.log("Added userr to whitelist success")
+                                                                )
+                                                                .catch((error) => {
+                                                                  //console.log("")
+                                                                  alert("Add User To WhiteList error: " + error.message);
+                                                                });;
+      })
     //const leagueAdminAddress = LeagueProxyContract.admin();
-    // if (accountData.address == newLeagueAdminAddress && formValues.leagueName == newLeagueName) {
-    if (true) {
+    // if (true) {
       setIsCreatingLeague(false);
       setHasCreatedLeague(true);
       console.log("Finsihed creating league: " 
                   + "\n\tname: " + newLeagueName
                   + "\n\tproxy address: " + newLeagueProxyAddress
-                  + "\n\tadmin address: " + newLeagueAdminAddress
-                  + "\n\tstate of invite list: " + inviteListValues);
+                  + "\n\tadmin address: " + newLeagueAdminAddress);
+                  // + "\n\tstate of invite list: " + inviteListValues);
       setNewLeagueName(newLeagueName);
       setNewLeagueAddress(newLeagueProxyAddress);
     }
@@ -198,7 +198,9 @@ export default function CreateLeague({ setDisplay }) {
 
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
-    console.log("submitting values: " + JSON.stringify(formValues, null, 2) + " \nwhitelistAddresses: " + inviteListValues);
+    console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
+     " \nwhitelistAddresses: " + inviteListValues + 
+     "\nisPublic " + (formValues.inviteListStatus === "open"));
     if(leagueMakerContract && accountData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
@@ -206,7 +208,9 @@ export default function CreateLeague({ setDisplay }) {
         .createLeague(
             formValues.leagueName,
             formValues.buyInCost,
-            (formValues.inviteListStatus == "open"),
+            //TODO this isn't setting the public var isPublic??
+            // true,
+            (formValues.inviteListStatus === "open"),
             accountData.address,
             CONTRACT_ADDRESSES.TestUSDC,
             CONTRACT_ADDRESSES.Athletes,
@@ -221,6 +225,8 @@ export default function CreateLeague({ setDisplay }) {
           setIsCreatingLeague(true);
           console.log("League Creation in progress...");
           console.log("With invite values: " + inviteListValues);
+          //how to tell if transaction failed?
+          //TODO print message to alert if it takes mroe than 60 seconds
         })
         .catch((error) => {
           alert("Create League error: " + error.message);
@@ -524,7 +530,7 @@ export default function CreateLeague({ setDisplay }) {
       )}
       {isCreatingLeague && (
         <Container>
-          <Typography>Your League is being Created...</Typography>
+          <Typography>Your League is being created...</Typography>
           <CircularProgress />
         </Container>
       )}
