@@ -58,6 +58,7 @@ contract LeagueMaker is Ownable {
     }
 
     // ======== Deploy New League Proxy ========
+    // First need to prompt approval before calling this function for the stakeAmount to be spend by league creator
     function createLeague(
         string calldata _name,
         uint256 _stakeAmount,
@@ -80,10 +81,11 @@ contract LeagueMaker is Ownable {
             address(this)
         );
 
+        testUSDC = TestUSDC(_testUSDCAddress);
+
         // Make sure the creator of the league has enough USDC
         require(
-            IERC20(_testUSDCAddress).balanceOf(address(msg.sender)) >=
-                _stakeAmount,
+            testUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
             "Creator of league needs enough USDC (equal to specified stake amount)."
         );
 
@@ -92,14 +94,9 @@ contract LeagueMaker is Ownable {
             delegateCallData
         );
 
-        // Creator of the league staking their initial currency
+        // Creator of the league staking their initial currency when they call createLeague()
         // TODO: Test different address that isn't also TeamDiff owner making a league and make sure the owner initial staking works
-        console.log("Msg.sender in createLeague() is ", msg.sender);
-        IERC20(_testUSDCAddress).transferFrom(
-            msg.sender,
-            address(proxy),
-            _stakeAmount
-        );
+        testUSDC.transferFrom(msg.sender, address(proxy), _stakeAmount);
 
         leagueAddresses.push(address(proxy));
         userToLeagueMap[msg.sender].push(address(proxy));
@@ -115,92 +112,6 @@ contract LeagueMaker is Ownable {
     function getLeagueAddresses() public view returns (address[] memory) {
         return leagueAddresses;
     }
-
-    // //TODO set to only owner,
-    // //owner will be our Team Diff wallet
-    // //Set all schedules for all leagues
-    // function setLeagueSchedules() public onlyOwner {
-    //     // LeagueMakerLibrary.setLeagueSchedules(leagueAddresses); // This isn't doing anything
-    //     bool success;
-    //     bytes memory data;
-    //     (success, data) = leagueMakerLibraryAddress.call(
-    //         abi.encodeWithSignature(
-    //             "setLeagueSchedules(address[])",
-    //             leagueAddresses
-    //         )
-    //     );
-    //     require(success, "Failed to call setLeagueSchedules() from library");
-    // }
-
-    // //Locking lineups for all leagues
-    // //TODO set to only owner
-    // //Locks the league Members for all leagues, so nobody new can join or leave
-    // function lockLeagueMembership() public onlyOwner {
-    //     // LeagueMakerLibrary.lockLeagueMembership(leagueAddresses);
-    //     bool success;
-    //     bytes memory data;
-    //     for (uint256 i = 0; i < leagueAddresses.length; i++) {
-    //         (success, data) = leagueAddresses[i].call(
-    //             abi.encodeWithSignature("setLeagueEntryIsClosed()")
-    //         );
-    //         emit Response(success, data);
-    //     }
-    //     require(success, "Failed to call lockLeagueMembership() from library");
-    // }
-
-    // // Locks all the leagues lineups, so you cannot change players after a certain point in the weeek
-    // function lockLeagueLineups() public onlyOwner {
-    //     // leagueMakerLibrary.lockLeagueLineups(leagueAddresses);
-    //     // Instead of above, call this way:
-    //     bool success;
-    //     bytes memory data;
-    //     (success, data) = leagueMakerLibraryAddress.call(
-    //         abi.encodeWithSignature(
-    //             "lockLeagueLineups(address[])",
-    //             leagueAddresses
-    //         )
-    //     );
-    //     require(success, "Failed to call lockLeagueLineups() from library");
-    // }
-
-    // //Unlocking lineups for all leagues
-    // //TODO set to only owner
-    // function unlockLeagueLineups() public onlyOwner {
-    //     // LeagueMakerLibrary.unlockLeagueLineups(leagueAddresses);
-    //     // bool success;
-    //     // bytes memory data;
-    //     // for (uint256 i = 0; i < leagueAddresses.length; i++) {
-    //     //     (success, data) = leagueAddresses[i].call(
-    //     //         abi.encodeWithSignature("unlockLineup()")
-    //     //     );
-    //     //     emit Response(success, data);
-    //     // }
-    // }
-
-    // //Create onlyOwner function to update week
-    // // function incrementCurrentWeek() public onlyOwner {
-    // //     currentWeek += 1;
-    // // }
-
-    // //Evaluates weekly scores for all matchups in all leagues
-    // // function evaluateWeekForAllLeagues() public onlyOwner {
-    // //     LeagueMakerLibrary.evaluateWeekForAllLeagues(
-    // //         leagueAddresses,
-    // //         currentWeek
-    // //     );
-    // //     bool success;
-    // //     bytes memory data;
-    // //     for (uint256 i = 0; i < leagueAddresses.length; i++) {
-    // //         (success, data) = leagueAddresses[i].call(
-    // //             abi.encodeWithSignature(
-    // //                 "evaluateWeek(uint256)",
-    // //                 currentWeek + 1
-    // //             )
-    // //         );
-    // //         emit Response(success, data);
-    // //     }
-    // //     currentWeek++;
-    // // }
 
     function updateUserToLeagueMapping(address user) external {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");

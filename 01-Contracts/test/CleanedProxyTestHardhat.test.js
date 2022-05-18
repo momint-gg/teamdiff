@@ -97,16 +97,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       "Athletes Contract Deployed to: " + AthletesContractInstance.address
     );
 
-    // Need to prompt allowance before making the league (happens after u click "create new league" button on frontend)
-    console.log(
-      "Owner/league creator, ",
-      owner.address,
-      "balance before createLeague(): ",
-      Number(await testUsdcContract.balanceOf(owner.address))
-    );
-    let approval = await testUsdcContract.approve(owner.address, 30); // Insert whatever stake amount they specify
-    await approval.wait();
-
     //Create League Maker Instance (no library needed anymore)
     LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
     LeagueMakerInstance = await LeagueMakerFactory.deploy(
@@ -117,6 +107,14 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     );
     await LeagueMakerInstance.deployed();
     console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
+
+    // Need to prompt approval before making the league (happens after u click "create new league" button on frontend)
+
+    let approval = await testUsdcContract.approve(
+      LeagueMakerInstance.address,
+      10
+    ); // Insert whatever stake amount they specify
+    await approval.wait();
 
     // Making the new proxy league
     var txn = await LeagueMakerInstance.connect(owner).createLeague(
@@ -269,12 +267,12 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     );
     await txn.wait();
 
-    // Sender should now have 20 (test) USDC
+    // Sender should now have 20 (test) USDC, owner has 70, contract has 10
     expect(Number(await testUsdcContract.balanceOf(addr1.address))).to.equal(
       20
     );
     expect(Number(await testUsdcContract.balanceOf(owner.address))).to.equal(
-      80
+      70
     );
   });
 
@@ -298,9 +296,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     // Proxy contract balance and user balance should be updated
     expect(
       Number(await testUsdcContract.balanceOf(proxyContract.address))
-    ).to.equal(10); // USDC Should be transferred to the league proxy
+    ).to.equal(20); // Proxy creator stake + addr1 stake
     expect(Number(await testUsdcContract.balanceOf(addr1.address))).to.equal(
-      //20-10
+      // 20-10
       10
     );
   });

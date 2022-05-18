@@ -161,19 +161,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         currentWeekNum++;
     }
 
-    // Creator of the league staking USDC
-    // function adminStake(address _adminAddress) public {
-    //     // console.log("Msg.sender in adminStake() is ", msg.sender);
-    //     require(
-    //         testUSDC.balanceOf(msg.sender) > stakeAmount,
-    //         "Insufficent funds for staking"
-    //     );
-    //     console.log("Creator of league is staking their currency...");
-    //     // Remember to first prompt approval for transfer on frontend
-    //     testUSDC.transferFrom(_adminAddress, address(this), stakeAmount);
-    //     console.log("Creator of league has successfully staked their currency");
-    // }
-
     /******************************************************/
     /*************** STAKING/LEAGUE FUNCTIONS *************/
     /******************************************************/
@@ -294,9 +281,9 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     // }
 
     // Getting lineupIsLocked (TODO: Comment out for prod)
-    // function getLineupIsLocked() external view returns (bool) {
-    //     return lineupIsLocked;
-    // }
+    function getLineupIsLocked() external view returns (bool) {
+        return lineupIsLocked;
+    }
 
     // You need to call an index when getting a mapping. More convenient to have a getter so we can return whole lineup
     function getLineup(address _user) public view returns (uint256[] memory) {
@@ -316,13 +303,6 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     function getAdmin() public view returns (address) {
         return admin;
     }
-
-    // Necessary: Returning the winners of the league
-    // function getWinners() public view returns(address [] memory)
-
-    /*****************************************************************/
-    /*******************LEAGUE MEMBERSHIP FUNCTIONS  *****************/
-    /*****************************************************************/
 
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
