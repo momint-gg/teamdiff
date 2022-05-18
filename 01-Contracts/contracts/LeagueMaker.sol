@@ -54,7 +54,8 @@ contract LeagueMaker is Ownable {
     // ======== Constructor ========
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
-        teamDiffAddress = msg.sender; // Creating the teamDiffAddress
+        // Creating the teamDiffAddress (we can hardcode this later if we want to change it)
+        teamDiffAddress = msg.sender;
     }
 
     // ======== Deploy New League Proxy ========
