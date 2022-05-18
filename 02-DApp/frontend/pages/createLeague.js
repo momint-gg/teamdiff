@@ -203,6 +203,7 @@ export default function CreateLeague({ setDisplay }) {
             accountData.address,
             CONTRACT_ADDRESSES.TestUSDC,
             CONTRACT_ADDRESSES.Athletes,
+            inviteListValues,
             //CONTRACT_ADDRESSES.Athletes,
           {
           gasLimit: 10000000,
