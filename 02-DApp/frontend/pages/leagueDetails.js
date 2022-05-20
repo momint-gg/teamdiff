@@ -32,15 +32,14 @@ import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_inf
 
 export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
    //WAGMI Hooks
-   const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+ const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const { data: signerData } = useSigner()
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect
+} from "wagmi";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
@@ -28,10 +29,13 @@ import { useMediaQuery } from "react-responsive";
 export default function Play() {
   //Router
   const router = useRouter();
+  //WAGMI Hooks
+  const { data: accountData, isLoading, error } = useAccount({ ens: true });
+  // const { data: ensName } = useEnsName()
+  // const { data: ensAvatar } = useEnsAvatar()
+  const { disconnect } = useDisconnect()
 
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
@@ -73,6 +77,11 @@ export default function Play() {
   //   const href= "/leagues/" + leagueAddress;
   //   router.push(href)
   // }
+
+  useEffect(() => {
+    if(accountData)
+     console.log("account data in use: " + accountData.address);
+  }, [accountData?.address])
 
   return (
 

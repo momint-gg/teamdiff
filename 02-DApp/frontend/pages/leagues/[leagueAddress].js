@@ -44,9 +44,8 @@ export default function LeagueDetails() {
    const router = useRouter();
    
     //WAGMI Hooks
-   const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+ const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",

@@ -22,6 +22,7 @@ import * as utils from "@ethersproject/hash";
 //Wagmi imports
 import {
   useAccount,
+  useDisconnect,
   useConnect,
   useSigner,
   useProvider,
@@ -47,15 +48,14 @@ export default function MyLeagues({ setDisplay }) {
   // };
 
   //WAGMI Hooks
-  const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
-    fetchEns: true,
-  });
+const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const { data: signerData } = useSigner()
   
 
   //TODO how to add hook for when we change our connected wallet?
@@ -102,9 +102,9 @@ export default function MyLeagues({ setDisplay }) {
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
             const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
-            console.log("isInleague:" + isInLeague);
+            // console.log("isInleague:" + isInLeague);
             const admin = await LeagueProxyContract.admin();
-            console.log("admin: " + admin);
+            // console.log("admin: " + admin);
             //Add League address  to appropriate state list
             (isInLeague ? (
               setActiveLeagueList(activeLeagueList => [...activeLeagueList, whitelistedLeague])

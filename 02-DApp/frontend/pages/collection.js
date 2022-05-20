@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect
+ } from "wagmi";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
@@ -11,9 +12,8 @@ import AthleteCardModal from "../components/AthleteCardModal";
 import { useMediaQuery } from 'react-responsive';
 
 export default function Collection() {
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);

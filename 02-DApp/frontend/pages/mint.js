@@ -19,9 +19,8 @@ import {
 import ConnectWalletModal from "../components/ConnectWalletModal";
 
 export default function Mint({ setDisplay }) {
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   const [modalOpen, setModalOpen] = useState(false);
 
   if (true) {

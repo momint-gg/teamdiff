@@ -1,4 +1,5 @@
-import { useAccount, useConnect } from "wagmi";
+import { useAccount, useDisconnect
+, useConnect } from "wagmi";
 import {
   Box,
   Button,

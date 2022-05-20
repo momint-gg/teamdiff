@@ -31,15 +31,14 @@ import profilePic from "../assets/images/starter-pack.png";
 export default function BurnPack({ setDisplay }) {
   const [{ data: connectData, error: connectError }, connect] = useConnect();
   const [mintedPackId, setMintedPackId] = useState(null);
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const { data: signerData } = useSigner()
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);

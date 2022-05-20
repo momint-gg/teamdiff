@@ -39,7 +39,7 @@ export default function JoinLeague({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const { data: signerData } = useSigner()
   
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {

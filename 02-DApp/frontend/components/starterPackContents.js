@@ -14,7 +14,8 @@ import StarterPackAthleteCard from "./StarterPackAthleteCard.js";
 import { useState, useEffect } from "react";
 // import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 // import constants from "../Constants";
-// import { useAccount } from 'wagmi';
+// import { useAccount, useDisconnect
+ } from 'wagmi';
 // Requiring fs module in which
 // readFile function is defined.
 // const fs = require('fs');

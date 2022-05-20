@@ -30,14 +30,13 @@ import profilePic from "../assets/images/starter-pack.png";
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
   const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const { data: signerData } = useSigner()
 
   // State Variables
   const [gameItemsContract, setGameItemsContract] = useState(null);

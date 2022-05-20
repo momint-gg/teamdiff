@@ -1,13 +1,21 @@
-import { useAccount, useConnect } from "wagmi";
+import { useAccount, 
+         useConnect,
+        useEnsAvatar, 
+        useEnsName,
+        useDisconnect } from "wagmi";
 import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
 import { useState } from "react";
 import ConnectWalletModal from "./ConnectWalletModal";
 
 export default function WalletLogin({isMobile}) {
-  const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+  const { isConnected, connector, connectors, connectAsync } = useConnect()
+  // const [{ data: accountData }, disconnect] = useAccount({
+  //   fetchEns: true,
+  // });
+  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  const { data: ensName } = useEnsName()
+  const { data: ensAvatar } = useEnsAvatar()
+  const { disconnect } = useDisconnect()
 
   const [modalOpen, setModalOpen] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -46,15 +54,15 @@ export default function WalletLogin({isMobile}) {
                 <Avatar
                   alt="Avatar"
                   src={
-                    accountData.ens?.avatar
-                      ? accountData.ens.avatar
+                    useEnsAvatar?.data
+                      ? useEnsAvatar.data
                       : "avatar.png"
                   }
                 />
               }
               label={
-                accountData.ens?.name
-                  ? `${accountData.ens?.name}`
+                useEnsName.data
+                  ? `${useEnsName.data}`
                   : shortenedAddress
               }
               variant="outlined"
@@ -67,15 +75,15 @@ export default function WalletLogin({isMobile}) {
                 <Avatar
                   alt="Avatar"
                   src={
-                    accountData.ens?.avatar
-                      ? accountData.ens.avatar
+                    useEnsAvatar?.data
+                      ? useEnsAvatar.data
                       : "avatar.png"
                   }
                 />
               }
               label={
-                accountData.ens?.name
-                  ? `${accountData.ens?.name}`
+                useEnsName?.data
+                  ? `${useEnsName.data}`
                   : shortenedAddress
               }
               variant="outlined"

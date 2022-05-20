@@ -1,4 +1,8 @@
-import { useAccount, useConnect } from 'wagmi'
+import { useAccount, 
+  useConnect,
+ useEnsAvatar, 
+ useEnsName,
+ useDisconnect } from "wagmi";
 import { Box, Button, Modal, Typography, } from '@mui/material'
 
 export default function ConnectWalletModal({
@@ -7,10 +11,22 @@ export default function ConnectWalletModal({
   setModalOpen,
   isMobile,
 }) {
-  const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+  // const [{ data: connectData, error: connectError }, connect] = useConnect();
+  // const [{ data: accountData }, disconnect] = useAccount({
+  //   fetchEns: true,
+  // });
+  const {
+    activeConnector,
+    connect,
+    connectors,
+    error : connectError,
+    isConnecting,
+    pendingConnector,
+  } = useConnect()
+  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  const { data: ensName } = useEnsName()
+  const { data: ensAvatar } = useEnsAvatar()
+  const { disconnect } = useDisconnect()
   const handleModalClose = () => {
     setModalOpen(false);
   };
@@ -56,7 +72,7 @@ export default function ConnectWalletModal({
         }}
       >
         <Typography color={"white"} fontSize={30}>CONNECT</Typography>
-        {connectData.connectors.map((x) => (
+        {connectors.map((x) => (
           <Button
             variant="outlined"
             color="secondary"

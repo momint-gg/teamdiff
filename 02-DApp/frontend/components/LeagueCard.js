@@ -20,6 +20,7 @@ import { ethers } from "ethers";
 //Wagmi imports
 import {
   useAccount,
+  useDisconnect,
   useConnect,
   useSigner,
   useProvider,
@@ -38,15 +39,14 @@ export default function LeagueCard({ leagueAddress }) {
 
 
   //WAGMI Hooks
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+const { data: accountData, isLoading, error } = useAccount({ ens: true })
+const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const { data: signerData } = useSigner()
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
 
@@ -67,7 +67,7 @@ export default function LeagueCard({ leagueAddress }) {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
         //setMountedLeagueAddress(leagueAddress);
-        console.log("leagueAddy: " + leagueAddress);
+        // console.log("leagueAddy: " + leagueAddress);
         //setActiveLeagueList(activeLeagues);
       }
       fetchData();

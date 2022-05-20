@@ -1,14 +1,16 @@
 import React from "react";
 import Head from "next/head";
 import theme from "../styles/theme";
+import { ethers } from "ethers";
+
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import "@fontsource/exo";
 import "../styles/globalStyles.css";
-import { Provider, chain, defaultChains } from "wagmi";
+import { Provider, chain, defaultChains, createClient, useProvider  } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { WalletLinkConnector } from "wagmi/connectors/walletLink";
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { Box } from "@mui/material";
 import Layout from "../components/Layout";
 import { useMediaQuery } from 'react-responsive';
@@ -35,7 +37,7 @@ const connectors = ({ chainId }) => {
         qrcode: true,
       },
     }),
-    new WalletLinkConnector({
+    new CoinbaseWalletConnector({
       options: {
         appName: "Momint",
         jsonRpcUrl: `${rpcUrl}/${infuraId}`,
@@ -44,16 +46,27 @@ const connectors = ({ chainId }) => {
   ];
 };
 
+
+
 function MyApp({ Component, pageProps }) {
   const isWeb = useMediaQuery({
     query: '(min-device-width: 1224px)'
   })
   const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
+  const provider = new ethers.providers.AlchemyProvider(
+    "rinkeby",
+    process.env.ALCHEMY_KEY
+  );
 
+  const client = createClient({
+    autoConnect: true,
+    connectors,
+    provider,
+  })
   return (
     <Box sx={{ backgroundColor: "#2E0744", height: "100%" }}>
-      <Provider autoConnect connectors={connectors}>
+      <Provider client={client}>
         <ThemeProvider theme={theme}>
           <Layout isWeb={isWeb} isMobile={isMobile}>
             <link
