@@ -33,6 +33,7 @@ import {
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
 import TestUSDCJSON from "../../../01-Contracts/build/contracts/contracts/TestUSDC.sol/TestUSDC.json";
 // const StyledOutlinedInput = styled(OutlinedInput)({
 //   [`&$focused .${outlinedInputClasses.input}`]: {
@@ -90,9 +91,6 @@ export default function CreateLeague({ setDisplay }) {
   };
 
   //WAGMI Hooks
-  // const [{ data: accountData }, disconnect] = useAccount({
-  //   fetchEns: true,
-  // });
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
   const { data: signerData, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
   const { disconnect } = useDisconnect()
@@ -190,6 +188,15 @@ export default function CreateLeague({ setDisplay }) {
         LeagueOfLegendsLogicJSON.abi,
         signerData
       );
+
+      const RinkebyUSDCContract = new ethers.Contract(
+        "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
+        RinkebyUSDCJSON,
+        signerData
+      );
+
+      const stakeAmount = await LeagueProxyContract.stakeAmount();
+      const approvalTxn = await RinkebyUSDCContract.approve(newLeagueProxyAddress, stakeAmount * 10000000);
 
       if (accountData.address == newLeagueAdminAddress) {
         console.log("initial Whitelist: " + initialWhitelistAddresses);

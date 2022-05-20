@@ -300,7 +300,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // User joining the league
     //TODO debug why onlyWhiteListed always reverts
-    function joinLeague() external nonReentrant {
+    function joinLeague() public nonReentrant {
     // function joinLeague() external onlyWhitelisted nonReentrant {
         require((whitelistContract.whitelist(msg.sender) || msg.sender == admin), "User is not on whitelist bro");
         require(!leagueEntryIsClosed, "League Entry is Closed!");
@@ -313,8 +313,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-        // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-        rinkebyUSDC.transfer(address(this), stakeAmount);
+        rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
+        // rinkebyUSDC.transfer(address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount);
     }
 

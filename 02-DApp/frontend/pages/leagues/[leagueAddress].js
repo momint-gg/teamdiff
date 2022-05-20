@@ -25,6 +25,7 @@ import * as utils from "@ethersproject/hash";
 //Wagmi imports
 import {
   useAccount,
+  useDisconnect,
   useConnect,
   useSigner,
   useProvider,
@@ -44,18 +45,15 @@ export default function LeagueDetails() {
    const router = useRouter();
    
     //WAGMI Hooks
- const { data: accountData, isLoading, error } = useAccount({ ens: true })
+ const { data: accountData } = useAccount({ ens: true })
 const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner({
-    onSuccess(data) {
-      console.log('Success', data)
-    },
-  });
+  const { data: signerData, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
+
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
 //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
@@ -109,6 +107,9 @@ const { disconnect } = useDisconnect()
         const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
         setIsLeagueMember(isInLeague);
         console.log("isInLeague: " + isInLeague)
+        const leagueMember1 = await LeagueProxyContract.leagueMembers(0).catch((e) => console.log(e));
+        // setIsLeagueMember(isInLeague);
+        console.log("isInLeague: " + leagueMember1)
         const leagueAdmin = await LeagueProxyContract.admin();
         //console.log(leagueAdmin);
         setIsLeagueAdmin(leagueAdmin == accountData.address);
