@@ -107,14 +107,14 @@ export default function MintPack({ setDisplay }) {
 
   return (
     <Box>
-      <Fab
+      {/* <Fab
         variant="extended"
         size="small"
         aria-label="add"
         onClick={() => setDisplay(false)}
       >
         &#60; BACK
-      </Fab>
+      </Fab> */}
       {accountData && !(isMinting || hasMinted) && packsAvailable != 0 && (
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box

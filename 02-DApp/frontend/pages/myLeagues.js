@@ -78,6 +78,7 @@ export default function MyLeagues({ setDisplay }) {
         // const activeLeagues = await LeagueMakerContract.leagueAddresses(1);
         var i = 0;
         var error = "none";
+
         //Continue to add leagues to activeLEagueList and pendingLeagueList
           //until we hit an error (because i is out of range presumably)
         do {
@@ -101,6 +102,9 @@ export default function MyLeagues({ setDisplay }) {
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
             const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+            console.log("isInleague:" + isInLeague);
+            const admin = await LeagueProxyContract.admin();
+            console.log("admin: " + admin);
             //Add League address  to appropriate state list
             (isInLeague ? (
               setActiveLeagueList(activeLeagueList => [...activeLeagueList, whitelistedLeague])
@@ -123,10 +127,10 @@ export default function MyLeagues({ setDisplay }) {
   //useEffect to update leagues on accountData change
   // var activeListItems;
   // var pendingListItems;
-  useEffect(() => {
-       //Create list of league cards for all active leagues
-    console.log("accountDataLoading in useEffect: " + accountDataLoading);
-  }, [accountDataLoading])
+  // useEffect(() => {
+  //      //Create list of league cards for all active leagues
+  //   console.log("accountDataLoading in useEffect: " + accountDataLoading);
+  // }, [accountDataLoading])
 
   var activeListItems = activeLeagueList.map((leagueAddress, index) =>
     <Box key={index}>

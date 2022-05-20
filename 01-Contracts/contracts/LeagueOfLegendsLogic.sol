@@ -57,7 +57,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 public testUSDC;
+    // IERC20 public testUSDC;
+    IERC20 public rinkebyUSDC;
     GameItems gameItemsContract;
 
     //**************/
@@ -100,8 +101,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         leagueName = _name;
         numWeeks = 8;
         // Setting up the admin role
-        inLeague[_admin] = true;
-        leagueMembers.push(_admin);
+        //inLeague[_admin] = true;
+        //leagueMembers.push(_admin);
         admin = _admin;
         stakeAmount = _stakeAmount;
         isPublic = _isPublic;
@@ -110,8 +111,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         athletesContract = Athletes(athletesDataStorageAddress);
         // leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist
-        rinkebyUSDCAddress = _rinkebyUSDCAddress;
-        testUSDC = IERC20(_testUSDCAddress);
+        rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
+        // testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
         // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
@@ -168,7 +169,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /******************************************************/
     // Returning the contracts USDC balance
     function getContractUSDCBalance() external view returns (uint256) {
-        return testUSDC.balanceOf(address(this));
+        return rinkebyUSDC.balanceOf(address(this));
     }
 
     // // Returning the sender's USDC balance (testing)
@@ -218,8 +219,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
         for (uint256 i; i < leagueWinners.length; i++) {
             // Approval first, then transfer with the below
-            testUSDC.approve(address(this), prizePerWinner);
-            testUSDC.transferFrom(
+            rinkebyUSDC.approve(address(this), prizePerWinner);
+            rinkebyUSDC.transferFrom(
                 address(this),
                 leagueWinners[i],
                 prizePerWinner
@@ -301,14 +302,20 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //TODO debug why onlyWhiteListed always reverts
     function joinLeague() external nonReentrant {
     // function joinLeague() external onlyWhitelisted nonReentrant {
-        require(whitelistContract.whitelist(msg.sender), "User is not on whitelist bro");
+        require((whitelistContract.whitelist(msg.sender) || msg.sender == admin), "User is not on whitelist bro");
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
-        require(testUSDC.balanceOf(msg.sender) > stakeAmount, "Insufficent funds for staking");
+        require(rinkebyUSDC.balanceOf(msg.sender) > stakeAmount, "Insufficent funds for staking");
         
+        //must approve for our own token
+        //testUSDC.approve(msg.sender, 100);
+
         
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
+        // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
+        rinkebyUSDC.transfer(address(this), stakeAmount);
+        emit Staked(msg.sender, stakeAmount);
     }
 
     

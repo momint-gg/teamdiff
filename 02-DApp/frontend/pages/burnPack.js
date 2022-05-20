@@ -44,6 +44,7 @@ export default function BurnPack({ setDisplay }) {
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
+  const [canMint, setCanMint] = useState(true);
   // Use Effect for component mount
   useEffect(() => {
     if (accountData) {
@@ -54,8 +55,8 @@ export default function BurnPack({ setDisplay }) {
         provider
       );
       setGameItemsContract(GameItemsContract);
-
-      // Callback for when pack burned function is called from GameItems contracts
+      
+      // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = (athleteIndices, signer) => {
         if (signer == accountData.address) {
           setIsMinting(false);
@@ -64,6 +65,13 @@ export default function BurnPack({ setDisplay }) {
           setMintedIndices(athleteIndices);
         }
       };
+
+      const fetchData = async () => {
+        const balanceOfPacks = await GameItemsContract.balanceOf(accountData.address, 0);
+        console.log("balance of packs" + balanceOfPacks);
+        setCanMint(balanceOfPacks > 0);
+      }
+      fetchData();
 
       // Listen to event for when pack burn function is called
       GameItemsContract.once("packBurned", packBurnedCallback);
@@ -154,6 +162,7 @@ export default function BurnPack({ setDisplay }) {
           >
             <Button
               onClick={burnStarterPack}
+              disabled={canMint}
               variant="contained"
               color="inherit"
               style={{

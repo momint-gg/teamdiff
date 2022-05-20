@@ -6,8 +6,12 @@ import profilePic from "../assets/images/starter-pack.png";
 import StarterPackContents from "../components/StarterPackContents";
 import MintPack from "./mintPack.js";
 import { useMediaQuery } from "react-responsive";
+//Router
+import { useRouter } from 'next/router'
 
 export default function MintHome() {
+  //Router
+  const router = useRouter();
   const [displayMint, setDisplayMint] = useState(false);
   const [displayCollection, setDisplayCollection] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 1224px)" });
@@ -52,7 +56,8 @@ export default function MintHome() {
                     variant="extended"
                     size="large"
                     aria-label="add"
-                    onClick={() => setDisplayMint(true)}
+                    onClick={() => router.push("./mintPack")}
+                    // onClick={() => setDisplayMint(true)}
                     sx={{
                       marginTop: 5,
                       marginRight: 1,

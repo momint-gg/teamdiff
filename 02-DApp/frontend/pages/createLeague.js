@@ -32,7 +32,7 @@ import {
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
-
+import TestUSDCJSON from "../../../01-Contracts/build/contracts/contracts/TestUSDC.sol/TestUSDC.json";
 // const StyledOutlinedInput = styled(OutlinedInput)({
 //   [`&$focused .${outlinedInputClasses.input}`]: {
 //     borderColor: "green"
@@ -97,7 +97,12 @@ export default function CreateLeague({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
+  const [{ data: signerData, loading, error }, disconnectSigner] = useSigner()
+  // const { data: signerData, isError, isLoading } = useSigner({
+  //   onError(error) {
+  //     console.log('Error', error)
+  //   },
+  // })
 
   //Contract State Hooks
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
@@ -128,6 +133,8 @@ export default function CreateLeague({ setDisplay }) {
   // Use Effect for component mount
   useEffect(() => {
     if (accountData) {
+       console.log("account data: " + accountData.address);
+
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -156,55 +163,91 @@ export default function CreateLeague({ setDisplay }) {
     } else {
       console.log("no account data found!");
     }
-  }, []);
+  }, [accountData?.address]);
+
+  useEffect(() => {
+    if(signerData)
+      console.log("signer data: " + signerData);
+    else
+      console.log("no signer data poop")
+  }, [signerData])
 
   // Callback for when pack burned function is called from GameItems contracts
   const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
     //TODO create a proxy instance from emitted address
     //TODO then check the admin of that proxy to filter events?
-    
-    const LeagueProxyContract = new ethers.Contract(
-      newLeagueProxyAddress,
-      LeagueOfLegendsLogicJSON.abi,
-      provider
-    );
-    //TODO sometimes these invviteListValues ar enull???
+    // while(signerData?.data) {
+      // const [{ data: signerData, loading, error }, disconnectSigner] = useSigner()
+      //TODO signer data is undefined in callback, so I can't sing join league transaction :/
+      console.log("signer data in callback: " + signerData?.data);
+      const LeagueProxyContract = new ethers.Contract(
+        newLeagueProxyAddress,
+        LeagueOfLegendsLogicJSON.abi,
+        provider
+      );
 
-    if (accountData.address == newLeagueAdminAddress) {
-      console.log("initial Whitelist: " + initialWhitelistAddresses);
+      if (accountData.address == newLeagueAdminAddress) {
+        console.log("initial Whitelist: " + initialWhitelistAddresses);
+        const LeagueProxyContractWithSigner = LeagueProxyContract.connect(signerData);
+        initialWhitelistAddresses.forEach(async (whitelistAddress) => {
+          //Add all set whitelis    ted users to newly deployed league Proxy
+          console.log("adding " + whitelistAddress + " to whitelist");
+          const addUsersToWhitelistTxn = await LeagueProxyContractWithSigner
+                                                                  .addUserToWhitelist(whitelistAddress)
+                                                                  .then(
+                                                                    console.log("Added userr to whitelist success")
+                                                                  )
+                                                                  .catch((error) => {
+                                                                    //console.log("")
+                                                                    alert("Add User To WhiteList error: " + error.message);
+                                                                  });;
+        })
 
-      initialWhitelistAddresses.forEach(async (whitelistAddress) => {
-        //Add all set whitelisted users to newly deployed league Proxy
-        console.log("adding " + whitelistAddress + " to whitelist");
-        const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
-                                                                .addUserToWhitelist(whitelistAddress)
-                                                                .then(
-                                                                  console.log("Added userr to whitelist success")
-                                                                )
-                                                                .catch((error) => {
-                                                                  //console.log("")
-                                                                  alert("Add User To WhiteList error: " + error.message);
-                                                                });;
-      })
-    //const leagueAdminAddress = LeagueProxyContract.admin();
-    // if (true) {
-      setIsCreatingLeague(false);
-      setHasCreatedLeague(true);
-      console.log("Finsihed creating league: " 
-                  + "\n\tname: " + newLeagueName
-                  + "\n\tproxy address: " + newLeagueProxyAddress
-                  + "\n\tadmin address: " + newLeagueAdminAddress);
-                  // + "\n\tstate of invite list: " + inviteListValues);
-      setNewLeagueName(newLeagueName);
-      setNewLeagueAddress(newLeagueProxyAddress);
-    }
+        //TODO, send request to user to pay the stake amount, to join the league
+        // const joinNewlyCreatedLeagueTxn = await LeagueProxyContract
+        // .joinLeague({
+        //   gasLimit: 1000000
+        // })
+        // .then(
+        //   console.log("joining newly created league...")
+        // )
+        // .catch((error) => {
+        //   console.log("Join League error: " + error.message);
+        //   // alert("Join League error: " + error.message);
+        // });
+        
+      //const leagueAdminAddress = LeagueProxyContract.admin();
+      // if (true) {
+        setIsCreatingLeague(false);
+        setHasCreatedLeague(true);
+        console.log("Finsihed creating league: " 
+                    + "\n\tname: " + newLeagueName
+                    + "\n\tproxy address: " + newLeagueProxyAddress
+                    + "\n\tadmin address: " + newLeagueAdminAddress);
+                    // + "\n\tstate of invite list: " + inviteListValues);
+        setNewLeagueName(newLeagueName);
+        setNewLeagueAddress(newLeagueProxyAddress);
+      }
+    //}
+  // else {
+    // console.log("no signer data");
+  // }
   };
 
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
-    console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
+
+    // const TestUSDCContract = new ethers.Contract(
+    //   CONTRACT_ADDRESSES.TestUSDC,
+    //   TestUSDCJSON.abi,
+    //   provider
+    // );
+
+    // const balance = await TestUSDCContract.balanceOf(accountData.address);
+    // console.log("balance: " + balance);
+    /*console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
      " \nwhitelistAddresses: " + inviteListValues + 
-     "\nisPublic " + (formValues.inviteListStatus === "open"));
+     "\nisPublic " + (formValues.inviteListStatus === "open"));*/
     if(leagueMakerContract && accountData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
@@ -212,12 +255,13 @@ export default function CreateLeague({ setDisplay }) {
         .createLeague(
             formValues.leagueName,
             formValues.buyInCost,
+            //2,
             //TODO this isn't setting the public var isPublic??
-            // true,
             (formValues.inviteListStatus === "open"),
             accountData.address,
             CONTRACT_ADDRESSES.TestUSDC,
             CONTRACT_ADDRESSES.Athletes,
+            CONTRACT_ADDRESSES.GameItems,
             inviteListValues,
             //CONTRACT_ADDRESSES.Athletes,
           {
@@ -225,10 +269,10 @@ export default function CreateLeague({ setDisplay }) {
           // nonce: nonce || undefined,
         })
         .then((res) => {
-          console.log("txn result: " + JSON.stringify(res, null, 2));
+          //console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
           console.log("League Creation in progress...");
-          console.log("With invite values: " + inviteListValues);
+          //console.log("With invite values: " + inviteListValues);
           //how to tell if transaction failed?
           //TODO print message to alert if it takes mroe than 60 seconds
         })

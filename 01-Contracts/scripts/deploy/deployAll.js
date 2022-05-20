@@ -7,27 +7,34 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  
+  textData += "exports.GameItems = '0x9B85F1611d24204D6b959AC9a49d666536d3ec57';";
+  /*
   //Create GameItems Instance
-  // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
-  // //const gameContract = await gameContractFactory.deploy(...constructorArgs);
-  // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
-  //   //overriding gas bc transaction was stuck
-  //   //gasPrice: 203000000000,
-  //   gasLimit: 20000000
-  // });
-  // await gameContract.deployed();
+  const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  //const gameContract = await gameContractFactory.deploy(...constructorArgs);
+  const gameContract = await gameContractFactory.deploy(...constructorArgs, {
+    //overriding gas bc transaction was stuck
+    //gasPrice: 203000000000,
+    gasLimit: 20000000
+  });
+  await gameContract.deployed();
 
-  // //Initial functions that need to be run
-  // console.log("First setting starting index...");
-  // let txn = await gameContract.setStartingIndex();
-  // await txn.wait();
-  // console.log("Now setting token URIs...");
-  // txn = await gameContract.setURIs();
-  // await txn.wait();
+  textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
+  console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
+  
+  txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
+  await txn.wait();
+  console.log("Added owner to whitelist");
+  //Initial functions that need to be run
+  console.log("First setting starting index...");
+  txn = await gameContract.setStartingIndex();
+  await txn.wait();
+  console.log("Now setting token URIs...");
+  txn = await gameContract.setURIs();
+  await txn.wait();
+  */
 
-  // textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
-  // consolge.log("exports.GameItems = \'" + gameContract.address + "\';\n");
+
   
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
@@ -146,6 +153,7 @@ const main = async () => {
     })
 
   })
+  
   
 
 };

@@ -12,4 +12,8 @@ contract TestUSDC is ERC20 {
         // Minting initial supply of 100 to the owner
         _mint(msg.sender, 100);
     }
+
+    function createSupply() public {
+        _mint(msg.sender, 1000);
+    }
 }

@@ -32,32 +32,28 @@ contract LeagueBeaconProxy is
     Whitelist
 {
     // Vars
-    //uint256 public version; // tsting
-    string public leagueName;
-    uint256 public numWeeks; // Length of a split
-    //uint256 public currentWeekNum; // Keeping track of week number
-    // Amount that will be staked (in USDC) for each league
-    uint256 public stakeAmount;
-    //Note Admin will be the user, and our leaguemaker will be the owner, must grant access control
-    address public admin;
-    address teamDiffAddress;
-    bool leagueEntryIsClosed;
-    bool lineupIsLocked;
 
-    // Mappings
-    mapping(address => uint256) public userToTotalWins;
-    mapping(address => uint256[8]) public userToRecord; // User to their record
+    string public leagueName;
+    uint256 public numWeeks; // Current week of the split
+    uint256 public stakeAmount;
+    uint256 public currentWeekNum;
+    address public admin;
+    address public teamDiffAddress;
+    bool public leagueEntryIsClosed;
+    bool public lineupIsLocked;
 
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
+    mapping(address => uint256[]) public userToRecord; // User to their record
     mapping(address => uint256[]) public userToLineup; // User to their lineup
+    mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
+    address[] private leagueWinners;
 
     // League schedule
     struct Matchup {
         address[2] players;
     }
-
     mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
@@ -69,7 +65,7 @@ contract LeagueBeaconProxy is
         uint256 assists;
         uint256 minionScore;
     }
-    address public polygonUSDCAddress; // When we deploy to mainnet
+    // address public polygonUSDCAddress = ; // When we deploy to mainnet
     address public rinkebyUSDCAddress;
 
     // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
@@ -78,7 +74,8 @@ contract LeagueBeaconProxy is
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 testUSDC;
+    // IERC20 public testUSDC;
+    IERC20 public rinkebyUSDC;
     GameItems gameItemsContract;
 
     //**************/
@@ -86,6 +83,7 @@ contract LeagueBeaconProxy is
     /***************/
     event Staked(address sender, uint256 amount);
     event testUSDCDeployed(address sender, address contractAddress);
+    event leagueEnded(address[] winner, uint256 prizePotPerWinner);
 
     /**
      * @dev Initializes the proxy with `beacon`.
