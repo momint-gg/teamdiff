@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 // import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 // import constants from "../Constants";
 // import { useAccount, useDisconnect
- } from 'wagmi';
+//  } from 'wagmi';
 // Requiring fs module in which
 // readFile function is defined.
 // const fs = require('fs');

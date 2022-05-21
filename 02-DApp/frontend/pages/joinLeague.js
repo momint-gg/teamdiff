@@ -31,9 +31,8 @@ export default function JoinLeague({ setDisplay }) {
   const [pendingLeagueList, setPendingLeagueList] = useState([]);
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
 
-  const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
-    fetchEns: true,
-  });
+  const { data: accountData, isLoading: accountDataLoading, error } = useAccount({ ens: true })
+
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -139,9 +138,12 @@ export default function JoinLeague({ setDisplay }) {
             //TODO create an instance of whitelist contract and read isPublic from that;
             const isPublic = await LeagueProxyContract.isPublic();
             console.log("\tIs public: " + isPublic);
-            //Add League address  to appropriate state list
-            if(isPublic) 
-              setPublicLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
+            const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+
+            //Add League address  to appropriate state list if the league is public
+              //and the user is not already in the league
+            if(isPublic && !isInLeague) 
+              setPublicLeagueList(publicLeagueList => [...publicLeagueList, leagueAddress])
           }
           //console.log("error value at end:" + error);
 
@@ -153,14 +155,14 @@ export default function JoinLeague({ setDisplay }) {
     else {
       console.log("no account data");
     }
-  }, []);
+  }, [accountData?.address]);
   //useEffect to update leagues on accountData change
   // var activeListItems;
   // var pendingListItems;
-  useEffect(() => {
-       //Create list of league cards for all active leagues
-    console.log("accountDataLoading in useEffect: " + accountDataLoading);
-  }, [accountDataLoading])
+  // useEffect(() => {
+  //      //Create list of league cards for all active leagues
+  //   console.log("accountDataLoading in useEffect: " + accountDataLoading);
+  // }, [accountDataLoading])
 
 
   var publicListItems = publicLeagueList.map((leagueAddress, index) =>
@@ -221,7 +223,7 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         }}
       />
       {publicLeagueList.length > 0 ? (
-          <ul>{activeListItems}</ul>
+          <ul>{publicListItems}</ul>
       ) : (
         <Typography variant="h6" color="primary" component="div">
           (No Active Leagues)

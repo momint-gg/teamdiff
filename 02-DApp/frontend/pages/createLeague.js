@@ -205,7 +205,9 @@ export default function CreateLeague({ setDisplay }) {
           //Add all set whitelis    ted users to newly deployed league Proxy
           console.log("adding " + whitelistAddress + " to whitelist");
           const addUsersToWhitelistTxn = await LeagueProxyContract
-                                                                  .addUserToWhitelist(whitelistAddress)
+                                                                  .addUserToWhitelist(whitelistAddress, {
+                                                                    gasLimit: 10000000
+                                                                  })
                                                                   .then(
                                                                     console.log("Added userr to whitelist success")
                                                                   )

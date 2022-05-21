@@ -29,10 +29,17 @@ import AthleteCard from "../components/AthleteCard";
 import profilePic from "../assets/images/starter-pack.png";
 
 export default function BurnPack({ setDisplay }) {
-  const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [mintedPackId, setMintedPackId] = useState(null);
+  const {
+    activeConnector,
+    connect,
+    connectors,
+    error : connectError,
+    isConnecting,
+    pendingConnector,
+  } = useConnect()
+    const [mintedPackId, setMintedPackId] = useState(null);
 const { data: accountData, isLoading, error } = useAccount({ ens: true })
-const { disconnect } = useDisconnect()
+// const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -43,7 +50,7 @@ const { disconnect } = useDisconnect()
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
-  const [canMint, setCanMint] = useState(true);
+  const [canMint, setCanMint] = useState(false);
   // Use Effect for component mount
   useEffect(() => {
     if (accountData) {
@@ -156,12 +163,13 @@ const { disconnect } = useDisconnect()
             alignItems="center"
             sx={{
               display: "flex",
+              flexDirection: "column",
               paddingTop: "20px",
             }}
           >
             <Button
               onClick={burnStarterPack}
-              disabled={canMint}
+              disabled={!canMint}
               variant="contained"
               color="inherit"
               style={{
@@ -173,6 +181,18 @@ const { disconnect } = useDisconnect()
             >
               BURN
             </Button>
+            {!canMint && 
+            <Box>
+              <Typography>
+                {"\nLooks like you don't have a starter pack yet. Head "}
+                <a
+                href="/mintPack"> 
+                  here
+                </a>                
+                { " to mint one now!"}
+              </Typography>
+            </Box>
+            }
           </Box>
         </Container>
       )}
