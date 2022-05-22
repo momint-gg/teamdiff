@@ -107,6 +107,7 @@ contract LeagueMaker is Ownable {
         // rinkebyUSDC.transfer(address(proxy), _stakeAmount);
 
         leagueAddresses.push(address(proxy));
+        
         userToLeagueMap[msg.sender].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 

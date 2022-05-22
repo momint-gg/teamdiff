@@ -4,7 +4,7 @@ import { useAccount,
         useEnsName,
         useDisconnect } from "wagmi";
 import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConnectWalletModal from "./ConnectWalletModal";
 
 export default function WalletLogin({isMobile}) {
@@ -16,6 +16,7 @@ export default function WalletLogin({isMobile}) {
   const { data: ensName } = useEnsName()
   const { data: ensAvatar } = useEnsAvatar()
   const { disconnect } = useDisconnect()
+  const [ shortenedAddress, setShortenedAddress ] = useState();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -32,20 +33,24 @@ export default function WalletLogin({isMobile}) {
     setMenu(false);
   };
 
-  var shortenedAddress = "";
-  if (accountData?.address) {
-    shortenedAddress = `${accountData.address.slice(
-      0,
-      6
-    )}...${accountData.address.slice(
-      accountData.address.length - 4,
-      accountData.address.length
-    )}`;
-  }
+  // var shortenedAddress = "";
+  useEffect(() => {
+    if (accountData?.address) {
+      var shortenedAddress1 = `${accountData.address.slice(
+        0,
+        6
+      )}...${accountData.address.slice(
+        accountData.address.length - 4,
+        accountData.address.length
+      )}`;
+      setShortenedAddress(shortenedAddress1);
+    }
 
+  }, [accountData?.address])
+  
   return (
     <Box>
-      {accountData ? (
+      {accountData?.address ? (
         <ClickAwayListener onClickAway={handleClickAway}>
           <Box sx={{ position: "relative" }}>
             {isMobile?
@@ -61,7 +66,7 @@ export default function WalletLogin({isMobile}) {
                 />
               }
               label={
-                useEnsName.data
+                useEnsName?.data
                   ? `${useEnsName.data}`
                   : shortenedAddress
               }

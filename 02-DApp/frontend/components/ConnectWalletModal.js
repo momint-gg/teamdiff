@@ -112,7 +112,7 @@ export default function ConnectWalletModal({
         }}
       >
         <Typography color={"white"} fontSize={30}>CONNECT</Typography>
-        {connectData.connectors.map((x) => (
+        {connectors.map((x) => (
           <Button
             variant="outlined"
             color="secondary"
