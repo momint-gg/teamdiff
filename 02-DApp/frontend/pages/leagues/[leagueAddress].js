@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Menu,
   MenuItem,
+  TextField
 } from "@mui/material";
 import { useState, useEffect } from "react";
 
@@ -21,6 +22,8 @@ import { useRouter } from 'next/router'
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import * as utils from "@ethersproject/hash";
+//NPM import
+import WAValidator from 'wallet-address-validator'; 
 
 //Wagmi imports
 import {
@@ -52,7 +55,7 @@ const { disconnect } = useDisconnect()
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const { data: signerData, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
+  const { data: signerData1, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
 
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
@@ -67,6 +70,12 @@ const { disconnect } = useDisconnect()
 
   const [isSettingLineup, setIsSettingLineup] = useState(false);
   //const [import {  } from "module";]
+
+  //Invite list states  
+  const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
+  const [inviteListValues, setInviteListValues] = useState([])
+  const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
+  const [validAddressesStatus, setValidAddressesStatus] = useState(true)
 
   //Menu Import
   const [anchorEl, setAnchorEl] = useState(null);
@@ -168,6 +177,78 @@ const { disconnect } = useDisconnect()
     }
   }, [accountData?.address]);
 
+  useEffect(() => {
+    let flag = true
+    inviteListValues.forEach((e) => {
+      if (WAValidator.validate(e, "ETH")) {
+        // console.log("validated")
+      } else {
+        // console.log("invalid")
+        flag = false
+        setValidAddressesStatus(false)
+      }
+    })
+    if (flag) {
+      setValidAddressesStatus(true) 
+    }
+  }, [inviteListValues])
+
+  const handlePlayerInviteInput = (e, i) => {
+    let inviteListValuesNew = [...inviteListValues]
+    inviteListValuesNew[i] = e.target.value
+    //setInviteListValues([...inviteListValues], e);
+    setInviteListValues(inviteListValuesNew)
+    console.log("short list in func: " + inviteListValues);
+
+  }
+
+  const [signerData, setSignerData] = useState();
+
+  useEffect(() => {
+    // refreshData();
+    // console.log("singerSTatus: " + signerStatus + ": " + signerData);
+    // if(signerError) 
+    //   console.log("error grabbing signer: " + signerError)
+    // if(isFetching)
+    //   console.log("is Fetching singer");
+    // if(signerLoading) 
+    //   console.log("loading signer...");
+    // const fetchData = async() => {
+    //   const addy = await signerData.getAddress();
+    //   console.log("address data: " + addy);
+    //   // setSignerData(signer);
+    // }
+    // fetchData();
+    if(signerData) {
+      console.log("signer data in useEffect: " + signerData);
+      setSignerData(signerData);
+      // const LeagueProxyContractWithSigner = new ethers.Contract(
+      //   router.query.leagueAddress,
+      //   LeagueOfLegendsLogicJSON.abi,
+      //   signerData
+      // );
+      // setLeagueProxyContractWithSigner(LeagueProxyContract);
+    }
+    else
+      console.log("no signer data poop")
+  }, [signerData1])
+
+  const addNewPlayerInviteInput = () => {
+    if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
+      setAddPlayerBtnEnabled(false)
+    }
+    setInviteListValues(prevState => ([...prevState, ""])) 
+  }
+
+  const removePlayer = (i) => {
+    let inviteListValuesNew = [...inviteListValues]
+    inviteListValuesNew.splice(i, 1)
+    setInviteListValues(inviteListValuesNew)
+    if (!addPlayerBtnEnabled && inviteListValuesNew.length < 8) {
+      setAddPlayerBtnEnabled(true)
+    }
+  }
+
 
   const joinLeagueHandler = async () => {
 
@@ -188,6 +269,31 @@ const { disconnect } = useDisconnect()
       //console.log("")
       alert("Join League error: " + error.message);
     });
+  }
+
+  const submitAddUsersToWhitelistClickHandler = async () => {
+    if(signerData) {
+      const leagueProxyContractWithSigner = leagueProxyContract.connect(signerData);
+      inviteListValues.forEach(async (invitedAddress, index) => {
+        const addUserToWhitelistTxn = await leagueProxyContractWithSigner
+        .addUserToWhitelist(invitedAddress, {
+          gasLimit: 1000000000
+        })
+        .then((res) => {
+            console.log("txn result: " + JSON.stringify(res, null, 2));
+            console.log("Txn: " + JSON.stringify(addUserToWhitelistTxn, null, 2))
+            console.log("joined league")
+        })
+        .catch((error) => {
+          //console.log("")
+          alert("addUserToWhitelistTxn error: " + error.message);
+        });
+      })
+      
+    }
+    else {
+      console.log("singer Data not set in add user to whitelist function ");
+    }
   }
 
   const submitLineup = async () => {
@@ -412,6 +518,66 @@ const { disconnect } = useDisconnect()
                         <ul>
                             <li>Add Users to Whitelist</li>
                         </ul>
+                        <>
+                <Typography variant="h7" color="lightgrey">
+                  Only users added to this leagues whitelist can join.
+                </Typography>
+                <Typography variant="h6" color="white" component="div">
+                  Invite list:
+                </Typography>
+                
+
+              {/* TODO: Abstract this into another component, controlled by createLeague page */}
+                <Typography variant="h6" color="white" component="div">
+                  Invite List (Private/Closed Leagues)
+                </Typography>
+                {!validAddressesStatus && ( 
+                  <p>
+                    There are invalid addresses.
+                  </p> 
+                )}
+
+                {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
+                  {inviteListValues.map((element, index) => (
+                    <>
+                    <TextField
+                      variant="standard"
+                      label={"Whitelisted Address " + (index + 1)} 
+                      onChange={e => {
+                        //This submits null address when I copy and paste
+                        handlePlayerInviteInput(e, index)
+                        console.log("short list outside func: " + inviteListValues);
+                      }}
+                      value={element}
+                      key={index}
+                    />
+                    {index ? 
+                      <Button 
+                        variant="outlined"
+                        onClick={() => removePlayer(index)}
+                        size="small"
+                      >
+                        Remove
+                      </Button>
+                      : null
+                    }
+                    </>
+                  ))}
+                  <Button 
+                    variant="outlined"
+                    onClick={addNewPlayerInviteInput}
+                    size="small"
+                    disabled={!addPlayerBtnEnabled}
+                  >
+                    Add Another Address to Whitelist
+                  </Button>
+                  <Fab
+                    onClick={submitAddUsersToWhitelistClickHandler}
+                    >
+                      Submit
+                    </Fab>
+
+                </>
                     </Box>
                 )}
                 </>

@@ -7,7 +7,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import "@fontsource/exo";
 import "../styles/globalStyles.css";
-import { Provider, chain, defaultChains, createClient, useProvider  } from "wagmi";
+import { Provider, chain, defaultChains, createClient, WagmiConfig  } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
@@ -65,6 +65,8 @@ function MyApp({ Component, pageProps }) {
     provider,
   })
   return (
+    // <WagmiConfig client={client}>
+
     <Box sx={{ backgroundColor: "#2E0744", height: "100%" }}>
       <Provider client={client}>
         <ThemeProvider theme={theme}>
@@ -110,7 +112,9 @@ function MyApp({ Component, pageProps }) {
           </Layout>
         </ThemeProvider>
       </Provider>
+      
     </Box>
+    // </WagmiConfig>
   );
 }
 

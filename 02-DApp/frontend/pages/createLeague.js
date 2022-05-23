@@ -29,6 +29,10 @@ import {
   useEnsLookup,
   useDisconnect
 } from "wagmi";
+
+//Router
+import { useRouter } from 'next/router';
+
 //Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
@@ -92,7 +96,16 @@ export default function CreateLeague({ setDisplay }) {
 
   //WAGMI Hooks
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
-  const { data: signerData, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
+  // const [signerData, setSignerData] = useState(null);
+
+  const { data: signerData, status : signerStatus, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner({
+    onSettled(data, error) {
+      console.log('Settled', data, error)
+    },
+    onSuccess(data) {
+      console.log('Success', data)
+    },
+  })
   const { disconnect } = useDisconnect()
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
@@ -100,14 +113,18 @@ export default function CreateLeague({ setDisplay }) {
     process.env.ALCHEMY_KEY
   );
 
+  
+  // Call this function when you want to refresh the data
+  const router = useRouter();
+  const refreshData = () => router.replace(router.asPath);
 
+  // refreshData();
   //Contract State Hooks
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
   const [isCreatingLeague, setIsCreatingLeague] = useState(false);
   const [hasCreatedLeague, setHasCreatedLeague] = useState(false);
   const [newLeagueName, setNewLeagueName] = useState(null);
   const [newLeagueAddress, setNewLeagueAddress] = useState(null);
-
   const [formValues, setFormValues] = useState(defaultValues)
 
   const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
@@ -129,17 +146,30 @@ export default function CreateLeague({ setDisplay }) {
 
   // Use Effect for component mount
   useEffect(() => {
-    if (accountData && signerData) {
-       console.log("account data: " + accountData.address);
+    if (accountData) {
+      console.log("account data: " + accountData.connector);
+      // const fetchData = async() => {
+      //   const signer = await accountData.connector?.getSigner();
+      //   // console.log("account data: " + JSON.stringify(signer, null, 2));
+      //   setSignerData(signer);
+      // }
+      // fetchData();
 
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
         LeagueMakerJSON.abi,
-        signerData
+        provider
       );
       setLeagueMakerContract(LeagueMakerContract);
 
+      //construct signer
+      // const rpcProvider = new ethers.providers.JsonRpcProvider("rinkeby");
+      // const rpcProvider = new ethers.providers.EtherscanProvider("rinkeby");
+      // const rpcProvider = new ethers.getDefaultProvider("rinkeby");
+      // const rpcProvider = new ethers.providers.InfuraProvider("rinkeby");;
+      // const signer = rpcProvider.getSigner(accountData.address)
+      // setSignerData(signer);
       //TODO add manual filter to event
       // const filter = {
       //   address: LeagueMakerContract.address,
@@ -156,30 +186,47 @@ export default function CreateLeague({ setDisplay }) {
       // LeagueMakerContract.on(filter, leagueCreatedCallback);
       // Listen to event for when pack burn function is called
       //TODO this doesn't listen after the event has triggered once during the session I think
-      LeagueMakerContract.on("LeagueCreated", leagueCreatedCallback);
+      LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
     } else {
-      console.log("no account data or signer Data found!");
+      console.log("no account data found!");
     }
-  }, [accountData?.address, signerData]);
+  }, [accountData?.address]);
 
+
+//TODO maybe try using sign message instead of useSigner? https://wagmi.sh/examples/sign-message
   useEffect(() => {
-    if(signerError) 
-      console.log("error grabbing signer: " + signerError)
-    if(isFetching)
-      console.log("is Fetching singer");
-    if(signerLoading) 
-      console.log("loading signer...");
-    if(signerData)
+    // refreshData();
+    // console.log("singerSTatus: " + signerStatus + ": " + signerData);
+    // if(signerError) 
+    //   console.log("error grabbing signer: " + signerError)
+    // if(isFetching)
+    //   console.log("is Fetching singer");
+    // if(signerLoading) 
+    //   console.log("loading signer...");
+    // const fetchData = async() => {
+    //   const addy = await signerData.getAddress();
+    //   console.log("address data: " + addy);
+    //   // setSignerData(signer);
+    // }
+    // fetchData();
+    if(signerData) {
       console.log("signer data in useEffect: " + signerData);
+      // const LeagueProxyContractWithSigner = new ethers.Contract(
+      //   router.query.leagueAddress,
+      //   LeagueOfLegendsLogicJSON.abi,
+      //   signerData
+      // );
+      // setLeagueProxyContractWithSigner(LeagueProxyContract);
+    }
     else
       console.log("no signer data poop")
   }, [signerData])
 
-  // Callback for when pack burned function is called from GameItems contracts
+  // Callback for when league created event is fired from league maker contract
   const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
     //TODO create a proxy instance from emitted address
     //TODO then check the admin of that proxy to filter events?
-    if(signerData) {
+    if(accountData.connector || signerData) {
       // const [{ data: signerData, loading, error }, disconnectSigner] = useSigner()
       //TODO signer data is undefined in callback, so I can't sing join league transaction :/
       console.log("signer data in callback: " + signerData);
@@ -205,16 +252,16 @@ export default function CreateLeague({ setDisplay }) {
           //Add all set whitelis    ted users to newly deployed league Proxy
           console.log("adding " + whitelistAddress + " to whitelist");
           const addUsersToWhitelistTxn = await LeagueProxyContract
-                                                                  .addUserToWhitelist(whitelistAddress, {
-                                                                    gasLimit: 10000000
-                                                                  })
-                                                                  .then(
-                                                                    console.log("Added userr to whitelist success")
-                                                                  )
-                                                                  .catch((error) => {
-                                                                    //console.log("")
-                                                                    alert("Add User To WhiteList error: " + error.message);
-                                                                  });;
+                                              .addUserToWhitelist(whitelistAddress, {
+                                                gasLimit: 100000000
+                                              })
+                                              .then(
+                                                console.log("Added userr to whitelist success")
+                                              )
+                                              .catch((error) => {
+                                                //console.log("")
+                                                alert("Add User To WhiteList error: " + error.message);
+                                              });
         })
 
         //TODO, send request to user to pay the stake amount, to join the league
@@ -262,7 +309,7 @@ export default function CreateLeague({ setDisplay }) {
     /*console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
      " \nwhitelistAddresses: " + inviteListValues + 
      "\nisPublic " + (formValues.inviteListStatus === "open"));*/
-    if(leagueMakerContract && accountData) {
+    if(leagueMakerContract && signerData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
       const createLeagueTxn = await leagueMakerContractWithSigner
@@ -295,7 +342,9 @@ export default function CreateLeague({ setDisplay }) {
         });
     }
     else {
-      alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Please refresh.");
+      // refreshData();
+      router.reload(window.location.pathname);
+      alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Refreshing now...");
       console.log("Account data not set or LeagueMaker contract unitiliazed!");
     }
   }
@@ -406,7 +455,7 @@ export default function CreateLeague({ setDisplay }) {
       {/* <Typography variant="h6" color="white" component="div">
         Fill out this form to create a league for you and your friends!
       </Typography> */}
-
+{/* 
       {showForm && (
         <Typography variant="p" color="white" component="div">
           Insert more info about league creation here... Should persist after clicking I understand ... 
@@ -426,9 +475,9 @@ export default function CreateLeague({ setDisplay }) {
             I Understand!
           </Button> 
         </>
-      )}
+      )} */}
 
-      {showForm && accountData && !(isCreatingLeague || hasCreatedLeague) && (
+      {accountData && !(isCreatingLeague || hasCreatedLeague) && (
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Box

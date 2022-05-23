@@ -42,8 +42,7 @@ const { disconnect } = useDisconnect()
   const { data: signerData } = useSigner()
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
-
-
+  
   
   useEffect(() => {
     //console.log("leagueADdy: " + leagueAddress)
@@ -85,6 +84,7 @@ const { disconnect } = useDisconnect()
     });
   }
 
+  
   
   return (
     
