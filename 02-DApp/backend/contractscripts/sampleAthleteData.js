@@ -2,8 +2,8 @@
 
 module.exports = [
   // possible attribute "points"
-  { name: 'Abbedagge', id: 0, description: "Abbedagge plays mid laner for 100 Thieves. His ID comes from a unit's sound in Age of Empires. He was awarded NA 2nd All Pro Team in Summer 2021." },
-  { name: 'Ablazeolive', id: 1, description: "Ablazeolive plays mid laner for Golden Guardians. He is known for his play on control mages and breakout performance in the 2021 LCS on champs like Zoe and Lucian." },
+  { name: 'Abbedagge', id: 0 },
+  { name: 'Ablazeolive', id: 1 },
   { name: 'aphromoo', id: 2 },
   { name: 'Berserker', id: 3 },
   { name: 'Biofrost', id: 4 },
@@ -15,7 +15,7 @@ module.exports = [
   { name: 'Contractz', id: 10 },
   { name: 'CoreJJ', id: 11 },
   { name: 'Danny', id: 12 },
-  { name: 'IgNar', id: 13 },
+  { name: 'IgNar', id: 13} ,
   { name: 'Gamsu', id: 14 },
   { name: 'FBI', id: 15 },
   { name: 'Jensen', id: 16 },
