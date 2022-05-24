@@ -24,6 +24,8 @@ import { FaCrown } from "react-icons/fa";
 //Router
 import { useRouter } from 'next/router'
 
+import { SignMessage } from '../components/SignMessage'
+
 import { useMediaQuery } from "react-responsive";
 
 export default function Play() {
@@ -86,6 +88,7 @@ export default function Play() {
   return (
 
     <Box>
+      <SignMessage/>
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
       {accountData ? (
         <Grid container spacing={3}>

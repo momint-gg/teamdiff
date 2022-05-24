@@ -27,7 +27,8 @@ import {
   useProvider,
   useContract,
   useEnsLookup,
-  useDisconnect
+  useDisconnect,
+  useSignMessage
 } from "wagmi";
 
 //Router
@@ -97,7 +98,7 @@ export default function CreateLeague({ setDisplay }) {
   //WAGMI Hooks
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
   // const [signerData, setSignerData] = useState(null);
-
+  const { activeConnecter, connect, connectors, connectError, isConnecting, pendingConnector } = useConnect()
   const { data: signerData, status : signerStatus, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner({
     onSettled(data, error) {
       console.log('Settled', data, error)
@@ -143,18 +144,7 @@ export default function CreateLeague({ setDisplay }) {
 
   const[isValidLeagueName, setIsValidLeagueName] = useState(true)
 
-
-  // Use Effect for component mount
   useEffect(() => {
-    if (accountData) {
-      console.log("account data: " + accountData.connector);
-      // const fetchData = async() => {
-      //   const signer = await accountData.connector?.getSigner();
-      //   // console.log("account data: " + JSON.stringify(signer, null, 2));
-      //   setSignerData(signer);
-      // }
-      // fetchData();
-
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -162,14 +152,7 @@ export default function CreateLeague({ setDisplay }) {
         provider
       );
       setLeagueMakerContract(LeagueMakerContract);
-
-      //construct signer
-      // const rpcProvider = new ethers.providers.JsonRpcProvider("rinkeby");
-      // const rpcProvider = new ethers.providers.EtherscanProvider("rinkeby");
-      // const rpcProvider = new ethers.getDefaultProvider("rinkeby");
-      // const rpcProvider = new ethers.providers.InfuraProvider("rinkeby");;
-      // const signer = rpcProvider.getSigner(accountData.address)
-      // setSignerData(signer);
+      //TODO filter
       //TODO add manual filter to event
       // const filter = {
       //   address: LeagueMakerContract.address,
@@ -183,69 +166,147 @@ export default function CreateLeague({ setDisplay }) {
       //     // hexZeroPad(signerAddress, 32)
       //   ],
       // };
+      // const filter = LeagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
+
       // LeagueMakerContract.on(filter, leagueCreatedCallback);
-      // Listen to event for when pack burn function is called
-      //TODO this doesn't listen after the event has triggered once during the session I think
-      LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
-    } else {
-      console.log("no account data found!");
+      // LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
+
+  }, [])
+
+  useEffect(() => {
+    if(accountData && leagueMakerContract) {
+      console.log("connected to acocunt : " + accountData.address);
+      const filter = leagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
+
+      leagueMakerContract.on(filter, leagueCreatedCallback);
     }
-  }, [accountData?.address]);
+    else {
+      console.log("no account data :'(");
+    }
+  }, [accountData?.address])
+
+  // Use Effect for component mount
+  // useEffect(() => {
+  //   if (accountData) {
+  //     console.log("account data: " + accountData.connector);
+  //     // const fetchData = async() => {
+  //     //   const signer = await accountData.connector?.getSigner();
+  //     //   // console.log("account data: " + JSON.stringify(signer, null, 2));
+  //     //   setSignerData(signer);
+  //     // }
+  //     // fetchData();
+
+  //     // Initialize connections to GameItems contract
+  //     const LeagueMakerContract = new ethers.Contract(
+  //       CONTRACT_ADDRESSES.LeagueMaker,
+  //       LeagueMakerJSON.abi,
+  //       provider
+  //     );
+  //     setLeagueMakerContract(LeagueMakerContract);
+
+  //     //construct signer
+  //     // const rpcProvider = new ethers.providers.JsonRpcProvider("rinkeby");
+  //     // const rpcProvider = new ethers.providers.EtherscanProvider("rinkeby");
+  //     // const rpcProvider = new ethers.getDefaultProvider("rinkeby");
+  //     // const rpcProvider = new ethers.providers.InfuraProvider("rinkeby");;
+  //     // const signer = rpcProvider.getSigner(accountData.address)
+  //     // setSignerData(signer);
+  //     //TODO add manual filter to event
+  //     // const filter = {
+  //     //   address: LeagueMakerContract.address,
+  //     //   topics: [
+  //     //     utils.id("leagueCreated(string,address,address)"),
+  //     //     //The below lines indicate what the returned event values should be filtered to
+  //     //     formValues.leagueName,
+  //     //     null,
+  //     //     hexZeroPad(accountData.address, 32),
+  //     //     //TODO add a signer field to leagueCreated Event
+  //     //     // hexZeroPad(signerAddress, 32)
+  //     //   ],
+  //     // };
+  //     // LeagueMakerContract.on(filter, leagueCreatedCallback);
+  //     // Listen to event for when pack burn function is called
+  //     //TODO this doesn't listen after the event has triggered once during the session I think
+  //     LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
+  //   } else {
+  //     console.log("no account data found!");
+  //   }
+  // }, [accountData?.address]);
 
 
 //TODO maybe try using sign message instead of useSigner? https://wagmi.sh/examples/sign-message
-  useEffect(() => {
-    // refreshData();
-    // console.log("singerSTatus: " + signerStatus + ": " + signerData);
-    // if(signerError) 
-    //   console.log("error grabbing signer: " + signerError)
-    // if(isFetching)
-    //   console.log("is Fetching singer");
-    // if(signerLoading) 
-    //   console.log("loading signer...");
-    // const fetchData = async() => {
-    //   const addy = await signerData.getAddress();
-    //   console.log("address data: " + addy);
-    //   // setSignerData(signer);
-    // }
-    // fetchData();
-    if(signerData) {
-      console.log("signer data in useEffect: " + signerData);
-      // const LeagueProxyContractWithSigner = new ethers.Contract(
-      //   router.query.leagueAddress,
-      //   LeagueOfLegendsLogicJSON.abi,
-      //   signerData
-      // );
-      // setLeagueProxyContractWithSigner(LeagueProxyContract);
+  // useEffect(() => {
+  //   // refreshData();
+  //   // console.log("singerSTatus: " + signerStatus + ": " + signerData);
+  //   // if(signerError) 
+  //   //   console.log("error grabbing signer: " + signerError)
+  //   // if(isFetching)
+  //   //   console.log("is Fetching singer");
+  //   // if(signerLoading) 
+  //   //   console.log("loading signer...");
+  //   // const fetchData = async() => {
+  //   //   const addy = await signerData.getAddress();
+  //   //   console.log("address data: " + addy);
+  //   //   // setSignerData(signer);
+  //   // }
+  //   // fetchData();
+  //   if(signerData) {
+  //     console.log("signer data in useEffect: " + signerData);
+  //     // const LeagueProxyContractWithSigner = new ethers.Contract(
+  //     //   router.query.leagueAddress,
+  //     //   LeagueOfLegendsLogicJSON.abi,
+  //     //   signerData
+  //     // );
+  //     // setLeagueProxyContractWithSigner(LeagueProxyContract);
+  //   }
+  //   else
+  //     console.log("no signer data poop")
+  // }, [signerData])
+
+  useEffect(async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    console.log("singer: " + await signer.getAddress());
+    if(activeConnecter) {
+      console.log.apply("activeConnector: " + await activeConnecter.getSigner())
     }
-    else
-      console.log("no signer data poop")
-  }, [signerData])
+    else {
+      console.log("no activeConnecter in useEffect")
+    }
+  }, [activeConnecter?.name])
 
   // Callback for when league created event is fired from league maker contract
   const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
     //TODO create a proxy instance from emitted address
     //TODO then check the admin of that proxy to filter events?
-    if(accountData.connector || signerData) {
+    // signMessage({ message })
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+    console.log("in callback: " + signer.getSigner());
+    // if(accountData.connector || signerData) {
       // const [{ data: signerData, loading, error }, disconnectSigner] = useSigner()
       //TODO signer data is undefined in callback, so I can't sing join league transaction :/
-      console.log("signer data in callback: " + signerData);
+      // console.log("signer data in callback: " + signerData);
       const LeagueProxyContract = new ethers.Contract(
         newLeagueProxyAddress,
         LeagueOfLegendsLogicJSON.abi,
-        signerData
+        signer
       );
 
       const RinkebyUSDCContract = new ethers.Contract(
         "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
         RinkebyUSDCJSON,
-        signerData
+        signer
       );
 
       const stakeAmount = await LeagueProxyContract.stakeAmount();
+      // const approvalMessage = {
+      //   to: RinkebyUSDCContract.address,
+      //   data: "approve(address, uint256"
+      // };
       const approvalTxn = await RinkebyUSDCContract.approve(newLeagueProxyAddress, stakeAmount * 10000000);
 
-      if (accountData.address == newLeagueAdminAddress) {
+      if (signer.getSigner() == newLeagueAdminAddress) {
         console.log("initial Whitelist: " + initialWhitelistAddresses);
         //const LeagueProxyContractWithSigner = LeagueProxyContract.connect(signerData);
         initialWhitelistAddresses.forEach(async (whitelistAddress) => {
@@ -289,11 +350,81 @@ export default function CreateLeague({ setDisplay }) {
         setNewLeagueName(newLeagueName);
         setNewLeagueAddress(newLeagueProxyAddress);
       }
-    }
-  else {
-    console.log("no signer data in callback");
-  }
+    
   };
+  // const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
+  //   //TODO create a proxy instance from emitted address
+  //   //TODO then check the admin of that proxy to filter events?
+  //   // signMessage({ message })
+
+  //   if(accountData.connector || signerData) {
+  //     // const [{ data: signerData, loading, error }, disconnectSigner] = useSigner()
+  //     //TODO signer data is undefined in callback, so I can't sing join league transaction :/
+  //     console.log("signer data in callback: " + signerData);
+  //     const LeagueProxyContract = new ethers.Contract(
+  //       newLeagueProxyAddress,
+  //       LeagueOfLegendsLogicJSON.abi,
+  //       signerData
+  //     );
+
+  //     const RinkebyUSDCContract = new ethers.Contract(
+  //       "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
+  //       RinkebyUSDCJSON,
+  //       signerData
+  //     );
+
+  //     const stakeAmount = await LeagueProxyContract.stakeAmount();
+  //     const approvalTxn = await RinkebyUSDCContract.approve(newLeagueProxyAddress, stakeAmount * 10000000);
+
+  //     if (accountData.address == newLeagueAdminAddress) {
+  //       console.log("initial Whitelist: " + initialWhitelistAddresses);
+  //       //const LeagueProxyContractWithSigner = LeagueProxyContract.connect(signerData);
+  //       initialWhitelistAddresses.forEach(async (whitelistAddress) => {
+  //         //Add all set whitelis    ted users to newly deployed league Proxy
+  //         console.log("adding " + whitelistAddress + " to whitelist");
+  //         const addUsersToWhitelistTxn = await LeagueProxyContract
+  //                                             .addUserToWhitelist(whitelistAddress, {
+  //                                               gasLimit: 100000000
+  //                                             })
+  //                                             .then(
+  //                                               console.log("Added userr to whitelist success")
+  //                                             )
+  //                                             .catch((error) => {
+  //                                               //console.log("")
+  //                                               alert("Add User To WhiteList error: " + error.message);
+  //                                             });
+  //       })
+
+  //       //TODO, send request to user to pay the stake amount, to join the league
+  //       const joinNewlyCreatedLeagueTxn = await LeagueProxyContract
+  //       .joinLeague({
+  //         gasLimit: 1000000
+  //       })
+  //       .then(
+  //         console.log("joining newly created league...")
+  //       )
+  //       .catch((error) => {
+  //         console.log("Join League error: " + error.message);
+  //         // alert("Join League error: " + error.message);
+  //       });
+        
+  //     //const leagueAdminAddress = LeagueProxyContract.admin();
+  //     // if (true) {
+  //       setIsCreatingLeague(false);
+  //       setHasCreatedLeague(true);
+  //       console.log("Finsihed creating league: " 
+  //                   + "\n\tname: " + newLeagueName
+  //                   + "\n\tproxy address: " + newLeagueProxyAddress
+  //                   + "\n\tadmin address: " + newLeagueAdminAddress);
+  //                   // + "\n\tstate of invite list: " + inviteListValues);
+  //       setNewLeagueName(newLeagueName);
+  //       setNewLeagueAddress(newLeagueProxyAddress);
+  //     }
+  //   }
+  //   else {
+  //     console.log("no signer data in callback");
+  //   }
+  // };
 
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
@@ -309,8 +440,10 @@ export default function CreateLeague({ setDisplay }) {
     /*console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
      " \nwhitelistAddresses: " + inviteListValues + 
      "\nisPublic " + (formValues.inviteListStatus === "open"));*/
-    if(leagueMakerContract && signerData) {
-      const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+    // if(leagueMakerContract && signerData) {
+      const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
 
       const createLeagueTxn = await leagueMakerContractWithSigner
         .createLeague(
@@ -340,13 +473,13 @@ export default function CreateLeague({ setDisplay }) {
         .catch((error) => {
           alert("Create League error: " + error.message);
         });
-    }
-    else {
-      // refreshData();
-      router.reload(window.location.pathname);
-      alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Refreshing now...");
-      console.log("Account data not set or LeagueMaker contract unitiliazed!");
-    }
+    // }
+    // else {
+    //   // refreshData();
+    //   router.reload(window.location.pathname);
+    //   alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Refreshing now...");
+    //   console.log("Account data not set or LeagueMaker contract unitiliazed!");
+    // }
   }
   
 
@@ -686,7 +819,7 @@ export default function CreateLeague({ setDisplay }) {
           </a>
           <Button
             onClick={() => {
-              setHasCreatedLeague(false);
+              router.reload(window.location.pathname);
             }}
           >
             Create Another League
