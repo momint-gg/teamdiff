@@ -25,6 +25,7 @@ import {
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import WhitelistJSON from "../../backend/contractscripts/contract_info/abis/Whitelist.json";
 
 export default function JoinLeague({ setDisplay }) {
   const [publicLeagueList, setPublicLeagueList] = useState([]);
@@ -120,7 +121,7 @@ export default function JoinLeague({ setDisplay }) {
                                                         .catch((_error) => {
                                                           error = _error;
                                                           //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
+                                                          // console.log("User To League Map Error: " + _error.message);
                                                         });
 
           if(error == "none") {  
@@ -133,10 +134,19 @@ export default function JoinLeague({ setDisplay }) {
               LeagueOfLegendsLogicJSON.abi,
               provider
             );
+
+            const whitelistContractAddress = await LeagueProxyContract.whitelistContract();
+            // console.log("white: " + whitelistContract);
+            const WhitelistContract = new ethers.Contract(
+              whitelistContractAddress,
+              WhitelistJSON.abi,
+              provider
+            );
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
             //TODO create an instance of whitelist contract and read isPublic from that;
-            const isPublic = await LeagueProxyContract.isPublic();
+            const isPublic = await WhitelistContract.isPublic();
+            // const isPublic = await LeagueProxyContract.isPublic();
             console.log("\tIs public: " + isPublic);
             const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
 

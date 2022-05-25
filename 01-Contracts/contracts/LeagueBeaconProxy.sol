@@ -28,8 +28,7 @@ contract LeagueBeaconProxy is
     Proxy,
     ERC1967Upgrade,
     Ownable,
-    AccessControl,
-    Whitelist
+    AccessControl
 {
     // Vars
 

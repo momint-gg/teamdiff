@@ -70,7 +70,7 @@ const { disconnect } = useDisconnect()
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
   const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
-
+  const [isPublicLeague, setIsPublicLeague] = useState([false]);
   const [isSettingLineup, setIsSettingLineup] = useState(false);
   //const [import {  } from "module";]
 
@@ -96,13 +96,7 @@ const { disconnect } = useDisconnect()
     console.log("lineup: " + lineup);
   }
 
-  // useEffect(() => {
-  //   (router.isReady ? (
-  //     console.log(router.query.leagueAddress)
-  //   ) : (
-  //     console.log("no router")
-  //   ))
-  // }, [router.isReady])
+
 
   useEffect(async () => {
     if(accountData) {
@@ -113,8 +107,8 @@ const { disconnect } = useDisconnect()
         provider
       );
   
-      const proxyAddy = await LeagueMakerContract.userToLeagueMap(accountData.address, 0)
-      console.log("proxy: " + proxyAddy);
+      // const proxyAddy = await LeagueMakerContract.userToLeagueMap(accountData.address, 0)
+      // console.log("proxy: " + proxyAddy);
       // const filter = leagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
       // leagueMakerContract.on(filter, leagueCreatedCallback);
     }
@@ -123,11 +117,6 @@ const { disconnect } = useDisconnect()
     }
   }, [accountData?.address])
 
-  useEffect(() => {
-    // Initialize connections to GameItems contract
-
-
-}, [])
 
   useEffect(() => {
     // setPackNFTs([]);
@@ -144,7 +133,7 @@ const { disconnect } = useDisconnect()
         provider
       );
       setLeagueProxyContract(LeagueProxyContract);
-        
+      // const white
 
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
@@ -152,13 +141,6 @@ const { disconnect } = useDisconnect()
         const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
         setIsLeagueMember(isInLeague);
         // console.log("isInLeague: " + isInLeague)
-        const leagueMember1 = await LeagueProxyContract.leagueMembers(0).catch((e) => console.log(e));
-        // setIsLeagueMember(isInLeague);
-        // console.log("isInLeague: " + leagueMember1)
-        const leagueAdmin = await LeagueProxyContract.admin();
-        //console.log(leagueAdmin);
-        setIsLeagueAdmin(leagueAdmin == accountData.address);
-        
         //Get whitelist of Proxy, to confirm connected user is on whitelist
         const whitelistAddress = await LeagueProxyContract.whitelistContract();
         //console.log("whitelistAddy: " + whitelistAddress);
@@ -167,8 +149,19 @@ const { disconnect } = useDisconnect()
             WhitelistJSON.abi,
             provider
         );
+        const isPublicLeague = await WhitelistContract.isPublic();
+        setIsPublicLeague(isPublicLeague);
+        console.log("isPublicLeague: " + isPublicLeague)
+        const leagueMember1 = await LeagueProxyContract.leagueMembers(0).catch((e) => console.log(e));
+        // setIsLeagueMember(isInLeague);
+        // console.log("isInLeague: " + leagueMember1)
+        const leagueAdmin = await LeagueProxyContract.admin();
+        //console.log(leagueAdmin);
+        setIsLeagueAdmin(leagueAdmin == accountData.address);
+        
+
         const isOnWhitelist = await WhitelistContract.whitelist(accountData.address);
-        //console.log("user is on whitelist: " + isOnWhitelist);
+        console.log("user is on whitelist: " + isOnWhitelist);
         setIsOnWhitelist(isOnWhitelist);
         setIsLoading(false);
 
@@ -238,36 +231,6 @@ const { disconnect } = useDisconnect()
 
   }
 
-  // const [signerData, setSignerData] = useState();
-
-  // useEffect(() => {
-  //   // refreshData();
-  //   // console.log("singerSTatus: " + signerStatus + ": " + signerData);
-  //   // if(signerError) 
-  //   //   console.log("error grabbing signer: " + signerError)
-  //   // if(isFetching)
-  //   //   console.log("is Fetching singer");
-  //   // if(signerLoading) 
-  //   //   console.log("loading signer...");
-  //   // const fetchData = async() => {
-  //   //   const addy = await signerData.getAddress();
-  //   //   console.log("address data: " + addy);
-  //   //   // setSignerData(signer);
-  //   // }
-  //   // fetchData();
-  //   if(signerData) {
-  //     console.log("signer data in useEffect: " + signerData);
-  //     setSignerData(signerData);
-  //     // const LeagueProxyContractWithSigner = new ethers.Contract(
-  //     //   router.query.leagueAddress,
-  //     //   LeagueOfLegendsLogicJSON.abi,
-  //     //   signerData
-  //     // );
-  //     // setLeagueProxyContractWithSigner(LeagueProxyContract);
-  //   }
-  //   else
-  //     console.log("no signer data poop")
-  // }, [signerData1])
 
   const addNewPlayerInviteInput = () => {
     if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
@@ -361,7 +324,7 @@ const { disconnect } = useDisconnect()
         //console.log("With invite values: " + inviteListValues);
       })
       .catch((error) => {
-        alert("Create League error: " + error.message);
+        alert("Set Lineup error: " + error.message);
       });
   }
 
@@ -645,12 +608,26 @@ const { disconnect } = useDisconnect()
                 </Fab>
             </>
             ) : (
+
+              (isPublicLeague ? (
                 <>
                 <Typography>
-                {"IDK how tf you got here, but you aren't whitelisted for this league, please contact the admin " 
-                    + " of the league if you would like to be added."} 
+                {"This is a public league, click below to join: " + leagueName} 
                 </Typography>
-            </>
+                <Fab
+                onClick={joinLeagueHandler}
+                >
+                Join League
+                </Fab>
+                </>
+              ) : (
+                <>
+                <Typography>
+                {"IDK how tf you got here, but you aren't whitelisted for this private league, therefore you cannot join at this time." 
+                 +" Please contact the admin of the league if you would like to be added."} 
+                </Typography>
+                </>
+              ))
             ))
             
           )}

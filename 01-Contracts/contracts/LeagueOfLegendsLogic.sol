@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./TestUSDC.sol";
 
-contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
+contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     using SafeMath for uint256;
 
     string public leagueName;
@@ -105,12 +105,12 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         //leagueMembers.push(_admin);
         admin = _admin;
         stakeAmount = _stakeAmount;
-        isPublic = _isPublic;
+        // isPublic = _isPublic;
         leagueEntryIsClosed = false;
         lineupIsLocked = false;
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
-        whitelistContract = new Whitelist(); // Initializing our whitelist
+        whitelistContract = new Whitelist(_isPublic); // Initializing our whitelist
         rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
         // testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;

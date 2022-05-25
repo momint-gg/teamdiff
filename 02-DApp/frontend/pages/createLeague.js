@@ -245,7 +245,7 @@ export default function CreateLeague({ setDisplay }) {
 
     //Connect to leagueMaker with connect wallet
     const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
-
+    console.log("submission values: " + (formValues.inviteListStatus === "open"));
     //Send createLeague transaction to LeagueMaker
     const createLeagueTxn = await leagueMakerContractWithSigner
       .createLeague(
@@ -269,7 +269,7 @@ export default function CreateLeague({ setDisplay }) {
         //TODO print message to alert if it takes mroe than 60 seconds
       })
       .catch((error) => {
-        alert("Create League error: " + error.error.message);
+        alert("Create League error: " + error.message);
       });
   }
   
