@@ -7,7 +7,7 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  textData += "exports.GameItems = '0x9B85F1611d24204D6b959AC9a49d666536d3ec57';";
+  textData += "exports.GameItems = '0x9B85F1611d24204D6b959AC9a49d666536d3ec57';\n";
   /*
   //Create GameItems Instance
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
@@ -102,23 +102,25 @@ const main = async () => {
   textData += "exports.Beacon = \'" + BeaconInstance.address + "\';\n";
 
   //Signers
-  [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
+  // [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
 
-  // Deploying test USDC contract
-  TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
-  testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
-  await testUsdcContract.deployed();
-  testUsdcContract.connect(owner);
-  console.log("Test USDC Deployed to: " + testUsdcContract.address);
-  textData += "exports.TestUSDC = \'" + testUsdcContract.address + "\';\n";
+  // // Deploying test USDC contract
+  // TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
+  // testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
+  // await testUsdcContract.deployed();
+  // testUsdcContract.connect(owner);
+  // console.log("Test USDC Deployed to: " + testUsdcContract.address);
+  // textData += "exports.TestUSDC = \'" + testUsdcContract.address + "\';\n";
+  textData += "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
 
   // Deploying athletes contract
-  AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
-  AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
-  await AthletesContractInstance.deployed();
-  AthletesContractInstance.connect(owner);
-  console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
-  textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  // AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
+  // AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  // await AthletesContractInstance.deployed();
+  // AthletesContractInstance.connect(owner);
+  // console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
+  // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  textData += "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n"
   
   //Adding polygonUSDC and rinkebyUSDC to contract addresses file
   textData += "exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';" + // When we deploy to mainnet

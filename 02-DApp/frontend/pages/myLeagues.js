@@ -13,7 +13,7 @@ import {
 
 import examplePic from "../assets/images/jinx.webp";
 import LeagueCard from "../components/LeagueCard";
-import LeagueDetails from "./leagueDetails";
+// import LeagueDetails from "./leagueDetails";
 //Web3 Imports
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -124,6 +124,12 @@ const { disconnect } = useDisconnect()
     }
   }, [accountData?.address]);
 
+
+  useEffect(() => {
+    setActiveLeagueList([]);
+    setPendingLeagueList([]);
+  }, [])
+
   //useEffect to update leagues on accountData change
   // var activeListItems;
   // var pendingListItems;
@@ -228,9 +234,9 @@ const { disconnect } = useDisconnect()
 
         </Box>
       )}
-      {leagueOpen && (
+      {/* {leagueOpen && (
         <LeagueDetails leagueData={currLeague} leagueAddress={mountedLeagueAddress} setLeagueOpen={setLeagueOpen} />
-      )}
+      )} */}
     </Box>
   );
 }

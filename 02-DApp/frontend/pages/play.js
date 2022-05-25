@@ -88,7 +88,7 @@ export default function Play() {
   return (
 
     <Box>
-      <SignMessage/>
+      {/* <SignMessage/> */}
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
       {accountData ? (
         <Grid container spacing={3}>

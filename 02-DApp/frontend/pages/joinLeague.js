@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 //Component Imports
 import LeagueCard from "../components/LeagueCard";
-import LeagueDetails from "./leagueDetails";
+// import LeagueDetails from "./leagueDetails";
 //Web3 Imports
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";

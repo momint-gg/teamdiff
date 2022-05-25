@@ -30,22 +30,13 @@ import profilePic from "../assets/images/starter-pack.png";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
-  const {
-    activeConnector,
-    connect,
-    connectors,
-    error : connectError,
-    isConnecting,
-    pendingConnector,
-  } = useConnect()
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
-const { disconnect } = useDisconnect()
+
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const { data: signerData, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
-
+  
   // State Variables
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
@@ -94,24 +85,16 @@ const { disconnect } = useDisconnect()
   }, [accountData?.address]);
 
 
-  useEffect(() => {
-    if(signerError) 
-      console.log("error grabbing signer: " + signerError)
-    if(isFetching)
-      console.log("is Fetching singer");
-    if(signerLoading) 
-      console.log("loading signer...");
-    if(signerData)
-      console.log("signer data in useEffect: " + signerData);
-    else
-      console.log("no signer data poop")
-  }, [signerData])
-
   const mintStarterPack = async () => {
-    if (gameItemsContract && signerData) {
       // Create a new instance of the Contract with a Signer, which allows
       // update methods
-      const gameItemsContractWithSigner = gameItemsContract.connect(signerData);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner()
+      const gameItemsContractWithSigner = new ethers.Contract(
+        CONTRACT_ADDRESSES.GameItems,
+        GameItemsJSON.abi,
+        signer
+      );
 
       const mintTxn = await gameItemsContractWithSigner
         .mintStarterPack()
@@ -121,12 +104,8 @@ const { disconnect } = useDisconnect()
           console.log("Minting pack in progress...");
         })
         .catch((error) => {
-          alert("error: " + error.message);
+          alert("error: " + error.error.message);
         });
-    }
-    else {
-      alert("Oops! Signer data not loaded or GameItems contract unitiliazed. Please refresh the page and try again.");
-    }
   };
 
   return (

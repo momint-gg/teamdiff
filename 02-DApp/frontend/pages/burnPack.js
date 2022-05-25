@@ -29,29 +29,24 @@ import AthleteCard from "../components/AthleteCard";
 import profilePic from "../assets/images/starter-pack.png";
 
 export default function BurnPack({ setDisplay }) {
-  const {
-    activeConnector,
-    connect,
-    connectors,
-    error : connectError,
-    isConnecting,
-    pendingConnector,
-  } = useConnect()
-    const [mintedPackId, setMintedPackId] = useState(null);
-const { data: accountData, isLoading, error } = useAccount({ ens: true })
-// const { disconnect } = useDisconnect()
+  //Wagmi Hooks
+  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const { data: signerData } = useSigner()
+
+  //State Hooks
+  const [mintedPackId, setMintedPackId] = useState(null);
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
   const [canMint, setCanMint] = useState(false);
-  // Use Effect for component mount
+
+  // Use Effect for change in accountData
   useEffect(() => {
     if (accountData) {
       // Initialize connections to GameItems contract
@@ -84,20 +79,24 @@ const { data: accountData, isLoading, error } = useAccount({ ens: true })
     } else {
       console.log("no account data found!");
     }
-  }, []);
+  }, [accountData?.address]);
 
   // TODO hide burn pack if they don't
   const burnStarterPack = async () => {
-    if (gameItemsContract) {
-      // Create a new instance of the Contract with a Signer, which allows
-      // update methods
-      //  setGameItemsContract(gameItemsContract.connect(signerData));
-      const gameItemsContractWithSigner = gameItemsContract.connect(signerData);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner()
+      // Create a new instance of the Contract with a Signer, which allows update methods
 
+      const gameItemsContractWithSigner = new ethers.Contract(
+        CONTRACT_ADDRESSES.GameItems,
+        GameItemsJSON.abi,
+        signer
+      );
+
+      //Calling burn on game items contract
       const burnTxn = await gameItemsContractWithSigner
         .burnStarterPack({
           gasLimit: 10000000,
-          // nonce: nonce || undefined,
         })
         .then((res) => {
           console.log("txn result: " + JSON.stringify(res, null, 2));
@@ -105,9 +104,9 @@ const { data: accountData, isLoading, error } = useAccount({ ens: true })
           console.log("Minting pack in progress...");
         })
         .catch((error) => {
-          alert("error: " + error.message);
+          alert("error: " + error.error.message);
         });
-    }
+    
   };
 
   return (
@@ -198,7 +197,7 @@ const { data: accountData, isLoading, error } = useAccount({ ens: true })
       )}
       {isMinting && (
         <Container>
-          <Typography>Your stuff is minting...</Typography>
+          <Typography>Your pack is burning...</Typography>
           <CircularProgress />
         </Container>
       )}

@@ -109,7 +109,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         leagueEntryIsClosed = false;
         lineupIsLocked = false;
         athletesContract = Athletes(athletesDataStorageAddress);
-        // leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
+        leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(); // Initializing our whitelist
         rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
         // testUSDC = IERC20(_testUSDCAddress);
@@ -347,10 +347,10 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
-        require(
-            !leagueEntryIsClosed,
-            "Nobody can enter/exit the league anymore. The season has started!"
-        );
+        // require(
+        //     !leagueEntryIsClosed,
+        //     "Nobody can enter/exit the league anymore. The season has started!"
+        // );
         whitelistContract.addAddressToWhitelist(_userToAdd);
         //TODO this mapp contain users to league and whitelisted leagues
         leagueMakerContract.updateUserToLeagueMapping(_userToAdd);

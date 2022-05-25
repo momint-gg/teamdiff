@@ -38,7 +38,10 @@ import {
 //Contract imports
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import LeagueMakerJSON from "../../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/abis/Whitelist.json";
+import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
+
 import constants from "../../Constants";
 
 
@@ -55,7 +58,7 @@ const { disconnect } = useDisconnect()
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const { data: signerData1, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
+  // const { data: signerData1, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
 
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
@@ -93,13 +96,46 @@ const { disconnect } = useDisconnect()
     console.log("lineup: " + lineup);
   }
 
+  // useEffect(() => {
+  //   (router.isReady ? (
+  //     console.log(router.query.leagueAddress)
+  //   ) : (
+  //     console.log("no router")
+  //   ))
+  // }, [router.isReady])
+
+  useEffect(async () => {
+    if(accountData) {
+      console.log("connected to acocunt : " + accountData.address);
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+  
+      const proxyAddy = await LeagueMakerContract.userToLeagueMap(accountData.address, 0)
+      console.log("proxy: " + proxyAddy);
+      // const filter = leagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
+      // leagueMakerContract.on(filter, leagueCreatedCallback);
+    }
+    else {
+      console.log("no account data :'(");
+    }
+  }, [accountData?.address])
+
+  useEffect(() => {
+    // Initialize connections to GameItems contract
+
+
+}, [])
+
   useEffect(() => {
     // setPackNFTs([]);
     setAthleteNFTs([]);
     // console.log("leagueAddress: " + leagueAddress)
     // console.log("router: " + JSON.stringify(router.query, null, 2));
     //console.log("signerData: " + JSON.stringify(signerData, null, 2));
-    if (accountData && router.query.leagueAddress) {
+    if (accountData && router.isReady) {
       
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -115,10 +151,10 @@ const { disconnect } = useDisconnect()
         setLeagueName(leagueName);
         const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
         setIsLeagueMember(isInLeague);
-        console.log("isInLeague: " + isInLeague)
+        // console.log("isInLeague: " + isInLeague)
         const leagueMember1 = await LeagueProxyContract.leagueMembers(0).catch((e) => console.log(e));
         // setIsLeagueMember(isInLeague);
-        console.log("isInLeague: " + leagueMember1)
+        // console.log("isInLeague: " + leagueMember1)
         const leagueAdmin = await LeagueProxyContract.admin();
         //console.log(leagueAdmin);
         setIsLeagueAdmin(leagueAdmin == accountData.address);
@@ -175,7 +211,7 @@ const { disconnect } = useDisconnect()
     //   console.log("leagueAddress: " + leagueAddress);
 
     }
-  }, [accountData?.address]);
+  }, [accountData?.address, router.isReady]);
 
   useEffect(() => {
     let flag = true
@@ -202,36 +238,36 @@ const { disconnect } = useDisconnect()
 
   }
 
-  const [signerData, setSignerData] = useState();
+  // const [signerData, setSignerData] = useState();
 
-  useEffect(() => {
-    // refreshData();
-    // console.log("singerSTatus: " + signerStatus + ": " + signerData);
-    // if(signerError) 
-    //   console.log("error grabbing signer: " + signerError)
-    // if(isFetching)
-    //   console.log("is Fetching singer");
-    // if(signerLoading) 
-    //   console.log("loading signer...");
-    // const fetchData = async() => {
-    //   const addy = await signerData.getAddress();
-    //   console.log("address data: " + addy);
-    //   // setSignerData(signer);
-    // }
-    // fetchData();
-    if(signerData) {
-      console.log("signer data in useEffect: " + signerData);
-      setSignerData(signerData);
-      // const LeagueProxyContractWithSigner = new ethers.Contract(
-      //   router.query.leagueAddress,
-      //   LeagueOfLegendsLogicJSON.abi,
-      //   signerData
-      // );
-      // setLeagueProxyContractWithSigner(LeagueProxyContract);
-    }
-    else
-      console.log("no signer data poop")
-  }, [signerData1])
+  // useEffect(() => {
+  //   // refreshData();
+  //   // console.log("singerSTatus: " + signerStatus + ": " + signerData);
+  //   // if(signerError) 
+  //   //   console.log("error grabbing signer: " + signerError)
+  //   // if(isFetching)
+  //   //   console.log("is Fetching singer");
+  //   // if(signerLoading) 
+  //   //   console.log("loading signer...");
+  //   // const fetchData = async() => {
+  //   //   const addy = await signerData.getAddress();
+  //   //   console.log("address data: " + addy);
+  //   //   // setSignerData(signer);
+  //   // }
+  //   // fetchData();
+  //   if(signerData) {
+  //     console.log("signer data in useEffect: " + signerData);
+  //     setSignerData(signerData);
+  //     // const LeagueProxyContractWithSigner = new ethers.Contract(
+  //     //   router.query.leagueAddress,
+  //     //   LeagueOfLegendsLogicJSON.abi,
+  //     //   signerData
+  //     // );
+  //     // setLeagueProxyContractWithSigner(LeagueProxyContract);
+  //   }
+  //   else
+  //     console.log("no signer data poop")
+  // }, [signerData1])
 
   const addNewPlayerInviteInput = () => {
     if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
@@ -252,14 +288,27 @@ const { disconnect } = useDisconnect()
 
   const joinLeagueHandler = async () => {
 
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+
+
+    const RinkebyUSDCContract = new ethers.Contract(
+      "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
+      RinkebyUSDCJSON,
+      signer
+    );
+    const stakeAmount = await leagueProxyContract.stakeAmount();
+    const approvalTxn = await RinkebyUSDCContract.approve(router.query.leagueAddress, stakeAmount * 10000000);
+    
     console.log("joining league: " + router.query.leagueAddress);
+
     //console.log("signer dataL: " + JSON.stringify(signerData, null, 2));
-    const leagueProxyContractWithSigner = leagueProxyContract.connect(signerData);
+    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
     const joinLeagueTxn = await leagueProxyContractWithSigner
-    .joinLeague()
-    // .joinLeague({
-    //     gasLimit: 20000000
-    // })
+    // .joinLeague()
+    .joinLeague({
+        gasLimit: 20000000
+    })
     .then((res) => {
         console.log("txn result: " + JSON.stringify(res, null, 2));
         console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
@@ -272,16 +321,18 @@ const { disconnect } = useDisconnect()
   }
 
   const submitAddUsersToWhitelistClickHandler = async () => {
-    if(signerData) {
-      const leagueProxyContractWithSigner = leagueProxyContract.connect(signerData);
+    // if(signerData) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner()
+      const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
       inviteListValues.forEach(async (invitedAddress, index) => {
         const addUserToWhitelistTxn = await leagueProxyContractWithSigner
         .addUserToWhitelist(invitedAddress, {
-          gasLimit: 1000000000
+          gasLimit: 1000000
         })
         .then((res) => {
             console.log("txn result: " + JSON.stringify(res, null, 2));
-            console.log("Txn: " + JSON.stringify(addUserToWhitelistTxn, null, 2))
+            // console.log("Txn: " + JSON.stringify(addUserToWhitelistTxn, null, 2))
             console.log("joined league")
         })
         .catch((error) => {
@@ -290,10 +341,10 @@ const { disconnect } = useDisconnect()
         });
       })
       
-    }
-    else {
-      console.log("singer Data not set in add user to whitelist function ");
-    }
+    //}
+    // else {
+    //   console.log("singer Data not set in add user to whitelist function ");
+    // }
   }
 
   const submitLineup = async () => {
