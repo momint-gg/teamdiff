@@ -34,27 +34,12 @@ const Layout = ({ children, isMobile }) => {
             {/* {!isMobile && <Typography>MOBILE</Typography>} */}
             
             <Image src={logo} alt="TeamDiff logo" width="300px" height="75px" />
-            <WalletLogin isMobile={isMobile}/>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              paddingRight: 1,
-              paddingLeft: 1,
-              paddingTop: 1,
-              marginRight: 1,
-              marginLeft: 1,
-              marginTop: 1,
-              borderRadius: 1,
-              backgroundColor: "primary.dark",
-              display: "flex",
-            }}
-          >
             {pages.map((page) => (
               <NavLink key={page.name} href={page.href} isMobile={isMobile}>
                 {page.name}
               </NavLink>
             ))}
+            <WalletLogin isMobile={isMobile}/>
           </Box>
           {isMobile? 
             <hr

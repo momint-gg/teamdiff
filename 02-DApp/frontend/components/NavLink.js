@@ -55,8 +55,8 @@ export default function NavLink({ className, href, children, isMobile }) {
                 fontSize: "40px",
                 textDecoration: "none",
                 fontFamily: "Exo",
-                marginRight: "10px",
-                marginLeft: "10px",
+                marginRight: "1%",
+                marginLeft: "1%",
               }
         }
       >
