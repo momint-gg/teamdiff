@@ -121,6 +121,7 @@ const { disconnect } = useDisconnect()
 
 
   const stakedEventCallback = async (stakerAddress, stakeAmount, leagueAddress) => {
+    console.log("inside staked callback")
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
     //Check is admin of the newly created league is the currently logged in account
@@ -128,7 +129,10 @@ const { disconnect } = useDisconnect()
     const currentAddress = await signer.getAddress();
     if(stakerAddress === currentAddress) {
       setIsJoiningLeague(false);
-      router.reload(window.location.pathname);
+      console.log("pushing router");
+      //TODO this is buggy, causes the window to reload like 6 times
+      // router.reload(window.location.pathname);
+      router.push("/leagues/" + leagueAddress);
       // router.reload(window.location.pathname);
 
       // setStakerAddress(stakerAddress)
@@ -150,7 +154,10 @@ const { disconnect } = useDisconnect()
         provider
       );
       setLeagueProxyContract(LeagueProxyContract);
-      LeagueProxyContract.once("Staked", stakedEventCallback);
+      if(isLoading) {
+        LeagueProxyContract.once("Staked", stakedEventCallback);
+        console.log("proxy callback set");
+      }
       // const white
 
       async function fetchData() {
@@ -169,7 +176,7 @@ const { disconnect } = useDisconnect()
         );
         const isPublicLeague = await WhitelistContract.isPublic();
         setIsPublicLeague(isPublicLeague);
-        console.log("isPublicLeague: " + isPublicLeague)
+        // console.log("isPublicLeague: " + isPublicLeague)
         const leagueMember1 = await LeagueProxyContract.leagueMembers(0).catch((e) => console.log(e));
         // setIsLeagueMember(isInLeague);
         // console.log("isInLeague: " + leagueMember1)
@@ -179,7 +186,7 @@ const { disconnect } = useDisconnect()
         
 
         const isOnWhitelist = await WhitelistContract.whitelist(accountData.address);
-        console.log("user is on whitelist: " + isOnWhitelist);
+        // console.log("user is on whitelist: " + isOnWhitelist);
         setIsOnWhitelist(isOnWhitelist);
         setIsLoading(false);
 
@@ -291,9 +298,9 @@ const { disconnect } = useDisconnect()
         gasLimit: 20000000
     })
     .then((res) => {
-        console.log("txn result: " + JSON.stringify(res, null, 2));
-        console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
-        console.log("joined league")
+        // console.log("txn result: " + JSON.stringify(res, null, 2));
+        // console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
+        // console.log("joined league")
     })
     .catch((error) => {
       //console.log("")
@@ -647,7 +654,6 @@ const { disconnect } = useDisconnect()
                 </Typography>
                 </>
               )}
-            )
             {isJoiningLeague && 
               <Box>
                 <Typography>Joining league...</Typography>
