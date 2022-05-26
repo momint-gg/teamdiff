@@ -64,7 +64,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //**************/
     //*** Events ***/
     /***************/
-    event Staked(address sender, uint256 amount);
+    event Staked(address sender, uint256 amount, address leagueAddress);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
 
@@ -315,7 +315,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         leagueMembers.push(msg.sender);
         rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         // rinkebyUSDC.transfer(address(this), stakeAmount);
-        emit Staked(msg.sender, stakeAmount);
+        emit Staked(msg.sender, stakeAmount, address(this));
     }
 
     

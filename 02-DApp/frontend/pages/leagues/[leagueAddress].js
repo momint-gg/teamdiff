@@ -72,6 +72,8 @@ const { disconnect } = useDisconnect()
   const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [isPublicLeague, setIsPublicLeague] = useState([false]);
   const [isSettingLineup, setIsSettingLineup] = useState(false);
+  const [isJoiningLeague, setIsJoiningLeague] = useState(false);
+
   //const [import {  } from "module";]
 
   //Invite list states  
@@ -118,12 +120,27 @@ const { disconnect } = useDisconnect()
   }, [accountData?.address])
 
 
+  const stakedEventCallback = async (stakerAddress, stakeAmount, leagueAddress) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+    //Check is admin of the newly created league is the currently logged in account
+      //If true, proceed with league creation callback behavior
+    const currentAddress = await signer.getAddress();
+    if(stakerAddress === currentAddress) {
+      setIsJoiningLeague(false);
+      router.reload(window.location.pathname);
+      // router.reload(window.location.pathname);
+
+      // setStakerAddress(stakerAddress)
+    }
+    else {
+      console.log(stakerAddress + " != " + currentAddress);
+    }
+  }
+
+
   useEffect(() => {
-    // setPackNFTs([]);
     setAthleteNFTs([]);
-    // console.log("leagueAddress: " + leagueAddress)
-    // console.log("router: " + JSON.stringify(router.query, null, 2));
-    //console.log("signerData: " + JSON.stringify(signerData, null, 2));
     if (accountData && router.isReady) {
       
       // Initialize connections to GameItems contract
@@ -133,6 +150,7 @@ const { disconnect } = useDisconnect()
         provider
       );
       setLeagueProxyContract(LeagueProxyContract);
+      LeagueProxyContract.once("Staked", stakedEventCallback);
       // const white
 
       async function fetchData() {
@@ -250,7 +268,7 @@ const { disconnect } = useDisconnect()
 
 
   const joinLeagueHandler = async () => {
-
+    setIsJoiningLeague(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
@@ -340,7 +358,6 @@ const { disconnect } = useDisconnect()
         </Box>
         ) : (           
         <>
-
         {isLeagueMember ? (
             <>
                 {/* <Avatar
@@ -594,31 +611,33 @@ const { disconnect } = useDisconnect()
                 </>
                     </Box>
                 )}
-                </>
-          ) : (
-            (isOnWhitelist ? (
-            <>
-                <Typography>
-                {"You are whitelisted for this league, click below to accept the invitation to: " + leagueName} 
-                </Typography>
-                <Fab
-                onClick={joinLeagueHandler}
-                >
-                Join League
-                </Fab>
             </>
-            ) : (
+          ) : (
+            <>
 
-              (isPublicLeague ? (
+            {isOnWhitelist ? (
+              <>
+                  <Typography>
+                  {"You are whitelisted for this league, click below to accept the invitation to: " + leagueName} 
+                  </Typography>
+                  <Fab
+                  onClick={joinLeagueHandler}
+                  >
+                  Join League
+                  </Fab>
+              </>
+            ) : (
+              <>
+              {isPublicLeague ? (
                 <>
-                <Typography>
-                {"This is a public league, click below to join: " + leagueName} 
-                </Typography>
-                <Fab
-                onClick={joinLeagueHandler}
-                >
-                Join League
-                </Fab>
+                  <Typography>
+                  {"This is a public league, click below to join: " + leagueName} 
+                  </Typography>
+                  <Fab
+                  onClick={joinLeagueHandler}
+                  >
+                    Join League
+                  </Fab>
                 </>
               ) : (
                 <>
@@ -627,13 +646,22 @@ const { disconnect } = useDisconnect()
                  +" Please contact the admin of the league if you would like to be added."} 
                 </Typography>
                 </>
-              ))
-            ))
-            
+              )}
+            )
+            {isJoiningLeague && 
+              <Box>
+                <Typography>Joining league...</Typography>
+                <CircularProgress />
+              </Box>
+            }
+            </>
           )}
-          </>
-      )}
-     
+            </>
+          )
+        }
+        </>
+        )
+      }
     </Box>
   );
 }

@@ -31,7 +31,6 @@ export default function JoinLeague({ setDisplay }) {
   const [publicLeagueList, setPublicLeagueList] = useState([]);
   const [pendingLeagueList, setPendingLeagueList] = useState([]);
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
-
   const { data: accountData, isLoading: accountDataLoading, error } = useAccount({ ens: true })
 
   //TODO change to matic network for prod
@@ -96,6 +95,8 @@ export default function JoinLeague({ setDisplay }) {
       console.log("no account data");
     }
   }, [accountData?.address]);
+
+
 
 
   useEffect(() => {

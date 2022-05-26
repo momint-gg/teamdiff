@@ -47,6 +47,7 @@ export default function WalletLogin({isMobile}) {
     }
 
   }, [accountData?.address])
+
   
   return (
     <Box>

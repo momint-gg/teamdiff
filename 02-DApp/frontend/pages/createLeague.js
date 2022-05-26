@@ -97,6 +97,7 @@ export default function CreateLeague({ setDisplay }) {
   const [newLeagueName, setNewLeagueName] = useState(null);
   const [newLeagueAddress, setNewLeagueAddress] = useState(null);
   const [formValues, setFormValues] = useState(defaultValues)
+  const [isJoiningLeague, setIsJoiningLeague] = useState(false);
 
   // const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
   //Rendering stat hooks
@@ -148,31 +149,55 @@ export default function CreateLeague({ setDisplay }) {
     }
   }, [accountData?.address])
 
+  //Callback for when a STaked event is fired from leagueProxy contract (occurs when user stakes USDC to joinLeague)
+  const stakedEventCallback = async (stakerAddress, stakeAmount, leagueAddress) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+    //Check is admin of the newly created league is the currently logged in account
+      //If true, proceed with league creation callback behavior
+    const currentAddress = await signer.getAddress();
+    if(stakerAddress === currentAddress) {
+      setIsJoiningLeague(false);
+      // router.reload(window.location.pathname);
+
+      // setStakerAddress(stakerAddress)
+    }
+    else {
+      console.log(stakerAddress + " != " + currentAddress);
+    }
+  }
+
   // Callback for when league created event is fired from league maker contract
   const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
 
     //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
-
-    //Construct LeagueProxyContract with signer
-    const LeagueProxyContractWithSigner = new ethers.Contract(
-      newLeagueProxyAddress,
-      LeagueOfLegendsLogicJSON.abi,
-      signer
-    );
-
-    const RinkebyUSDCContract = new ethers.Contract(
-      "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
-      RinkebyUSDCJSON,
-      signer
-    );
-
-
     //Check is admin of the newly created league is the currently logged in account
       //If true, proceed with league creation callback behavior
     const currentAddress = await signer.getAddress();
     if (currentAddress == newLeagueAdminAddress) {
+      //Update state hooks
+      setIsCreatingLeague(false);
+      setHasCreatedLeague(true);
+      setNewLeagueName(newLeagueName);
+      setNewLeagueAddress(newLeagueProxyAddress);
+      setIsJoiningLeague(true);
+
+      //Construct LeagueProxyContract with signer
+      const LeagueProxyContractWithSigner = new ethers.Contract(
+        newLeagueProxyAddress,
+        LeagueOfLegendsLogicJSON.abi,
+        signer
+      );
+      LeagueProxyContractWithSigner.once("Staked", stakedEventCallback);
+
+
+      const RinkebyUSDCContract = new ethers.Contract(
+        "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
+        RinkebyUSDCJSON,
+        signer
+      );
 
       //Request that user approves their new league to withdraw USDC on behalf of their wallet
         //Required for staking
@@ -183,7 +208,7 @@ export default function CreateLeague({ setDisplay }) {
       .catch((error) => {
         //  console.log("Join League error: " + error.error.message);
          alert("Approve USDC error: " + error.message);
-         setIsCreatingLeague(false);
+         setIsJoiningLeague(false);
 
        });
       
@@ -199,7 +224,7 @@ export default function CreateLeague({ setDisplay }) {
        .catch((error) => {
         //  console.log("Join League error: " + error.error.message);
          alert("Join League error: " + error.message);
-         setIsCreatingLeague(false);
+         setIsJoiningLeague(false);
 
        });
 
@@ -216,17 +241,13 @@ export default function CreateLeague({ setDisplay }) {
         .catch((error) => {
           //console.log("")
           alert("Add User To WhiteList error: " + error.message);
-          setIsCreatingLeague(false);
+          // setIsCreatingLeague(false);
 
         });
       })
 
      
-      //Update state hooks
-      setIsCreatingLeague(false);
-      setHasCreatedLeague(true);
-      setNewLeagueName(newLeagueName);
-      setNewLeagueAddress(newLeagueProxyAddress);
+
       // console.log("Finsihed creating league: " 
       //             + "\n\tname: " + newLeagueName
       //             + "\n\tproxy address: " + newLeagueProxyAddress
@@ -327,7 +348,7 @@ export default function CreateLeague({ setDisplay }) {
     inviteListValuesNew[i] = e.target.value
     //setInviteListValues([...inviteListValues], e);
     setInviteListValues(inviteListValuesNew)
-    console.log("short list in func: " + inviteListValues);
+    // console.log("short list in func: " + inviteListValues);
 
   }
 
@@ -539,7 +560,7 @@ export default function CreateLeague({ setDisplay }) {
                       onChange={e => {
                         //This submits null address when I copy and paste
                         handlePlayerInviteInput(e, index)
-                        console.log("short list outside func: " + inviteListValues);
+                        // console.log("short list outside func: " + inviteListValues);
                       }}
                       value={element}
                       key={index}
@@ -597,18 +618,27 @@ export default function CreateLeague({ setDisplay }) {
           >
             View League on Etherscan
           </a>
-          <br></br>
-          <a
-            href={
-              "http://localhost:3000/leagues/"
-              + newLeagueAddress
-            }
-            target={"_blank"}
-            rel="noreferrer"
-          >
-            View League on TeamDiff
-          </a>
-          <br></br>
+          <br></br> 
+          {isJoiningLeague ? (
+            <Container>
+              <Typography>Joining newly created league...</Typography>
+              <CircularProgress />
+            </Container>
+          ) : (
+            <>
+              <a
+                href={
+                  "http://localhost:3000/leagues/"
+                  + newLeagueAddress
+                }
+                target={"_blank"}
+                rel="noreferrer"
+              >
+                View League on TeamDiff
+              </a>
+              <br></br>
+            </>
+          )}
           <Button
             onClick={() => {
               router.reload(window.location.pathname);

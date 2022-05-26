@@ -86,7 +86,7 @@ const { disconnect } = useDisconnect()
                                                         .catch((_error) => {
                                                           error = _error;
                                                           //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
+                                                          // console.log("User To League Map Error: " + _error.message);
                                                         });
 
           if(error == "none") {  
