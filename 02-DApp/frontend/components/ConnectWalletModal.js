@@ -1,5 +1,10 @@
-import { useAccount, useConnect } from 'wagmi'
-import { Box, Button, Modal, Typography, } from '@mui/material'
+import { useAccount, useConnect } from "wagmi";
+import { Box, Button, Modal, Typography } from "@mui/material";
+import Image from "next/image";
+import MetaMask from "../assets/images/metamask.png";
+import WalletConnect from "../assets/images/wallet-connect.png";
+import CoinbaseWallet from "../assets/images/coinbase.png";
+import { IoCloseOutline } from "react-icons/io";
 
 export default function ConnectWalletModal({
   modalOpen,
@@ -11,6 +16,19 @@ export default function ConnectWalletModal({
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
+
+  function getConnectorImage(connector) {
+    if (connector.name === "MetaMask") {
+      return MetaMask;
+    } else if (connector.name === "WalletConnect") {
+      return WalletConnect;
+    } else if (connector.name === "Coinbase Wallet") {
+      return CoinbaseWallet;
+    } else {
+      return MetaMask;
+    }
+  }
+
   const handleModalClose = () => {
     setModalOpen(false);
   };
@@ -38,88 +56,139 @@ export default function ConnectWalletModal({
         justifyContent: "center",
       }}
     >
-      {isMobile?
-      <Box
-        sx={{
-          position: "absolute",
-          borderTop: "50%",
-          borderLeft: "25%",
-          width: "75%",
-          height: "50%",
-          backgroundColor: "primary.charcoal",
-          boxShadow: 24,
-          borderRadius: "10%",
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          padding: 8,
-        }}
-      >
-        <Typography color={"white"} fontSize={30}>CONNECT</Typography>
-        {connectData.connectors.map((x) => (
-          <Button
-            variant="outlined"
-            color="secondary"
-            disabled={!x.ready}
-            key={x.id}
-            onClick={() => {
-              connect(x);
-              handleModalClose();
-              if (handleClickAway) {
-                handleClickAway();
-              }
-            }}
-            sx={{ flexBasis: "100%", marginBottom: 2, borderRadius: "40px" }}
-          >
-            {x.name}
-            {!x.ready && " (unsupported)"}
-          </Button>
-        ))}
-        {connectError && (
-          <div>{connectError?.message ?? "Failed to connect"}</div>
-        )}
-      </Box> :
-      <Box
-        sx={{
-          position: "absolute",
-          borderTop: "50%",
-          borderLeft: "50%",
-          width: "25%",
-          height: "50%",
-          backgroundColor: "primary.charcoal",
-          boxShadow: 24,
-          borderRadius: "10%",
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          padding: 8,
-        }}
-      >
-        <Typography color={"white"} fontSize={30}>CONNECT</Typography>
-        {connectData.connectors.map((x) => (
-          <Button
-            variant="outlined"
-            color="secondary"
-            disabled={!x.ready}
-            key={x.id}
-            onClick={() => {
-              connect(x);
-              handleModalClose();
-              if (handleClickAway) {
-                handleClickAway();
-              }
-            }}
-            sx={{ flexBasis: "100%", marginBottom: 2, borderRadius: "40px" }}
-          >
-            {x.name}
-            {!x.ready && " (unsupported)"}
-          </Button>
-        ))}
-        {connectError && (
-          <div>{connectError?.message ?? "Failed to connect"}</div>
-        )}
-      </Box>
-      }
+      {isMobile ? (
+        <Box
+          sx={{
+            position: "absolute",
+            borderTop: "50%",
+            borderLeft: "25%",
+            width: "23rem",
+            height: "25rem",
+            backgroundColor: "white",
+            boxShadow: 24,
+            borderRadius: "10%",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            padding: 6,
+          }}
+        >
+          <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bold"}>
+            Connect Wallet
+          </Typography>
+          {connectData.connectors.map((x) => (
+            <Button
+              variant="outlined"
+              color="secondary"
+              disabled={!x.ready}
+              key={x.id}
+              onClick={() => {
+                connect(x);
+                handleModalClose();
+                if (handleClickAway) {
+                  handleClickAway();
+                }
+              }}
+              sx={{
+                flexBasis: "100%",
+                marginBottom: 2,
+                borderRadius: "20px",
+                backgroundColor: "#F4F4F4",
+                borderColor: "#dddddd",
+                color: "black",
+                fontWeight: "500",
+                textTransform: "capitalize",
+                fontSize: "1.4em",
+                textAlign: "left",
+                ":hover": {
+                  backgroundColor: "#dddddd!important",
+                },
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Image
+                  src={getConnectorImage(x)}
+                  alt={x.name}
+                  width="35rem"
+                  height="35rem"
+                />
+                {x.name}
+                {!x.ready && " (unsupported)"}
+              </div>
+            </Button>
+          ))}
+          {connectError && (
+            <div>{connectError?.message ?? "Failed to connect"}</div>
+          )}
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            position: "absolute",
+            borderTop: "50%",
+            borderLeft: "50%",
+            width: "30rem",
+            height: "30rem",
+            backgroundColor: "white",
+            boxShadow: 24,
+            borderRadius: "10%",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            padding: 8,
+          }}
+        >
+          <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bolder"}>
+            Connect Wallet
+          </Typography>
+          <div>
+            <IoCloseOutline size={"3rem"} />
+          </div>
+          {connectData.connectors.map((x) => (
+            <Button
+              variant="contained"
+              disabled={!x.ready}
+              key={x.id}
+              onClick={() => {
+                connect(x);
+                handleModalClose();
+                if (handleClickAway) {
+                  handleClickAway();
+                }
+              }}
+              sx={{
+                flexBasis: "100%",
+                marginBottom: 2,
+                borderRadius: "20px",
+                backgroundColor: "#F4F4F4",
+                borderColor: "#dddddd",
+                color: "black",
+                fontWeight: "500",
+                textTransform: "capitalize",
+                fontSize: "1.4em",
+                textAlign: "left",
+                ":hover": {
+                  backgroundColor: "#dddddd!important",
+                },
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Image
+                  src={getConnectorImage(x)}
+                  alt={x.name}
+                  width="35rem"
+                  height="35rem"
+                />
+                {x.name}
+                {!x.ready && " (unsupported)"}
+              </div>
+            </Button>
+          ))}
+          {connectError && (
+            <div>{connectError?.message ?? "Failed to connect"}</div>
+          )}
+        </Box>
+      )}
     </Modal>
   );
 }
