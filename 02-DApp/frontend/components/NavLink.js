@@ -13,21 +13,19 @@ export default function NavLink({ className, href, children, isMobile }) {
           router.pathname === href
             ? {
                 color: "white",
-                fontSize: "20px",
+                fontSize: "15px",
                 textDecoration: "underline",
                 fontFamily: "Exo",
                 marginRight: "10px",
-                marginLeft: "10px",
                 textDecorationColor: "cyan",
                 textUnderlineOffset: "10px",
               }
             : {
                 color: "white",
-                fontSize: "20px",
+                fontSize: "15px",
                 textDecoration: "none",
                 fontFamily: "Exo",
                 marginRight: "10px",
-                marginLeft: "10px",
               }
         }
       >
@@ -42,21 +40,19 @@ export default function NavLink({ className, href, children, isMobile }) {
           router.pathname === href
             ? {
                 color: "white",
-                fontSize: "40px",
+                fontSize: "24px",
                 textDecoration: "underline",
                 fontFamily: "Exo",
-                marginRight: "1%",
-                marginLeft: "1%",
+                marginRight: "10px",
                 textDecorationColor: "cyan",
                 textUnderlineOffset: "10px",
               }
             : {
                 color: "white",
-                fontSize: "40px",
+                fontSize: "24px",
                 textDecoration: "none",
                 fontFamily: "Exo",
-                marginRight: "1%",
-                marginLeft: "1%",
+                marginRight: "10px",
               }
         }
       >

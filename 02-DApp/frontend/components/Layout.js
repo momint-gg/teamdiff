@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import Image from "next/image";
 import WalletLogin from "../components/WalletLogin";
 import logo from "../assets/images/logo-horizontal.png";
@@ -22,7 +22,8 @@ const Layout = ({ children, isMobile }) => {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "flex-end",
+              flexDirection: "row",
               p: 1,
               m: 1,
               borderRadius: 1,
@@ -32,8 +33,9 @@ const Layout = ({ children, isMobile }) => {
           >
             {/* {isWeb && <Typography>WEB</Typography>} */}
             {/* {!isMobile && <Typography>MOBILE</Typography>} */}
-            
-            <Image src={logo} alt="TeamDiff logo" width="300px" height="75px" />
+            <Container alignSelf={"flex-start"}>
+            <Image src={logo} alt="TeamDiff logo" width="300px" height="75px"/>
+            </Container>
             {pages.map((page) => (
               <NavLink key={page.name} href={page.href} isMobile={isMobile}>
                 {page.name}
