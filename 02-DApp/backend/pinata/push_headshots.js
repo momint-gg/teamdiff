@@ -22,14 +22,18 @@ async function pushHeadshots() {
     const readableStreamForFile = fs.createReadStream(
       `headshots/${headshots[i]}`
     );
-    let result = await pinata.pinFileToIPFS(readableStreamForFile);
-    console.log(result.IpfsHash + '\n');
+    try {
+      let result = await pinata.pinFileToIPFS(readableStreamForFile, {});
+      console.log(result.IpfsHash + '\n');
 
-    // Creating array with athlete name to their ipfs hash
-    const athleteName = headshots[i].split('.')[0];
-    const pinataHash = `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`;
-    const currStr = `"${athleteName}": "${pinataHash}/",`;
-    finalArr.push(currStr);
+      // Creating array with athlete name to their ipfs hash
+      const athleteName = headshots[i].split('.')[0];
+      const pinataHash = `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`;
+      const currStr = `"${athleteName}": "${pinataHash}/",`;
+      finalArr.push(currStr);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   for (let i = 0; i < finalArr.length; i++) {
