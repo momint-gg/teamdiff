@@ -13,6 +13,6 @@ module.exports = [
     697, // Chainlink sub ID
   ],
   "https://gateway.pinata.cloud/ipfs/QmWrW8LwYwusQieTnwX6Bj74qxrXWPEJ3mLzzN3ynjWqsX/", // athleteURI (pinata url) - updated Mar 8
-  "https://gateway.pinata.cloud/ipfs/QmVaHk5vQJnbZNmcrdh66G6zaB9WSTLX8ZXeVd8WbyPKKW/", // starterPackURI (pinata url)
-  "Insert booster pack URI here :)", // boosterPackURI (pinata url)
+  "https://gateway.pinata.cloud/ipfs/QmQZHHJTxE6zt7fdRUbZpqNod3d2DMVscB4sBXk1nZXiTh/", // starterPackURI (pinata url)
+  "", // boosterPackURI (v2)
 ];
