@@ -125,7 +125,7 @@ export default function WalletLogin({isMobile}) {
               onClick={handleModalOpen}
               style={{ color: "black", borderRadius: "40px", fontSize: 15 }}
             >
-              CONNECT WALLET
+              CONNECT
             </Button>
           }
           

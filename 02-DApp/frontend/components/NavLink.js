@@ -13,19 +13,19 @@ export default function NavLink({ className, href, children, isMobile }) {
           router.pathname === href
             ? {
                 color: "white",
-                fontSize: "15px",
+                fontSize: "18px",
                 textDecoration: "underline",
                 fontFamily: "Exo",
-                marginRight: "10px",
+                marginLeft: "10px",
                 textDecorationColor: "cyan",
                 textUnderlineOffset: "10px",
               }
             : {
                 color: "white",
-                fontSize: "15px",
+                fontSize: "18px",
                 textDecoration: "none",
                 fontFamily: "Exo",
-                marginRight: "10px",
+                marginLeft: "10px",
               }
         }
       >

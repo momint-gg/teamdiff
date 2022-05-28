@@ -10,7 +10,7 @@ import { useMediaQuery } from "react-responsive";
 export default function MintHome() {
   const [displayMint, setDisplayMint] = useState(false);
   const [displayCollection, setDisplayCollection] = useState(false);
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   return (
     <Box>

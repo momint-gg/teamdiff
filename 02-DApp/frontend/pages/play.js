@@ -54,7 +54,7 @@ export default function Play() {
     setMenu(false);
   };
 
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   // const handleViewLeaguesClick = (e) => {
   //   e.preventDefault()
@@ -79,8 +79,8 @@ export default function Play() {
     <Box>
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
       {accountData ? (
-        <Grid container spacing={3}>
-          <Grid item xs={4}>
+        <Grid container spacing={isMobile? 1 : 3}>
+          <Grid item xs={isMobile? 12 : 4}>
             <Card variant="outlined" onClick={() => router.push("/myLeagues")}>
             <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
@@ -98,7 +98,7 @@ export default function Play() {
                 </Fragment>
             </Card>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isMobile? 12 : 4}>
             <Card variant="outlined" onClick={() =>  router.push("/joinLeague")}>
             <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
