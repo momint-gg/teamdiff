@@ -4,7 +4,7 @@ import Image from "next/image";
 import MetaMask from "../assets/images/metamask.png";
 import WalletConnect from "../assets/images/wallet-connect.png";
 import CoinbaseWallet from "../assets/images/coinbase.png";
-import { IoCloseOutline } from "react-icons/io";
+import { IoCloseOutline } from "react-icons/io5";
 
 export default function ConnectWalletModal({
   modalOpen,
