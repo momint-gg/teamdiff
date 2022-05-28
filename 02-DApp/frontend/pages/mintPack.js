@@ -5,6 +5,7 @@ import {
   useProvider,
   useContract,
   useEnsLookup,
+  useNetwork,
 } from "wagmi";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
@@ -33,6 +34,7 @@ export default function MintPack({ setDisplay }) {
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
+  const [activeChain, chains] = useNetwork()
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -44,6 +46,21 @@ export default function MintPack({ setDisplay }) {
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [packsAvailable, setPacksAvailable] = useState(null);
+
+  const currentUserChain = activeChain?.data?.chain?.id
+
+  const isPolygon = currentUserChain === 137
+
+  const checkUserChain = () => {
+    if (!currentUserChain || currentUserChain != 137) {
+      if (currentUserChain === 1) {
+        // in the future we can potentially switch networks for them using useNetwork wagmi hook?
+        alert("Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint.")
+      } else {
+        alert("Please switch to the Polygon network to proceed with the mint!")
+      }
+    }
+  }
 
   // Use Effect for component mount
   useEffect(async () => {
@@ -81,10 +98,16 @@ export default function MintPack({ setDisplay }) {
         ],
       };
       GameItemsContract.on(filter, packMintedCallback);
+
+      checkUserChain()
     } else {
       console.log("no account data found!");
     }
   }, []);
+
+  useEffect(() => {
+    console.log("user chain changed: ", currentUserChain)
+  }, [currentUserChain])
 
   const mintStarterPack = async () => {
     if (gameItemsContract) {
@@ -188,9 +211,29 @@ export default function MintPack({ setDisplay }) {
                 width: "10%",
                 fontSize: 20,
               }}
+              disabled={!isPolygon}
             >
               MINT
             </Button>
+          </Box>
+          <Box
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+              display: "flex",
+              paddingTop: "20px",
+            }}
+          >
+          {!isPolygon && 
+              <Typography
+                style={{
+                  color: "red",
+                  fontSize: 16
+                }}
+              >
+                Please switch to Polygon to proceed with minting.
+              </Typography>
+            }
           </Box>
         </Container>
       )}
