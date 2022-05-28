@@ -1,8 +1,10 @@
+const fs = require('fs');
+
 // Reads in athletes from excel file and generates JSON
 // Dumps JSON into final_metadata folder for final upload
 
 // Generated from push_headshots.js
-const athleteImages = {
+athleteImages = {
   Abbedagge:
     'https://gateway.pinata.cloud/ipfs/QmSRWW6xugkewMeJBLTKSBMnkgPFMp1bxKSvwhtV8H6EGN/',
   Ablazeolive:
@@ -97,11 +99,17 @@ const athleteImages = {
     'https://gateway.pinata.cloud/ipfs/QmWtr1GvvUrQWBz4MoMKr3vdA79EZTQmwhgM4EjZMz3BjN/',
 };
 
-async function main() {}
+// Reading in from sorted excel sheet and generating JSON for each athlete, named 0-49.json
+// Dumped in final_metadata folder
+async function generateJSON() {
+  for (const key of Object.keys(athleteImages)) {
+    console.log(key, athleteImages[key]);
+  }
+}
 
 const runMain = async () => {
   try {
-    await main();
+    await generateJSON();
     process.exit(0);
   } catch (error) {
     console.log(error);
