@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Container, Typography } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 import WalletLogin from "../components/WalletLogin";
 import logo from "../assets/images/logo-horizontal.png";
 import Footer from "./Footer";
@@ -14,7 +15,7 @@ const Layout = ({ children, isMobile }) => {
     { name: "BURN", href: "/burnPack" },
   ];
 
-  console.log(isMobile);
+  // console.log(isMobile);
   return (
     <>
       <Box component="div" height="100%" backgroundColor="primary.dark">
@@ -68,7 +69,11 @@ const Layout = ({ children, isMobile }) => {
             }}
           >
             <Container>
-            <Image src={logo} alt="TeamDiff logo" width="300px" height="75px"/>
+            <Link href="/"> 
+              <a>
+                <Image src={logo} alt="TeamDiff logo" width="300px" height="75px"/>
+              </a>
+            </Link>
             </Container>
             {pages.map((page) => (
               <NavLink key={page.name} href={page.href} isMobile={isMobile}>
