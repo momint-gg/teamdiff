@@ -76,6 +76,19 @@ export default function ConnectWalletModal({
           <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bold"}>
             Connect Wallet
           </Typography>
+          <IoCloseOutline 
+          size={"3rem"} 
+          onClick={() => {
+            handleModalClose()
+            if (handleClickAway) {
+              handleClickAway()
+            }}} 
+          style={{ cursor: "pointer",
+                   position: "absolute",
+                   right: "5px",
+                   top: "5px"
+                }}
+          />
           {connectData.connectors.map((x) => (
             <Button
               variant="outlined"
@@ -141,9 +154,19 @@ export default function ConnectWalletModal({
           <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bolder"}>
             Connect Wallet
           </Typography>
-          <div>
-            <IoCloseOutline size={"3rem"} />
-          </div>
+          <IoCloseOutline 
+          size={"3rem"} 
+          onClick={() => {
+            handleModalClose()
+            if (handleClickAway) {
+              handleClickAway()
+            }}} 
+          style={{ cursor: "pointer",
+                   position: "absolute",
+                   right: "10px",
+                   top: "10px"
+                }}
+          />
           {connectData.connectors.map((x) => (
             <Button
               variant="contained"
