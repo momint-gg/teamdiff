@@ -15,7 +15,6 @@ const Layout = ({ children, isMobile }) => {
     { name: "BURN", href: "/burnPack" },
   ];
 
-  // console.log(isMobile);
   return (
     <>
       <Box component="div" height="100%" backgroundColor="primary.dark">
