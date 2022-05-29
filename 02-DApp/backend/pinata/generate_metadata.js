@@ -1,7 +1,13 @@
 const fs = require('fs');
+const XLSX = require('xlsx');
+const readXlsxFile = require('read-excel-file');
+const path = require('path');
 
 // Reads in athletes from excel file and generates JSON
 // Dumps JSON into final_metadata folder for final upload
+
+// Our number of athletes
+numAthletes = 50;
 
 // Generated from push_headshots.js
 athleteImages = {
@@ -35,7 +41,7 @@ athleteImages = {
     'https://gateway.pinata.cloud/ipfs/QmXPEkp2jDUht3r7zbS2YXZJatiroJzdhnTcuDXJ6VGSrF/',
   Gamsu:
     'https://gateway.pinata.cloud/ipfs/QmRcpkboabLz9HbCWZyXGtjWmEYxMsiALC6Ujqm1t2DTaM/',
-  'Hans sama':
+  Hans_sama:
     'https://gateway.pinata.cloud/ipfs/QmQuGr9dDgjxVFH7r7ps52YRY3SLoFwNCztQegGoz5gRwh/',
   Huni: 'https://gateway.pinata.cloud/ipfs/QmVGBsn58vCohDccnoLY668w1SzExrPu6NuNuEZrAcQjjq/',
   IgNar:
@@ -99,13 +105,59 @@ athleteImages = {
     'https://gateway.pinata.cloud/ipfs/QmWtr1GvvUrQWBz4MoMKr3vdA79EZTQmwhgM4EjZMz3BjN/',
 };
 
-// Reading in from sorted excel sheet and generating JSON for each athlete, named 0-49.json
-// Dumped in final_metadata folder
-async function generateJSON() {
-  for (const key of Object.keys(athleteImages)) {
-    console.log(key, athleteImages[key]);
+const parseExcel = (filename) => {
+  const excelData = XLSX.readFile(filename);
+
+  return Object.keys(excelData.Sheets).map((name) => ({
+    name,
+    data: XLSX.utils.sheet_to_json(excelData.Sheets[name]),
+  }));
+};
+
+// Populating the final_metadata folder
+const generateJSON = async () => {
+  console.log('Num athletes is ', Object.keys(athleteImages).length);
+
+  parseExcel('./athletes.xlsx').forEach((element) => {
+    data = element.data;
+  });
+
+  for (let i = 0; i < numAthletes + 1; i++) {
+    if (i == 0) continue;
+    const gamer_name = data[i]['__EMPTY'];
+    const name = data[i]['__EMPTY_1'];
+    const team = data[i]['__EMPTY_2'];
+    const team_abbreviated = data[i]['__EMPTY_3'];
+    const position = data[i]['__EMPTY_4'];
+    const description = data[i]['__EMPTY_5'];
+    if (name == 'Hans sama') {
+      // Not necessary but was just debugging shit
+      imageHash = athleteImages['Hans_sama'];
+    } else {
+      imageHash = athleteImages[gamer_name];
+    }
+
+    // Constructing object with metadata properties
+    const teamAttribute = { trait_type: 'Team', value: team };
+    const positionAttribute = { trait_type: 'Position', value: position };
+    const attributes = [teamAttribute, positionAttribute];
+    const jsonObject = {
+      name: gamer_name,
+      description: description,
+      image: imageHash,
+      attributes: attributes,
+    };
+    // Stringifying our JSON object
+    const jsonString = JSON.stringify(jsonObject);
+    console.log('Final json ', jsonString);
+
+    // Writing into final_metadata folder
+    fs.writeFileSync(
+      path.resolve(__dirname, `./final_metadata/${i - 1}.json`),
+      jsonString
+    );
   }
-}
+};
 
 const runMain = async () => {
   try {

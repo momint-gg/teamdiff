@@ -1,0 +1,9 @@
+{
+  "name": "Berserker",
+  "description": "Berserker plays bot laner for Cloud9. He originally played in South Korea's primary and secondary leagues.",
+  "image": "https://gateway.pinata.cloud/ipfs/QmaSXrJ7MjF4L8mHqgqYYwbj4afFmMhUDyrcoaHYB9rp32/",
+  "attributes": [
+    { "trait_type": "Team", "value": "Cloud9" },
+    { "trait_type": "Position", "value": "ADC" }
+  ]
+}
