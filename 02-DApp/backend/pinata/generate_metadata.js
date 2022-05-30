@@ -170,3 +170,5 @@ const runMain = async () => {
 };
 
 runMain();
+
+// Note: You should manually upload the final_metadata folder to pinata (didn't feel like automating that part cuz I got hungry)

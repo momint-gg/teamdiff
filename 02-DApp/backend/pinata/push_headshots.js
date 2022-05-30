@@ -1,5 +1,4 @@
 require('dotenv').config();
-const { CallMadeSharp } = require('@material-ui/icons');
 const pinataSDK = require('@pinata/sdk');
 const fs = require('fs');
 
