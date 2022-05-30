@@ -2,9 +2,9 @@
 
 import csv
 import datetime as dt
-# import ipfsApi
+import ipfsApi
 import json
-# import mwclient
+import mwclient
 from pprint import pprint
 import os
 import random
@@ -450,25 +450,25 @@ class Datafetcher():
 
 
 def main():
-    # if len(sys.argv) != 7:
-    #     Datafetcher.usage()
-    #     return
+    if len(sys.argv) != 7:
+        Datafetcher.usage()
+        return
 
-    # a = sys.argv[1]
-    # t = sys.argv[3]
-    # d = sys.argv[5]
+    a = sys.argv[1]
+    t = sys.argv[3]
+    d = sys.argv[5]
 
-    # if a != "-a" or t != "-t" or d != "-d":
-    #     Datafetcher.usage()
-    #     return
+    if a != "-a" or t != "-t" or d != "-d":
+        Datafetcher.usage()
+        return
 
-    # athlete_source = sys.argv[2]
-    # tournament = sys.argv[4]
-    # days = int(sys.argv[6])
+    athlete_source = sys.argv[2]
+    tournament = sys.argv[4]
+    days = int(sys.argv[6])
 
-    # df = Datafetcher(athlete_source, tournament, days)
-    # print("\nStarting datafetch for the last", days,
-    #       "for the following tournament:", tournament + "...\n")
+    df = Datafetcher(athlete_source, tournament, days)
+    print("\nStarting datafetch for the last", days,
+          "for the following tournament:", tournament + "...\n")
 
     df.set_athletes_and_teams_from_csv()
 

@@ -3,8 +3,8 @@ const fs = require('fs');
 const pinataSDK = require('@pinata/sdk');
 
 // ADD IN YOUR OWN KEYS HERE
-const PINATA_KEY = process.env.PINATA_KEY;
-const SECRET_API_KEY = process.env.PINATA_SECRET_KEY;
+const PINATA_KEY='f6d42225a14dc568107e';
+const SECRET_API_KEY='72ebc73480ebf7dda08117e7e85b6e5e7632f20b562c5336443607ee7e3ab56a';
 
 const pinata = pinataSDK(PINATA_KEY, SECRET_API_KEY);
 
