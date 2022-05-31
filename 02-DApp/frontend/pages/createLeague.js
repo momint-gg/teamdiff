@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Input from '@mui/material/Input';
+// import Link from '@mui/material/Link'
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@material-ui/core/Grid'
 // import wallet_address_validator from 'wallet-address-validator';
@@ -18,6 +19,7 @@ import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
+// import { Link } from "react-router-dom"
 
 //Wagmi imports
 import {
@@ -212,41 +214,42 @@ export default function CreateLeague({ setDisplay }) {
     console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
      " \nwhitelistAddresses: " + preparedInviteListValues + 
      "\nisPublic " + (formValues.inviteListStatus === "open"));
-    if(leagueMakerContract && accountData) {
-      const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
+     setHasCreatedLeague(true);
+    // if(leagueMakerContract && accountData) {
+    //   const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
-      const createLeagueTxn = await leagueMakerContractWithSigner
-        .createLeague(
-            formValues.leagueName,
-            formValues.buyInCost,
-            //TODO this isn't setting the public var isPublic??
-            // true,
-            (formValues.inviteListStatus === "open"),
-            accountData.address,
-            CONTRACT_ADDRESSES.TestUSDC,
-            CONTRACT_ADDRESSES.Athletes,
-            preparedInviteListValues,
-            //CONTRACT_ADDRESSES.Athletes,
-          {
-          gasLimit: 10000000,
-          // nonce: nonce || undefined,
-        })
-        .then((res) => {
-          console.log("txn result: " + JSON.stringify(res, null, 2));
-          setIsCreatingLeague(true);
-          console.log("League Creation in progress...");
-          console.log("With invite values: " + preparedInviteListValues);
-          //how to tell if transaction failed?
-          //TODO print message to alert if it takes mroe than 60 seconds
-        })
-        .catch((error) => {
-          alert("Create League error: " + error.message);
-        });
-    }
-    else {
-      alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Please refresh.");
-      console.log("Account data not set or LeagueMaker contract unitiliazed!");
-    }
+    //   const createLeagueTxn = await leagueMakerContractWithSigner
+    //     .createLeague(
+    //         formValues.leagueName,
+    //         formValues.buyInCost,
+    //         //TODO this isn't setting the public var isPublic??
+    //         // true,
+    //         (formValues.inviteListStatus === "open"),
+    //         accountData.address,
+    //         CONTRACT_ADDRESSES.TestUSDC,
+    //         CONTRACT_ADDRESSES.Athletes,
+    //         preparedInviteListValues,
+    //         //CONTRACT_ADDRESSES.Athletes,
+    //       {
+    //       gasLimit: 10000000,
+    //       // nonce: nonce || undefined,
+    //     })
+    //     .then((res) => {
+    //       console.log("txn result: " + JSON.stringify(res, null, 2));
+    //       setIsCreatingLeague(true);
+    //       console.log("League Creation in progress...");
+    //       console.log("With invite values: " + preparedInviteListValues);
+    //       //how to tell if transaction failed?
+    //       //TODO print message to alert if it takes mroe than 60 seconds
+    //     })
+    //     .catch((error) => {
+    //       alert("Create League error: " + error.message);
+    //     });
+    // }
+    // else {
+    //   alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Please refresh.");
+    //   console.log("Account data not set or LeagueMaker contract unitiliazed!");
+    // }
   }
   
 
@@ -292,7 +295,7 @@ export default function CreateLeague({ setDisplay }) {
   const validateFormValues = () => {
     return isValidBuyInCost && formValues.buyInCost !== "" && 
            isValidLeagueName && formValues.leagueName !== "" && 
-           preparedInviteListValues.length > 0 && validAddressesStatus
+           (formValues.inviteListStatus === "open" || preparedInviteListValues.length > 0 && validAddressesStatus)
   }
 
   useEffect(() => {
@@ -379,7 +382,7 @@ export default function CreateLeague({ setDisplay }) {
         </Typography>
       )}
 
-      {showForm && accountData && (
+      {showForm && accountData && !(isCreatingLeague || hasCreatedLeague) && (
         <Typography variant="p" color="white" component="div">
           Insert more info about league creation here... Should persist after clicking I understand ... 
           Buy in cost must be less than 100 USD. League name must be between 1-100 characters. 
@@ -594,27 +597,31 @@ export default function CreateLeague({ setDisplay }) {
       )}
       {isCreatingLeague && (
         <Container>
-          <Typography>Your League is being created...</Typography>
+          <Typography color="white">Your league is being created... Hang on, this could take a minute! </Typography>
           <CircularProgress />
         </Container>
       )}
       {hasCreatedLeague && (
         <Box>
-          <Typography>
+          <Typography color="white">
             {"Your Team Diff League \"" + newLeagueName + "\" has been created!"}
           </Typography>
-          <a
-            href={
-              "https://rinkeby.etherscan.io/address/"
-              + newLeagueAddress
-              + "#internaltx"
-            }
+          <Button
             target={"_blank"}
-            rel="noreferrer"
+            href={"https://rinkeby.etherscan.io/address/"
+            + newLeagueAddress
+            + "#internaltx"}
+            variant="outlined"
+            sx={{
+              mb: "10px",
+              mt: "10px"
+            }}
           >
             View League on Etherscan
-          </a>
+          </Button>
+          <br />
           <Button
+            variant="outlined"
             onClick={() => {
               setHasCreatedLeague(false);
             }}
