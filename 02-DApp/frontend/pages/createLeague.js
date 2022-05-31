@@ -214,42 +214,42 @@ export default function CreateLeague({ setDisplay }) {
     console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
      " \nwhitelistAddresses: " + preparedInviteListValues + 
      "\nisPublic " + (formValues.inviteListStatus === "open"));
-     setHasCreatedLeague(true);
-    // if(leagueMakerContract && accountData) {
-    //   const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
+    //  setHasCreatedLeague(true);
+    if(leagueMakerContract && accountData) {
+      const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
-    //   const createLeagueTxn = await leagueMakerContractWithSigner
-    //     .createLeague(
-    //         formValues.leagueName,
-    //         formValues.buyInCost,
-    //         //TODO this isn't setting the public var isPublic??
-    //         // true,
-    //         (formValues.inviteListStatus === "open"),
-    //         accountData.address,
-    //         CONTRACT_ADDRESSES.TestUSDC,
-    //         CONTRACT_ADDRESSES.Athletes,
-    //         preparedInviteListValues,
-    //         //CONTRACT_ADDRESSES.Athletes,
-    //       {
-    //       gasLimit: 10000000,
-    //       // nonce: nonce || undefined,
-    //     })
-    //     .then((res) => {
-    //       console.log("txn result: " + JSON.stringify(res, null, 2));
-    //       setIsCreatingLeague(true);
-    //       console.log("League Creation in progress...");
-    //       console.log("With invite values: " + preparedInviteListValues);
-    //       //how to tell if transaction failed?
-    //       //TODO print message to alert if it takes mroe than 60 seconds
-    //     })
-    //     .catch((error) => {
-    //       alert("Create League error: " + error.message);
-    //     });
-    // }
-    // else {
-    //   alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Please refresh.");
-    //   console.log("Account data not set or LeagueMaker contract unitiliazed!");
-    // }
+      const createLeagueTxn = await leagueMakerContractWithSigner
+        .createLeague(
+            formValues.leagueName,
+            formValues.buyInCost,
+            //TODO this isn't setting the public var isPublic??
+            // true,
+            (formValues.inviteListStatus === "open"),
+            accountData.address,
+            CONTRACT_ADDRESSES.TestUSDC,
+            CONTRACT_ADDRESSES.Athletes,
+            preparedInviteListValues,
+            //CONTRACT_ADDRESSES.Athletes,
+          {
+          gasLimit: 10000000,
+          // nonce: nonce || undefined,
+        })
+        .then((res) => {
+          console.log("txn result: " + JSON.stringify(res, null, 2));
+          setIsCreatingLeague(true);
+          console.log("League Creation in progress...");
+          console.log("With invite values: " + preparedInviteListValues);
+          //how to tell if transaction failed?
+          //TODO print message to alert if it takes mroe than 60 seconds
+        })
+        .catch((error) => {
+          alert("Create League error: " + error.message);
+        });
+    }
+    else {
+      alert("error: Account data not set or LeagueMaker contract unitiliazed!\n Please refresh.");
+      console.log("Account data not set or LeagueMaker contract unitiliazed!");
+    }
   }
   
 
