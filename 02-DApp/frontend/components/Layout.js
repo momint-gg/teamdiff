@@ -67,13 +67,13 @@ const Layout = ({ children, isMobile }) => {
               backgroundColor: "primary.dark",
             }}
           >
-            <Container>
+            <Box sx={{flexGrow: 1}}>
             <Link href="/"> 
               <a>
                 <Image src={logo} alt="TeamDiff logo" width="300px" height="75px"/>
               </a>
             </Link>
-            </Container>
+            </Box>
             {pages.map((page) => (
               <NavLink key={page.name} href={page.href} isMobile={isMobile}>
                 {page.name}
