@@ -3,7 +3,7 @@
 require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/Athletes.json');
-const sampleAthleteData = require('../sampleAthleteData');
+const athleteToId = require('../athleteToId');
 const { Athletes } = require('../contract_info/contractAddresses');
 
 async function main() {
@@ -14,6 +14,9 @@ async function main() {
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
   const contract = new ethers.Contract(Athletes, abi.abi, rinkebySigner);
+
+  // Parsing excel
+  finalStatsToPush = [];
 
   // Adding stats
   for (let i = 0; i < sampleAthleteData.length; i++) {
