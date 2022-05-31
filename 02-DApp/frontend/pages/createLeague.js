@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
-import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel, Divider } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -71,6 +71,7 @@ const StyledSelect = styled(Select)`
 const StyledButton = styled(Button)`
   color: white;
   background-color: ${props => props.theme.palette.primary.light};
+  height: 40px;
   &:hover {
     filter: brightness(85%);
     background-color: ${props => props.theme.palette.primary.light};
@@ -81,7 +82,7 @@ const StyledButton = styled(Button)`
 export default function CreateLeague({ setDisplay }) {
   const defaultValues = {
     leagueName: "",
-    token: "usdc",
+    // token: "usdc",
     buyInCost: "",
     payoutSplit: "default",
     whitelistedAddresses: [],
@@ -111,7 +112,7 @@ export default function CreateLeague({ setDisplay }) {
   const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
 
 
-  const [inviteListValues, setInviteListValues] = useState([])
+  const [inviteListValues, setInviteListValues] = useState([accountData?.address, ""])
   // TODO: automatically set the first value to be user that's logged in
 
   const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
@@ -123,6 +124,8 @@ export default function CreateLeague({ setDisplay }) {
   const[isValidBuyInCost, setIsValidBuyInCost] = useState(true)
 
   const[isValidLeagueName, setIsValidLeagueName] = useState(true)
+
+  const preparedInviteListValues = inviteListValues.filter((address) => address !== "")
 
 
   // Use Effect for component mount
@@ -202,8 +205,12 @@ export default function CreateLeague({ setDisplay }) {
 
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
+    if (!validateFormValues()) {
+      alert("Please ensure input values are valid!")
+      return
+    }
     console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
-     " \nwhitelistAddresses: " + inviteListValues + 
+     " \nwhitelistAddresses: " + preparedInviteListValues + 
      "\nisPublic " + (formValues.inviteListStatus === "open"));
     if(leagueMakerContract && accountData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
@@ -218,7 +225,7 @@ export default function CreateLeague({ setDisplay }) {
             accountData.address,
             CONTRACT_ADDRESSES.TestUSDC,
             CONTRACT_ADDRESSES.Athletes,
-            inviteListValues,
+            preparedInviteListValues,
             //CONTRACT_ADDRESSES.Athletes,
           {
           gasLimit: 10000000,
@@ -228,7 +235,7 @@ export default function CreateLeague({ setDisplay }) {
           console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
           console.log("League Creation in progress...");
-          console.log("With invite values: " + inviteListValues);
+          console.log("With invite values: " + preparedInviteListValues);
           //how to tell if transaction failed?
           //TODO print message to alert if it takes mroe than 60 seconds
         })
@@ -282,6 +289,12 @@ export default function CreateLeague({ setDisplay }) {
   //   setInviteListStatus(!inviteListStatus)
   // }
 
+  const validateFormValues = () => {
+    return isValidBuyInCost && formValues.buyInCost !== "" && 
+           isValidLeagueName && formValues.leagueName !== "" && 
+           preparedInviteListValues.length > 0 && validAddressesStatus
+  }
+
   useEffect(() => {
     let flag = true
     inviteListValues.forEach((e) => {
@@ -289,8 +302,10 @@ export default function CreateLeague({ setDisplay }) {
         // console.log("validated")
       } else {
         // console.log("invalid")
-        flag = false
-        setValidAddressesStatus(false)
+        if (e !== "") {
+          flag = false
+          setValidAddressesStatus(false)
+        }
       }
     })
     if (flag) {
@@ -328,7 +343,11 @@ export default function CreateLeague({ setDisplay }) {
   }
 
   return (
-    <Box sx={{ backgroundColor: "primary.dark" }}>
+    <Box sx={{ 
+      backgroundColor: "primary.dark",
+      justifyContent: "center",
+      textAlign: "center"
+    }}>
      {/* <Box sx={{ backgroundColor: "gray" }}> */}
       {/* <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
         &#60; BACK
@@ -349,15 +368,26 @@ export default function CreateLeague({ setDisplay }) {
         Fill out this form to create a league for you and your friends!
       </Typography> */}
 
-      {showForm && (
+      {!accountData && (
+        <Typography
+        style={{
+          color: "red",
+          fontSize: 16
+          }}
+        >
+          Please connect your wallet to create a league.
+        </Typography>
+      )}
+
+      {showForm && accountData && (
         <Typography variant="p" color="white" component="div">
           Insert more info about league creation here... Should persist after clicking I understand ... 
           Buy in cost must be less than 100 USD. League name must be between 1-100 characters. 
         </Typography>
       )}
-      {!showForm && (
+      {!showForm && accountData && (
         <>
-          <Typography variant="p" color="white" component="div">
+          <Typography variant="p" color="white" component="div" sx={{ mb: "10px" }}>
             By pressing "I Understand"... I assert that I'm a crypto and gaming fan... Insert more info about league creation here...
           </Typography>
           <Button
@@ -371,6 +401,12 @@ export default function CreateLeague({ setDisplay }) {
       )}
 
       {showForm && accountData && !(isCreatingLeague || hasCreatedLeague) && (
+        <>
+        <Divider sx={{ 
+          color: "primary.main",
+          mt: "20px",
+          mb: "20px"
+        }} />
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Box
@@ -405,7 +441,7 @@ export default function CreateLeague({ setDisplay }) {
                   id='outlined-required'
                   // defaultValue="e.g. TeamDiff"
                 /> */}
-              <FormControl required >
+              {/* <FormControl required >
                 <StyledInputLabel htmlFor="token-select">Token</StyledInputLabel>
                 <StyledSelect
                   id="token-select"
@@ -414,11 +450,11 @@ export default function CreateLeague({ setDisplay }) {
                   name="token"
                   onChange={handleInputChange}
                 >
-                  <MenuItem key="usdc" value="usdc">USDC</MenuItem>
+                  <MenuItem key="usdc" value="usdc">USDC</MenuItem> */}
                   {/* <MenuItem key="eth" value="eth">eth</MenuItem>
                   <MenuItem key="other" value="other">other</MenuItem> */}
-                </StyledSelect>
-              </FormControl>
+                {/* </StyledSelect>
+              </FormControl> */}
 
               <FormControl required>
                 <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel>
@@ -516,7 +552,7 @@ export default function CreateLeague({ setDisplay }) {
                     <>
                     <TextField
                       variant="standard"
-                      label={"Whitelisted Address " + (index + 1)} 
+                      label={"Whitelisted Address " + (index + 1) + (index === 0 ? " (League Admin)" : "")} 
                       onChange={e => {
                         //This submits null address when I copy and paste
                         handlePlayerInviteInput(e, index)
@@ -554,6 +590,7 @@ export default function CreateLeague({ setDisplay }) {
             
           </Grid>
         </Grid>
+        </>
       )}
       {isCreatingLeague && (
         <Container>
@@ -585,9 +622,6 @@ export default function CreateLeague({ setDisplay }) {
             Create Another League
           </Button>
         </Box>
-      )}
-      {!accountData && !hasCreatedLeague && !isCreatingLeague && (
-        <div> Please connect your wallet to create a league </div>
       )}
       
     </Box>

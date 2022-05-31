@@ -2,7 +2,7 @@
 
 import csv
 import datetime as dt
-# import ipfsApi
+import ipfsApi
 import json
 from pprint import pprint
 import mwclient
