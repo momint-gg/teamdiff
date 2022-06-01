@@ -347,7 +347,6 @@ export default function CreateLeague({ setDisplay }) {
 
   return (
     <Box sx={{ 
-      backgroundColor: "primary.dark",
       justifyContent: "center",
       textAlign: "center"
     }}>

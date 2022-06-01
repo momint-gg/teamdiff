@@ -7,55 +7,79 @@ import {
   Typography,
   ImageList,
   ImageListItem,
+  Button,
 } from "@mui/material";
-import StarterPackAthleteCard from "./StarterPackAthleteCard.js";
-// import Image from 'next/image';
-// import profilePic from '../assets/images/example.png';
-import { useState, useEffect } from "react";
-// import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-// import constants from "../Constants";
-// import { useAccount } from 'wagmi';
-// Requiring fs module in which
-// readFile function is defined.
-// const fs = require('fs');
-//import athleteMetadata from '../../backend/datafetcher/nft_metadata_2022-02-13.json';
-//import starterPackAthleteCard from './StarterPackAthleteCard';
 
-export default function StarterPackContents({ setDisplay }) {
-  //const starterPackAthleteData = Object.keys(athleteMetadata).map((key) => [key, athleteMetadata[key]])
+export default function StarterPackContents({ setDisplay, isMobile }) {
+  // If we want to try to load from pinata
+  // const requireContext = require.context('../../backend/pinata/final_metadata', false, /\.json$/);
+  // const starterPackAthleteData = [];
+  // requireContext.keys().forEach((key) => {
+  //   const obj = requireContext(key);
+  //   starterPackAthleteData.push(obj);
+  // });
+  // console.log(starterPackAthleteData)
 
-  // if (starterPackAthleteData.length >0) {
-  if (true) {
+  // Loading from public folder
+  const requireContext = require.context('../assets/cards/', false, /png$/);
+  const reqArr = []
+  requireContext.keys().forEach((key) => {
+    reqArr.push(key);
+  });
+
+  if (reqArr.length >0) {
     return (
-      <Box
-        /*this should be in constants style sheet as the wrapper box for all pages*/
-        sx={{
-          backgroundColor: "primary.dark",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        <Fab
-          variant="extended"
-          size="small"
-          aria-label="add"
+      <Box>
+        <Button
+          variant="text"
+          sx={{
+            backgroundColor:"transparent",
+            color:"white",
+            borderRadius: "50%",
+            fontSize: 18
+          }
+          }
           onClick={() => setDisplay(false)}
         >
-          &#60; BACK
-        </Fab>
-        <Container>
-          {/* <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
-            </ImageList> */}
-          {/*<Grid container spacing={3}>
-                    {starterPackAthleteData.map(athleteData => (
-                        <Grid item xs={4}>
-                            <StarterPackAthleteCard athleteData={athleteData[1]} />
+          ‹ GO BACK
+        </Button>
+        <Box>
+        <Typography variant="h3" color="white" marginBottom={2} >
+          Starter Pack Contents
+        </Typography>
+          <ImageList 
+            sx={{ width: "100%", 
+                  height: "75vh", 
+                  borderColor: "white", 
+                  color:"white",
+                  borderRadius:2,
+                  border:1 }} 
+            cols={isMobile? 3 : 5}>
+            {/* If we want to try to load from pinata */}
+            {/* {starterPackAthleteData.map((athleteData) => (
+              <ImageListItem key={athleteData.image}>
+                <img
+                  src={`${athleteData.image}?w=164&h=164&fit=crop&auto=format`}
+                  srcSet={`${athleteData.image}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  alt={athleteData.title}
+                  loading="eager"
+                />
+              </ImageListItem>
+            ))} */}
 
-                        </Grid>
-                    ))}
-                    </Grid>*/}
-          Placeholder
-        </Container>
+            {/* Loading from public folder */}
+            {reqArr.map((imgs) => (
+              <ImageListItem sx={{margin:"5%"}}>
+                <img
+                  src={'/cards/'+imgs+'?w=164&h=164&fit=crop&auto=format'}
+                  srcSet={'/cards/'+imgs+'?w=164&h=164&fit=crop&auto=format&dpr=2 2x'}
+                  alt={"image"}
+                  loading="lazy"
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
+        </Box>
       </Box>
     );
   }

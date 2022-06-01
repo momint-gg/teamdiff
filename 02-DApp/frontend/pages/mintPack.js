@@ -130,14 +130,19 @@ export default function MintPack({ setDisplay }) {
 
   return (
     <Box>
-      <Fab
-        variant="extended"
-        size="small"
-        aria-label="add"
-        onClick={() => setDisplay(false)}
-      >
-        &#60; BACK
-      </Fab>
+      <Button
+          variant="text"
+          sx={{
+            backgroundColor:"transparent",
+            color:"white",
+            borderRadius: "50%",
+            fontSize: 18
+          }
+          }
+          onClick={() => setDisplay(false)}
+        >
+          ‹ GO BACK
+      </Button>
       {accountData && !(isMinting || hasMinted) && packsAvailable != 0 && (
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box

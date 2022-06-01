@@ -27,15 +27,19 @@ export default function Mint({ setDisplay }) {
   if (true) {
     return (
       <Box>
-        <Fab
-          variant="extended"
-          size="small"
-          color="primary"
-          aria-label="add"
+       <Button
+          variant="text"
+          sx={{
+            backgroundColor:"transparent",
+            color:"white",
+            borderRadius: "50%",
+            fontSize: 18
+          }
+          }
           onClick={() => setDisplay(false)}
         >
-          &#60; BACK
-        </Fab>
+          ‹ GO BACK
+      </Button>
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"

@@ -19,7 +19,6 @@ export default function MintHome() {
           {isMobile ? (
             <Box
               sx={{
-                backgroundColor: "primary.dark",
                 display: "flex",
                 flexDirection: "row",
                 alignContent: "center",
@@ -79,9 +78,7 @@ export default function MintHome() {
             </Box>
           ) : (
             <Box
-              /* this should be in constants style sheet as the wrapper box for all pages */
               sx={{
-                backgroundColor: "primary.dark",
                 display: "flex",
                 flexDirection: "row",
                 alignContent: "center",
@@ -156,7 +153,7 @@ export default function MintHome() {
       )}
       {displayCollection && (
         <Box>
-          <StarterPackContents setDisplay={setDisplayCollection} />
+          <StarterPackContents setDisplay={setDisplayCollection} isMobile={isMobile}/>
         </Box>
       )}
       {displayMint && (

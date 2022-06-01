@@ -45,8 +45,7 @@ export default function Index(props) {
 
   if (typeof window !== "undefined") {
     return (
-      <Box sx={{backgroundColor: '#2E0744', height: '100%'}}>
-      </Box>
+      <Box />
     );
   }
   return null;

@@ -16,9 +16,16 @@ const Layout = ({ children, isMobile }) => {
   ];
 
   return (
-    <>
-      <Box component="div" height="100%" backgroundColor="primary.dark">
-        <Box component="body" height="100vh" backgroundColor="primary.dark">
+    // <>
+        <Box component="body" minHeight="100vh" backgroundColor="transparent"
+        sx={{
+          backgroundImage:"url(/dots.png), linear-gradient(135deg, #330D36 0%, #110412 100%)",
+          backgroundSize: "cover",
+          backgroundRepeat:"no-repeat",
+          backgroundAttachment:"scroll",
+          
+        }}
+        >
           
           {isMobile? 
             <div>
@@ -30,7 +37,7 @@ const Layout = ({ children, isMobile }) => {
                 m: 1,
                 borderRadius: 1,
                 alignItems: "center",
-                backgroundColor: "primary.dark",
+                backgroundColor: "transparent",
               }}
             >
               <Image src={logo} alt="TeamDiff logo" width="200px" height="50px"/>
@@ -61,10 +68,10 @@ const Layout = ({ children, isMobile }) => {
               justifyContent: "flex-end",
               flexDirection: "row",
               p: 1,
-              m: 1,
+              m: 0,
               borderRadius: 1,
               alignItems: "center",
-              backgroundColor: "primary.dark",
+              backgroundColor: "transparent",
             }}
           >
             <Box sx={{flexGrow: 1}}>
@@ -96,8 +103,7 @@ const Layout = ({ children, isMobile }) => {
           </Box>
           <Footer />
         </Box>
-      </Box>
-    </>
+    // </>
   );
 };
 

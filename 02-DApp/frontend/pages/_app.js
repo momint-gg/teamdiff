@@ -12,6 +12,7 @@ import { WalletLinkConnector } from "wagmi/connectors/walletLink";
 import { Box } from "@mui/material";
 import Layout from "../components/Layout";
 import { useMediaQuery } from 'react-responsive';
+import { Html } from "next/document";
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -52,9 +53,11 @@ function MyApp({ Component, pageProps }) {
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
 
   return (
-    <Box sx={{ backgroundColor: "#2E0744", height: "100%" }}>
+    <Box sx={{ backgroundImage:"linear-gradient(135deg, #330D36 0%, #110412 100%)", height: "100%" }}>
       <Provider autoConnect connectors={connectors}>
         <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <main>
           <Layout isWeb={isWeb} isMobile={isMobile}>
             <link
               rel="stylesheet"
@@ -92,9 +95,9 @@ function MyApp({ Component, pageProps }) {
               <meta name="msapplication-TileColor" content="#2b5797" />
               <meta name="theme-color" content="#4b4b4b" />
             </Head>
-            <CssBaseline />
             <Component {...pageProps} />
           </Layout>
+          </main>
         </ThemeProvider>
       </Provider>
     </Box>
