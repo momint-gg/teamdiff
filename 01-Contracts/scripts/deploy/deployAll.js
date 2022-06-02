@@ -7,8 +7,8 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  textData += "exports.GameItems = '0x9B85F1611d24204D6b959AC9a49d666536d3ec57';\n";
-  /*
+  // textData += "exports.GameItems = '0x9B85F1611d24204D6b959AC9a49d666536d3ec57';\n";
+  
   //Create GameItems Instance
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
   //const gameContract = await gameContractFactory.deploy(...constructorArgs);
@@ -22,9 +22,13 @@ const main = async () => {
   textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
   console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
   
+  //Add users to gameitems whitelist
   txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
   await txn.wait();
   console.log("Added owner to whitelist");
+  gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
+  await txn.wait();
+  console.log("Added user to whitelist");
   //Initial functions that need to be run
   console.log("First setting starting index...");
   txn = await gameContract.setStartingIndex();
@@ -32,7 +36,7 @@ const main = async () => {
   console.log("Now setting token URIs...");
   txn = await gameContract.setURIs();
   await txn.wait();
-  */
+  
 
 
   

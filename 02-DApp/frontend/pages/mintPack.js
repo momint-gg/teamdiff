@@ -21,6 +21,7 @@ import {
   Fab,
 } from "@mui/material";
 import Image from "next/image";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
@@ -48,6 +49,7 @@ export default function MintPack({ setDisplay }) {
 
 
   useEffect(() => {
+    // setHasMinted(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
@@ -154,9 +156,8 @@ export default function MintPack({ setDisplay }) {
       >
         &#60; BACK
       </Fab> */}
-      {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
+      {isConnected && !hasMinted &&
+      <Box
             justifyContent="center"
             alignItems="center"
             sx={{
@@ -181,13 +182,16 @@ export default function MintPack({ setDisplay }) {
               <Image
                 src={profilePic}
                 alt="Picture of the author"
-                width="310px"
-                height="450px"
+                // width="310px"
+                // height="100vw"
+                // height="450px"
                 position="absolute"
               />
             </Container>
-          </Box>
-
+        </Box>
+      }
+      {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
             alignItems="center"
@@ -196,11 +200,11 @@ export default function MintPack({ setDisplay }) {
               display: "flex",
             }}
           >
-            <Typography variant="h2" color="white" component="div">
+            <Typography variant="h3" color="white" component="div">
               Mint Starter Pack
             </Typography>
             {packsAvailable != null && (
-              <Typography variant="h4" color="white" component="div">
+              <Typography variant="h6" color="white" component="div">
                 There are{" "}
                 <Box fontWeight="fontWeightBold" display="inline">
                   {packsAvailable}
@@ -217,49 +221,171 @@ export default function MintPack({ setDisplay }) {
               paddingTop: "20px",
             }}
           >
-            <Button
+            <Fab
+              variant="extended"
+              size="large"
+              aria-label="add"
               onClick={mintStarterPack}
-              variant="contained"
-              color="inherit"
-              style={{
-                color: "black",
-                borderRadius: "40px",
-                width: "10%",
+              // onClick={() => setDisplayMint(true)}
+              sx={{
+                marginRight: 1,
+                background:
+                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                color: "white",
                 fontSize: 20,
               }}
             >
-              MINT
-            </Button>
+              Mint
+            </Fab>
           </Box>
         </Container>
       )}
       {isMinting && (
-        <Container>
-          <Typography>Your stuff is minting...</Typography>
-          <CircularProgress />
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
+          <Box
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column"
+            sx={{
+              display: "flex",
+            }}
+          >
+            <Typography variant="h5" color="white" component="div">
+              Minting In Progress
+            </Typography>
+            <br></br>
+            <CircularProgress />
+          </Box>
         </Container>
       )}
       {hasMinted && (
-        <Box>
-          <Typography>
-            Your Team Diff Starter Pack is all done minting!
-          </Typography>
-          <a
-            href={
-              "https://testnets.opensea.io/assets/" +
-              gameItemsContract.address +
-              "/50" // the pack Id is after the athletes (not 0)
-            }
-            target={"_blank"}
-            rel="noreferrer"
+        <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-evenly"
+          }}
+        >
+          <Box
+            sx={{
+              flex: 3
+            }}
           >
-            View on OpenSea.
-          </a>
-          <Typography>
-            Note that it may take a few minutes for images and metadata to
-            properly load on OpenSea.
-          </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
+            <Typography sx={{marginRight: 2}} variant="h4" color="white" component="div">
+              Acquired Starter Pack!
+            </Typography>
+            <CheckCircleIcon color="secondary"></CheckCircleIcon>
+            </Box>
+            <br></br>
+            <Box>
+              <Box
+                sx={{
+                 display: "flex",
+                 flexDirection: "row",
+                 justifyContent: "space-between"
+                }}
+              >
+                <Box
+                  sx={{
+                    flex: 1,
+                    marginRight: 3
+                  }}
+                >
+                  <Typography variant="h5"> Contents </Typography>
+                  <a
+                    href={
+                      "https://testnets.opensea.io/assets/" +
+                      gameItemsContract.address +
+                      "/50" // the pack Id is after the athletes (not 0)
+                    }
+                    // href="#"
+                    target={"_blank"}
+                    rel="noreferrer"
+                  >
+                    View on OpenSea.
+                  </a> 
+                  <Typography variant="subtitle2"> 
+                    Note that it may take a few minutes for images and metadata to
+                    properly load on OpenSea.
+                  </Typography>               
+                </Box>
+                
+                <Box
+                  sx={{
+                    flex: 1
+                  }}
+                >
+                  <Typography variant="h5"> Pack #</Typography>
+                  <Typography> {100 - packsAvailable} </Typography>
+                    
+                </Box>
+              </Box>
+            </Box>
+        
+
+            <Box>
+              <Fab
+                variant="extended"
+                size="large"
+                aria-label="add"
+                onClick={() => router.push("./burnPack")}
+                // onClick={() => setDisplayMint(true)}
+                sx={{
+                  marginTop: 5,
+                  marginRight: 1,
+                  background:
+                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                  color: "white",
+                  fontSize: 20,
+                }}
+              >
+                Open Pack
+              </Fab>
+              <Fab
+                variant="extended"
+                size="large"
+                color="white"
+                aria-label="add"
+                // onClick={() => setDisplayCollection(true)}
+                sx={{ marginTop: 5, fontSize: 20 }}
+              >
+                Go To Collection
+              </Fab>
+            </Box>
+          </Box>
+          <Box sx={{
+            flex: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <Image
+              src={profilePic}
+              alt="Picture of the author"
+              // height="100%"
+              // width="auto"
+              width="155px"
+              height="225px"
+            />
+          </Box>
         </Box>
+        
+      </Container>
       )}
       {!isConnected && !hasMinted && !isMinting && (
         <Box>

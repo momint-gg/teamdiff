@@ -163,8 +163,8 @@ export default function BurnPack({ setDisplay }) {
               <Image
                 src={profilePic}
                 alt="Picture of the author"
-                width="310px"
-                height="450px"
+                // width="310px"
+                // height="450px"
                 position="absolute"
               />
             </Container>
@@ -178,7 +178,7 @@ export default function BurnPack({ setDisplay }) {
               display: "flex",
             }}
           >
-            <Typography variant="h2" color="white" component="div">
+            <Typography variant="h4" color="white" component="div">
               Burn Starter Pack
             </Typography>
           </Box>
@@ -191,20 +191,24 @@ export default function BurnPack({ setDisplay }) {
               paddingTop: "20px",
             }}
           >
-            <Button
+            <Fab
+              variant="extended"
+              size="large"
+              aria-label="add"
               onClick={burnStarterPack}
               disabled={!canMint}
-              variant="contained"
-              color="inherit"
-              style={{
-                color: "black",
-                borderRadius: "40px",
-                width: "10%",
+              // onClick={() => setDisplayMint(true)}
+              sx={{
+                marginRight: 1,
+                marginBottom: 2,
+                background:
+                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                color: "white",
                 fontSize: 20,
               }}
             >
-              BURN
-            </Button>
+              Burn 
+            </Fab>
             {!canMint && 
             <Box>
               <Typography>

@@ -177,10 +177,10 @@ contract GameItems is ERC1155, Ownable {
             starterPacksMinted < MAX_PACKS,
             "All packs have already been minted!"
         );
-        require(
-            balanceOf(msg.sender, starterPackId) < 1,
-            "Can only mint one starter pack per account"
-        );
+        // require(
+        //     balanceOf(msg.sender, starterPackId) < 1,
+        //     "Can only mint one starter pack per account"
+        // );
 
         // Making the index 1 after the athletes end
         _mint(msg.sender, starterPackId, 1, "0x00");

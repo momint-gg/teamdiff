@@ -32,19 +32,67 @@ export default function MintHome() {
               <Container
                 sx={{
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                 }}
               >
-                <Box>
-                  <Typography variant="h4" color="white" component="div">
-                    Starter Pack
-                  </Typography>
-                  <Typography color="white" component="div">
-                    The starter pack is the perfect pack for a beginner. Minting
-                    this pack will provide 6 unique NFT cards, which will allow
-                    you to get right into the action.
-                  </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-evenly"
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 2
+                    }}
+                  >
+                    <Typography variant="h4" color="white" component="div">
+                      Starter Pack
+                    </Typography>
+                    <Typography color="white" component="div">
+                      The starter pack is the perfect pack for a beginner. Minting
+                      this pack will provide 6 unique NFT cards, which will allow
+                      you to get right into the action.
+                    </Typography>
+                    <Box>
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        aria-label="add"
+                        onClick={() => router.push("./mintPack")}
+                        // onClick={() => setDisplayMint(true)}
+                        sx={{
+                          marginTop: 5,
+                          marginRight: 1,
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                          color: "white",
+                          fontSize: 20,
+                        }}
+                      >
+                        Mint
+                      </Fab>
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        color="white"
+                        aria-label="add"
+                        onClick={() => setDisplayCollection(true)}
+                        sx={{ marginTop: 5, fontSize: 20 }}
+                      >
+                        CONTENTS
+                      </Fab>
+                    </Box>
+                  </Box>
+                  <Box sx={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
                     <Image
                       src={profilePic}
                       alt="Picture of the author"
@@ -52,34 +100,8 @@ export default function MintHome() {
                       height="225px"
                     />
                   </Box>
-                  <Fab
-                    variant="extended"
-                    size="large"
-                    aria-label="add"
-                    onClick={() => router.push("./mintPack")}
-                    // onClick={() => setDisplayMint(true)}
-                    sx={{
-                      marginTop: 5,
-                      marginRight: 1,
-                      background:
-                        "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                      color: "white",
-                      fontSize: 20,
-                    }}
-                  >
-                    Mint
-                  </Fab>
-                  <Fab
-                    variant="extended"
-                    size="large"
-                    color="white"
-                    aria-label="add"
-                    onClick={() => setDisplayCollection(true)}
-                    sx={{ marginTop: 5, fontSize: 20 }}
-                  >
-                    CONTENTS
-                  </Fab>
                 </Box>
+                
               </Container>
             </Box>
           ) : (
