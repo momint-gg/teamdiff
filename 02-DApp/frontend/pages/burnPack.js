@@ -29,9 +29,6 @@ import AthleteCard from "../components/AthleteCard";
 import profilePic from "../assets/images/starter-pack.png";
 
 export default function BurnPack({ setDisplay }) {
-  //Wagmi Hooks
-  const { data: accountData, isLoading, error } = useAccount({ ens: true })
-
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -45,10 +42,38 @@ export default function BurnPack({ setDisplay }) {
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
   const [canMint, setCanMint] = useState(false);
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-  // Use Effect for change in accountData
+
   useEffect(() => {
-    if (accountData) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const sig ner = provider.getSigner()
+    const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, []);
+
+  // Use Effect for change in if user isConnected
+  useEffect(() => {
+    if (isConnected) {
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -59,7 +84,7 @@ export default function BurnPack({ setDisplay }) {
       
       // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = (athleteIndices, signer) => {
-        if (signer == accountData.address) {
+        if (signer == connectedAccount) {
           setIsMinting(false);
           setHasMinted(true);
           // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
@@ -68,7 +93,7 @@ export default function BurnPack({ setDisplay }) {
       };
 
       const fetchData = async () => {
-        const balanceOfPacks = await GameItemsContract.balanceOf(accountData.address, 0);
+        const balanceOfPacks = await GameItemsContract.balanceOf(connectedAccount, 0);
         console.log("balance of packs" + balanceOfPacks);
         setCanMint(balanceOfPacks > 0);
       }
@@ -79,12 +104,12 @@ export default function BurnPack({ setDisplay }) {
     } else {
       console.log("no account data found!");
     }
-  }, [accountData?.address]);
+  }, [isConnected]);
 
   // TODO hide burn pack if they don't
   const burnStarterPack = async () => {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner()
+      // const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner()
       // Create a new instance of the Contract with a Signer, which allows update methods
 
       const gameItemsContractWithSigner = new ethers.Contract(
@@ -111,7 +136,7 @@ export default function BurnPack({ setDisplay }) {
 
   return (
     <Box>
-      {accountData && !(isMinting || hasMinted) && (
+      {isConnected && !(isMinting || hasMinted) && (
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
@@ -228,8 +253,12 @@ export default function BurnPack({ setDisplay }) {
           </Typography>
         </Box>
       )}
-      {!accountData && !hasMinted && !isMinting && (
-        <div> Please connect your wallet. </div>
+      {!isConnected && !hasMinted && !isMinting && (
+        <Box>
+          <Typography variant="h6" component="div">
+            Please connect your wallet to get started.
+          </Typography>
+        </Box>      
       )}
     </Box>
   );

@@ -30,7 +30,7 @@ import profilePic from "../assets/images/starter-pack.png";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
-  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  // const { data: accountData, isLoading, error } = useAccount({ ens: true })
 
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -42,10 +42,45 @@ export default function MintPack({ setDisplay }) {
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [packsAvailable, setPacksAvailable] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+
+
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, []);
+
 
   // Use Effect for component mount
   useEffect(async () => {
-    if (accountData) {
+    if (isConnected) {
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -59,9 +94,9 @@ export default function MintPack({ setDisplay }) {
       setPacksAvailable(packsAvail.toNumber());
 
       // Callback for when packMinted Events is fired from contract
-      const signerAddress = accountData.address;
+      // const signerAddress = accountData.address;
       const packMintedCallback = (signer, packID) => {
-        if (signer == signerAddress) {
+        if (signer == connectedAccount) {
           setIsMinting(false);
           setHasMinted(true);
         }
@@ -69,7 +104,7 @@ export default function MintPack({ setDisplay }) {
 
       // A filter that matches my address as the signer of the contract call
       // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
-      console.log(hexZeroPad(signerAddress, 32));
+      console.log(hexZeroPad(connectedAccount, 32));
       const filter = {
         address: GameItemsContract.address,
         topics: [
@@ -79,17 +114,18 @@ export default function MintPack({ setDisplay }) {
         ],
       };
       GameItemsContract.on(filter, packMintedCallback);
-    } else {
-      console.log("no account data found!");
     }
-  }, [accountData?.address]);
+    else {
+      console.log("no account connected");
+    }
+  }, [isConnected]);
 
 
   const mintStarterPack = async () => {
       // Create a new instance of the Contract with a Signer, which allows
       // update methods
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner()
+      // const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner()
       const gameItemsContractWithSigner = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
         GameItemsJSON.abi,
@@ -118,7 +154,7 @@ export default function MintPack({ setDisplay }) {
       >
         &#60; BACK
       </Fab> */}
-      {accountData && !(isMinting || hasMinted) && packsAvailable != 0 && (
+      {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
@@ -225,8 +261,12 @@ export default function MintPack({ setDisplay }) {
           </Typography>
         </Box>
       )}
-      {!accountData && !hasMinted && !isMinting && (
-        <div> Please connect your wallet. </div>
+      {!isConnected && !hasMinted && !isMinting && (
+        <Box>
+          <Typography variant="h6" component="div">
+            Please connect your wallet to get started.
+          </Typography>
+        </Box>  
       )}
       {packsAvailable == 0 && (
         <Box>

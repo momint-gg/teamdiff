@@ -11,14 +11,15 @@ import ConnectWalletModal from "./ConnectWalletModal";
 import { fetchFeeData } from "@wagmi/core";
 
 export default function WalletLogin({isMobile}) {
-  const { isConnected, connector, connectors, connectAsync } = useConnect()
+  // const { isConnected, connector, connectors, connectAsync } = useConnect()
   // const [{ data: accountData }, disconnect] = useAccount({
   //   fetchEns: true,
   // });
-  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  // const { data: accountData, isLoading, error } = useAccount({ ens: true })
   // const { data: ensName } = useEnsName()
   // const { data: ensAvatar } = useEnsAvatar()
-  const { disconnect } = useDisconnect()
+  // const { disconnect } = useDisconnect()
+  const [ isConnected, setIsConnected ] = useState();
   const [ shortenedAddress, setShortenedAddress ] = useState();
   // const [isConnected, setIsConnected] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,14 +41,27 @@ export default function WalletLogin({isMobile}) {
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
-    const fetchData = async () => {
-      const currentAddress = await signer.getAddress()
-      setAddressPreview(currentAddress)
-    }
-    fetchData()
-    provider.provider.on('accountsChanged', (accounts) => { setAddressPreview(accounts[0].toUpperCase()) })
-    // provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
-    //                                             setIsConnected(false) })
+
+    // console.log("signer: " + signer.getAddress());
+    // if(accounts.length > 0) {
+      const fetchData = async () => {
+        const accounts = await provider.listAccounts();
+        if(accounts.length > 0) {
+          // const currentAddress = "0x0x"
+          const currentAddress = await signer.getAddress()
+          setAddressPreview(currentAddress)
+          setIsConnected(true);
+        }
+        else {
+          setIsConnected(false);          
+          console.log("no connected accounts")
+        }
+      }
+      fetchData()
+      provider.provider.on('accountsChanged', (accounts) => { fetchData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    
   }, [])
 
   const setAddressPreview = (address) => {
@@ -113,7 +127,7 @@ export default function WalletLogin({isMobile}) {
               sx={{ height: 40, fontSize: 18 }}
             />
             }
-            {menu ? (
+            {/* {menu ? (
               <Box
                 sx={{
                   position: "absolute",
@@ -134,7 +148,7 @@ export default function WalletLogin({isMobile}) {
                   DISCONNECT
                 </Button>
               </Box>
-            ) : null}
+            ) : null} */}
           </Box>
         </ClickAwayListener>
       ) : (

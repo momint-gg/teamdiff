@@ -152,9 +152,11 @@ export default function Play() {
           </Grid>
         </Grid>
       ) : (
-        <Typography>
-          Please connect wallet
-        </Typography>
+        <Box>
+          <Typography variant="h6" component="div">
+            Please connect your wallet to get started.
+          </Typography>
+        </Box>
       )}
 
     </Box>

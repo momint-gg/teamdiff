@@ -78,7 +78,6 @@ export default function CreateLeague({ setDisplay }) {
   };
 
   //WAGMI Hooks
-  const { data: accountData, isLoading, error } = useAccount({ ens: true })
 
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
@@ -109,14 +108,44 @@ export default function CreateLeague({ setDisplay }) {
   const[isValidLeagueName, setIsValidLeagueName] = useState(true)
   const [isValidInviteList, setIsValidInviteList] = useState(true);
   const [isPrivate, setIsPrivate] = useState(false);
-  // const [signer, setSigner] = useState(null);
-  
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
 
   useEffect(() => {
-      // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const signer = provider.getSigner()
-      // setSigner(signer);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, []);
+
+
+    useEffect(() => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -125,7 +154,6 @@ export default function CreateLeague({ setDisplay }) {
       );
       setLeagueMakerContract(LeagueMakerContract);
       //TODO filter
-      //TODO add manual filter to event
       // const filter = {
       //   address: LeagueMakerContract.address,
       //   topics: [
@@ -143,19 +171,8 @@ export default function CreateLeague({ setDisplay }) {
       // LeagueMakerContract.on(filter, leagueCreatedCallback);
 
       LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
-
   }, [])
 
-  useEffect(() => {
-    if(accountData) {
-      console.log("connected to acocunt : " + accountData.address);
-      // const filter = leagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
-      // leagueMakerContract.on(filter, leagueCreatedCallback);
-    }
-    else {
-      console.log("no account data :'(");
-    }
-  }, [accountData?.address])
 
   //Callback for when a STaked event is fired from leagueProxy contract (occurs when user stakes USDC to joinLeague)
   const stakedEventCallback = async (stakerAddress, stakeAmount, leagueAddress) => {
@@ -281,7 +298,7 @@ export default function CreateLeague({ setDisplay }) {
           formValues.leagueName,
           formValues.buyInCost,
           (formValues.inviteListStatus === "open"),
-          accountData.address,
+          connectedAccount,
           CONTRACT_ADDRESSES.TestUSDC,
           CONTRACT_ADDRESSES.Athletes,
           CONTRACT_ADDRESSES.GameItems,
@@ -321,10 +338,6 @@ export default function CreateLeague({ setDisplay }) {
     }
   }, [formValues.leagueName])
 
-  // useEffect(() => {
-  //   console.log("inv lsit change");
-  //   if()
-  // }, [inviteListValues])
 
 
   useEffect(() => {
@@ -362,8 +375,8 @@ export default function CreateLeague({ setDisplay }) {
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
     // const currentAddress = await signer.getAddress()
-    console.log("target value = " + accountData.address);
-    if(inviteListValuesNew.includes(e.target.value) || e.target.value === accountData.address) {
+    // console.log("target value = " + accountData.address);
+    if(inviteListValuesNew.includes(e.target.value) || e.target.value === connectedAccount) {
       console.log("invalid address added");
       alert("No duplicate address allowed + no adding yourself to whitelist")
     } else {
@@ -401,7 +414,7 @@ export default function CreateLeague({ setDisplay }) {
     <Box sx={{ backgroundColor: "primary.dark" }}>
       
     
-      {accountData && !(isCreatingLeague || hasCreatedLeague) && (
+      {isConnected && !(isCreatingLeague || hasCreatedLeague) && (
         <>
         <Grid container spacing={{ xs: 2, md: 3 }}>
           <Grid item xs s>
@@ -711,8 +724,12 @@ export default function CreateLeague({ setDisplay }) {
           </Button>
         </Box>
       )}
-      {!accountData && !hasCreatedLeague && !isCreatingLeague && (
-        <div> Please connect your wallet to create a league </div>
+      {!isConnected && !hasCreatedLeague && !isCreatingLeague && (
+            <Box>
+              <Typography variant="h6" component="div">
+                Please connect your wallet to get started.
+              </Typography>
+            </Box>
       )}
       
     </Box>
