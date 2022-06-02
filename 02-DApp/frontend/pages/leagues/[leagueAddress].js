@@ -73,7 +73,7 @@ const { disconnect } = useDisconnect()
   const [isPublicLeague, setIsPublicLeague] = useState([false]);
   const [isSettingLineup, setIsSettingLineup] = useState(false);
   const [isJoiningLeague, setIsJoiningLeague] = useState(false);
-
+  const [hasJoinedLeague, setHasJoinedLeague] = useState(false);
   //const [import {  } from "module";]
 
   //Invite list states  
@@ -129,10 +129,11 @@ const { disconnect } = useDisconnect()
     const currentAddress = await signer.getAddress();
     if(stakerAddress === currentAddress) {
       setIsJoiningLeague(false);
+      setHasJoinedLeague(true);
       console.log("pushing router");
       //TODO this is buggy, causes the window to reload like 6 times
       // router.reload(window.location.pathname);
-      router.push("/leagues/" + leagueAddress);
+      // router.push("/leagues/" + leagueAddress);
       // router.reload(window.location.pathname);
 
       // setStakerAddress(stakerAddress)
@@ -336,7 +337,9 @@ const { disconnect } = useDisconnect()
   }
 
   const submitLineup = async () => {
-    const leagueProxyContractWithSigner = leagueProxyContract.connect(signerData);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
 
     const setLineupTxn = await leagueProxyContractWithSigner
       .setLineup(lineup, {
@@ -654,14 +657,33 @@ const { disconnect } = useDisconnect()
                 </Typography>
                 </>
               )}
-            {isJoiningLeague && 
+
+            </>
+          )}
+          {isJoiningLeague && 
               <Box>
                 <Typography>Joining league...</Typography>
                 <CircularProgress />
               </Box>
             }
-            </>
-          )}
+            {hasJoinedLeague && 
+                <>
+                <Typography>
+                  {"Succesfully Joined League: " + leagueName}
+                </Typography>
+                <a
+                  href={
+                    "http://localhost:3000/leagues/"
+                    + router.query.leagueAddress
+                  }
+                  target={"_blank"}
+                  rel="noreferrer"
+                >
+                  View League on TeamDiff
+                </a>
+                <br></br>
+              </>
+            }
             </>
           )
         }

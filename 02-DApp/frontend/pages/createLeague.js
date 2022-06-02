@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css'
-import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -107,8 +107,16 @@ export default function CreateLeague({ setDisplay }) {
   const [showForm, setShowForm] = useState(false)
   const[isValidBuyInCost, setIsValidBuyInCost] = useState(true)
   const[isValidLeagueName, setIsValidLeagueName] = useState(true)
+  const [isValidInviteList, setIsValidInviteList] = useState(true);
+  const [isPrivate, setIsPrivate] = useState(false);
+  // const [signer, setSigner] = useState(null);
+  
+
 
   useEffect(() => {
+      // const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner()
+      // setSigner(signer);
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -263,10 +271,10 @@ export default function CreateLeague({ setDisplay }) {
     //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
-
+    
     //Connect to leagueMaker with connect wallet
     const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
-    console.log("submission values: " + (formValues.inviteListStatus === "open"));
+    // console.log("submission values: " + (formValues.inviteListStatus === "open"));
     //Send createLeague transaction to LeagueMaker
     const createLeagueTxn = await leagueMakerContractWithSigner
       .createLeague(
@@ -313,6 +321,12 @@ export default function CreateLeague({ setDisplay }) {
     }
   }, [formValues.leagueName])
 
+  // useEffect(() => {
+  //   console.log("inv lsit change");
+  //   if()
+  // }, [inviteListValues])
+
+
   useEffect(() => {
     if (formValues.buyInCost === "" ) {
       setIsValidBuyInCost(true)
@@ -345,10 +359,21 @@ export default function CreateLeague({ setDisplay }) {
 
   const handlePlayerInviteInput = (e, i) => {
     let inviteListValuesNew = [...inviteListValues]
-    inviteListValuesNew[i] = e.target.value
-    //setInviteListValues([...inviteListValues], e);
-    setInviteListValues(inviteListValuesNew)
-    // console.log("short list in func: " + inviteListValues);
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const signer = provider.getSigner()
+    // const currentAddress = await signer.getAddress()
+    console.log("target value = " + accountData.address);
+    if(inviteListValuesNew.includes(e.target.value) || e.target.value === accountData.address) {
+      console.log("invalid address added");
+      alert("No duplicate address allowed + no adding yourself to whitelist")
+    } else {
+      inviteListValuesNew[i] = e.target.value
+      //setInviteListValues([...inviteListValues], e);
+      setInviteListValues(inviteListValuesNew)
+      // console.log("short list in func: " + inviteListValues);
+    
+    }
+
 
   }
 
@@ -375,44 +400,11 @@ export default function CreateLeague({ setDisplay }) {
   return (
     <Box sx={{ backgroundColor: "primary.dark" }}>
       
-      <Typography variant="h3" color="secondary" component="div">
-        CREATE A LEAGUE
-      </Typography>
-      {/* <hr
-        style={{
-          color: "secondary",
-          backgroundColor: "secondary",
-          height: 5,
-        }}
-      /> */}
-      {/* <Typography variant="h6" color="white" component="div">
-        Fill out this form to create a league for you and your friends!
-      </Typography> */}
-{/* 
-      {showForm && (
-        <Typography variant="p" color="white" component="div">
-          Insert more info about league creation here... Should persist after clicking I understand ... 
-          Buy in cost must be less than 100 USD. League name must be between 1-100 characters. 
-        </Typography>
-      )}
-      {!showForm && (
-        <>
-          <Typography variant="p" color="white" component="div">
-            By pressing "I Understand"... I assert that I'm a crypto and gaming fan... Insert more info about league creation here...
-          </Typography>
-          <Button
-            variant="outlined"
-            onClick={handleShowForm}
-            size="small"
-          >
-            I Understand!
-          </Button> 
-        </>
-      )} */}
-
+    
       {accountData && !(isCreatingLeague || hasCreatedLeague) && (
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <>
+        <Grid container spacing={{ xs: 2, md: 3 }}>
+          <Grid item xs s>
             <Box
               component="div"
               sx={{
@@ -421,33 +413,74 @@ export default function CreateLeague({ setDisplay }) {
               noValidate
               autoComplete="off"
             >
-              <Typography variant="h6" color="white" component="div">
+              <Typography variant="h4" color="white" component="div">
                 Form
               </Typography>
-              <FormControl required>
-                <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel>
-                <StyledOutlinedInput
-                  id="league-name"
-                  value={formValues.leaguename}
-                  onChange={handleInputChange}
-                  label="League Name"
-                  name="leagueName"
-                  error={!isValidLeagueName}
-                />
-              </FormControl>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: "5px"
+                }}
+              > 
+                <br></br>
+                <Typography
+                  sx={{
+                    minWidth: "15vw",
+                    marginRight: "2vw"
+                  }}
+                >
+                  League Name
+                </Typography>
+                <FormControl required>
+                  {/* <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel> */}
+                  <TextField
+                    id="league-name"
+                    value={formValues.leaguename}
+                    onChange={handleInputChange}
+                    label="League Name*"
+                    placeholder="My Awesome League"
+                    hiddenLabel
+                    // focused
+                    color="secondary"
+                    name="leagueName"
+                    // variant="filled"
+                    error={!isValidLeagueName}
+                  />
+                  {/* <StyledOutlinedInput
+                    id="league-name"
+                    value={formValues.leaguename}
+                    onChange={handleInputChange}
+                    label="League Name"
+                    name="leagueName"
+                    error={!isValidLeagueName}
+                  /> */}
+                </FormControl>
+              </Box>
 
-              {/* <TextField
-                  required
-                  label="League Name"
-                  variant="standard"
-                  color="secondary"
-                  backgroundColor="secondary"
-                  id='outlined-required'
-                  // defaultValue="e.g. TeamDiff"
-                /> */}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: "5px"
+                }}
+              >
+                <Typography
+                  sx={{
+                    minWidth: "15vw",
+                    marginRight: "2vw"
+                  }}
+                >
+                  Token
+                </Typography>
               <FormControl required >
                 <StyledInputLabel htmlFor="token-select">Token</StyledInputLabel>
                 <StyledSelect
+                    color="secondary"
+                
                   id="token-select"
                   value={formValues.token}
                   label="token"
@@ -459,44 +492,45 @@ export default function CreateLeague({ setDisplay }) {
                   <MenuItem key="other" value="other">other</MenuItem> */}
                 </StyledSelect>
               </FormControl>
-
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: "5px"
+                }}
+              >
+                <Typography
+                  sx={{
+                      minWidth: "15vw",
+                      marginRight: "2vw"
+                    }}
+                >
+                  Buy-in Cost
+                </Typography>
               <FormControl required>
-                <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel>
-                <StyledOutlinedInput
+                {/* <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel> */}
+                <TextField
                   id="buy-in"
+                  type="number"
+                  color="secondary"
+                  
                   value={formValues.leaguename}
                   onChange={handleInputChange}
                   label="Buy-In Cost"
+                  // hiddenLabel
                   name="buyInCost"
+                  placeholder='10'
                   endAdornment={<InputAdornment position="end">USDC</InputAdornment>}
                   error={!isValidBuyInCost}
                 >
 
-                </StyledOutlinedInput>
-                {/* <Input
-                    id="standard-adornment-amount"
-                    value={formValues.buyInCost}
-                    onChange={handleInputChange}
-                    name="buyInCost"
-                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                  /> */}
-              </FormControl>
+                </TextField>
 
-              <FormControl required sx={{ marginLeft: 3 }}>
-                <StyledInputLabel id="demo-simple-select-label">Payout Split</StyledInputLabel>
-                <StyledSelect
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={formValues.payoutSplit}
-                  label="payoutSplit"
-                  name="payoutSplit"
-                  onChange={handleInputChange}
-                >
-                  <MenuItem key="default" value="default">default</MenuItem>
-                </StyledSelect>
               </FormControl>
-
-              <FormControl required sx={{ marginLeft: 3 }}>
+              </Box>
+              {/* <FormControl required sx={{ marginLeft: 3 }}>
                 <StyledInputLabel id="open-closed-toggle">League Status</StyledInputLabel>
                 <StyledSelect
                   labelId="open-closed-toggle"
@@ -509,25 +543,48 @@ export default function CreateLeague({ setDisplay }) {
                   <MenuItem key="open" value="open">open</MenuItem>
                   <MenuItem key="closed" value="closed">closed</MenuItem>
                 </StyledSelect>
-              </FormControl>
+              </FormControl> */}
               
-              <StyledButton onClick={()=>{createLeagueSubmitHandler()}} variant="contained" size="small">Submit</StyledButton>
               {/* <Button variant="contained" size="small" sx={{backgroundColor: "primary.light"}}>Submit</Button> */}
             </Box>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs s>
             <Box
                 component="div"
                 sx={{
                   '& > :not(style)': { m: 1, width: '50ch' },
                   color: "white",
+                  alignItems: "left"
+
                 }}
+
                 noValidate
                 autoComplete="off"
               >
+                <Typography
+                  variant="h4"
+                >
+                  Invite List (Whitelist)
+                </Typography>
+                <Box>
+                <FormControl component="fieldset">
+                  <FormGroup aria-label="position" row>
 
+                  <FormControlLabel
+                      value="start"
+                      control={<Switch 
+                        onChange={() => {
+                          setIsPrivate(!isPrivate)
+                        }}                                                                   
+                      color="secondary" />}
+                      label="Invite-Only"
+                      labelPlacement="start"
+                    />
+                    </FormGroup>
+                </FormControl>
+                </Box>
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {!(formValues.inviteListStatus === "closed") ? (
+              {!(isPrivate) ? (
                 <Typography variant="h7" color="lightgrey">
                     Anybody with a wallet address can search and join this league.
                 </Typography>
@@ -536,19 +593,14 @@ export default function CreateLeague({ setDisplay }) {
                 <Typography variant="h7" color="lightgrey">
                   Only users added to this leagues whitelist can join.
                 </Typography>
-                <Typography variant="h6" color="white" component="div">
-                  Invite list:
-                </Typography>
-                
-
-              {/* TODO: Abstract this into another component, controlled by createLeague page */}
-                <Typography variant="h6" color="white" component="div">
-                  Invite List (Private/Closed Leagues)
-                </Typography>
                 {!validAddressesStatus && ( 
-                  <p>
-                    There are invalid addresses.
-                  </p> 
+                  <Typography
+                    sx={{
+                     color: "brown" 
+                    }}
+                  >
+                    Please fix the invalid addresses below.
+                  </Typography> 
                 )}
 
                 {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
@@ -578,9 +630,10 @@ export default function CreateLeague({ setDisplay }) {
                     </>
                   ))}
                   <Button 
-                    variant="outlined"
+                    variant="contained"
                     onClick={addNewPlayerInviteInput}
                     size="small"
+                    filled
                     disabled={!addPlayerBtnEnabled}
                   >
                     Add Another Address to Whitelist
@@ -594,6 +647,16 @@ export default function CreateLeague({ setDisplay }) {
             
           </Grid>
         </Grid>
+        <Fab 
+          sx={{
+            float: "right",
+            // color: "purple"
+          }} onClick={()=>{createLeagueSubmitHandler()}} variant="extended" size="medium" color="tertiary">
+            Submit
+          </Fab>
+          <br></br>
+
+        </>
       )}
       {isCreatingLeague && (
         <Container>

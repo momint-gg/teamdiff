@@ -131,7 +131,7 @@ export default function Play() {
           <Grid item xs={isMobile ? 12 : 4}>
             <Card
               variant="outlined"
-              onClick={() =>  router.push("/createLeague")}
+              onClick={() =>  router.push("/createLeagueLanding")}
             >
               <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>

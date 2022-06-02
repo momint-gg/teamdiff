@@ -238,6 +238,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //***************************************************/
     // Setting the lineup for a user
     // TODO: Move requires to a library to save space (MOBALogicLibrary)
+    // note: this is inefficient if we want to update one position only :/
+        //TODO: we should require that they cannot set duplicates
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
@@ -274,6 +276,42 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         userToLineup[msg.sender] = athleteIds;
     }
 
+
+    function setAthleteInLineup(uint256 athleteId, uint256 position) external {
+        require(!lineupIsLocked, "lineup is locked for the week!");
+        require(inLeague[msg.sender], "User is not in League.");
+
+        //Decrement all athleteToLineup Occurences from previous lineup
+        // for (uint256 i; i < userToLineup[msg.sender].length; i++) {
+        //     athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
+        //         currentWeekNum
+        //     ]--;
+        // }
+
+        // // Require ownership of all athleteIds + update mapping
+        // for (uint256 i; i < athleteIds.length; i++) {
+        //     athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
+        // }
+
+        // Requiring the user has ownership of the athletes
+        // for (uint256 i; i < athleteIds.length; i++) {
+            require(
+                gameItemsContract.balanceOf(msg.sender, athleteId) > 0,
+                "Caller does not own given athleteIds"
+            );
+        // }
+
+        // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
+        // for (uint256 i; i < athleteIds.length; i++) {
+            require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
+                athleteId >= (position * 10) &&
+                    athleteId <= ((position + 1) * 10 - 1),
+                "You are setting an athlete in the wrong position!"
+            );
+        // }
+
+        userToLineup[msg.sender][position] = athleteId;
+    }
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/

@@ -7,7 +7,7 @@ export default function ConnectWallet() {
   const [{ data: connectData, error: connectError }, connect] = useConnect();
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
   const { disconnect } = useDisconnect()
-
+       
   if (accountData) {
     return (
       <Box>
@@ -19,7 +19,7 @@ export default function ConnectWallet() {
         </div>
         <div>Connected to {accountData.connector.name}</div>
         <Button variant="outlined" color="secondary" onClick={disconnect}>
-          Disconnect
+          Disconnecsdft
         </Button>
       </Box>
     );

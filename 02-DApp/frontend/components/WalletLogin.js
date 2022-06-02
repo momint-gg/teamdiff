@@ -5,7 +5,10 @@ import { useAccount,
         useDisconnect } from "wagmi";
 import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
 import { useEffect, useState } from "react";
+
+import { ethers } from "ethers";
 import ConnectWalletModal from "./ConnectWalletModal";
+import { fetchFeeData } from "@wagmi/core";
 
 export default function WalletLogin({isMobile}) {
   const { isConnected, connector, connectors, connectAsync } = useConnect()
@@ -13,11 +16,11 @@ export default function WalletLogin({isMobile}) {
   //   fetchEns: true,
   // });
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
-  const { data: ensName } = useEnsName()
-  const { data: ensAvatar } = useEnsAvatar()
+  // const { data: ensName } = useEnsName()
+  // const { data: ensAvatar } = useEnsAvatar()
   const { disconnect } = useDisconnect()
   const [ shortenedAddress, setShortenedAddress ] = useState();
-
+  // const [isConnected, setIsConnected] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const handleModalOpen = () => {
@@ -35,23 +38,35 @@ export default function WalletLogin({isMobile}) {
 
   // var shortenedAddress = "";
   useEffect(() => {
-    if (accountData?.address) {
-      var shortenedAddress1 = `${accountData.address.slice(
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+    const fetchData = async () => {
+      const currentAddress = await signer.getAddress()
+      setAddressPreview(currentAddress)
+    }
+    fetchData()
+    provider.provider.on('accountsChanged', (accounts) => { setAddressPreview(accounts[0].toUpperCase()) })
+    // provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+    //                                             setIsConnected(false) })
+  }, [])
+
+  const setAddressPreview = (address) => {
+
+    console.log("address: " + address);
+      var shortenedAddress1 = `${address.slice(
         0,
         6
-      )}...${accountData.address.slice(
-        accountData.address.length - 4,
-        accountData.address.length
+      )}...${address.slice(
+        address.length - 4,
+        address.length
       )}`;
       setShortenedAddress(shortenedAddress1);
-    }
-
-  }, [accountData?.address])
-
+      // setIsConnected(true);
+  }
   
   return (
     <Box>
-      {accountData?.address ? (
+      {isConnected ? (
         <ClickAwayListener onClickAway={handleClickAway}>
           <Box sx={{ position: "relative" }}>
             {isMobile?
