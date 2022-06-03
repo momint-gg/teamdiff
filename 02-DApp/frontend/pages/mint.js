@@ -17,6 +17,8 @@ import {
   Fab,
 } from "@mui/material";
 import ConnectWalletModal from "../components/ConnectWalletModal";
+import StarterPack from "../assets/images/starter-pack.png"
+import Image from "next/image";
 
 export default function Mint({ setDisplay }) {
   const [{ data: accountData }, disconnect] = useAccount({
@@ -61,7 +63,6 @@ export default function Mint({ setDisplay }) {
             />
             <img src="/starter-pack.png" style={{ position: "absolute" }} />
           </Box>
-
           <Box
             justifyContent="center"
             alignItems="center"
