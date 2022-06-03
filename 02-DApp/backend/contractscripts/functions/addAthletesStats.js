@@ -42,14 +42,38 @@ async function main() {
     const name = data[i]['Player'].toLowerCase(); // Gamer name columnn
     const points = Math.round(data[i]['Points']); // Total points column
     const id = athleteToId[name];
-    console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
-    finalStatsToPush.push({ id: id, points: points });
-    console.log(Object.keys(finalStatsToPush).length);
+    // console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
+    if (id !== undefined) {
+      // Only IDs in our league should be updated
+      finalStatsToPush.push({ id: id, points: points });
+    } else {
+      console.log('Athlete named ', name, ' is not in TeamDiff');
+    }
+  }
+
+  // Looping through all of our athletes and if they aren't in our object, set points equal to 0
+  for (let [key, value] of Object.entries(athleteToId)) {
+    if (!finalStatsToPush.hasOwnProperty(value)) {
+      // If our final stats array doesn't have this id, athlete has 0 points
+      finalStatsToPush.push({ id: value, points: 0 });
+    }
+    // console.log(`${key}: ${value}`);
+  }
+
+  // Logging our output to see (yes I should write test cases but not enough time man)
+  for (let i = 0; i < finalStatsToPush.length; i++) {
+    console.log(
+      'Athlete ID: ',
+      finalStatsToPush[i].id,
+      '\n Athlete points: ',
+      finalStatsToPush[i].points
+    );
   }
 
   // Finally, pushing stats to the contract
-  for (let i = 0; i < sampleAthleteData.length; i++) {
-    console.log('Adding athletes stats for ', i);
+  for (let i = 0; i < 50; i++) {
+    console.log('Adding athletes stats for athlete index ', i);
+
     const addAthletesStatsTxn = await contract.appendStats(
       finalStatsToPush[i].id, // index of athlete
       finalStatsToPush[i].points // their points for the week
@@ -57,12 +81,12 @@ async function main() {
     console.log(
       'Adding points: ',
       finalStatsToPush[i].points,
-      ' for athlete ',
-      finalStatsToPush[i].name
+      ' for athlete id ',
+      finalStatsToPush[i].id
     );
     // Waiting for txn to mine
     await addAthletesStatsTxn.wait();
-  // }
+  }
 }
 
 const runMain = async () => {
