@@ -4,6 +4,7 @@ import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { WalletLinkConnector } from 'wagmi/connectors/walletLink'
 import Box from '@mui/material/Box';
+import Homepage from './homepage'
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -45,7 +46,8 @@ export default function Index(props) {
 
   if (typeof window !== "undefined") {
     return (
-      <Box sx={{backgroundColor: '#2E0744', height: '100%'}}>
+      <Box sx={{ backgroundColor: '#2E0744', height: '100%' }}>
+        <Homepage />
       </Box>
     );
   }
