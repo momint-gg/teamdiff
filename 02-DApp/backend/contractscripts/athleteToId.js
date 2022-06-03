@@ -2,9 +2,10 @@
 //Their index in this list is their id
 
 const athletes = [
+  // What order they should be fin
   'Berserker', // id = 0, Neo's id = 1, etc...
   'Neo',
-  'Johns,un',
+  'Johnsun',
   'FBI',
   'Danny',
   'Hans sama',
@@ -54,19 +55,9 @@ const athletes = [
   'Licorice',
 ];
 
-// async function main() {
-//   const athleteToIdObject = {};
-//   for (let i = 0; i < athletes.length; i++) {
-//     athleteToIdObject[athletes[i]] = i;
-//   }
-
-//   console.log('Athletes');
-//   for (let i = 0; i < athletes.length; i++) {
-//     console.log(athleteToIdObject[athletes[i]]);
-//   }
-// }
-
-// main().catch((err) => console.log(err));
+for (let i = 0; i < athletes.length; i++) {
+  athletes[i] = athletes[i].toLowerCase();
+}
 
 athleteToIdObject = {};
 for (let i = 0; i < athletes.length; i++) {
