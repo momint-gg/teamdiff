@@ -32,6 +32,10 @@ const main = async () => {
   //Initial functions that need to be run
   console.log("First setting starting index...");
   txn = await gameContract.setStartingIndex();
+  // txn = await gameContract.setStartingIndex({
+  //   gasLimit: 23000000,
+  //   gasPrice: 100000000
+  // });
   await txn.wait();
   console.log("Now setting token URIs...");
   txn = await gameContract.setURIs();

@@ -17,30 +17,35 @@ export default function CreateLeagueLanding() {
     <Box sx={{ backgroundColor: "primary.dark" }}>
       
         <Typography variant="h3" color="secondary" component="div">
-            CREATE A LEAGUE
+            Create a League
         </Typography>
-        <hr
+        {/* <hr
             style={{
             color: "secondary",
             backgroundColor: "secondary",
-            height: 5,
+            height: 2,
             }}
-        /> 
+        />  */}
+        <br></br>
         <Box
             sx={{
                 // margin: "3vh, 0, 3vh, 0"
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "flex-end"
+                // alignItems: "flex-end"
             }}  
         >
-            <Typography variant="p" color="white" component="div">
+            <Typography align="left" variant="h6" color="white" component="div">
                 By pressing "I Understand"... I assert that I'm a crypto and gaming fan... Insert more info about league creation here...
             </Typography>
             <br></br>
             <Fab  
                 onClick={() =>  router.push("/createLeague")}
                 variant="extended"
+                sx={{
+                    background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    marginLeft: "auto"
+                }}
             >
                 I Understand
             </Fab>

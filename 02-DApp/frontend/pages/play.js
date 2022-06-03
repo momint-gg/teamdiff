@@ -13,6 +13,9 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+
 import constants from "../Constants";
 import MyLeagues from "./myLeagues";
 import JoinLeague from "./joinLeague";
@@ -93,7 +96,12 @@ export default function Play() {
       {accountData ? (
         <Grid container spacing={3}>
           <Grid item xs={4}>
-            <Card variant="outlined" onClick={() => router.push("/myLeagues")}>
+            <Card 
+              sx={{
+                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 20
+              }}
+              variant="outlined" onClick={() => router.push("/myLeagues")}>
             <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
@@ -101,17 +109,22 @@ export default function Play() {
                       My Leagues
                     </Typography>
                   ) : (
-                    <Typography variant="h5" color="secondary" component="div">
+                    <Typography variant="h4" color="secondary" component="div">
                       My Leagues
                     </Typography>
                   )}
-                  <FaCrown size={"3rem"} />
+                  <EmojiEventsIcon fontSize={"large"} />
                 </CardContent>
                 </Fragment>
             </Card>
           </Grid>
           <Grid item xs={4}>
-            <Card variant="outlined" onClick={() =>  router.push("/joinLeague")}>
+            <Card 
+              sx={{
+                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 20
+              }}
+              variant="outlined" onClick={() =>  router.push("/joinLeague")}>
             <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
@@ -119,18 +132,22 @@ export default function Play() {
                       Join League
                     </Typography>
                   ) : (
-                    <Typography variant="h5" color="secondary" component="div">
+                    <Typography variant="h4" color="secondary" component="div">
                       Join League
                     </Typography>
                   )}
-                  <FaCrown size={"3rem"} />
+                  <GroupAddIcon fontSize={"large"} />
                 </CardContent>
                 </Fragment>
             </Card>
           </Grid>
-          <Grid item xs={isMobile ? 12 : 4}>
+          <Grid item xs={4}>
             <Card
               variant="outlined"
+              sx={{
+                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 20
+              }}
               onClick={() =>  router.push("/createLeagueLanding")}
             >
               <Fragment>
@@ -140,11 +157,11 @@ export default function Play() {
                       Create League
                     </Typography>
                   ) : (
-                    <Typography variant="h5" color="secondary" component="div">
+                    <Typography variant="h4" color="secondary" component="div">
                       Create League
                     </Typography>
                   )}
-                  <FaCrown size={"3rem"} />
+                  <FaCrown size={"2rem"} />
                 </CardContent>
                 <CardActions></CardActions>
               </Fragment>

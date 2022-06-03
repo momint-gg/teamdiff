@@ -28,10 +28,12 @@ import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/Game
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
+//Router
+import { useRouter } from 'next/router';
 
 export default function MintPack({ setDisplay }) {
-  // WAGMI Hooks
-  // const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  // Router
+  const router = useRouter();
 
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -77,7 +79,7 @@ export default function MintPack({ setDisplay }) {
       provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
       provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
                                                   setIsConnected(false) })
-    }, []);
+    }, [connectedAccount]);
 
 
   // Use Effect for component mount
@@ -97,8 +99,9 @@ export default function MintPack({ setDisplay }) {
 
       // Callback for when packMinted Events is fired from contract
       // const signerAddress = accountData.address;
-      const packMintedCallback = (signer, packID) => {
-        if (signer == connectedAccount) {
+      const packMintedCallback = (signerAddress, packID) => {
+        console.log("signer in callback : " + signerAddress)
+        if (signerAddress == connectedAccount) {
           setIsMinting(false);
           setHasMinted(true);
         }
@@ -106,7 +109,7 @@ export default function MintPack({ setDisplay }) {
 
       // A filter that matches my address as the signer of the contract call
       // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
-      console.log(hexZeroPad(connectedAccount, 32));
+      // console.log(hexZeroPad(connectedAccount, 32));
       const filter = {
         address: GameItemsContract.address,
         topics: [
@@ -115,7 +118,8 @@ export default function MintPack({ setDisplay }) {
           // hexZeroPad(signerAddress, 32)
         ],
       };
-      GameItemsContract.on(filter, packMintedCallback);
+      // GameItemsContract.on(filter, packMintedCallback);
+      GameItemsContract.once("packMinted", packMintedCallback)
     }
     else {
       console.log("no account connected");
@@ -137,9 +141,9 @@ export default function MintPack({ setDisplay }) {
       const mintTxn = await gameItemsContractWithSigner
         .mintStarterPack()
         .then((res) => {
-          console.log("txn result: " + JSON.stringify(res, null, 2));
+          // console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsMinting(true);
-          console.log("Minting pack in progress...");
+          // console.log("Minting pack in progress...");
         })
         .catch((error) => {
           alert("error: " + error.error.message);
@@ -319,10 +323,10 @@ export default function MintPack({ setDisplay }) {
                   >
                     View on OpenSea.
                   </a> 
-                  <Typography variant="subtitle2"> 
+                  {/* <Typography variant="subtitle2"> 
                     Note that it may take a few minutes for images and metadata to
                     properly load on OpenSea.
-                  </Typography>               
+                  </Typography>                */}
                 </Box>
                 
                 <Box
@@ -364,7 +368,7 @@ export default function MintPack({ setDisplay }) {
                 // onClick={() => setDisplayCollection(true)}
                 sx={{ marginTop: 5, fontSize: 20 }}
               >
-                Go To Collection
+                Go To My Collection
               </Fab>
             </Box>
           </Box>
