@@ -182,8 +182,8 @@ const { disconnect } = useDisconnect()
             &#60; BACK
           </Fab> */}
 
-          <Typography variant="h3" color="secondary" component="div">
-            ACTIVE LEAGUES
+          <Typography variant="h4" color="secondary" component="div">
+            Active Leagues
           </Typography>
           <hr
             style={{
@@ -208,12 +208,12 @@ const { disconnect } = useDisconnect()
 
          
           <Typography
-            variant="h3"
+            variant="h4"
             color="secondary"
             component="div"
             sx={{ marginTop: 5 }}
           >
-            PENDING LEAGUES
+            Pending Leagues
           </Typography>
           <hr
             style={{

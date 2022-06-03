@@ -1,7 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.css'
-import { Box, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import 'bootstrap/dist/css/bootstrap.css';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+import { Box, Link, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -97,7 +99,7 @@ export default function CreateLeague({ setDisplay }) {
   const [newLeagueAddress, setNewLeagueAddress] = useState(null);
   const [formValues, setFormValues] = useState(defaultValues)
   const [isJoiningLeague, setIsJoiningLeague] = useState(false);
-
+  const [hasJoinedLeague, setHasJoinedLeague] = useState(false);
   // const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
   //Rendering stat hooks
   const [inviteListValues, setInviteListValues] = useState([])
@@ -114,6 +116,9 @@ export default function CreateLeague({ setDisplay }) {
 
 
   useEffect(() => {
+    // setIsCreatingLeague(false);
+    // setHasCreatedLeague(true);
+    // setHasJoinedLeague(true)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
@@ -183,6 +188,7 @@ export default function CreateLeague({ setDisplay }) {
     const currentAddress = await signer.getAddress();
     if(stakerAddress === currentAddress) {
       setIsJoiningLeague(false);
+      setHasJoinedLeague(true);
       // router.reload(window.location.pathname);
 
       // setStakerAddress(stakerAddress)
@@ -663,27 +669,46 @@ export default function CreateLeague({ setDisplay }) {
         <Fab 
           sx={{
             float: "right",
-            // color: "purple"
-          }} onClick={()=>{createLeagueSubmitHandler()}} variant="extended" size="medium" color="tertiary">
-            Submit
-          </Fab>
+            background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+          }} 
+          onClick={()=>{createLeagueSubmitHandler()}} variant="extended" size="medium" color="tertiary"
+        >
+            Create League
+        </Fab>
           <br></br>
 
         </>
       )}
       {isCreatingLeague && (
-        <Container>
-          <Typography>Your League is being created...</Typography>
-          <CircularProgress />
-        </Container>
-      )}
-      {hasCreatedLeague && (
-        <Box>
-          <Typography>
-            {"Your Team Diff League \"" + newLeagueName + "\" has been created!"}
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography variant="h5" color="white" component="div">
+            League Creation in progress
           </Typography>
           <br></br>
-          <a
+          <CircularProgress />
+        </Box>
+      </Container>
+      )}
+      {hasCreatedLeague && (
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+          sx={{
+            display: "flex",
+          }}
+        >
+
+          <br></br>
+          <Link
             href={
               "https://rinkeby.etherscan.io/address/"
               + newLeagueAddress
@@ -691,18 +716,48 @@ export default function CreateLeague({ setDisplay }) {
             }
             target={"_blank"}
             rel="noreferrer"
+            sx={{
+              textDecoration: "none"
+            }}
           >
-            View League on Etherscan
-          </a>
+              <Paper
+                  elevation={5}
+                  sx={{
+                    background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    
+                    marginRight: 3,
+                    padding: 2
+                  }}
+                >
+                    <Typography variant="h6">
+                      {"Your Team Diff League \"" + newLeagueName + "\" has been created"}
+                      <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
+
+                    </Typography>
+              </Paper>
+          </Link>
           <br></br> 
-          {isJoiningLeague ? (
-            <Container>
-              <Typography>Joining newly created league...</Typography>
-              <CircularProgress />
+          {isJoiningLeague && (
+            <Container maxWidth="lg" justifyContent="center" alignItems="center">
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+                sx={{
+                  display: "flex",
+                }}
+              >
+                <Typography variant="h5" color="white" component="div">
+                  {"Joining newly created League: " + newLeagueName}
+                </Typography>
+                <br></br>
+                <CircularProgress />
+              </Box>
             </Container>
-          ) : (
+          )}
+          {hasJoinedLeague && (
             <>
-              <a
+              < Link
                 href={
                   "http://localhost:3000/leagues/"
                   + newLeagueAddress
@@ -710,18 +765,43 @@ export default function CreateLeague({ setDisplay }) {
                 target={"_blank"}
                 rel="noreferrer"
               >
-                View League on TeamDiff
-              </a>
+              <Paper
+                  elevation={5}
+                  sx={{
+                    background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    flex: 1,
+                    marginRight: 3,
+                    padding: 2
+                  }}
+                >
+                  <Typography variant="h6">
+                    Succesfully joined league
+                    <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
+
+                  </Typography>
+                
+              </Paper>      
+              <Typography align="center" variant="subtitle1">
+                  Click to view league on TeamDiff
+              </Typography>        
+              </Link>
+              <br></br>
+              <Fab
+                variant='extended'
+                size="large"
+                // sx={{
+                //   background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                // }}
+                onClick={() => {
+                  router.reload(window.location.pathname);
+                }}
+              >
+                Create Another League
+              </Fab>
               <br></br>
             </>
           )}
-          <Button
-            onClick={() => {
-              router.reload(window.location.pathname);
-            }}
-          >
-            Create Another League
-          </Button>
+          
         </Box>
       )}
       {!isConnected && !hasCreatedLeague && !isCreatingLeague && (

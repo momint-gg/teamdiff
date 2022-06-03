@@ -366,8 +366,7 @@ export default function BurnPack({ setDisplay }) {
                    <Paper
                     elevation={5}
                     sx={{
-                      background:
-                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                      background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                       flex: 1,
                       marginRight: 3,
                       padding: 2
