@@ -17,8 +17,6 @@ import {
   Fab,
 } from "@mui/material";
 import ConnectWalletModal from "../components/ConnectWalletModal";
-import StarterPack from "../assets/images/starter-pack.png"
-import Image from "next/image";
 
 export default function Mint({ setDisplay }) {
   const [{ data: accountData }, disconnect] = useAccount({
