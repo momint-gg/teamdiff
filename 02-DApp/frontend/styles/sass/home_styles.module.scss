@@ -34,6 +34,13 @@ $breakpoint-large: 992px;
 //   min-width: fit-content;
 // }
 
+.cardAndPack {
+  margin-bottom: 3rem !important;
+  @media (max-width: $breakpoint-mobile) {
+    margin-bottom: auto !important;
+  }
+}
+
 span.early-access {
   color: black;
   font-weight: 700;
