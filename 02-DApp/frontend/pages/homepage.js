@@ -81,6 +81,21 @@ export default function Homepage() {
                         </div>
                     </div>
                 </div>
+                <div className={[styles["bg-second-cta"], bootstrap["pb-3"]].join(' ')}>
+                    <div className={bootstrap.container}>
+                        <div className={styles["second-cta"]}>
+                            <h2 className={[bootstrap["display-3"], bootstrap["fw-bold"]].join(' ')}>Create a League</h2>
+                            <p className={[bootstrap["fs-5"], bootstrap["mt-3"]].join(' ')}>
+                                Minting and opening your player card packs was only the first step. Now, it's time to put them to use. Create or join a fantasy league to compete to win tokens for the League of Legends LCS Summer Split of 2022 and create your TeamDiff.
+                            </p>
+                            <Link href="/createLeague">
+                                <button className={[bootstrap["btn"], bootstrap["btn-outline-secondary"], bootstrap["fs-5"], bootstrap["pe-5"], bootstrap["ps-5"], bootstrap["mt-3"], bootstrap["fw-bold"]].join(' ')}>
+                                    Create a League
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div >
     )
