@@ -12,8 +12,13 @@ import {
   CircularProgress,
   Menu,
   MenuItem,
-  TextField
+  TextField,
+  Container,
+  Link
+  // CircularProgress
 } from "@mui/material";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 import { useState, useEffect } from "react";
 
 import { useRouter } from 'next/router'
@@ -49,10 +54,7 @@ import constants from "../../Constants";
 export default function LeagueDetails() {
    //Router params
    const router = useRouter();
-   
-    //WAGMI Hooks
- const { data: accountData } = useAccount({ ens: true })
-const { disconnect } = useDisconnect()
+
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -98,26 +100,51 @@ const { disconnect } = useDisconnect()
     console.log("lineup: " + lineup);
   }
 
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
 
-  useEffect(async () => {
-    if(accountData) {
-      console.log("connected to acocunt : " + accountData.address);
-      const LeagueMakerContract = new ethers.Contract(
-        CONTRACT_ADDRESSES.LeagueMaker,
-        LeagueMakerJSON.abi,
-        provider
-      );
-  
-      // const proxyAddy = await LeagueMakerContract.userToLeagueMap(accountData.address, 0)
-      // console.log("proxy: " + proxyAddy);
-      // const filter = leagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
-      // leagueMakerContract.on(filter, leagueCreatedCallback);
-    }
-    else {
-      console.log("no account data :'(");
-    }
-  }, [accountData?.address])
+  useEffect(() => {
+    // setIsCreatingLeague(false);
+    // setHasCreatedLeague(true);
+    // setHasJoinedLeague(true)
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        // setIsLoading(true);
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+          //TODO this doesn't update screen when switching accounts :/
+        }
+        else {
+          setIsConnected(false);
+
+        }
+        // setIsLoading(false);
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, [isConnected]);
+
+
+
+ 
+
 
 
   const stakedEventCallback = async (stakerAddress, stakeAmount, leagueAddress) => {
@@ -146,8 +173,8 @@ const { disconnect } = useDisconnect()
 
   useEffect(() => {
     setAthleteNFTs([]);
-    if (accountData && router.isReady) {
-      
+    if (isConnected && router.isReady) {
+      setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
         router.query.leagueAddress,
@@ -162,9 +189,10 @@ const { disconnect } = useDisconnect()
       // const white
 
       async function fetchData() {
+        setIsLoading(true);
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+        const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
         // console.log("isInLeague: " + isInLeague)
         //Get whitelist of Proxy, to confirm connected user is on whitelist
@@ -175,22 +203,18 @@ const { disconnect } = useDisconnect()
             WhitelistJSON.abi,
             provider
         );
+ 
+        const isOnWhitelist = await WhitelistContract.whitelist(connectedAccount);
+        setIsOnWhitelist(isOnWhitelist);
+
         const isPublicLeague = await WhitelistContract.isPublic();
         setIsPublicLeague(isPublicLeague);
-        // console.log("isPublicLeague: " + isPublicLeague)
-        const leagueMember1 = await LeagueProxyContract.leagueMembers(0).catch((e) => console.log(e));
-        // setIsLeagueMember(isInLeague);
-        // console.log("isInLeague: " + leagueMember1)
+
         const leagueAdmin = await LeagueProxyContract.admin();
-        //console.log(leagueAdmin);
-        setIsLeagueAdmin(leagueAdmin == accountData.address);
+        setIsLeagueAdmin(leagueAdmin == connectedAccount);
         
-
-        const isOnWhitelist = await WhitelistContract.whitelist(accountData.address);
-        // console.log("user is on whitelist: " + isOnWhitelist);
-        setIsOnWhitelist(isOnWhitelist);
+        //TODO this is slightly buggy when someone tries to switch accounts
         setIsLoading(false);
-
       }
 
 
@@ -199,7 +223,7 @@ const { disconnect } = useDisconnect()
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
   
         const nfts = await web3.alchemy.getNfts({
-          owner: accountData.address,
+          owner: connectedAccount,
           contractAddresses: [CONTRACT_ADDRESSES.GameItems],
         });
   
@@ -230,7 +254,7 @@ const { disconnect } = useDisconnect()
     //   console.log("leagueAddress: " + leagueAddress);
 
     }
-  }, [accountData?.address, router.isReady]);
+  }, [isConnected, router.isReady, connectedAccount]);
 
   useEffect(() => {
     let flag = true
@@ -362,10 +386,22 @@ const { disconnect } = useDisconnect()
     <Box>
 
       {isLoading ? (
-        <Box>
-            <Typography>Loading</Typography>
-            <CircularProgress />
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography variant="h5" color="white" component="div">
+            Loading
+          </Typography>
+          <br></br>
+          <CircularProgress />
         </Box>
+      </Container>
         ) : (           
         <>
         {isLeagueMember ? (
@@ -625,62 +661,123 @@ const { disconnect } = useDisconnect()
           ) : (
             <>
 
-            {isOnWhitelist ? (
-              <>
-                  <Typography>
-                  {"You are whitelisted for this league, click below to accept the invitation to: " + leagueName} 
+            {isOnWhitelist && !isJoiningLeague && !hasJoinedLeague ? (
+               <Box
+               justifyContent="center"
+               alignItems="center"
+               flexDirection="column"
+               sx={{
+                 display: "flex",
+               }}
+              >
+                  <Typography variant="h5">
+                  {"You are whitelisted for this league. Click below to accept the invitation to: " + leagueName} 
                   </Typography>
+                  <br></br>
                   <Fab
-                  onClick={joinLeagueHandler}
+                    onClick={joinLeagueHandler}
+                    variant="extended"
+                    sx={{
+                        background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    }}
                   >
-                  Join League
+                  {"Join \"" + leagueName + "\""}
                   </Fab>
-              </>
+              </Box>
             ) : (
               <>
-              {isPublicLeague ? (
-                <>
-                  <Typography>
-                  {"This is a public league, click below to join: " + leagueName} 
-                  </Typography>
-                  <Fab
-                  onClick={joinLeagueHandler}
+              {isPublicLeague && !isJoiningLeague && !hasJoinedLeague ? (
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    flexDirection="column"
+                    sx={{
+                      display: "flex",
+                    }}
                   >
-                    Join League
-                  </Fab>
-                </>
+                      <Typography variant="h5">
+                      {"This is a public league. Click below to join: " + leagueName} 
+                      </Typography>
+                      <br></br>
+                      <Fab
+                        onClick={joinLeagueHandler}
+                        variant="extended"
+                        sx={{
+                            background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                        }}
+                      >
+                        {"Join \"" + leagueName + "\""}
+                      </Fab>
+                  </Box>
               ) : (
-                <>
-                <Typography>
-                {"IDK how tf you got here, but you aren't whitelisted for this private league, therefore you cannot join at this time." 
-                 +" Please contact the admin of the league if you would like to be added."} 
-                </Typography>
-                </>
+                (!isJoiningLeague && !hasJoinedLeague && 
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    flexDirection="column"
+                    sx={{
+                      display: "flex",
+                    }}
+                  >
+                      <Typography>
+                      {"IDK how tf you got here, but you aren't whitelisted for this private league, therefore you cannot join at this time." 
+                      +" Please contact the admin of the league if you would like to be added."} 
+                      </Typography>
+                  </Box>
+                )
               )}
 
             </>
           )}
           {isJoiningLeague && 
-              <Box>
-                <Typography>Joining league...</Typography>
+              <Container maxWidth="lg" justifyContent="center" alignItems="center">
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+                sx={{
+                  display: "flex",
+                }}
+              >
+                <Typography variant="h5" color="white" component="div">
+                  Joining League
+                </Typography>
+                <br></br>
                 <CircularProgress />
               </Box>
+            </Container>
             }
             {hasJoinedLeague && 
                 <>
-                <Typography>
-                  {"Succesfully Joined League: " + leagueName}
-                </Typography>
-                <a
-                  href={
-                    "http://localhost:3000/leagues/"
-                    + router.query.leagueAddress
-                  }
-                  target={"_blank"}
-                  rel="noreferrer"
-                >
-                  View League on TeamDiff
-                </a>
+              <Link
+                href={
+                  "http://localhost:3000/leagues/"
+                  + router.query.leagueAddress
+                }
+                target={"_blank"}
+                rel="noreferrer"
+              >
+                <Paper
+                    elevation={5}
+                    sx={{
+                      background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                      flex: 1,
+                      marginRight: 3,
+                      padding: 2,
+                      // width: "50vw"
+                    }}
+                  >
+                    <Typography variant="h6">
+                      Succesfully joined league
+                      <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
+
+                    </Typography>
+                  
+                </Paper>      
+                <Typography align="center" variant="subtitle1">
+                    Click to view league on TeamDiff
+                </Typography>        
+              </Link>
                 <br></br>
               </>
             }

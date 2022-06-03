@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-
+import theme from '../styles/theme.js';
 import { Box, Link, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -31,6 +31,7 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
+import AddToWhitelist from '../components/AddToWhitelist.js';
 
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
@@ -103,7 +104,7 @@ export default function CreateLeague({ setDisplay }) {
   // const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
   //Rendering stat hooks
   const [inviteListValues, setInviteListValues] = useState([])
-  const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
+  // const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
   const [validAddressesStatus, setValidAddressesStatus] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const[isValidBuyInCost, setIsValidBuyInCost] = useState(true)
@@ -174,7 +175,7 @@ export default function CreateLeague({ setDisplay }) {
       // const filter = LeagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
 
       // LeagueMakerContract.on(filter, leagueCreatedCallback);
-
+      //TODO this still triggers more than once sometimes idk whyyyyy
       LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
   }, [])
 
@@ -303,7 +304,7 @@ export default function CreateLeague({ setDisplay }) {
       .createLeague(
           formValues.leagueName,
           formValues.buyInCost,
-          (formValues.inviteListStatus === "open"),
+          !isPrivate,
           connectedAccount,
           CONTRACT_ADDRESSES.TestUSDC,
           CONTRACT_ADDRESSES.Athletes,
@@ -382,7 +383,7 @@ export default function CreateLeague({ setDisplay }) {
     // const signer = provider.getSigner()
     // const currentAddress = await signer.getAddress()
     // console.log("target value = " + accountData.address);
-    if(inviteListValuesNew.includes(e.target.value) || e.target.value === connectedAccount) {
+    if(inviteListValuesNew.includes(e.target.value) || e.target.value == connectedAccount) {
       console.log("invalid address added");
       alert("No duplicate address allowed + no adding yourself to whitelist")
     } else {
@@ -412,9 +413,9 @@ export default function CreateLeague({ setDisplay }) {
     }
   }
 
-  function handleShowForm() {
-    setShowForm(true)
-  }
+  // function handleShowForm() {
+  //   setShowForm(true)
+  // }
 
   return (
     <Box sx={{ backgroundColor: "primary.dark" }}>
@@ -422,15 +423,24 @@ export default function CreateLeague({ setDisplay }) {
     
       {isConnected && !(isCreatingLeague || hasCreatedLeague) && (
         <>
-        <Grid container spacing={{ xs: 2, md: 3 }}>
-          <Grid item xs s>
+        {/* <Grid container spacing={{ xs: 2, md: 3 }}>
+          <Grid item xs s> */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            // alignItems: "flex-start"
+          }}
+        >
             <Box
-              component="div"
+              // component="div"
               sx={{
-                '& > :not(style)': { m: 1, width: '50ch' },
+                // '& > :not(style)': { m: 1, width: '50ch' },
+                flex: 1
               }}
-              noValidate
-              autoComplete="off"
+              // noValidate
+              // autoComplete="off"
             >
               <Typography variant="h4" color="white" component="div">
                 Form
@@ -549,36 +559,20 @@ export default function CreateLeague({ setDisplay }) {
 
               </FormControl>
               </Box>
-              {/* <FormControl required sx={{ marginLeft: 3 }}>
-                <StyledInputLabel id="open-closed-toggle">League Status</StyledInputLabel>
-                <StyledSelect
-                  labelId="open-closed-toggle"
-                  id="open-closed-toggle-select"
-                  value={formValues.inviteListStatus}
-                  label="inviteListStatus"
-                  name="inviteListStatus"
-                  onChange={handleInputChange}
-                >
-                  <MenuItem key="open" value="open">open</MenuItem>
-                  <MenuItem key="closed" value="closed">closed</MenuItem>
-                </StyledSelect>
-              </FormControl> */}
-              
-              {/* <Button variant="contained" size="small" sx={{backgroundColor: "primary.light"}}>Submit</Button> */}
             </Box>
-          </Grid>
-          <Grid item xs s>
+          {/* </Grid>
+          <Grid item xs s> */}
             <Box
-                component="div"
+                // component="div"
                 sx={{
-                  '& > :not(style)': { m: 1, width: '50ch' },
-                  color: "white",
-                  alignItems: "left"
-
+                  // '& > :not(style)': { m: 1, width: '50ch' },
+                  // color: "white",
+                  // alignItems: "left",
+                  flex: 1
                 }}
 
-                noValidate
-                autoComplete="off"
+                // noValidate
+                // autoComplete="off"
               >
                 <Typography
                   variant="h4"
@@ -608,64 +602,22 @@ export default function CreateLeague({ setDisplay }) {
                     Anybody with a wallet address can search and join this league.
                 </Typography>
                 ) : (
-                <>
-                <Typography variant="h7" color="lightgrey">
-                  Only users added to this leagues whitelist can join.
-                </Typography>
-                {!validAddressesStatus && ( 
-                  <Typography
-                    sx={{
-                     color: "brown" 
-                    }}
-                  >
-                    Please fix the invalid addresses below.
-                  </Typography> 
-                )}
-
-                {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
-                  {inviteListValues.map((element, index) => (
-                    <>
-                    <TextField
-                      variant="standard"
-                      label={"Whitelisted Address " + (index + 1)} 
-                      onChange={e => {
-                        //This submits null address when I copy and paste
-                        handlePlayerInviteInput(e, index)
-                        // console.log("short list outside func: " + inviteListValues);
-                      }}
-                      value={element}
-                      key={index}
-                    />
-                    {index ? 
-                      <Button 
-                        variant="outlined"
-                        onClick={() => removePlayer(index)}
-                        size="small"
-                      >
-                        Remove
-                      </Button>
-                      : null
-                    }
-                    </>
-                  ))}
-                  <Button 
-                    variant="contained"
-                    onClick={addNewPlayerInviteInput}
-                    size="small"
-                    filled
-                    disabled={!addPlayerBtnEnabled}
-                  >
-                    Add Another Address to Whitelist
-                  </Button>
-
-
-                </>
+                  <>
+                  <Typography variant="h7" color="lightgrey">
+                    Only Address manually added to the whitelist can join this league
+                  </Typography>
+                  <AddToWhitelist
+                    setInviteListValues={setInviteListValues}
+                    inviteListValues={inviteListValues}
+                    connectedAccount={connectedAccount}
+                  ></AddToWhitelist>
+                  </>
                 
                 )}
             </Box>
-            
-          </Grid>
-        </Grid>
+        </Box>
+          {/* </Grid>
+        </Grid> */}
         <Fab 
           sx={{
             float: "right",
@@ -730,7 +682,7 @@ export default function CreateLeague({ setDisplay }) {
                   }}
                 >
                     <Typography variant="h6">
-                      {"Your Team Diff League \"" + newLeagueName + "\" has been created"}
+                      {"Your TeamDiff league \"" + newLeagueName + "\" has been created"}
                       <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
 
                     </Typography>
@@ -748,7 +700,7 @@ export default function CreateLeague({ setDisplay }) {
                 }}
               >
                 <Typography variant="h5" color="white" component="div">
-                  {"Joining newly created League: " + newLeagueName}
+                  {"Joining newly created league: \"" + newLeagueName + "\""}
                 </Typography>
                 <br></br>
                 <CircularProgress />
@@ -775,7 +727,7 @@ export default function CreateLeague({ setDisplay }) {
                   }}
                 >
                   <Typography variant="h6">
-                    Succesfully joined league
+                    {"Succesfully joined league: \"" + newLeagueName + "\""}
                     <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
 
                   </Typography>

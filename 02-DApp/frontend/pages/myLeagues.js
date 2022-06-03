@@ -41,15 +41,35 @@ export default function MyLeagues({ setDisplay }) {
   const [pendingLeagueList, setPendingLeagueList] = useState([]);
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
   const [mountedLeagueAddress, setMountedLeagueAddress] = useState(null);
-  // const exampleData = {
-  //   leagueName: "Katie's League",
-  //   image: { examplePic },
-  //   standing: "2 of 8",
-  // };
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-  //WAGMI Hooks
-const { data: accountData, isLoading, error } = useAccount({ ens: true })
-const { disconnect } = useDisconnect()
+
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const signer = provider.getSigner()
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, []);
+
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -62,7 +82,7 @@ const { disconnect } = useDisconnect()
   useEffect(() => {
     setActiveLeagueList([]);
     setPendingLeagueList([]);
-    if (accountData) {
+    if (isConnected) {
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -82,7 +102,7 @@ const { disconnect } = useDisconnect()
         //Continue to add leagues to activeLEagueList and pendingLeagueList
           //until we hit an error (because i is out of range presumably)
         do {
-          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(accountData.address, i)
+          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(connectedAccount, i)
                                                         .catch((_error) => {
                                                           error = _error;
                                                           //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
@@ -101,11 +121,12 @@ const { disconnect } = useDisconnect()
             );
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
-            const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+            const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
             // console.log("isInleague:" + isInLeague);
             const admin = await LeagueProxyContract.admin();
             // console.log("admin: " + admin);
             //Add League address  to appropriate state list
+            //TODO we
             (isInLeague ? (
               setActiveLeagueList(activeLeagueList => [...activeLeagueList, whitelistedLeague])
             ) : (
@@ -122,21 +143,13 @@ const { disconnect } = useDisconnect()
     else {
       console.log("no account data");
     }
-  }, [accountData?.address]);
+  }, [isConnected, connectedAccount]);
 
 
   useEffect(() => {
     setActiveLeagueList([]);
     setPendingLeagueList([]);
   }, [])
-
-  //useEffect to update leagues on accountData change
-  // var activeListItems;
-  // var pendingListItems;
-  // useEffect(() => {
-  //      //Create list of league cards for all active leagues
-  //   console.log("accountDataLoading in useEffect: " + accountDataLoading);
-  // }, [accountDataLoading])
 
   var activeListItems = activeLeagueList.map((leagueAddress, index) =>
     <Box key={index}>

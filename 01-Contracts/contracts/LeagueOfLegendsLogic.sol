@@ -348,7 +348,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         //must approve for our own token
         //testUSDC.approve(msg.sender, 100);
 
-        
+        //Update mapping if contract is public, since whitelist is skipped
+        if(whitelistContract.isPublic) {
+            leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
+        }
+
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
         rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
