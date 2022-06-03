@@ -12,7 +12,7 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
-import constants from "../Constants";
+import constants from "../constants";
 import MyLeagues from "./myLeagues";
 import JoinLeague from "./joinLeague";
 import CreateLeague from "./createLeague";
@@ -21,7 +21,7 @@ import { GiPodium } from "react-icons/gi";
 import { MdGroupAdd } from "react-icons/md";
 import { FaCrown } from "react-icons/fa";
 //Router
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 import { useMediaQuery } from "react-responsive";
 
@@ -75,14 +75,13 @@ export default function Play() {
   // }
 
   return (
-
     <Box>
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
       {accountData ? (
-        <Grid container spacing={isMobile? 1 : 3}>
-          <Grid item xs={isMobile? 12 : 4}>
+        <Grid container spacing={isMobile ? 1 : 3}>
+          <Grid item xs={isMobile ? 12 : 4}>
             <Card variant="outlined" onClick={() => router.push("/myLeagues")}>
-            <Fragment>
+              <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
                     <Typography color="secondary" component="div" fontSize={18}>
@@ -95,12 +94,12 @@ export default function Play() {
                   )}
                   <FaCrown size={"3rem"} />
                 </CardContent>
-                </Fragment>
+              </Fragment>
             </Card>
           </Grid>
-          <Grid item xs={isMobile? 12 : 4}>
-            <Card variant="outlined" onClick={() =>  router.push("/joinLeague")}>
-            <Fragment>
+          <Grid item xs={isMobile ? 12 : 4}>
+            <Card variant="outlined" onClick={() => router.push("/joinLeague")}>
+              <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
                     <Typography color="secondary" component="div" fontSize={18}>
@@ -113,13 +112,13 @@ export default function Play() {
                   )}
                   <FaCrown size={"3rem"} />
                 </CardContent>
-                </Fragment>
+              </Fragment>
             </Card>
           </Grid>
           <Grid item xs={isMobile ? 12 : 4}>
             <Card
               variant="outlined"
-              onClick={() =>  router.push("/createLeague")}
+              onClick={() => router.push("/createLeague")}
             >
               <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
@@ -140,11 +139,8 @@ export default function Play() {
           </Grid>
         </Grid>
       ) : (
-        <Typography>
-          Please connect wallet
-        </Typography>
+        <Typography>Please connect wallet</Typography>
       )}
-
     </Box>
   );
 }

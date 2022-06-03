@@ -20,3 +20,20 @@ h7 {
 /* .MuiInputLabel-root.Mui-focused {
     color: white;
   } */
+.MuiTableCell-root {
+  border-bottom: none;
+}
+.modal-container {
+  position: absolute;
+  border-top: 10%;
+  border-left: 10%;
+  width: 80%;
+  height: 90%;
+  background-color: #2e2e2e;
+  box-shadow: 24px;
+  border-radius: 20px;
+  padding: 26px 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

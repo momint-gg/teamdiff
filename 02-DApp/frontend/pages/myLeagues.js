@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import {
@@ -47,16 +46,16 @@ export default function MyLeagues({ setDisplay }) {
   // };
 
   //WAGMI Hooks
-  const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
-    fetchEns: true,
-  });
+  const [{ data: accountData, loading: accountDataLoading }, disconnect] =
+    useAccount({
+      fetchEns: true,
+    });
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
   const [{ data: signerData, error, loading }, getSigner] = useSigner();
-  
 
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {
@@ -79,17 +78,19 @@ export default function MyLeagues({ setDisplay }) {
         var i = 0;
         var error = "none";
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
-          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(accountData.address, i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
-                                                        });
+          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(
+            accountData.address,
+            i
+          ).catch((_error) => {
+            error = _error;
+            //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+            console.log("User To League Map Error: " + _error.message);
+          });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
             //console.log("member #" + i + ": " + leagueMembers)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
@@ -100,22 +101,25 @@ export default function MyLeagues({ setDisplay }) {
             );
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
-            const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+            const isInLeague = await LeagueProxyContract.inLeague(
+              accountData.address
+            );
             //Add League address  to appropriate state list
-            (isInLeague ? (
-              setActiveLeagueList(activeLeagueList => [...activeLeagueList, whitelistedLeague])
-            ) : (
-              setPendingLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
-            ));
+            isInLeague
+              ? setActiveLeagueList((activeLeagueList) => [
+                  ...activeLeagueList,
+                  whitelistedLeague,
+                ])
+              : setPendingLeagueList((pendingLeagueList) => [
+                  ...pendingLeagueList,
+                  whitelistedLeague,
+                ]);
           }
           //console.log("error value at end:" + error);
-
         } while (error == "none");
-
       }
       fetchData();
-    }
-    else {
+    } else {
       console.log("no account data");
     }
   }, [accountData?.address]);
@@ -124,40 +128,40 @@ export default function MyLeagues({ setDisplay }) {
   // var activeListItems;
   // var pendingListItems;
   useEffect(() => {
-       //Create list of league cards for all active leagues
+    //Create list of league cards for all active leagues
     console.log("accountDataLoading in useEffect: " + accountDataLoading);
-  }, [accountDataLoading])
+  }, [accountDataLoading]);
 
-  var activeListItems = activeLeagueList.map((leagueAddress, index) =>
+  var activeListItems = activeLeagueList.map((leagueAddress, index) => (
     <Box key={index}>
-    <LeagueCard
-      // leagueData={exampleData}
-      leagueAddress={leagueAddress}
-      // isJoined={true}
-      // setMountedLeagueAddress={setMountedLeagueAddress}
+      <LeagueCard
+        // leagueData={exampleData}
+        leagueAddress={leagueAddress}
+        // isJoined={true}
+        // setMountedLeagueAddress={setMountedLeagueAddress}
 
-      // setLeague={setCurrLeague}
-      // setLeagueOpen={setLeagueOpen}
-    />
-    <hr></hr>
+        // setLeague={setCurrLeague}
+        // setLeagueOpen={setLeagueOpen}
+      />
+      <hr></hr>
     </Box>
-  );
+  ));
 
   //Create list of league cards for all pending leagues
-  var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
+  var pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
     <Box key={index}>
-    <LeagueCard
-      // leagueData={exampleData}
-      leagueAddress={leagueAddress}
-      // isJoined={false}
-      // setMountedLeagueAddress={setMountedLeagueAddress}
+      <LeagueCard
+        // leagueData={exampleData}
+        leagueAddress={leagueAddress}
+        // isJoined={false}
+        // setMountedLeagueAddress={setMountedLeagueAddress}
 
-      // setLeague={setCurrLeague}
-      // setLeagueOpen={setLeagueOpen}
-    />
-    <hr></hr>
+        // setLeague={setCurrLeague}
+        // setLeagueOpen={setLeagueOpen}
+      />
+      <hr></hr>
     </Box>
-  );
+  ));
 
   return (
     <Box>
@@ -183,11 +187,11 @@ export default function MyLeagues({ setDisplay }) {
             }}
           />
           {activeLeagueList.length > 0 ? (
-              <ul>{activeListItems}</ul>
+            <ul>{activeListItems}</ul>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Active Leagues)
-            </Typography>   
+            </Typography>
           )}
           {/* <LeagueCard
                 leagueData={exampleData}
@@ -196,7 +200,6 @@ export default function MyLeagues({ setDisplay }) {
                 setLeagueOpen={setLeagueOpen}
               /> */}
 
-         
           <Typography
             variant="h3"
             color="secondary"
@@ -211,21 +214,22 @@ export default function MyLeagues({ setDisplay }) {
               backgroundColor: "secondary",
               height: 5,
             }}
-            
           />
           {pendingLeagueList.length > 0 ? (
-              <ul>{pendingListItems}</ul>
+            <ul>{pendingListItems}</ul>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Pending Leagues)
-            </Typography>   
+            </Typography>
           )}
-
-
         </Box>
       )}
       {leagueOpen && (
-        <LeagueDetails leagueData={currLeague} leagueAddress={mountedLeagueAddress} setLeagueOpen={setLeagueOpen} />
+        <LeagueDetails
+          leagueData={currLeague}
+          leagueAddress={mountedLeagueAddress}
+          setLeagueOpen={setLeagueOpen}
+        />
       )}
     </Box>
   );

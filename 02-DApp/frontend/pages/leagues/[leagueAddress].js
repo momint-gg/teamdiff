@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 //Web3 Imports
 import { ethers } from "ethers";
@@ -35,16 +35,15 @@ import {
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/abis/Whitelist.json";
-import constants from "../../Constants";
-
+import constants from "../../constants";
 
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
 export default function LeagueDetails() {
-   //Router params
-   const router = useRouter();
-   
-    //WAGMI Hooks
-   const [{ data: accountData }, disconnect] = useAccount({
+  //Router params
+  const router = useRouter();
+
+  //WAGMI Hooks
+  const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
   //TODO change to matic network for prod
@@ -54,12 +53,12 @@ export default function LeagueDetails() {
   );
   const [{ data: signerData, error, loading }, getSigner] = useSigner({
     onSuccess(data) {
-      console.log('Success', data)
+      console.log("Success", data);
     },
   });
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
-//   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
+  //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
   const [isLeagueMember, setIsLeagueMember] = useState(false);
   const [isLeagueAdmin, setIsLeagueAdmin] = useState(false);
   const [isOnWhitelist, setIsOnWhitelist] = useState(true);
@@ -85,7 +84,7 @@ export default function LeagueDetails() {
     setAnchorEl(null);
     lineup[athleteNum] = athleteNum;
     console.log("lineup: " + lineup);
-  }
+  };
 
   useEffect(() => {
     // setPackNFTs([]);
@@ -94,7 +93,6 @@ export default function LeagueDetails() {
     // console.log("router: " + JSON.stringify(router.query, null, 2));
     //console.log("signerData: " + JSON.stringify(signerData, null, 2));
     if (accountData && router.query.leagueAddress) {
-      
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
         router.query.leagueAddress,
@@ -102,43 +100,44 @@ export default function LeagueDetails() {
         provider
       );
       setLeagueProxyContract(LeagueProxyContract);
-        
 
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+        const isInLeague = await LeagueProxyContract.inLeague(
+          accountData.address
+        );
         setIsLeagueMember(isInLeague);
-        console.log("isInLeague: " + isInLeague)
+        console.log("isInLeague: " + isInLeague);
         const leagueAdmin = await LeagueProxyContract.admin();
         //console.log(leagueAdmin);
         setIsLeagueAdmin(leagueAdmin == accountData.address);
-        
+
         //Get whitelist of Proxy, to confirm connected user is on whitelist
         const whitelistAddress = await LeagueProxyContract.whitelistContract();
         //console.log("whitelistAddy: " + whitelistAddress);
         const WhitelistContract = new ethers.Contract(
-            whitelistAddress,
-            WhitelistJSON.abi,
-            provider
+          whitelistAddress,
+          WhitelistJSON.abi,
+          provider
         );
-        const isOnWhitelist = await WhitelistContract.whitelist(accountData.address);
+        const isOnWhitelist = await WhitelistContract.whitelist(
+          accountData.address
+        );
         //console.log("user is on whitelist: " + isOnWhitelist);
         setIsOnWhitelist(isOnWhitelist);
         setIsLoading(false);
-
       }
-
 
       // declare the async data fetching function
       const getNFTData = async () => {
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
-  
+
         const nfts = await web3.alchemy.getNfts({
           owner: accountData.address,
           contractAddresses: [CONTRACT_ADDRESSES.GameItems],
         });
-  
+
         setNFTResp(nfts);
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
@@ -153,49 +152,46 @@ export default function LeagueDetails() {
         }
       };
 
-        getNFTData().catch((error) => {
-          console.log("fetch NFT DATA error: " +error);
-        });
-        fetchData();
-
-    }
-    else {
-        //alert("no account data or league Address found, please refresh.");
+      getNFTData().catch((error) => {
+        console.log("fetch NFT DATA error: " + error);
+      });
+      fetchData();
+    } else {
+      //alert("no account data or league Address found, please refresh.");
       console.log("no account data or league Address found");
       console.log("router: " + JSON.stringify(router.query, null, 2));
-    //   console.log("leagueAddress: " + leagueAddress);
-
+      //   console.log("leagueAddress: " + leagueAddress);
     }
   }, [accountData?.address]);
 
-
   const joinLeagueHandler = async () => {
-
     console.log("joining league: " + router.query.leagueAddress);
     //console.log("signer dataL: " + JSON.stringify(signerData, null, 2));
-    const leagueProxyContractWithSigner = leagueProxyContract.connect(signerData);
+    const leagueProxyContractWithSigner =
+      leagueProxyContract.connect(signerData);
     const joinLeagueTxn = await leagueProxyContractWithSigner
-    .joinLeague()
-    // .joinLeague({
-    //     gasLimit: 20000000
-    // })
-    .then((res) => {
+      .joinLeague()
+      // .joinLeague({
+      //     gasLimit: 20000000
+      // })
+      .then((res) => {
         console.log("txn result: " + JSON.stringify(res, null, 2));
-        console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
-        console.log("joined league")
-    })
-    .catch((error) => {
-      //console.log("")
-      alert("Join League error: " + error.message);
-    });
-  }
+        console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2));
+        console.log("joined league");
+      })
+      .catch((error) => {
+        //console.log("")
+        alert("Join League error: " + error.message);
+      });
+  };
 
   const submitLineup = async () => {
-    const leagueProxyContractWithSigner = leagueProxyContract.connect(signerData);
+    const leagueProxyContractWithSigner =
+      leagueProxyContract.connect(signerData);
 
     const setLineupTxn = await leagueProxyContractWithSigner
       .setLineup(lineup, {
-          gasLimit: 10000000
+        gasLimit: 10000000,
       })
       .then((res) => {
         console.log("txn result: " + JSON.stringify(res, null, 2));
@@ -206,112 +202,108 @@ export default function LeagueDetails() {
       .catch((error) => {
         alert("Create League error: " + error.message);
       });
-  }
+  };
 
-  
   return (
-    
     <Box>
-
       {isLoading ? (
         <Box>
-            <Typography>Loading</Typography>
-            <CircularProgress />
+          <Typography>Loading</Typography>
+          <CircularProgress />
         </Box>
-        ) : (           
+      ) : (
         <>
-
-        {isLeagueMember ? (
+          {isLeagueMember ? (
             <>
-                {/* <Avatar
+              {/* <Avatar
                   alt="League Image"
                   src={leagueData?.image?.examplePic.src}
                   sx={{ bgcolor: "white", position: "absolute" }}
                 /> */}
-                <Box sx={{ marginLeft: 6 }}>
-                  <Typography variant="h2" color="secondary" component="div">
-                    {leagueName}
-                  </Typography>
-    
-                  {/* <Typography variant="body1" color="white">
+              <Box sx={{ marginLeft: 6 }}>
+                <Typography variant="h2" color="secondary" component="div">
+                  {leagueName}
+                </Typography>
+
+                {/* <Typography variant="body1" color="white">
                     Your current standing: {leagueData?.standing}
                   </Typography> */}
-    
-                  <Typography
-                    variant="h4"
-                    color="secondary"
-                    component="div"
-                    sx={{ marginTop: 5 }}
-                  >
-                    SET YOUR LINEUP!
-                  </Typography>
-    
-                  <Grid container spacing={5}>
-                    <Grid item>
-                      <Paper
-                        elevation={0}
-                        style={{
-                          background:
-                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                          width: 150,
-                          height: 200,
+
+                <Typography
+                  variant="h4"
+                  color="secondary"
+                  component="div"
+                  sx={{ marginTop: 5 }}
+                >
+                  SET YOUR LINEUP!
+                </Typography>
+
+                <Grid container spacing={5}>
+                  <Grid item>
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        width: 150,
+                        height: 200,
+                      }}
+                    >
+                      <Fab
+                        id="basic-button"
+                        aria-controls={open ? "basic-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={handleClick}
+                      >
+                        Set 1
+                      </Fab>
+                      <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                          "aria-labelledby": "basic-button",
                         }}
                       >
-                        <Fab
-                            id="basic-button"
-                            aria-controls={open ? 'basic-menu' : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={open ? 'true' : undefined}
-                            onClick={handleClick}
-                        >
-                            Set 1
-                        </Fab>
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                            }}
-                        >
-                            {athleteNFTs.map((athlete, index) => 
-                                (athlete.id.tokenId % 10 == 0 && 
-                                    <MenuItem onClick={() => (handleSetAthlete(0))}>{"Athlete #" + athlete.id.tokenId}</MenuItem>
-                                )
+                        {athleteNFTs.map(
+                          (athlete, index) =>
+                            athlete.id.tokenId % 10 == 0 && (
+                              <MenuItem onClick={() => handleSetAthlete(0)}>
+                                {"Athlete #" + athlete.id.tokenId}
+                              </MenuItem>
                             )
-                            }
-                            {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
+                        )}
+                        {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
                             <MenuItem onClick={handleClose}>My account</MenuItem>
                             <MenuItem onClick={handleClose}>Logout</MenuItem> */}
-                        </Menu>
-                        {lineup[0] != null && 
-                            <Typography>
-                                {"lineup[0] = " + lineup[0]}
-                            </Typography>
-                        }
-                      </Paper>
-                    </Grid>
-                    <Grid item>
-                      <Paper
-                        elevation={0}
-                        style={{
-                          background:
-                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                          width: 150,
-                          height: 200,
-                        }}
+                      </Menu>
+                      {lineup[0] != null && (
+                        <Typography>{"lineup[0] = " + lineup[0]}</Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                  <Grid item>
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        width: 150,
+                        height: 200,
+                      }}
+                    >
+                      <Fab
+                        id="basic-button"
+                        aria-controls={open ? "basic-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={handleClick}
                       >
-                           <Fab
-                            id="basic-button"
-                            aria-controls={open ? 'basic-menu' : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={open ? 'true' : undefined}
-                            onClick={handleClick}
-                        >
-                            Set 2
-                        </Fab>
-                        {/* <Menu
+                        Set 2
+                      </Fab>
+                      {/* <Menu
                             //id="basic-menu"
                             anchorEl={anchorEl}
                             open={open}
@@ -330,116 +322,89 @@ export default function LeagueDetails() {
                             <MenuItem onClick={handleClose}>My account</MenuItem>
                             <MenuItem onClick={handleClose}>Logout</MenuItem> }
                         </Menu>                         */}
-                            {lineup[1] != null && 
-                            <Typography>
-                                {"lineup[1] = " + lineup[1]}
-                            </Typography>
-                        }
-                          </Paper>
-                    </Grid>
-                    <Grid item>
-                      <Paper
-                        elevation={0}
-                        style={{
-                          background:
-                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                          width: 150,
-                          height: 200,
-                        }}
-                      >
-                          <Fab>
-                              Set 3
-                          </Fab>
-                          {lineup[2] != null && 
-                            <Typography>
-                                {"lineup[21] = " + lineup[2]}
-                            </Typography>
-                        }
+                      {lineup[1] != null && (
+                        <Typography>{"lineup[1] = " + lineup[1]}</Typography>
+                      )}
                     </Paper>
-                    </Grid>
-                    <Grid item>
-                      <Paper
-                        elevation={0}
-                        style={{
-                          background:
-                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                          width: 150,
-                          height: 200,
-                        }}
-                      >
-                          <Fab>
-                              Set 4
-                          </Fab>    
-                          {lineup[3] != null && 
-                            <Typography>
-                                {"lineup[3] = " + lineup[3]}
-                            </Typography>
-                            }                      
-                          </Paper>
-                    </Grid>
-                    <Grid item>
-                      <Paper
-                        elevation={0}
-                        style={{
-                          background:
-                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                          width: 150,
-                          height: 200,
-                        }}
-                      >
-                          <Fab>
-                              Set 5
-                          </Fab>    
-                          {lineup[4] != null && 
-                            <Typography>
-                                {"lineup[4] = " + lineup[4]}
-                            </Typography>
-                        }                      
-                          </Paper>
-                    </Grid>
-                    <Fab
-                        onClick={submitLineup}
-                    >
-                        Submit Lineup
-                    </Fab>
                   </Grid>
+                  <Grid item>
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        width: 150,
+                        height: 200,
+                      }}
+                    >
+                      <Fab>Set 3</Fab>
+                      {lineup[2] != null && (
+                        <Typography>{"lineup[21] = " + lineup[2]}</Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                  <Grid item>
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        width: 150,
+                        height: 200,
+                      }}
+                    >
+                      <Fab>Set 4</Fab>
+                      {lineup[3] != null && (
+                        <Typography>{"lineup[3] = " + lineup[3]}</Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                  <Grid item>
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        width: 150,
+                        height: 200,
+                      }}
+                    >
+                      <Fab>Set 5</Fab>
+                      {lineup[4] != null && (
+                        <Typography>{"lineup[4] = " + lineup[4]}</Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                  <Fab onClick={submitLineup}>Submit Lineup</Fab>
+                </Grid>
+              </Box>
+              {isLeagueAdmin && (
+                <Box>
+                  <Typography>Admin Actions</Typography>
+                  <ul>
+                    <li>Add Users to Whitelist</li>
+                  </ul>
                 </Box>
-                {isLeagueAdmin && (
-                    <Box>
-                        <Typography>
-                            Admin Actions
-                        </Typography>
-                        <ul>
-                            <li>Add Users to Whitelist</li>
-                        </ul>
-                    </Box>
-                )}
-                </>
-          ) : (
-            (isOnWhitelist ? (
+              )}
+            </>
+          ) : isOnWhitelist ? (
             <>
-                <Typography>
-                {"You are whitelisted for this league, click below to accept the invitation to: " + leagueName} 
-                </Typography>
-                <Fab
-                onClick={joinLeagueHandler}
-                >
-                Join League
-                </Fab>
+              <Typography>
+                {"You are whitelisted for this league, click below to accept the invitation to: " +
+                  leagueName}
+              </Typography>
+              <Fab onClick={joinLeagueHandler}>Join League</Fab>
             </>
-            ) : (
-                <>
-                <Typography>
-                {"IDK how tf you got here, but you aren't whitelisted for this league, please contact the admin " 
-                    + " of the league if you would like to be added."} 
-                </Typography>
+          ) : (
+            <>
+              <Typography>
+                {"IDK how tf you got here, but you aren't whitelisted for this league, please contact the admin " +
+                  " of the league if you would like to be added."}
+              </Typography>
             </>
-            ))
-            
           )}
-          </>
+        </>
       )}
-     
     </Box>
   );
 }
