@@ -13,7 +13,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@material-ui/core/Grid'
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
-import WAValidator from 'wallet-address-validator'; 
+import WAValidator from 'wallet-address-validator';
 
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -123,9 +123,9 @@ export default function CreateLeague({ setDisplay }) {
 
   const [showForm, setShowForm] = useState(false)
 
-  const[isValidBuyInCost, setIsValidBuyInCost] = useState(true)
+  const [isValidBuyInCost, setIsValidBuyInCost] = useState(true)
 
-  const[isValidLeagueName, setIsValidLeagueName] = useState(true)
+  const [isValidLeagueName, setIsValidLeagueName] = useState(true)
 
   const preparedInviteListValues = inviteListValues.filter((address) => address !== "")
 
@@ -167,7 +167,7 @@ export default function CreateLeague({ setDisplay }) {
   const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
     //TODO create a proxy instance from emitted address
     //TODO then check the admin of that proxy to filter events?
-    
+
     const LeagueProxyContract = new ethers.Contract(
       newLeagueProxyAddress,
       LeagueOfLegendsLogicJSON.abi,
@@ -182,24 +182,24 @@ export default function CreateLeague({ setDisplay }) {
         //Add all set whitelisted users to newly deployed league Proxy
         console.log("adding " + whitelistAddress + " to whitelist");
         const addUsersToWhitelistTxn = await LeagueProxyContract.connect(signerData)
-                                                                .addUserToWhitelist(whitelistAddress)
-                                                                .then(
-                                                                  console.log("Added userr to whitelist success")
-                                                                )
-                                                                .catch((error) => {
-                                                                  //console.log("")
-                                                                  alert("Add User To WhiteList error: " + error.message);
-                                                                });;
+          .addUserToWhitelist(whitelistAddress)
+          .then(
+            console.log("Added userr to whitelist success")
+          )
+          .catch((error) => {
+            //console.log("")
+            alert("Add User To WhiteList error: " + error.message);
+          });;
       })
-    //const leagueAdminAddress = LeagueProxyContract.admin();
-    // if (true) {
+      //const leagueAdminAddress = LeagueProxyContract.admin();
+      // if (true) {
       setIsCreatingLeague(false);
       setHasCreatedLeague(true);
-      console.log("Finsihed creating league: " 
-                  + "\n\tname: " + newLeagueName
-                  + "\n\tproxy address: " + newLeagueProxyAddress
-                  + "\n\tadmin address: " + newLeagueAdminAddress);
-                  // + "\n\tstate of invite list: " + inviteListValues);
+      console.log("Finsihed creating league: "
+        + "\n\tname: " + newLeagueName
+        + "\n\tproxy address: " + newLeagueProxyAddress
+        + "\n\tadmin address: " + newLeagueAdminAddress);
+      // + "\n\tstate of invite list: " + inviteListValues);
       setNewLeagueName(newLeagueName);
       setNewLeagueAddress(newLeagueProxyAddress);
     }
@@ -212,28 +212,28 @@ export default function CreateLeague({ setDisplay }) {
       return
     }
     console.log("submitting values: " + JSON.stringify(formValues, null, 2) +
-     " \nwhitelistAddresses: " + preparedInviteListValues + 
-     "\nisPublic " + (formValues.inviteListStatus === "open"));
+      " \nwhitelistAddresses: " + preparedInviteListValues +
+      "\nisPublic " + (formValues.inviteListStatus === "open"));
     //  setHasCreatedLeague(true);
-    if(leagueMakerContract && accountData) {
+    if (leagueMakerContract && accountData) {
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signerData);
 
       const createLeagueTxn = await leagueMakerContractWithSigner
         .createLeague(
-            formValues.leagueName,
-            formValues.buyInCost,
-            //TODO this isn't setting the public var isPublic??
-            // true,
-            (formValues.inviteListStatus === "open"),
-            accountData.address,
-            CONTRACT_ADDRESSES.TestUSDC,
-            CONTRACT_ADDRESSES.Athletes,
-            preparedInviteListValues,
-            //CONTRACT_ADDRESSES.Athletes,
+          formValues.leagueName,
+          formValues.buyInCost,
+          //TODO this isn't setting the public var isPublic??
+          // true,
+          (formValues.inviteListStatus === "open"),
+          accountData.address,
+          CONTRACT_ADDRESSES.TestUSDC,
+          CONTRACT_ADDRESSES.Athletes,
+          preparedInviteListValues,
+          //CONTRACT_ADDRESSES.Athletes,
           {
-          gasLimit: 10000000,
-          // nonce: nonce || undefined,
-        })
+            gasLimit: 10000000,
+            // nonce: nonce || undefined,
+          })
         .then((res) => {
           console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
@@ -251,7 +251,7 @@ export default function CreateLeague({ setDisplay }) {
       console.log("Account data not set or LeagueMaker contract unitiliazed!");
     }
   }
-  
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -272,7 +272,7 @@ export default function CreateLeague({ setDisplay }) {
   }, [formValues.leagueName])
 
   useEffect(() => {
-    if (formValues.buyInCost === "" ) {
+    if (formValues.buyInCost === "") {
       setIsValidBuyInCost(true)
     } else if (isNaN(formValues.buyInCost) || Number(formValues.buyInCost) <= 0 || Number(formValues.buyInCost) > 100) {
       // console.log("uhoh")
@@ -284,18 +284,18 @@ export default function CreateLeague({ setDisplay }) {
     // console.log("--", parseInt(formValues.buyInCost))
   }, [formValues.buyInCost])
 
-//   const handleInviteListCheckbox = () => {
-//     setInviteListIsEnabled(!inviteListIsEnabled)
-//   }
+  //   const handleInviteListCheckbox = () => {
+  //     setInviteListIsEnabled(!inviteListIsEnabled)
+  //   }
   // const handleInviteListChange = (e) => {
   //   if (e.target.value === )
   //   setInviteListStatus(!inviteListStatus)
   // }
 
   const validateFormValues = () => {
-    return isValidBuyInCost && formValues.buyInCost !== "" && 
-           isValidLeagueName && formValues.leagueName !== "" && 
-           (formValues.inviteListStatus === "open" || preparedInviteListValues.length > 0 && validAddressesStatus)
+    return isValidBuyInCost && formValues.buyInCost !== "" &&
+      isValidLeagueName && formValues.leagueName !== "" &&
+      (formValues.inviteListStatus === "open" || preparedInviteListValues.length > 0 && validAddressesStatus)
   }
 
   useEffect(() => {
@@ -312,7 +312,7 @@ export default function CreateLeague({ setDisplay }) {
       }
     })
     if (flag) {
-      setValidAddressesStatus(true) 
+      setValidAddressesStatus(true)
     }
   }, [inviteListValues])
 
@@ -329,7 +329,7 @@ export default function CreateLeague({ setDisplay }) {
     if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
       setAddPlayerBtnEnabled(false)
     }
-    setInviteListValues(prevState => ([...prevState, ""])) 
+    setInviteListValues(prevState => ([...prevState, ""]))
   }
 
   const removePlayer = (i) => {
@@ -346,17 +346,14 @@ export default function CreateLeague({ setDisplay }) {
   }
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       backgroundColor: "primary.dark",
       justifyContent: "center",
       textAlign: "center"
     }}>
-     {/* <Box sx={{ backgroundColor: "gray" }}> */}
-      {/* <Fab variant="extended" size="small" color="primary" aria-label="add" onClick={() => setDisplay(false)}>
-        &#60; BACK
-      </Fab> */}
-      
-      
+      {/* <Box sx={{ backgroundColor: "gray" }}> */}
+      {/* <BackButton onClickHandler={() => setDisplay(false)} /> */}
+
       <Typography variant="h3" color="secondary" component="div">
         CREATE A LEAGUE
       </Typography>
@@ -373,9 +370,9 @@ export default function CreateLeague({ setDisplay }) {
 
       {!accountData && (
         <Typography
-        style={{
-          color: "red",
-          fontSize: 16
+          style={{
+            color: "red",
+            fontSize: 16
           }}
         >
           Please connect your wallet to create a league.
@@ -384,8 +381,8 @@ export default function CreateLeague({ setDisplay }) {
 
       {showForm && accountData && !(isCreatingLeague || hasCreatedLeague) && (
         <Typography variant="p" color="white" component="div">
-          Insert more info about league creation here... Should persist after clicking I understand ... 
-          Buy in cost must be less than 100 USD. League name must be between 1-100 characters. 
+          Insert more info about league creation here... Should persist after clicking I understand ...
+          Buy in cost must be less than 100 USD. League name must be between 1-100 characters.
         </Typography>
       )}
       {!showForm && accountData && (
@@ -399,43 +396,43 @@ export default function CreateLeague({ setDisplay }) {
             size="small"
           >
             I Understand!
-          </Button> 
+          </Button>
         </>
       )}
 
       {showForm && accountData && !(isCreatingLeague || hasCreatedLeague) && (
         <>
-        <Divider sx={{ 
-          color: "primary.main",
-          mt: "20px",
-          mb: "20px"
-        }} />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Box
-              component="div"
-              sx={{
-                '& > :not(style)': { m: 1, width: '50ch' },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <Typography variant="h6" color="white" component="div">
-                Form
-              </Typography>
-              <FormControl required>
-                <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel>
-                <StyledOutlinedInput
-                  id="league-name"
-                  value={formValues.leaguename}
-                  onChange={handleInputChange}
-                  label="League Name"
-                  name="leagueName"
-                  error={!isValidLeagueName}
-                />
-              </FormControl>
+          <Divider sx={{
+            color: "primary.main",
+            mt: "20px",
+            mb: "20px"
+          }} />
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Box
+                component="div"
+                sx={{
+                  '& > :not(style)': { m: 1, width: '50ch' },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <Typography variant="h6" color="white" component="div">
+                  Form
+                </Typography>
+                <FormControl required>
+                  <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel>
+                  <StyledOutlinedInput
+                    id="league-name"
+                    value={formValues.leaguename}
+                    onChange={handleInputChange}
+                    label="League Name"
+                    name="leagueName"
+                    error={!isValidLeagueName}
+                  />
+                </FormControl>
 
-              {/* <TextField
+                {/* <TextField
                   required
                   label="League Name"
                   variant="standard"
@@ -444,7 +441,7 @@ export default function CreateLeague({ setDisplay }) {
                   id='outlined-required'
                   // defaultValue="e.g. TeamDiff"
                 /> */}
-              {/* <FormControl required >
+                {/* <FormControl required >
                 <StyledInputLabel htmlFor="token-select">Token</StyledInputLabel>
                 <StyledSelect
                   id="token-select"
@@ -454,68 +451,68 @@ export default function CreateLeague({ setDisplay }) {
                   onChange={handleInputChange}
                 >
                   <MenuItem key="usdc" value="usdc">USDC</MenuItem> */}
-                  {/* <MenuItem key="eth" value="eth">eth</MenuItem>
+                {/* <MenuItem key="eth" value="eth">eth</MenuItem>
                   <MenuItem key="other" value="other">other</MenuItem> */}
                 {/* </StyledSelect>
               </FormControl> */}
 
-              <FormControl required>
-                <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel>
-                <StyledOutlinedInput
-                  id="buy-in"
-                  value={formValues.leaguename}
-                  onChange={handleInputChange}
-                  label="Buy-In Cost"
-                  name="buyInCost"
-                  endAdornment={<InputAdornment position="end">USDC</InputAdornment>}
-                  error={!isValidBuyInCost}
-                >
+                <FormControl required>
+                  <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel>
+                  <StyledOutlinedInput
+                    id="buy-in"
+                    value={formValues.leaguename}
+                    onChange={handleInputChange}
+                    label="Buy-In Cost"
+                    name="buyInCost"
+                    endAdornment={<InputAdornment position="end">USDC</InputAdornment>}
+                    error={!isValidBuyInCost}
+                  >
 
-                </StyledOutlinedInput>
-                {/* <Input
+                  </StyledOutlinedInput>
+                  {/* <Input
                     id="standard-adornment-amount"
                     value={formValues.buyInCost}
                     onChange={handleInputChange}
                     name="buyInCost"
                     startAdornment={<InputAdornment position="start">$</InputAdornment>}
                   /> */}
-              </FormControl>
+                </FormControl>
 
-              <FormControl required sx={{ marginLeft: 3 }}>
-                <StyledInputLabel id="demo-simple-select-label">Payout Split</StyledInputLabel>
-                <StyledSelect
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={formValues.payoutSplit}
-                  label="payoutSplit"
-                  name="payoutSplit"
-                  onChange={handleInputChange}
-                >
-                  <MenuItem key="default" value="default">default</MenuItem>
-                </StyledSelect>
-              </FormControl>
+                <FormControl required sx={{ marginLeft: 3 }}>
+                  <StyledInputLabel id="demo-simple-select-label">Payout Split</StyledInputLabel>
+                  <StyledSelect
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={formValues.payoutSplit}
+                    label="payoutSplit"
+                    name="payoutSplit"
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem key="default" value="default">default</MenuItem>
+                  </StyledSelect>
+                </FormControl>
 
-              <FormControl required sx={{ marginLeft: 3 }}>
-                <StyledInputLabel id="open-closed-toggle">League Status</StyledInputLabel>
-                <StyledSelect
-                  labelId="open-closed-toggle"
-                  id="open-closed-toggle-select"
-                  value={formValues.inviteListStatus}
-                  label="inviteListStatus"
-                  name="inviteListStatus"
-                  onChange={handleInputChange}
-                >
-                  <MenuItem key="open" value="open">open</MenuItem>
-                  <MenuItem key="closed" value="closed">closed</MenuItem>
-                </StyledSelect>
-              </FormControl>
-              
-              <StyledButton onClick={()=>{createLeagueSubmitHandler()}} variant="contained" size="small">Submit</StyledButton>
-              {/* <Button variant="contained" size="small" sx={{backgroundColor: "primary.light"}}>Submit</Button> */}
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box
+                <FormControl required sx={{ marginLeft: 3 }}>
+                  <StyledInputLabel id="open-closed-toggle">League Status</StyledInputLabel>
+                  <StyledSelect
+                    labelId="open-closed-toggle"
+                    id="open-closed-toggle-select"
+                    value={formValues.inviteListStatus}
+                    label="inviteListStatus"
+                    name="inviteListStatus"
+                    onChange={handleInputChange}
+                  >
+                    <MenuItem key="open" value="open">open</MenuItem>
+                    <MenuItem key="closed" value="closed">closed</MenuItem>
+                  </StyledSelect>
+                </FormControl>
+
+                <StyledButton onClick={() => { createLeagueSubmitHandler() }} variant="contained" size="small">Submit</StyledButton>
+                {/* <Button variant="contained" size="small" sx={{backgroundColor: "primary.light"}}>Submit</Button> */}
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box
                 component="div"
                 sx={{
                   '& > :not(style)': { m: 1, width: '50ch' },
@@ -525,74 +522,74 @@ export default function CreateLeague({ setDisplay }) {
                 autoComplete="off"
               >
 
-              {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {!(formValues.inviteListStatus === "closed") ? (
-                <Typography variant="h7" color="lightgrey">
+                {/* TODO: Abstract this into another component, controlled by createLeague page */}
+                {!(formValues.inviteListStatus === "closed") ? (
+                  <Typography variant="h7" color="lightgrey">
                     Anybody with a wallet address can search and join this league.
-                </Typography>
+                  </Typography>
                 ) : (
-                <>
-                <Typography variant="h7" color="lightgrey">
-                  Only users added to this leagues whitelist can join.
-                </Typography>
-                <Typography variant="h6" color="white" component="div">
-                  Invite list:
-                </Typography>
-                
+                  <>
+                    <Typography variant="h7" color="lightgrey">
+                      Only users added to this leagues whitelist can join.
+                    </Typography>
+                    <Typography variant="h6" color="white" component="div">
+                      Invite list:
+                    </Typography>
 
-              {/* TODO: Abstract this into another component, controlled by createLeague page */}
-                <Typography variant="h6" color="white" component="div">
-                  Invite List (Private/Closed Leagues)
-                </Typography>
-                {!validAddressesStatus && ( 
-                  <p>
-                    There are invalid addresses.
-                  </p> 
+
+                    {/* TODO: Abstract this into another component, controlled by createLeague page */}
+                    <Typography variant="h6" color="white" component="div">
+                      Invite List (Private/Closed Leagues)
+                    </Typography>
+                    {!validAddressesStatus && (
+                      <p>
+                        There are invalid addresses.
+                      </p>
+                    )}
+
+                    {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
+                    {inviteListValues.map((element, index) => (
+                      <>
+                        <TextField
+                          variant="standard"
+                          label={"Whitelisted Address " + (index + 1) + (index === 0 ? " (League Admin)" : "")}
+                          onChange={e => {
+                            //This submits null address when I copy and paste
+                            handlePlayerInviteInput(e, index)
+                            console.log("short list outside func: " + inviteListValues);
+                          }}
+                          value={element}
+                          key={index}
+                        />
+                        {index ?
+                          <Button
+                            variant="outlined"
+                            onClick={() => removePlayer(index)}
+                            size="small"
+                          >
+                            Remove
+                          </Button>
+                          : null
+                        }
+                      </>
+                    ))}
+                    <Button
+                      variant="outlined"
+                      onClick={addNewPlayerInviteInput}
+                      size="small"
+                      disabled={!addPlayerBtnEnabled}
+                    >
+                      Add Another Address to Whitelist
+                    </Button>
+
+
+                  </>
+
                 )}
+              </Box>
 
-                {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
-                  {inviteListValues.map((element, index) => (
-                    <>
-                    <TextField
-                      variant="standard"
-                      label={"Whitelisted Address " + (index + 1) + (index === 0 ? " (League Admin)" : "")} 
-                      onChange={e => {
-                        //This submits null address when I copy and paste
-                        handlePlayerInviteInput(e, index)
-                        console.log("short list outside func: " + inviteListValues);
-                      }}
-                      value={element}
-                      key={index}
-                    />
-                    {index ? 
-                      <Button 
-                        variant="outlined"
-                        onClick={() => removePlayer(index)}
-                        size="small"
-                      >
-                        Remove
-                      </Button>
-                      : null
-                    }
-                    </>
-                  ))}
-                  <Button 
-                    variant="outlined"
-                    onClick={addNewPlayerInviteInput}
-                    size="small"
-                    disabled={!addPlayerBtnEnabled}
-                  >
-                    Add Another Address to Whitelist
-                  </Button>
-
-
-                </>
-                
-                )}
-            </Box>
-            
+            </Grid>
           </Grid>
-        </Grid>
         </>
       )}
       {isCreatingLeague && (
@@ -609,8 +606,8 @@ export default function CreateLeague({ setDisplay }) {
           <Button
             target={"_blank"}
             href={"https://rinkeby.etherscan.io/address/"
-            + newLeagueAddress
-            + "#internaltx"}
+              + newLeagueAddress
+              + "#internaltx"}
             variant="outlined"
             sx={{
               mb: "10px",
@@ -630,7 +627,7 @@ export default function CreateLeague({ setDisplay }) {
           </Button>
         </Box>
       )}
-      
+
     </Box>
   )
 }

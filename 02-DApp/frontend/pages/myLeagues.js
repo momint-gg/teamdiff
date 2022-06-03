@@ -47,7 +47,7 @@ export default function MyLeagues({ setDisplay }) {
   // };
 
   //WAGMI Hooks
-  const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
+  const [{ data: accountData, loading: accountDataLoading }, disconnect] = useAccount({
     fetchEns: true,
   });
   //TODO change to matic network for prod
@@ -56,7 +56,7 @@ export default function MyLeagues({ setDisplay }) {
     process.env.ALCHEMY_KEY
   );
   const [{ data: signerData, error, loading }, getSigner] = useSigner();
-  
+
 
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {
@@ -79,17 +79,17 @@ export default function MyLeagues({ setDisplay }) {
         var i = 0;
         var error = "none";
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
           const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(accountData.address, i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
-                                                        });
+            .catch((_error) => {
+              error = _error;
+              //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+              console.log("User To League Map Error: " + _error.message);
+            });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
             //console.log("member #" + i + ": " + leagueMembers)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
@@ -124,38 +124,38 @@ export default function MyLeagues({ setDisplay }) {
   // var activeListItems;
   // var pendingListItems;
   useEffect(() => {
-       //Create list of league cards for all active leagues
+    //Create list of league cards for all active leagues
     console.log("accountDataLoading in useEffect: " + accountDataLoading);
   }, [accountDataLoading])
 
   var activeListItems = activeLeagueList.map((leagueAddress, index) =>
     <Box key={index}>
-    <LeagueCard
-      // leagueData={exampleData}
-      leagueAddress={leagueAddress}
+      <LeagueCard
+        // leagueData={exampleData}
+        leagueAddress={leagueAddress}
       // isJoined={true}
       // setMountedLeagueAddress={setMountedLeagueAddress}
 
       // setLeague={setCurrLeague}
       // setLeagueOpen={setLeagueOpen}
-    />
-    <hr></hr>
+      />
+      <hr></hr>
     </Box>
   );
 
   //Create list of league cards for all pending leagues
   var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
     <Box key={index}>
-    <LeagueCard
-      // leagueData={exampleData}
-      leagueAddress={leagueAddress}
+      <LeagueCard
+        // leagueData={exampleData}
+        leagueAddress={leagueAddress}
       // isJoined={false}
       // setMountedLeagueAddress={setMountedLeagueAddress}
 
       // setLeague={setCurrLeague}
       // setLeagueOpen={setLeagueOpen}
-    />
-    <hr></hr>
+      />
+      <hr></hr>
     </Box>
   );
 
@@ -163,15 +163,7 @@ export default function MyLeagues({ setDisplay }) {
     <Box>
       {!leagueOpen && (
         <Box>
-          {/* <Fab
-            variant="extended"
-            size="small"
-            aria-label="add"
-            onClick={() => setDisplay(false)}
-          >
-            &#60; BACK
-          </Fab> */}
-
+          {/* <BackButton onClickHandler={() => setDisplay(false)} /> */}
           <Typography variant="h3" color="secondary" component="div">
             ACTIVE LEAGUES
           </Typography>
@@ -183,11 +175,11 @@ export default function MyLeagues({ setDisplay }) {
             }}
           />
           {activeLeagueList.length > 0 ? (
-              <ul>{activeListItems}</ul>
+            <ul>{activeListItems}</ul>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Active Leagues)
-            </Typography>   
+            </Typography>
           )}
           {/* <LeagueCard
                 leagueData={exampleData}
@@ -196,7 +188,7 @@ export default function MyLeagues({ setDisplay }) {
                 setLeagueOpen={setLeagueOpen}
               /> */}
 
-         
+
           <Typography
             variant="h3"
             color="secondary"
@@ -211,14 +203,14 @@ export default function MyLeagues({ setDisplay }) {
               backgroundColor: "secondary",
               height: 5,
             }}
-            
+
           />
           {pendingLeagueList.length > 0 ? (
-              <ul>{pendingListItems}</ul>
+            <ul>{pendingListItems}</ul>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Pending Leagues)
-            </Typography>   
+            </Typography>
           )}
 
 

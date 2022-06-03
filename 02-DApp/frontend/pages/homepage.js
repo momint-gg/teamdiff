@@ -19,7 +19,7 @@ export default function Homepage() {
                                     building the future of fantasy esports, on the blockchain. Mint a starter pack now for free to unlock five LCS trading cards and join a league today!</p>
                             </div>
                             <div className={[bootstrap["mt-5"], bootstrap["d-none"], bootstrap["d-md-inline"]].join(' ')}>
-                                <Link href="/mint">
+                                <Link href="/mintHome">
                                     <button className={[bootstrap["btn"], bootstrap["btn-primary"], bootstrap["fs-5"], bootstrap["pe-5"], bootstrap["ps-5"], bootstrap["fw-bold"]].join(' ')}>
                                         Mint Starter Pack
                                     </button>
@@ -30,7 +30,7 @@ export default function Homepage() {
                             <Image src={cardAndPack} alt="MVP Card" className={[bootstrap["img-fluid"], styles.cardAndPack].join(' ')} />
                         </div>
                         <div className={[bootstrap["mt-4"], bootstrap["d-inline"], bootstrap["d-md-none"], bootstrap["text-center"]].join(' ')}>
-                            <Link href="/mint">
+                            <Link href="/mintHome">
                                 <button className={[bootstrap["btn"], bootstrap["btn-primary"], bootstrap["fs-5"], bootstrap["pe-5"], bootstrap["ps-5"], bootstrap["fw-bold"]].join(' ')}                               >
                                     Mint Starter Pack
                                 </button>

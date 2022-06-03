@@ -27,6 +27,7 @@ import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/Game
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
+import BackButton from "../components/BackButton.js";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
@@ -130,14 +131,7 @@ export default function MintPack({ setDisplay }) {
 
   return (
     <Box>
-      <Fab
-        variant="extended"
-        size="small"
-        aria-label="add"
-        onClick={() => setDisplay(false)}
-      >
-        &#60; BACK
-      </Fab>
+      <BackButton onClickHandler={() => setDisplay(false)} />
       {accountData && !(isMinting || hasMinted) && packsAvailable != 0 && (
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
@@ -224,7 +218,7 @@ export default function MintPack({ setDisplay }) {
               paddingTop: "20px",
             }}
           >
-          {!isPolygon && 
+            {!isPolygon &&
               <Typography
                 style={{
                   color: "red",

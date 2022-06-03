@@ -9,6 +9,7 @@ import {
   ImageListItem,
 } from "@mui/material";
 import StarterPackAthleteCard from "./StarterPackAthleteCard.js";
+import BackButton from "../components/BackButton.js"
 // import Image from 'next/image';
 // import profilePic from '../assets/images/example.png';
 import { useState, useEffect } from "react";
@@ -35,14 +36,7 @@ export default function StarterPackContents({ setDisplay }) {
           flexDirection: "row",
         }}
       >
-        <Fab
-          variant="extended"
-          size="small"
-          aria-label="add"
-          onClick={() => setDisplay(false)}
-        >
-          &#60; BACK
-        </Fab>
+        <BackButton onClickHandler={() => setDisplay(false)} />
         <Container>
           {/* <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
             </ImageList> */}

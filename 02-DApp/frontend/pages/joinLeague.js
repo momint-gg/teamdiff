@@ -31,7 +31,7 @@ export default function JoinLeague({ setDisplay }) {
   const [pendingLeagueList, setPendingLeagueList] = useState([]);
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
 
-  const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
+  const [{ data: accountData, loading: accountDataLoading }, disconnect] = useAccount({
     fetchEns: true,
   });
   //TODO change to matic network for prod
@@ -40,7 +40,7 @@ export default function JoinLeague({ setDisplay }) {
     process.env.ALCHEMY_KEY
   );
   const [{ data: signerData, error, loading }, getSigner] = useSigner();
-  
+
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {
     // setActiveLeagueList([]);
@@ -59,17 +59,17 @@ export default function JoinLeague({ setDisplay }) {
         var i = 0;
         var error = "none";
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
           const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(accountData.address, i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
-                                                        });
+            .catch((_error) => {
+              error = _error;
+              //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+              console.log("User To League Map Error: " + _error.message);
+            });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
             //console.log("member #" + i + ": " + leagueMembers)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
@@ -82,7 +82,7 @@ export default function JoinLeague({ setDisplay }) {
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
             const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
             //Add League address  to appropriate state list
-            if(!isInLeague) 
+            if (!isInLeague)
               setPendingLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
           }
           //console.log("error value at end:" + error);
@@ -115,17 +115,17 @@ export default function JoinLeague({ setDisplay }) {
         var i = 0;
         var error = "none";
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
           const leagueAddress = await LeagueMakerContract.leagueAddresses(i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
-                                                        });
+            .catch((_error) => {
+              error = _error;
+              //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+              console.log("User To League Map Error: " + _error.message);
+            });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
             console.log("league #" + i + ": " + leagueAddress)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
@@ -140,7 +140,7 @@ export default function JoinLeague({ setDisplay }) {
             const isPublic = await LeagueProxyContract.isPublic();
             console.log("\tIs public: " + isPublic);
             //Add League address  to appropriate state list
-            if(isPublic) 
+            if (isPublic)
               setPublicLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
           }
           //console.log("error value at end:" + error);
@@ -158,41 +158,33 @@ export default function JoinLeague({ setDisplay }) {
   // var activeListItems;
   // var pendingListItems;
   useEffect(() => {
-       //Create list of league cards for all active leagues
+    //Create list of league cards for all active leagues
     console.log("accountDataLoading in useEffect: " + accountDataLoading);
   }, [accountDataLoading])
 
 
   var publicListItems = publicLeagueList.map((leagueAddress, index) =>
-  <Box key={index}>
-  <LeagueCard
-    leagueAddress={leagueAddress}
-  />
-  <hr></hr>
-  </Box>
-);
+    <Box key={index}>
+      <LeagueCard
+        leagueAddress={leagueAddress}
+      />
+      <hr></hr>
+    </Box>
+  );
 
-//Create list of league cards for all pending leagues
-var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
-  <Box key={index}>
-  <LeagueCard
-    leagueAddress={leagueAddress}
-  />
-  <hr></hr>
-  </Box>
-);
+  //Create list of league cards for all pending leagues
+  var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
+    <Box key={index}>
+      <LeagueCard
+        leagueAddress={leagueAddress}
+      />
+      <hr></hr>
+    </Box>
+  );
 
   return (
     <Box>
-      {/* <Fab
-        variant="extended"
-        size="small"
-        aria-label="add"
-        onClick={() => setDisplay(false)}
-      >
-        &#60; BACK
-      </Fab> */}
-
+      {/* <BackButton onClickHandler={() => setDisplay(false)} /> */}
       <Typography variant="h3" color="secondary" component="div" marginTop={2}>
         YOUR WHITELISTED LEAGUES
       </Typography>
@@ -204,11 +196,11 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         }}
       />
       {pendingLeagueList.length > 0 ? (
-          <ul>{pendingListItems}</ul>
+        <ul>{pendingListItems}</ul>
       ) : (
         <Typography variant="h6" color="primary" component="div">
           (No Pending Leagues)
-        </Typography>   
+        </Typography>
       )}
       <Typography variant="h3" color="secondary" component="div">
         PUBLIC LEAGUES
@@ -221,11 +213,11 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         }}
       />
       {publicLeagueList.length > 0 ? (
-          <ul>{activeListItems}</ul>
+        <ul>{activeListItems}</ul>
       ) : (
         <Typography variant="h6" color="primary" component="div">
           (No Active Leagues)
-        </Typography>   
+        </Typography>
       )}
     </Box>
   );

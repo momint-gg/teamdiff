@@ -17,6 +17,7 @@ import {
   Fab,
 } from "@mui/material";
 import ConnectWalletModal from "../components/ConnectWalletModal";
+import BackButton from "../components/BackButton";
 
 export default function Mint({ setDisplay }) {
   const [{ data: accountData }, disconnect] = useAccount({
@@ -27,15 +28,7 @@ export default function Mint({ setDisplay }) {
   if (true) {
     return (
       <Box>
-        <Fab
-          variant="extended"
-          size="small"
-          color="primary"
-          aria-label="add"
-          onClick={() => setDisplay(false)}
-        >
-          &#60; BACK
-        </Fab>
+        <BackButton onClickHandler={() => setDisplay(false)} />
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
