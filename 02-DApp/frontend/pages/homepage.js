@@ -90,7 +90,7 @@ export default function Homepage() {
                             </p>
                             <Link href="/createLeague">
                                 <button className={[bootstrap["btn"], bootstrap["btn-outline-secondary"], bootstrap["fs-5"], bootstrap["pe-5"], bootstrap["ps-5"], bootstrap["mt-3"], bootstrap["fw-bold"]].join(' ')}>
-                                    Create a League
+                                    Create League
                                 </button>
                             </Link>
                         </div>
