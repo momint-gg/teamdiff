@@ -16,7 +16,8 @@ import { useMediaQuery } from "react-responsive";
 import logo from "../assets/images/player.png";
 import PlayerStateModal from "../components/PlayerStateModal";
 import PlayerSelectModal from "../components/PlayerSelectModal";
-import Card from "../assets/cards/Fudge.png";
+import Card1 from "../assets/cards/Fudge.png";
+import Card2 from "../assets/cards/Abbedagge.png";
 import Sample from "../../backend/sample.json";
 
 const atheleteData = Sample.athleteData;
@@ -26,32 +27,32 @@ const players = [
   {
     name: "TRADING CARD",
     title: "Darshan 2022",
-    image: Card,
+    image: Card1,
   },
   {
     name: "TRADING CARD",
     title: "Darshan 2022",
-    image: Card,
+    image: Card2,
   },
   {
     name: "TRADING CARD",
     title: "Darshan 2022",
-    image: Card,
+    image: Card1,
   },
   {
     name: "TRADING CARD",
     title: "Darshan 2022",
-    image: Card,
+    image: Card2,
   },
   {
     name: "TRADING CARD",
     title: "Darshan 2022",
-    image: Card,
+    image: Card1,
   },
   {
     name: "TRADING CARD",
     title: "Darshan 2022",
-    image: Card,
+    image: Card1,
   },
 ];
 
@@ -141,7 +142,10 @@ export default function MyTeam() {
                   <TableCell align="center">
                     <Typography fontSize={30}> {athelete.position}</Typography>
                   </TableCell>
-                  <TableCell sx={{ display: "flex" }} align="center">
+                  <TableCell
+                    sx={{ display: "flex", alignItems: "center" }}
+                    align="center"
+                  >
                     <Image src={logo} />
                     <div>
                       <Typography

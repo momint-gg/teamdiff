@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import Image from "next/image";
 import { Box, Button, Typography, Modal, TextField } from "@mui/material";
 import { makeStyles } from "@material-ui/core";
@@ -39,6 +40,8 @@ export default function PlayerSelectModal({
   handleModalClose,
 }) {
   const classes = useStyles();
+  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
+
   return (
     <Modal
       open={modalOpen}
@@ -95,37 +98,48 @@ export default function PlayerSelectModal({
             <Box
               className={classes.scrollBar}
               sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "30px",
-                height: "70%",
                 overflowY: "auto",
                 direction: "rtl",
+                height: "70%",
               }}
             >
-              {players?.map((player, index) => (
-                <Box sx={{ direction: "ltr" }}>
-                  <Box
-                    sx={{
-                      border: "2px solid #FFFFFF",
-                      borderRadius: "10px",
-                      padding: "20px 40px",
-                    }}
-                  >
-                    <Image src={player.image} width={118} height={158} />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "30px",
+                  direction: "ltr",
+                  marginLeft: "40px",
+                }}
+              >
+                {players?.map((player) => (
+                  <Box sx={{ direction: "ltr" }}>
+                    <Box
+                      sx={{
+                        border: "2px solid",
+                        borderColor:
+                          player === selectedPlayer ? "#FF00FF" : "#FFFFFF",
+                        borderRadius: "10px",
+                        padding: "20px 40px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setSelectedPlayer(player)}
+                    >
+                      <Image src={player.image} width={118} height={158} />
+                    </Box>
+                    <Typography
+                      color={"white"}
+                      fontSize={12}
+                      sx={{ marginTop: "18px" }}
+                    >
+                      {player.name}
+                    </Typography>
+                    <Typography color={"white"} fontSize={18}>
+                      {player.title}
+                    </Typography>
                   </Box>
-                  <Typography
-                    color={"white"}
-                    fontSize={12}
-                    sx={{ marginTop: "18px" }}
-                  >
-                    {player.name}
-                  </Typography>
-                  <Typography color={"white"} fontSize={18}>
-                    {player.title}
-                  </Typography>
-                </Box>
-              ))}
+                ))}
+              </Box>
             </Box>
           </Box>
           <Box
@@ -134,7 +148,7 @@ export default function PlayerSelectModal({
               marginTop: "30px",
             }}
           >
-            <Image src={Card} width={255} height={342} />
+            <Image src={selectedPlayer.image} width={255} height={342} />
             <Button
               onClick={() => handleSubModal(row)}
               style={{
