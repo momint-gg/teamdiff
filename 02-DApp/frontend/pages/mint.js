@@ -56,9 +56,10 @@ export default function Mint({ setDisplay }) {
                 background:
                   "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
                 filter: "blur(35px)",
+                marginBottom: "2rem"
               }}
             />
-            <img src="/starterPack.png" style={{ position: "absolute" }} />
+            <img src="/starter-pack.png" style={{ position: "absolute" }} />
           </Box>
 
           <Box
