@@ -28,6 +28,7 @@ contract LeagueMaker is Ownable {
 
     // For staking
     TestUSDC testUSDC;
+    IERC20 rinkebyUSDC;
 
     // ======== Mutable storage ========
     address beaconAddress;
@@ -55,10 +56,12 @@ contract LeagueMaker is Ownable {
         string calldata _name,
         uint256 _stakeAmount,
         bool _isPublic,
+        address _admin,
         address _testUSDCAddress, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
         address _athletesContractAddress,
         address _gameItemsContractAddress,
         address[] calldata _whitelistUsers
+        
     ) external returns (address) {
         // constructorContractAddresses[2] = _testUSDCAddress;
         // constructorContractAddresses[3] = _athletesContractAddress;
@@ -69,7 +72,8 @@ contract LeagueMaker is Ownable {
             _stakeAmount,
             _isPublic,
             _athletesContractAddress,
-            msg.sender, // I was wrong before.. msg.sender IS the admin
+            //msg.sender, // I was wrong before.. msg.sender IS the admin TODO i keep getting 0x0 address here
+            _admin,
             _rinkebyUSDCAddress,
             _testUSDCAddress,
             _gameItemsContractAddress,
@@ -77,13 +81,13 @@ contract LeagueMaker is Ownable {
             address(this)
         );
 
-        testUSDC = TestUSDC(_testUSDCAddress);
-
-        // Make sure the creator of the league has enough USDC
-        require(
-            testUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
-            "Creator of league needs enough USDC (equal to specified stake amount)."
-        );
+        // testUSDC = TestUSDC(_testUSDCAddress);
+        // rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
+        // // Make sure the creator of the league has enough USDC
+        // require(
+        //     rinkebyUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
+        //     "Creator of league needs enough USDC (equal to specified stake amount)."
+        // );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
@@ -92,13 +96,22 @@ contract LeagueMaker is Ownable {
 
         // Creator of the league staking their initial currency when they call createLeague()
         // TODO: Test different address that isn't also TeamDiff owner making a league and make sure the owner initial staking works
-        testUSDC.transferFrom(msg.sender, address(proxy), _stakeAmount);
+        // TODO this kept failing with error code "ERC20: transfer amount exceeds allowance"", ignoring for now
+        // TODO we will need to call .approve on all our proxy contracts to transfer usdc out of them i think
+        //testUSDC.approve(msg.sender, 100);
+        // TODO before a user can create a league, they must sign a .approve([leagueMakerAddres], spendAmount) transaction to 
+                //allow this contract to send usdc on their behalf
+                    //or we might have to make them sign another transaction to stake and join league after they create the league
+                        //which might be weird 
+        // rinkebyUSDC.transferFrom(msg.sender, address(proxy), _stakeAmount);
+        // rinkebyUSDC.transfer(address(proxy), _stakeAmount);
 
         leagueAddresses.push(address(proxy));
+        
         userToLeagueMap[msg.sender].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 
-        emit LeagueCreated(_name, address(proxy), msg.sender, _whitelistUsers);
+        emit LeagueCreated(_name, address(proxy), _admin, _whitelistUsers);
         // delete parameters;
         return address(proxy);
     }

@@ -3,13 +3,15 @@
 require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/Athletes.json');
-const athleteToId = require('../athleteToId');
 const { Athletes } = require('../contract_info/contractAddresses');
+const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
 
+// Modules for parsing excel
 const fs = require('fs');
 const XLSX = require('xlsx');
 const path = require('path');
-numAthletes = 50; // Fixing a bug
+
+// NOTE: In the functions folder (same directory as this file) you should put the excel file with two columns: name, points
 
 async function main() {
   // Constructing our contract
@@ -22,7 +24,6 @@ async function main() {
 
   // Parsing excel
   finalStatsToPush = [];
-
   const parseExcel = (filename) => {
     const excelData = XLSX.readFile(filename);
 
@@ -32,22 +33,57 @@ async function main() {
     }));
   };
 
-  for (let i = 0; i < numAthletes; i++) {
-    if (i == 0) continue;
-    const name = data[i]['__EMPTY'];
-    const points = data[i]['__EMPTY_1'];
+  parseExcel('./week_dummy_data.xlsx').forEach((element) => {
+    data = element.data;
+  });
+
+  for (let i = 0; i < 50; i++) {
+    // Looping through all of our athletes
+    const name = data[i]['Player'].toLowerCase(); // Gamer name columnn
+    const points = Math.round(data[i]['Points']); // Total points column
     const id = athleteToId[name];
-    finalStatsToPush.push({ id: id, points: points });
+    // console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
+    if (id !== undefined) {
+      // Only IDs in our league should be updated
+      finalStatsToPush.push({ id: id, points: points });
+    } else {
+      console.log('Athlete named ', name, ' is not in TeamDiff');
+    }
   }
 
-  // Adding stats
-  for (let i = 0; i < sampleAthleteData.length; i++) {
-    console.log('Adding athletes stats for ', i);
+  // Looping through all of our athletes and if they aren't in our object, set points equal to 0
+  for (let [key, value] of Object.entries(athleteToId)) {
+    if (!finalStatsToPush.hasOwnProperty(value)) {
+      // If our final stats array doesn't have this id, athlete has 0 points
+      finalStatsToPush.push({ id: value, points: 0 });
+    }
+    // console.log(`${key}: ${value}`);
+  }
+
+  // Logging our output to see (yes I should write test cases but not enough time man)
+  for (let i = 0; i < finalStatsToPush.length; i++) {
+    console.log(
+      'Athlete ID: ',
+      finalStatsToPush[i].id,
+      '\n Athlete points: ',
+      finalStatsToPush[i].points
+    );
+  }
+
+  // Finally, pushing stats to the contract
+  for (let i = 0; i < 50; i++) {
+    console.log('Adding athletes stats for athlete index ', i);
+
     const addAthletesStatsTxn = await contract.appendStats(
       finalStatsToPush[i].id, // index of athlete
       finalStatsToPush[i].points // their points for the week
     );
-    console.log('Adding points: ', sampleAthleteData[i].points);
+    console.log(
+      'Adding points: ',
+      finalStatsToPush[i].points,
+      ' for athlete id ',
+      finalStatsToPush[i].id
+    );
     // Waiting for txn to mine
     await addAthletesStatsTxn.wait();
   }

@@ -20,6 +20,7 @@ import { ethers } from "ethers";
 //Wagmi imports
 import {
   useAccount,
+  useDisconnect,
   useConnect,
   useSigner,
   useProvider,
@@ -37,24 +38,19 @@ export default function LeagueCard({ leagueAddress }) {
   const router = useRouter()
 
 
-  //WAGMI Hooks
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
-
+  const [leagueSize, setLeagueSize] = useState(1);
 
   
   useEffect(() => {
     //console.log("leagueADdy: " + leagueAddress)
-    if (accountData && leagueAddress) {
+    if (leagueAddress) {
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
         leagueAddress,
@@ -66,9 +62,25 @@ export default function LeagueCard({ leagueAddress }) {
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        //setMountedLeagueAddress(leagueAddress);
-        console.log("leagueAddy: " + leagueAddress);
-        //setActiveLeagueList(activeLeagues);
+        let i = 0;
+        var error = "none";
+
+        //Continue to add leagues to activeLEagueList and pendingLeagueList
+          //until we hit an error (because i is out of range presumably)
+        do {
+          const whitelistedLeague = await LeagueProxyContract.leagueMembers(i)
+                                                        .catch((_error) => {
+                                                          error = _error;
+                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+                                                          // console.log("User To League Map Error: " + _error.message);
+                                                        });
+
+          if(error == "none") {  
+            i++;  
+          }
+
+        } while (error == "none");
+        setLeagueSize(i);
       }
       fetchData();
     }
@@ -92,6 +104,9 @@ export default function LeagueCard({ leagueAddress }) {
 
           <Typography variant="body1" color="inherit">
             {leagueAddress}
+          </Typography>
+          <Typography variant="body1" color="inherit">
+            {leagueSize + " /8"}
           </Typography>
           {/* <Typography variant="body1" color="inherit">
             Your current standing: {leagueData?.standing}

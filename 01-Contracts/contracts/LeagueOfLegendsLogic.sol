@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./TestUSDC.sol";
 
-contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
+contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     using SafeMath for uint256;
 
     string public leagueName;
@@ -57,13 +57,14 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 public testUSDC;
+    // IERC20 public testUSDC;
+    IERC20 public rinkebyUSDC;
     GameItems gameItemsContract;
 
     //**************/
     //*** Events ***/
     /***************/
-    event Staked(address sender, uint256 amount);
+    event Staked(address sender, uint256 amount, address leagueAddress);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
 
@@ -100,18 +101,18 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         leagueName = _name;
         numWeeks = 8;
         // Setting up the admin role
-        inLeague[_admin] = true;
-        leagueMembers.push(_admin);
+        //inLeague[_admin] = true;
+        //leagueMembers.push(_admin);
         admin = _admin;
         stakeAmount = _stakeAmount;
-        isPublic = _isPublic;
+        // isPublic = _isPublic;
         leagueEntryIsClosed = false;
         lineupIsLocked = false;
         athletesContract = Athletes(athletesDataStorageAddress);
-        // leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
-        whitelistContract = new Whitelist(); // Initializing our whitelist
-        rinkebyUSDCAddress = _rinkebyUSDCAddress;
-        testUSDC = IERC20(_testUSDCAddress);
+        leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
+        whitelistContract = new Whitelist(_isPublic); // Initializing our whitelist
+        rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
+        // testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
         // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
@@ -168,7 +169,7 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     /******************************************************/
     // Returning the contracts USDC balance
     function getContractUSDCBalance() external view returns (uint256) {
-        return testUSDC.balanceOf(address(this));
+        return rinkebyUSDC.balanceOf(address(this));
     }
 
     // // Returning the sender's USDC balance (testing)
@@ -202,8 +203,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
         for (uint256 i; i < leagueWinners.length; i++) {
             // Approval first, then transfer with the below
-            testUSDC.approve(address(this), prizePerWinner);
-            testUSDC.transferFrom(
+            rinkebyUSDC.approve(address(this), prizePerWinner);
+            rinkebyUSDC.transferFrom(
                 address(this),
                 leagueWinners[i],
                 prizePerWinner
@@ -221,6 +222,8 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     //***************************************************/
     // Setting the lineup for a user
     // TODO: Move requires to a library to save space (MOBALogicLibrary)
+    // note: this is inefficient if we want to update one position only :/
+        //TODO: we should require that they cannot set duplicates
     function setLineup(uint256[] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
@@ -257,6 +260,42 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
         userToLineup[msg.sender] = athleteIds;
     }
 
+
+    function setAthleteInLineup(uint256 athleteId, uint256 position) external {
+        require(!lineupIsLocked, "lineup is locked for the week!");
+        require(inLeague[msg.sender], "User is not in League.");
+
+        //Decrement all athleteToLineup Occurences from previous lineup
+        // for (uint256 i; i < userToLineup[msg.sender].length; i++) {
+        //     athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
+        //         currentWeekNum
+        //     ]--;
+        // }
+
+        // // Require ownership of all athleteIds + update mapping
+        // for (uint256 i; i < athleteIds.length; i++) {
+        //     athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
+        // }
+
+        // Requiring the user has ownership of the athletes
+        // for (uint256 i; i < athleteIds.length; i++) {
+            require(
+                gameItemsContract.balanceOf(msg.sender, athleteId) > 0,
+                "Caller does not own given athleteIds"
+            );
+        // }
+
+        // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
+        // for (uint256 i; i < athleteIds.length; i++) {
+            require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
+                athleteId >= (position * 10) &&
+                    athleteId <= ((position + 1) * 10 - 1),
+                "You are setting an athlete in the wrong position!"
+            );
+        // }
+
+        userToLineup[msg.sender][position] = athleteId;
+    }
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
@@ -282,19 +321,27 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
     }
 
     // User joining the league
-    function joinLeague() external onlyWhitelisted nonReentrant {
+    //TODO debug why onlyWhiteListed always reverts
+    function joinLeague() public nonReentrant {
+    // function joinLeague() external onlyWhitelisted nonReentrant {
+        require((whitelistContract.whitelist(msg.sender) || whitelistContract.isPublic() || msg.sender == admin), "User is not on whitelist bro");
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
-        require(
-            testUSDC.balanceOf(msg.sender) > stakeAmount,
-            "Insufficent funds for staking"
-        );
+        require(rinkebyUSDC.balanceOf(msg.sender) > stakeAmount, "Insufficent funds for staking");
+        
+        //must approve for our own token
+        //testUSDC.approve(msg.sender, 100);
+
+        //Update mapping if contract is public, since whitelist is skipped
+        if(whitelistContract.isPublic()) {
+            leagueMakerContract.updateUserToLeagueMapping(msg.sender);
+        }
 
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-
-        testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-        emit Staked(msg.sender, stakeAmount);
+        rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
+        // rinkebyUSDC.transfer(address(this), stakeAmount);
+        emit Staked(msg.sender, stakeAmount, address(this));
     }
 
     // User joining the league
@@ -347,10 +394,10 @@ contract LeagueOfLegendsLogic is Initializable, Whitelist, ReentrancyGuard {
 
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
-        require(
-            !leagueEntryIsClosed,
-            "Nobody can enter/exit the league anymore. The season has started!"
-        );
+        // require(
+        //     !leagueEntryIsClosed,
+        //     "Nobody can enter/exit the league anymore. The season has started!"
+        // );
         whitelistContract.addAddressToWhitelist(_userToAdd);
 
         //TODO this mapp contain users to league and whitelisted leagues

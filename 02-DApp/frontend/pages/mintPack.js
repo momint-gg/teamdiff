@@ -5,7 +5,8 @@ import {
   useProvider,
   useContract,
   useEnsLookup,
-  useNetwork,
+  useDisconnect,
+  useNetwork
 } from "wagmi";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
@@ -21,39 +22,95 @@ import {
   Fab,
 } from "@mui/material";
 import Image from "next/image";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
+//Router
+import { useRouter } from 'next/router';
 
 export default function MintPack({ setDisplay }) {
+  // Router
+  const router = useRouter();
+
   // WAGMI Hooks
-  const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
-  const [activeChain, chains] = useNetwork()
+  // const [{ data: connectData, error: connectError }, connect] = useConnect();
+  // const [{ data: accountData }, disconnect] = useAccount({
+  //   fetchEns: true,
+  // });
+  // const [activeChain, chains] = useNetwork()
+
+  // const currentChain = activeChain?.data?.chain?.id
+
+  // const isPolygon = currentChain === 137
+
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
-
+  
   // State Variables
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [packsAvailable, setPacksAvailable] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [currentChain, setCurrentChain] = useState();
+  const [isPolygon, setIsPolygon] = useState();
 
-  const currentUserChain = activeChain?.data?.chain?.id
+  useEffect(() => {
+    // setHasMinted(true);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const signer = provider.getSigner()
 
-  const isPolygon = currentUserChain === 137
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          const { chainId } = await provider.getNetwork()
+          setCurrentChain(chainId)
+          setIsPolygon(chainId === 137)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+      provider.on("network", (newNetwork, oldNetwork) => {
+        // When a Provider makes its initial connection, it emits a "network"
+        // event with a null oldNetwork along with the newNetwork. So, if the
+        // oldNetwork exists, it represents a changing network
+        if (oldNetwork) {
+            window.location.reload();
+        }
+      });
+    }, [connectedAccount]);
+
+
+
 
   const checkUserChain = () => {
-    if (!currentUserChain || currentUserChain != 137) {
-      if (currentUserChain === 1) {
+    if (!currentChain || currentChain != 137) {
+      if (currentChain === 1) {
         // in the future we can potentially switch networks for them using useNetwork wagmi hook?
         alert("Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint.")
       } else {
@@ -64,7 +121,7 @@ export default function MintPack({ setDisplay }) {
 
   // Use Effect for component mount
   useEffect(async () => {
-    if (accountData) {
+    if (isConnected) {
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -78,9 +135,10 @@ export default function MintPack({ setDisplay }) {
       setPacksAvailable(packsAvail.toNumber());
 
       // Callback for when packMinted Events is fired from contract
-      const signerAddress = accountData.address;
-      const packMintedCallback = (signer, packID) => {
-        if (signer == signerAddress) {
+      // const signerAddress = accountData.address;
+      const packMintedCallback = (signerAddress, packID) => {
+        console.log("signer in callback : " + signerAddress)
+        if (signerAddress == connectedAccount) {
           setIsMinting(false);
           setHasMinted(true);
         }
@@ -88,7 +146,7 @@ export default function MintPack({ setDisplay }) {
 
       // A filter that matches my address as the signer of the contract call
       // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
-      console.log(hexZeroPad(signerAddress, 32));
+      // console.log(hexZeroPad(connectedAccount, 32));
       const filter = {
         address: GameItemsContract.address,
         topics: [
@@ -97,35 +155,42 @@ export default function MintPack({ setDisplay }) {
           // hexZeroPad(signerAddress, 32)
         ],
       };
-      GameItemsContract.on(filter, packMintedCallback);
-
+      // GameItemsContract.on(filter, packMintedCallback);
+      GameItemsContract.once("packMinted", packMintedCallback)
       checkUserChain()
-    } else {
-      console.log("no account data found!");
+
     }
-  }, []);
+    else {
+      console.log("no account connected");
+    }
+  }, [isConnected]);
+
 
   useEffect(() => {
-    console.log("user chain changed: ", currentUserChain)
-  }, [currentUserChain])
+    console.log("user chain changed: ", currentChain)
+  }, [currentChain])
 
   const mintStarterPack = async () => {
-    if (gameItemsContract) {
       // Create a new instance of the Contract with a Signer, which allows
       // update methods
-      const gameItemsContractWithSigner = gameItemsContract.connect(signerData);
+      // const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner()
+      const gameItemsContractWithSigner = new ethers.Contract(
+        CONTRACT_ADDRESSES.GameItems,
+        GameItemsJSON.abi,
+        signer
+      );
 
       const mintTxn = await gameItemsContractWithSigner
         .mintStarterPack()
         .then((res) => {
-          console.log("txn result: " + JSON.stringify(res, null, 2));
+          // console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsMinting(true);
-          console.log("Minting pack in progress...");
+          // console.log("Minting pack in progress...");
         })
         .catch((error) => {
           alert("error: " + error.message);
         });
-    }
   };
 
   return (
@@ -143,9 +208,8 @@ export default function MintPack({ setDisplay }) {
         >
           ‹ GO BACK
       </Button>
-      {accountData && !(isMinting || hasMinted) && packsAvailable != 0 && (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
+      {isConnected && !hasMinted &&
+      <Box
             justifyContent="center"
             alignItems="center"
             sx={{
@@ -170,13 +234,16 @@ export default function MintPack({ setDisplay }) {
               <Image
                 src={profilePic}
                 alt="Picture of the author"
-                width="310px"
-                height="450px"
+                // width="310px"
+                // height="100vw"
+                // height="450px"
                 position="absolute"
               />
             </Container>
-          </Box>
-
+        </Box>
+      }
+      {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
             alignItems="center"
@@ -185,11 +252,11 @@ export default function MintPack({ setDisplay }) {
               display: "flex",
             }}
           >
-            <Typography variant="h2" color="white" component="div">
+            <Typography variant="h3" color="white" component="div">
               Mint Starter Pack
             </Typography>
             {packsAvailable != null && (
-              <Typography variant="h4" color="white" component="div">
+              <Typography variant="h6" color="white" component="div">
                 There are{" "}
                 <Box fontWeight="fontWeightBold" display="inline">
                   {packsAvailable}
@@ -206,20 +273,23 @@ export default function MintPack({ setDisplay }) {
               paddingTop: "20px",
             }}
           >
-            <Button
+            <Fab
+              variant="extended"
+              size="large"
+              aria-label="add"
               onClick={mintStarterPack}
-              variant="contained"
-              color="inherit"
-              style={{
-                color: "black",
-                borderRadius: "40px",
-                width: "10%",
+              // onClick={() => setDisplayMint(true)}
+              sx={{
+                marginRight: 1,
+                background:
+                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                color: "white",
                 fontSize: 20,
               }}
-              disabled={!isPolygon}
+              // disabled={!isPolygon}
             >
-              MINT
-            </Button>
+              Mint
+            </Fab>
           </Box>
           <Box
             justifyContent="center"
@@ -243,35 +313,158 @@ export default function MintPack({ setDisplay }) {
         </Container>
       )}
       {isMinting && (
-        <Container>
-          <Typography>Your stuff is minting...</Typography>
-          <CircularProgress />
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
+          <Box
+            justifyContent="center"
+            alignItems="center"
+            flexDirection="column"
+            sx={{
+              display: "flex",
+            }}
+          >
+            <Typography variant="h5" color="white" component="div">
+              Minting In Progress
+            </Typography>
+            <br></br>
+            <CircularProgress />
+          </Box>
         </Container>
       )}
       {hasMinted && (
-        <Box>
-          <Typography>
-            Your Team Diff Starter Pack is all done minting!
-          </Typography>
-          <a
-            href={
-              "https://testnets.opensea.io/assets/" +
-              gameItemsContract.address +
-              "/50" // the pack Id is after the athletes (not 0)
-            }
-            target={"_blank"}
-            rel="noreferrer"
+        <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-evenly"
+          }}
+        >
+          <Box
+            sx={{
+              flex: 3
+            }}
           >
-            View on OpenSea.
-          </a>
-          <Typography>
-            Note that it may take a few minutes for images and metadata to
-            properly load on OpenSea.
-          </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
+            <Typography sx={{marginRight: 2}} variant="h4" color="white" component="div">
+              Acquired Starter Pack!
+            </Typography>
+            <CheckCircleIcon color="secondary"></CheckCircleIcon>
+            </Box>
+            <br></br>
+            <Box>
+              <Box
+                sx={{
+                 display: "flex",
+                 flexDirection: "row",
+                 justifyContent: "space-between"
+                }}
+              >
+                <Box
+                  sx={{
+                    flex: 1,
+                    marginRight: 3
+                  }}
+                >
+                  <Typography variant="h5"> Contents </Typography>
+                  <a
+                    href={
+                      "https://testnets.opensea.io/assets/" +
+                      gameItemsContract.address +
+                      "/50" // the pack Id is after the athletes (not 0)
+                    }
+                    // href="#"
+                    target={"_blank"}
+                    rel="noreferrer"
+                  >
+                    View on OpenSea.
+                  </a> 
+                  {/* <Typography variant="subtitle2"> 
+                    Note that it may take a few minutes for images and metadata to
+                    properly load on OpenSea.
+                  </Typography>                */}
+                </Box>
+                
+                <Box
+                  sx={{
+                    flex: 1
+                  }}
+                >
+                  <Typography variant="h5"> Pack #</Typography>
+                  <Typography> {100 - packsAvailable} </Typography>
+                    
+                </Box>
+              </Box>
+            </Box>
+        
+
+            <Box>
+              <Fab
+                variant="extended"
+                size="large"
+                aria-label="add"
+                onClick={() => router.push("./burnPack")}
+                // onClick={() => setDisplayMint(true)}
+                sx={{
+                  marginTop: 5,
+                  marginRight: 1,
+                  background:
+                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                  color: "white",
+                  fontSize: 20,
+                }}
+              >
+                Open Pack
+              </Fab>
+              <Fab
+                variant="extended"
+                size="large"
+                color="white"
+                aria-label="add"
+                // onClick={() => setDisplayCollection(true)}
+                sx={{ marginTop: 5, fontSize: 20 }}
+              >
+                Go To My Collection
+              </Fab>
+            </Box>
+          </Box>
+          <Box sx={{
+            flex: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <Image
+              src={profilePic}
+              alt="Picture of the author"
+              // height="100%"
+              // width="auto"
+              width="155px"
+              height="225px"
+            />
+          </Box>
         </Box>
+        
+      </Container>
       )}
-      {!accountData && !hasMinted && !isMinting && (
-        <div> Please connect your wallet. </div>
+      {!isConnected && !hasMinted && !isMinting && (
+        <Box>
+          <Typography variant="h6" component="div">
+            Please connect your wallet to get started.
+          </Typography>
+        </Box>  
       )}
       {packsAvailable == 0 && (
         <Box>

@@ -12,10 +12,26 @@ export default function ConnectWalletModal({
   setModalOpen,
   isMobile,
 }) {
-  const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+  // const [{ data: connectData, error: connectError }, connect] = useConnect();
+  // const [{ data: accountData }, disconnect] = useAccount({
+  //   fetchEns: true,
+  // });
+  const {
+    activeConnector,
+    connect,
+    connectors,
+    error : connectError,
+    isConnecting,
+    pendingConnector,
+  } = useConnect()
+  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  const { data: ensName } = useEnsName()
+  const { data: ensAvatar } = useEnsAvatar()
+  const { disconnect } = useDisconnect()
+  // const [{ data: connectData, error: connectError }, connect] = useConnect();
+  // const [{ data: accountData }, disconnect] = useAccount({
+  //   fetchEns: true,
+  // });
 
   function getConnectorImage(connector) {
     if (connector.name === "MetaMask") {
