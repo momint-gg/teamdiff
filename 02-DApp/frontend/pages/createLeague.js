@@ -526,12 +526,13 @@ export default function CreateLeague({ setDisplay }) {
                   Token
                 </Typography>
               <FormControl required >
-                <StyledInputLabel htmlFor="token-select">Token</StyledInputLabel>
+              <FormControl required >
+                <InputLabel htmlFor="token-select">Token</InputLabel>
                 <StyledSelect
-                    color="secondary"
+                  color="secondary"
                 
                   id="token-select"
-                  value={"USDC"}
+                  // value={"USDC"}
                   // value={"formValues.token"}
                   label="token"
                   name="token"
@@ -541,6 +542,7 @@ export default function CreateLeague({ setDisplay }) {
                   {/* <MenuItem key="eth" value="eth">eth</MenuItem>
                   <MenuItem key="other" value="other">other</MenuItem> */}
                 </StyledSelect>
+              </FormControl>
               </FormControl>
               </Box>
               <Box
