@@ -19,18 +19,18 @@ import {
 import ConnectWalletModal from "../components/ConnectWalletModal";
 
 export default function Mint({ setDisplay }) {
-const { data: accountData, isLoading, error } = useAccount({ ens: true })
-const { disconnect } = useDisconnect()
+  const { data: accountData, isLoading, error } = useAccount({ ens: true })
+  const { disconnect } = useDisconnect()
   const [modalOpen, setModalOpen] = useState(false);
 
   if (true) {
     return (
       <Box>
-       <Button
+        <Button
           variant="text"
           sx={{
-            backgroundColor:"transparent",
-            color:"white",
+            backgroundColor: "transparent",
+            color: "white",
             borderRadius: "50%",
             fontSize: 18
           }
@@ -38,7 +38,7 @@ const { disconnect } = useDisconnect()
           onClick={() => setDisplay(false)}
         >
           ‹ GO BACK
-      </Button>
+        </Button>
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
@@ -61,7 +61,7 @@ const { disconnect } = useDisconnect()
                 filter: "blur(35px)",
               }}
             />
-            <img src="/starterPack.png" style={{ position: "absolute" }} />
+            <img src="/starter-pack.png" style={{ position: "absolute" }} />
           </Box>
 
           <Box
