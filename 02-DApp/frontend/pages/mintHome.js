@@ -108,7 +108,7 @@ export default function MintHome() {
               sx={{
                 display: "flex",
                 flexDirection: "row",
-                alignContent: "center",
+                alignContent: "space-between",
               }}
             >
               <Container

@@ -46,7 +46,7 @@ export default function Index(props) {
 
   if (typeof window !== "undefined") {
     return (
-      <Box />
+      <Homepage />
     );
   }
   return null;
