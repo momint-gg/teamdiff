@@ -482,7 +482,7 @@ export default function CreateLeague({ setDisplay }) {
                 >
                   League Name
                 </Typography>
-                <FormControl required>
+                <FormControl fullWidth required>
                   {/* <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel> */}
                   <TextField
                     id="league-name"
@@ -525,15 +525,16 @@ export default function CreateLeague({ setDisplay }) {
                 >
                   Token
                 </Typography>
-              <FormControl required >
-              <FormControl required >
-                <InputLabel htmlFor="token-select">Token</InputLabel>
-                <StyledSelect
+              <FormControl fullWidth required >
+              {/* <FormControl fullWidth required > */}
+                <InputLabel id="token-select-label">Token</InputLabel>
+                <Select
                   color="secondary"
-                
+                  labelId='token-select-label'
                   id="token-select"
                   // value={"USDC"}
-                  // value={"formValues.token"}
+                  value={formValues.token}
+                  placeholder="USDC"
                   label="token"
                   name="token"
                   onChange={handleInputChange}
@@ -541,8 +542,8 @@ export default function CreateLeague({ setDisplay }) {
                   <MenuItem key="usdc" value="usdc">USDC</MenuItem>
                   {/* <MenuItem key="eth" value="eth">eth</MenuItem>
                   <MenuItem key="other" value="other">other</MenuItem> */}
-                </StyledSelect>
-              </FormControl>
+                </Select>
+              {/* </FormControl> */}
               </FormControl>
               </Box>
               <Box
@@ -561,7 +562,7 @@ export default function CreateLeague({ setDisplay }) {
                 >
                   Buy-in Cost
                 </Typography>
-              <FormControl required>
+              <FormControl fullWidth required>
                 {/* <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel> */}
                 <TextField
                   id="buy-in"
