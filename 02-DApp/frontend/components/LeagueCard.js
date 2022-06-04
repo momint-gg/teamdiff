@@ -17,16 +17,6 @@ import { useRouter } from 'next/router';
 //Web3 Imports
 import { ethers } from "ethers";
 
-//Wagmi imports
-import {
-  useAccount,
-  useDisconnect,
-  useConnect,
-  useSigner,
-  useProvider,
-  useContract,
-  useEnsLookup,
-} from "wagmi";
 //Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
