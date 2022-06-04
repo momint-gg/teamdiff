@@ -305,8 +305,8 @@ export default function CreateLeague({ setDisplay }) {
   //Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
     //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const signer = provider.getSigner()
     
     //Connect to leagueMaker with connect wallet
     const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
@@ -316,12 +316,19 @@ export default function CreateLeague({ setDisplay }) {
       .createLeague(
           formValues.leagueName,
           formValues.buyInCost,
+          // 10,
           !isPrivate,
+          // false,
           connectedAccount,
+          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
+          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
+          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
+          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
           CONTRACT_ADDRESSES.TestUSDC,
           CONTRACT_ADDRESSES.Athletes,
           CONTRACT_ADDRESSES.GameItems,
           inviteListValues,
+          // [], 
         {
         gasLimit: 10000000,
       })
@@ -612,6 +619,9 @@ export default function CreateLeague({ setDisplay }) {
                       control={<Switch 
                         onChange={() => {
                           setIsPrivate(!isPrivate)
+                          if(!isPrivate) {
+                            setInviteListValues([]);
+                          }
                         }}                                                                   
                       color="secondary" />}
                       label="Invite-Only"
