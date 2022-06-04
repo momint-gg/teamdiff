@@ -4,12 +4,15 @@ import 'bootstrap/dist/css/bootstrap.css';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import theme from '../styles/theme.js';
 import { Box, Link, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+// import 'bootstrap/dist/css/bootstrap.css'
+// import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel, Divider } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Input from '@mui/material/Input';
+// import Link from '@mui/material/Link'
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@material-ui/core/Grid'
 // import wallet_address_validator from 'wallet-address-validator';
@@ -17,6 +20,10 @@ import Grid from '@material-ui/core/Grid'
 import WAValidator from 'wallet-address-validator'; 
 
 import { ethers } from "ethers";
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import * as utils from "@ethersproject/hash";
+import { hexZeroPad } from "@ethersproject/bytes";
+// import { Link } from "react-router-dom"
 
 //Wagmi imports
 import {
@@ -63,6 +70,7 @@ const StyledSelect = styled(Select)`
 const StyledButton = styled(Button)`
   color: white;
   background-color: ${props => props.theme.palette.primary.light};
+  height: 40px;
   &:hover {
     filter: brightness(85%);
     background-color: ${props => props.theme.palette.primary.light};
@@ -73,7 +81,7 @@ const StyledButton = styled(Button)`
 export default function CreateLeague({ setDisplay }) {
   const defaultValues = {
     leagueName: "",
-    token: "usdc",
+    // token: "usdc",
     buyInCost: "",
     payoutSplit: "default",
     whitelistedAddresses: [],
@@ -115,11 +123,15 @@ export default function CreateLeague({ setDisplay }) {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
+  const preparedInviteListValues = inviteListValues.filter((address) => address !== "")
+
 
   useEffect(() => {
     // setIsCreatingLeague(false);
     // setHasCreatedLeague(true);
     // setHasJoinedLeague(true)
+    // setIsConnected(false)
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
@@ -361,6 +373,12 @@ export default function CreateLeague({ setDisplay }) {
   }, [formValues.buyInCost])
 
 
+  const validateFormValues = () => {
+    return isValidBuyInCost && formValues.buyInCost !== "" && 
+           isValidLeagueName && formValues.leagueName !== "" && 
+           (formValues.inviteListStatus === "open" || preparedInviteListValues.length > 0 && validAddressesStatus)
+  }
+
   useEffect(() => {
     let flag = true
     inviteListValues.forEach((e) => {
@@ -368,8 +386,10 @@ export default function CreateLeague({ setDisplay }) {
         // console.log("validated")
       } else {
         // console.log("invalid")
-        flag = false
-        setValidAddressesStatus(false)
+        if (e !== "") {
+          flag = false
+          setValidAddressesStatus(false)
+        }
       }
     })
     if (flag) {
@@ -377,41 +397,41 @@ export default function CreateLeague({ setDisplay }) {
     }
   }, [inviteListValues])
 
-  const handlePlayerInviteInput = (e, i) => {
-    let inviteListValuesNew = [...inviteListValues]
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
-    // const currentAddress = await signer.getAddress()
-    // console.log("target value = " + accountData.address);
-    if(inviteListValuesNew.includes(e.target.value) || e.target.value == connectedAccount) {
-      console.log("invalid address added");
-      alert("No duplicate address allowed + no adding yourself to whitelist")
-    } else {
-      inviteListValuesNew[i] = e.target.value
-      //setInviteListValues([...inviteListValues], e);
-      setInviteListValues(inviteListValuesNew)
-      // console.log("short list in func: " + inviteListValues);
+  // const handlePlayerInviteInput = (e, i) => {
+  //   let inviteListValuesNew = [...inviteListValues]
+  //   // const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   // const signer = provider.getSigner()
+  //   // const currentAddress = await signer.getAddress()
+  //   // console.log("target value = " + accountData.address);
+  //   if(inviteListValuesNew.includes(e.target.value) || e.target.value == connectedAccount) {
+  //     console.log("invalid address added");
+  //     alert("No duplicate address allowed + no adding yourself to whitelist")
+  //   } else {
+  //     inviteListValuesNew[i] = e.target.value
+  //     //setInviteListValues([...inviteListValues], e);
+  //     setInviteListValues(inviteListValuesNew)
+  //     // console.log("short list in func: " + inviteListValues);
     
-    }
+  //   }
 
 
-  }
+  // }
 
-  const addNewPlayerInviteInput = () => {
-    if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
-      setAddPlayerBtnEnabled(false)
-    }
-    setInviteListValues(prevState => ([...prevState, ""])) 
-  }
+  // const addNewPlayerInviteInput = () => {
+  //   if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
+  //     setAddPlayerBtnEnabled(false)
+  //   }
+  //   setInviteListValues(prevState => ([...prevState, ""])) 
+  // }
 
-  const removePlayer = (i) => {
-    let inviteListValuesNew = [...inviteListValues]
-    inviteListValuesNew.splice(i, 1)
-    setInviteListValues(inviteListValuesNew)
-    if (!addPlayerBtnEnabled && inviteListValuesNew.length < 8) {
-      setAddPlayerBtnEnabled(true)
-    }
-  }
+  // const removePlayer = (i) => {
+  //   let inviteListValuesNew = [...inviteListValues]
+  //   inviteListValuesNew.splice(i, 1)
+  //   setInviteListValues(inviteListValuesNew)
+  //   if (!addPlayerBtnEnabled && inviteListValuesNew.length < 8) {
+  //     setAddPlayerBtnEnabled(true)
+  //   }
+  // }
 
   // function handleShowForm() {
   //   setShowForm(true)
@@ -511,7 +531,8 @@ export default function CreateLeague({ setDisplay }) {
                     color="secondary"
                 
                   id="token-select"
-                  value={formValues.token}
+                  value={"USDC"}
+                  // value={"formValues.token"}
                   label="token"
                   name="token"
                   onChange={handleInputChange}
@@ -623,7 +644,7 @@ export default function CreateLeague({ setDisplay }) {
             float: "right",
             background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
           }} 
-          onClick={()=>{createLeagueSubmitHandler()}} variant="extended" size="medium" color="tertiary"
+          onClick={()=>{createLeagueSubmitHandler()}} variant="extended" size="medium" 
         >
             Create League
         </Fab>

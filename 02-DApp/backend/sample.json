@@ -1,0 +1,164 @@
+
+{
+    "leagueData": {
+        "0": {
+            "name": "ESport Fanatics League",
+            "size": 4,
+            "address": "0xb411fC7Ed32faBb692AE7bA96014122282483eeB",
+            "weekNum": 0,
+            "pending": true,
+            "rosterLockCountdown": 7,
+            "rosterIsLocked": false
+        },
+        "1": {
+            "name": "Riot Runners",
+            "size": 4,
+            "address": "0x16bbCBd2254149bAE3B17AfF505038d136e972C4",
+            "weekNum": 2,
+            "pending": false,
+            "rosterLockCountdown": 0,
+            "rosterIsLocked": true
+        },
+        "2": {
+            "name": "Super Sweepers",
+            "size": 7,
+            "address": "0x5354887d5A96970e76F897B0C62486bE9dB446c0",
+            "weekNum": 0,
+            "pending": false,
+            "rosterLockCountdown": 2,
+            "rosterIsLocked": false
+        }
+    },
+    "schedule": {
+        "0": {
+            "0": ["0x5354887d5A96970e76F897B0C62486bE9dB446c0", "0x6F6E475154C983Da637e2691addD77D33d418171"],
+            "1": ["0x16bbCBd2254149bAE3B17AfF505038d136e972C4", "0xb411fC7Ed32faBb692AE7bA96014122282483eeB"]
+        },
+        "1": {
+            "0": ["0x16bbCBd2254149bAE3B17AfF505038d136e972C4", "0x6F6E475154C983Da637e2691addD77D33d418171"],
+            "1": ["0x5354887d5A96970e76F897B0C62486bE9dB446c0", "0xb411fC7Ed32faBb692AE7bA96014122282483eeB"]
+        },
+        "2": {
+            "0": ["0x16bbCBd2254149bAE3B17AfF505038d136e972C4", "0x5354887d5A96970e76F897B0C62486bE9dB446c0"],
+            "1": ["0x6F6E475154C983Da637e2691addD77D33d418171", "0xb411fC7Ed32faBb692AE7bA96014122282483eeB"]
+        }
+    },
+    "userData": {
+        "0x5354887d5A96970e76F897B0C62486bE9dB446c0": {
+            "thisWeekPoints": 3,
+            "wins": 2,
+            "losses": 2,
+            "ties": 1,
+            "ens": "will.eth"
+        },
+        "0x6F6E475154C983Da637e2691addD77D33d418171": {
+            "thisWeekPoints": 2,
+            "wins": 3,
+            "losses": 1,
+            "ties": 1,
+            "ens": null
+        },
+        "0x16bbCBd2254149bAE3B17AfF505038d136e972C4": {
+            "thisWeekPoints": 5,
+            "wins": 2,
+            "losses": 2,
+            "ties": 1,
+            "ens": "reg.eth"
+        },
+        "0xb411fC7Ed32faBb692AE7bA96014122282483eeB": {
+            "thisWeekPoints": 0,
+            "wins": 0,
+            "losses": 4,
+            "ties": 1,
+            "ens": null
+        }
+    },
+    "athleteData": {
+        "0": {
+            "position": "TOP",
+            "name": "Fakr",
+            "team": "clippers",
+            "prevPoints": 32,
+            "opponent": "c9",
+            "gameDate": "7/12/22"
+        },
+        "1": {
+            "position": "JUNGLE",
+            "name": "Closer",
+            "team": "Lakers",
+            "prevPoints": 12,
+            "opponent": "c9",
+            "gameDate": "7/14/22"
+        },
+        "2": {
+            "position": "MID",
+            "name": "Lebron",
+            "team": "Lakers",
+            "prevPoints": 36,
+            "opponent": "c9",
+            "gameDate": "7/14/22"
+        },
+        "3": {
+            "position": "Support",
+            "name": "Lebron",
+            "team": "Lakers",
+            "prevPoints": 36,
+            "opponent": "c9",
+            "gameDate": "7/14/22"
+        },
+        "4": {
+            "position": "Support",
+            "name": "Lebron",
+            "team": "Lakers",
+            "prevPoints": 36,
+            "opponent": "c9",
+            "gameDate": "7/14/22"
+        },
+        "5": {
+            "position": "null",
+            "name": "null",
+            "team": "null",
+            "prevPoints": null,
+            "opponent": null,
+            "gameDate": null
+        },
+        "6": {
+            "position": "JUNGLE",
+            "name": "Rondo",
+            "team": "Lakers",
+            "prevPoints": 16,
+            "opponent": "c9",
+            "gameDate": "7/14/22"
+        },
+        "7": {
+            "position": "JUNGLE",
+            "name": "Magic",
+            "team": "Clippers",
+            "prevPoints": 1,
+            "opponent": "bulls",
+            "gameDate": "7/14/22"
+        }
+    },
+    "statsData": {
+        "0": {
+            "opponent": "c9",
+            "gameDate": "7/14/22",
+            "kills": 4,
+            "deaths": 3,
+            "assists": 3,
+            "cs": 200,
+            "teamWin": true,
+            "totalPoints": 200
+        },
+        "1": {
+            "opponent": "clippers",
+            "gameDate": "7/13/22",
+            "kills": 7,
+            "deaths": 1,
+            "assists": 3,
+            "cs": 223,
+            "teamWin": true,
+            "totalPoints": 234
+        }
+    }
+}

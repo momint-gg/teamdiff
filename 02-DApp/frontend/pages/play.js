@@ -63,7 +63,7 @@ export default function Play() {
     setMenu(false);
   };
 
-  const isMobile = useMediaQuery({ query: "(max-width: 1224px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   // const handleViewLeaguesClick = (e) => {
   //   e.preventDefault()

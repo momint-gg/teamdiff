@@ -11,6 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pinata/sdk": "^1.1.23"
+    "@pinata/sdk": "^1.1.23",
+    "dotenv": "^16.0.1",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "read-excel-file": "^5.3.3",
+    "xlsx": "^0.18.5"
   }
 }

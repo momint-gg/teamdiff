@@ -768,7 +768,7 @@ export default function LeagueDetails() {
                     }}
                   >
                     <Typography variant="h6">
-                      Succesfully joined league
+                      {"Succesfully joined league \"" + leagueName + "\""}
                       <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
 
                     </Typography>

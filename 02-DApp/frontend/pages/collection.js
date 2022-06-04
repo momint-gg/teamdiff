@@ -66,7 +66,7 @@ export default function Collection() {
     setMenu(false);
   };
 
-  const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
 
   useEffect(() => {
     setPackNFTs([]);
