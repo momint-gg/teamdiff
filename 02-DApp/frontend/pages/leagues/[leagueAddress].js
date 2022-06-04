@@ -301,6 +301,7 @@ export default function LeagueDetails() {
 
   const joinLeagueHandler = async () => {
     setIsJoiningLeague(true);
+    var hasCancelledTransaction = false;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
@@ -311,26 +312,35 @@ export default function LeagueDetails() {
       signer
     );
     const stakeAmount = await leagueProxyContract.stakeAmount();
-    const approvalTxn = await RinkebyUSDCContract.approve(router.query.leagueAddress, stakeAmount * 10000000);
+    const approvalTxn = await RinkebyUSDCContract.approve(router.query.leagueAddress, stakeAmount * 10000000)
+    .catch((error) => {
+      setIsJoiningLeague(false);
+      hasCancelledTransaction = true;
+      console.log("Join League error: " + error.message);
+      alert("Approve error: " + error.message);
+    });;
     
     console.log("joining league: " + router.query.leagueAddress);
 
     //console.log("signer dataL: " + JSON.stringify(signerData, null, 2));
-    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
-    const joinLeagueTxn = await leagueProxyContractWithSigner
-    // .joinLeague()
-    .joinLeague({
-        gasLimit: 20000000
-    })
-    .then((res) => {
-        // console.log("txn result: " + JSON.stringify(res, null, 2));
-        // console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
-        // console.log("joined league")
-    })
-    .catch((error) => {
-      //console.log("")
-      alert("Join League error: " + error.message);
-    });
+    if(!hasCancelledTransaction){
+      const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
+      const joinLeagueTxn = await leagueProxyContractWithSigner
+      // .joinLeague()
+      .joinLeague({
+          gasLimit: 20000000
+      })
+      // .then((res) => {
+      //     // console.log("txn result: " + JSON.stringify(res, null, 2));
+      //     // console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
+      //     // console.log("joined league")
+      // })
+      .catch((error) => {
+        setIsJoiningLeague(false);
+        console.log("Join League error: " + error.message);
+        alert("Join League error: " + error.message);
+      });
+    }
   }
 
   const submitAddUsersToWhitelistClickHandler = async () => {

@@ -189,7 +189,7 @@ export default function MintPack({ setDisplay }) {
           // console.log("Minting pack in progress...");
         })
         .catch((error) => {
-          alert("error: " + error.error.message);
+          alert("error: " + error.message);
         });
   };
 

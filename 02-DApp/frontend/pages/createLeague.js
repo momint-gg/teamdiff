@@ -541,7 +541,7 @@ export default function CreateLeague({ setDisplay }) {
                   id="token-select"
                   // value={"USDC"}
                   value={formValues.token}
-                  placeholder="USDC"
+                  defaultValue="USDC"
                   label="token"
                   name="token"
                   onChange={handleInputChange}

@@ -24,7 +24,7 @@ export default function AddToWhitelist({setInviteListValues, inviteListValues, c
         let flag = true
         inviteListValues.forEach((e) => {
           if (WAValidator.validate(e, "ETH")) {
-            // console.log("validated")
+            // console.log("val idated")
           } else {
             // console.log("invalid")
             flag = false
