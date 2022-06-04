@@ -52,7 +52,7 @@ function MyApp({ Component, pageProps }) {
   const isWeb = useMediaQuery({
     query: '(min-device-width: 1224px)'
   })
-  const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",

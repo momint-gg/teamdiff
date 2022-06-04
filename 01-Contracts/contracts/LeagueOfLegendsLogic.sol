@@ -178,22 +178,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //     return testUSDC.balanceOf(msg.sender);
     // }
 
-    // // User joining the league
-    // function joinLeague() external onlyWhitelisted nonReentrant {
-    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
-    //     require(!inLeague[msg.sender], "You have already joined this league");
-    //     require(
-    //         testUSDC.balanceOf(msg.sender) > stakeAmount,
-    //         "Insufficent funds for staking"
-    //     );
-
-    //     inLeague[msg.sender] = true;
-    //     leagueMembers.push(msg.sender);
-
-    //     testUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-    //     emit Staked(msg.sender, stakeAmount);
-    // }
-
     // // TODO: Change to private/internal (public for testing)
     function onLeagueEnd() public onlyTeamDiff {
         uint256 contractBalance = leagueMembers.length * stakeAmount; // TODO change to balance of function? Might be a bit more foolproof...
@@ -349,8 +333,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         //testUSDC.approve(msg.sender, 100);
 
         //Update mapping if contract is public, since whitelist is skipped
-        if(whitelistContract.isPublic) {
-            leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
+        if(whitelistContract.isPublic()) {
+            leagueMakerContract.updateUserToLeagueMapping(msg.sender);
         }
 
         inLeague[msg.sender] = true;
@@ -360,7 +344,27 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 
-    
+    // User joining the league
+    //TODO debug why onlyWhiteListed always reverts
+    // It wasn't reverting for me.. you gotta make sure the user is on the whitelist first?
+    // Using the other joinLeague function above ^
+    // function joinLeague() external nonReentrant onlyWhitelisted {
+    //     // function joinLeague() external onlyWhitelisted nonReentrant {
+    //     // require(
+    //     //     whitelistContract.whitelist(msg.sender),
+    //     //     "User is not on whitelist bro"
+    //     // );
+    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
+    //     require(!inLeague[msg.sender], "You have already joined this league");
+    //     require(
+    //         testUSDC.balanceOf(msg.sender) > stakeAmount,
+    //         "Insufficent funds for staking"
+    //     );
+
+    //     inLeague[msg.sender] = true;
+    //     leagueMembers.push(msg.sender);
+    // }
+
     // Getting a schedule for a week
     function getScheduleForWeek(uint256 _week)
         external
@@ -371,21 +375,22 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     // Returning the admin for the league (for testing)
-    // function getAdmin() public view returns (address) {
-    //     return admin;
-    // }
+    function getAdmin() public view returns (address) {
+        return admin;
+    }
 
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
     /*****************************************************************/
     // Removing a user from the whitelist before the season starts
-    // function removeFromWhitelist(address _userToRemove) external onlyAdmin {
-    //     require(
-    //         !leagueEntryIsClosed,
-    //         "Nobody can enter/exit the league anymore. The season has started!"
-    //     );
-    //     whitelistContract.removeAddressFromWhitelist(_userToRemove);
-    // }
+    // We need this function I'm assuming? Let's not comment out for now
+    function removeFromWhitelist(address _userToRemove) external onlyAdmin {
+        require(
+            !leagueEntryIsClosed,
+            "Nobody can enter/exit the league anymore. The season has started!"
+        );
+        whitelistContract.removeAddressFromWhitelist(_userToRemove);
+    }
 
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
@@ -394,8 +399,9 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         //     "Nobody can enter/exit the league anymore. The season has started!"
         // );
         whitelistContract.addAddressToWhitelist(_userToAdd);
+
         //TODO this mapp contain users to league and whitelisted leagues
-        leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
-        // whitelist[_userToAdd] = true;
+        // leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
+        // // whitelist[_userToAdd] = true;
     }
 }

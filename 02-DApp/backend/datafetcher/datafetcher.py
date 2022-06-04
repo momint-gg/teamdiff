@@ -1,11 +1,11 @@
-#!/usr/bin/python3
+# !/usr/bin/python3
 
 import csv
 import datetime as dt
 import ipfsApi
 import json
-import mwclient
 from pprint import pprint
+import mwclient
 import os
 import random
 import re
@@ -13,8 +13,7 @@ import ssl
 import sys
 import subprocess
 import time
-import urllib.request
-
+import urllib
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -30,7 +29,7 @@ class Datafetcher():
                      :19], "%Y-%m-%dT%H:%M:%S").date(),
                  ):
         self.site = mwclient.Site(site, path)
-        self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
+        # self.ipfs = ipfsApi.Client(host='https://ipfs.infura.io', port=5001)
         self.tournament = tournament
         self.start_date = start_date
         self.time_interval = time_interval
@@ -337,98 +336,7 @@ class Datafetcher():
         self._convert_to_json(self.aggregated_athlete_game_stats,
                               "aggregated_stats.json")
 
-        print("\nDone!\n")
-
-    def fetch_athlete_headshot_data(self):
-        print("(Step 5/7) Fetching athlete headshot data...\n")
-        for i, athlete in enumerate(sorted(self.athletes.keys())):
-            print("(Athlete ", i+1, "/", len(self.athletes), ") ", athlete, sep="")
-            self.athletes[athlete]["ipfs"] = {
-                "Name": "",
-                "Hash": "",
-                "Size": "",
-            }
-            try:
-                self.athletes[athlete]["ipfs"] = self.ipfs.add("../pinata/headshots/" +
-                                                               i + ".png")[0]
-            except:
-                print("ERROR: Headshot of athlete",
-                      athlete, "couldn't be retrieved")
-            finally:
-                print(self.athletes[athlete]["ipfs"]["Hash"])
-                print()
-                time.sleep(5)
-
-        print("Done!\n")
-
-    def create_nft_metadata_ordered(self):
-        print("(Step 6/7) Creating position-ordered NFT metadata JSON files...\n")
-        file_name = 0
-        for target_position in self.positions:
-            for athlete, info in self.athletes.items():
-                current_athlete_position = info["Role"] if info["Role"] != "Bot" else "ADC"
-
-                if current_athlete_position == target_position:
-                    self.nft_metadata[athlete] = {}
-                    self.nft_metadata[athlete]["name"] = info["Name"]
-                    self.nft_metadata[athlete]["description"] = "Combine this card with 4 other athletes to build your dream roster. TeamDiff Genesis mint 2022."
-                    self.nft_metadata[athlete]["image"] = "https://gateway.pinata.cloud/ipfs/" + \
-                        self.athletes[athlete]["ipfs"]["Hash"]
-                    self.nft_metadata[athlete]["attributes"] = [
-                        {
-                            "trait_type": "team",
-                            "value": info["Team"]
-                        },
-                        {
-                            "trait_type": "position",
-                            "value": current_athlete_position
-                        },
-                    ]
-
-                    if not os.path.isdir("nft_metadata_ordered/"):
-                        os.mkdir("nft_metadata_ordered/")
-
-                    self._convert_to_json(
-                        self.nft_metadata[athlete], "nft_metadata_ordered/" + str(file_name) + ".json")
-
-                    file_name += 1
-        print("\nDone!\n")
-
-    def create_nft_metadata_random(self):
-        print("(Step 7/7) Creating random-ordered NFT metadata JSON files...\n")
-        random_athletes = []
-        for athlete, info in self.athletes.items():
-            self.nft_metadata[athlete] = {}
-            self.nft_metadata[athlete]["name"] = info["Name"]
-            self.nft_metadata[athlete]["description"] = "Combine this card with 4 other athletes to build your dream roster. TeamDiff Genesis mint 2022."
-            self.nft_metadata[athlete]["image"] = "https://gateway.pinata.cloud/ipfs/" + \
-                self.athletes[athlete]["ipfs"]["Hash"]
-            self.nft_metadata[athlete]["attributes"] = [
-                {
-                    "trait_type": "team",
-                    "value": info["Team"]
-                },
-                {
-                    "trait_type": "position",
-                    "value": info["Role"] if info["Role"] != "Bot" else "ADC"
-                },
-            ]
-            random_athletes.append(athlete)
-
-        random.shuffle(random_athletes)
-
-        file_name = 0
-
-        for athlete in random_athletes:
-            if not os.path.isdir("nft_metadata_random/"):
-                os.mkdir("nft_metadata_random/")
-
-            self._convert_to_json(
-                self.nft_metadata[athlete], "nft_metadata_random/" + str(file_name) + ".json")
-
-            file_name += 1
-
-        print("\nDone!")
+        # print("\nDone!\n")
 
     def is_correct_athlete_count(self, target_count):
         if len(self.athletes.keys()) != target_count:
@@ -437,12 +345,6 @@ class Datafetcher():
             return False
 
         return True
-
-    def upload_headshots_to_pinata(self):
-        print("\n(Step 4/7) Uploading headshots to Pinata...\n")
-        time.sleep(1)
-        subprocess.call(["node", "../pinata/app.js", "-p"])
-        print("Done!\n")
 
     def usage():
         print(
@@ -479,11 +381,11 @@ def main():
     df.fetch_athlete_game_stats()
     df.aggregate_athlete_game_stats()
 
-    df.upload_headshots_to_pinata()
-    df.fetch_athlete_headshot_data()
-
-    df.create_nft_metadata_ordered()
-    df.create_nft_metadata_random()
+    # Don't need this stuff here anymore (done in pinata folder)
+    # df.upload_headshots_to_pinata()
+    # df.fetch_athlete_headshot_data()
+    # df.create_nft_metadata_ordered()
+    # df.create_nft_metadata_random()
 
     print("\nDatafetch complete!\n")
 

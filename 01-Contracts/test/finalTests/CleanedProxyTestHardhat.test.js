@@ -122,7 +122,8 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       // owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
       testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
       AthletesContractInstance.address, // Address of our athletes storage contract
-      GameItemInstance.address // GameItems contract address
+      GameItemInstance.address, // GameItems contract address
+      [] //Whitelisted users
     );
     var leagueProxyContractAddress;
     receipt = await txn.wait();
@@ -286,6 +287,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       .connect(addr1)
       .approve(proxyContract.address, 10);
     await approval.wait();
+
+    console.log(
+      "Balance of contract before addr1 joins ",
+      Number(await testUsdcContract.balanceOf(proxyContract.address))
+    );
 
     // Addr1 joining the league and staking the 10 USDC
     let join = await proxyContract.connect(addr1).joinLeague();

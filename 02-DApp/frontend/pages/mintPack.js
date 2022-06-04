@@ -5,7 +5,8 @@ import {
   useProvider,
   useContract,
   useEnsLookup,
-  useDisconnect
+  useDisconnect,
+  useNetwork
 } from "wagmi";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
@@ -35,6 +36,17 @@ export default function MintPack({ setDisplay }) {
   // Router
   const router = useRouter();
 
+  // WAGMI Hooks
+  // const [{ data: connectData, error: connectError }, connect] = useConnect();
+  // const [{ data: accountData }, disconnect] = useAccount({
+  //   fetchEns: true,
+  // });
+  // const [activeChain, chains] = useNetwork()
+
+  // const currentChain = activeChain?.data?.chain?.id
+
+  // const isPolygon = currentChain === 137
+
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -48,12 +60,13 @@ export default function MintPack({ setDisplay }) {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-
+  const [currentChain, setCurrentChain] = useState();
+  const [isPolygon, setIsPolygon] = useState();
 
   useEffect(() => {
     // setHasMinted(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    // const signer = provider.getSigner()
 
       // const fetchData = async () => {
       //   const currentAddress = await signer.getAddress()
@@ -68,6 +81,9 @@ export default function MintPack({ setDisplay }) {
           const accountAddress = await signer.getAddress()
           setSigner(signer)
           setConnectedAccount(accountAddress)
+          const { chainId } = await provider.getNetwork()
+          setCurrentChain(chainId)
+          setIsPolygon(chainId === 137)
           setIsConnected(true)
       
         }
@@ -79,8 +95,29 @@ export default function MintPack({ setDisplay }) {
       provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
       provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
                                                   setIsConnected(false) })
+      provider.on("network", (newNetwork, oldNetwork) => {
+        // When a Provider makes its initial connection, it emits a "network"
+        // event with a null oldNetwork along with the newNetwork. So, if the
+        // oldNetwork exists, it represents a changing network
+        if (oldNetwork) {
+            window.location.reload();
+        }
+      });
     }, [connectedAccount]);
 
+
+
+
+  const checkUserChain = () => {
+    if (!currentChain || currentChain != 137) {
+      if (currentChain === 1) {
+        // in the future we can potentially switch networks for them using useNetwork wagmi hook?
+        alert("Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint.")
+      } else {
+        alert("Please switch to the Polygon network to proceed with the mint!")
+      }
+    }
+  }
 
   // Use Effect for component mount
   useEffect(async () => {
@@ -120,12 +157,18 @@ export default function MintPack({ setDisplay }) {
       };
       // GameItemsContract.on(filter, packMintedCallback);
       GameItemsContract.once("packMinted", packMintedCallback)
+      checkUserChain()
+
     }
     else {
       console.log("no account connected");
     }
   }, [isConnected]);
 
+
+  useEffect(() => {
+    console.log("user chain changed: ", currentChain)
+  }, [currentChain])
 
   const mintStarterPack = async () => {
       // Create a new instance of the Contract with a Signer, which allows
@@ -238,9 +281,29 @@ export default function MintPack({ setDisplay }) {
                 color: "white",
                 fontSize: 20,
               }}
+              // disabled={!isPolygon}
             >
               Mint
             </Fab>
+          </Box>
+          <Box
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+              display: "flex",
+              paddingTop: "20px",
+            }}
+          >
+          {!isPolygon && 
+              <Typography
+                style={{
+                  color: "red",
+                  fontSize: 16
+                }}
+              >
+                Please switch to Polygon to proceed with minting.
+              </Typography>
+            }
           </Box>
         </Container>
       )}

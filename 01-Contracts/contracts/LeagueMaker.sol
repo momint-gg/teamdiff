@@ -119,6 +119,7 @@ contract LeagueMaker is Ownable {
 
     // You need a getter for this because Solidity's default getter (AKA contract.leagueAddresses()) needs to be called with an index
     // ^ And we want the whole list
+    // Do NOT delete this 
     function getLeagueAddresses() public view returns (address[] memory) {
         return leagueAddresses;
     }
