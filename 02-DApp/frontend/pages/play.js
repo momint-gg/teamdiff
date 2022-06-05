@@ -26,9 +26,6 @@ import { MdGroupAdd } from "react-icons/md";
 import { FaCrown } from "react-icons/fa";
 //Router
 import { useRouter } from 'next/router'
-
-import { SignMessage } from '../components/SignMessage'
-
 import { useMediaQuery } from "react-responsive";
 
 export default function Play() {
