@@ -29,7 +29,8 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import * as utils from "@ethersproject/hash";
 //NPM import
 import WAValidator from 'wallet-address-validator'; 
-
+//Component imports
+import MyTeam from "../myTeam.js";
 //Wagmi imports
 import {
   useAccount,
@@ -129,7 +130,6 @@ export default function LeagueDetails() {
           setSigner(signer)
           setConnectedAccount(accountAddress)
           setIsConnected(true)
-          //TODO this doesn't update screen when switching accounts :/
         }
         else {
           setIsConnected(false);
@@ -254,7 +254,7 @@ export default function LeagueDetails() {
       //alert("no account data or league Address found, please refresh.");
       console.log("no account data or league Address found");
       console.log("router: " + JSON.stringify(router.query, null, 2));
-      //   console.log("leagueAddress: " + leagueAddress);
+      //   console.log("leagueAddLress: " + leagueAddress);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
@@ -418,241 +418,244 @@ export default function LeagueDetails() {
         ) : (           
         <>
         {isLeagueMember ? (
-            <>
-              {/* <Avatar
-                  alt="League Image"
-                  src={leagueData?.image?.examplePic.src}
-                  sx={{ bgcolor: "white", position: "absolute" }}
-                /> */}
-              <Box sx={{ marginLeft: 6 }}>
-                <Typography variant="h2" color="secondary" component="div">
-                  {leagueName}
-                </Typography>
+          <>
+            <MyTeam></MyTeam>
+          </>
+            // <>
+            //   {/* <Avatar
+            //       alt="League Image"
+            //       src={leagueData?.image?.examplePic.src}
+            //       sx={{ bgcolor: "white", position: "absolute" }}
+            //     /> */}
+            //   <Box sx={{ marginLeft: 6 }}>
+            //     <Typography variant="h2" color="secondary" component="div">
+            //       {leagueName}
+            //     </Typography>
 
-                {/* <Typography variant="body1" color="white">
-                    Your current standing: {leagueData?.standing}
-                  </Typography> */}
+            //     {/* <Typography variant="body1" color="white">
+            //         Your current standing: {leagueData?.standing}
+            //       </Typography> */}
 
-                <Typography
-                  variant="h4"
-                  color="secondary"
-                  component="div"
-                  sx={{ marginTop: 5 }}
-                >
-                  SET YOUR LINEUP!
-                </Typography>
+            //     <Typography
+            //       variant="h4"
+            //       color="secondary"
+            //       component="div"
+            //       sx={{ marginTop: 5 }}
+            //     >
+            //       SET YOUR LINEUP!
+            //     </Typography>
 
-                <Grid container spacing={5}>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab
-                        id="basic-button"
-                        aria-controls={open ? "basic-menu" : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={handleClick}
-                      >
-                        Set 1
-                      </Fab>
-                      <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                          "aria-labelledby": "basic-button",
-                        }}
-                      >
-                        {athleteNFTs.map(
-                          (athlete, index) =>
-                            athlete.id.tokenId % 10 == 0 && (
-                              <MenuItem onClick={() => handleSetAthlete(0)}>
-                                {"Athlete #" + athlete.id.tokenId}
-                              </MenuItem>
-                            )
-                        )}
-                        {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
-                            <MenuItem onClick={handleClose}>Logout</MenuItem> */}
-                      </Menu>
-                      {lineup[0] != null && (
-                        <Typography>{"lineup[0] = " + lineup[0]}</Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab
-                        id="basic-button"
-                        aria-controls={open ? "basic-menu" : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={handleClick}
-                      >
-                        Set 2
-                      </Fab>
-                      {/* <Menu
-                            //id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                            }}
-                        >
-                            {athleteNFTs.map((athlete, index) => 
-                                (athlete.id.tokenId % 10 == 1 && 
-                                    <MenuItem onClick={() => (handleSetAthlete(1))}>{"Athlete #" + athlete.id.tokenId}</MenuItem>
-                                )
-                            )
-                            }
-                            {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
-                            <MenuItem onClick={handleClose}>Logout</MenuItem> }
-                        </Menu>                         */}
-                      {lineup[1] != null && (
-                        <Typography>{"lineup[1] = " + lineup[1]}</Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab>Set 3</Fab>
-                      {lineup[2] != null && (
-                        <Typography>{"lineup[21] = " + lineup[2]}</Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab>Set 4</Fab>
-                      {lineup[3] != null && (
-                        <Typography>{"lineup[3] = " + lineup[3]}</Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab>Set 5</Fab>
-                      {lineup[4] != null && (
-                        <Typography>{"lineup[4] = " + lineup[4]}</Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                  <Fab onClick={submitLineup}>Submit Lineup</Fab>
-                </Grid>
-              </Box>
-                {isLeagueAdmin && (
-                    <Box>
-                        <Typography>
-                            Admin Actions
-                        </Typography>
-                        <ul>
-                            <li>Add Users to Whitelist</li>
-                        </ul>
-                        <>
-                <Typography variant="h7" color="lightgrey">
-                  Only users added to this leagues whitelist can join.
-                </Typography>
-                <Typography variant="h6" color="white" component="div">
-                  Invite list:
-                </Typography>
+            //     <Grid container spacing={5}>
+            //       <Grid item>
+            //         <Paper
+            //           elevation={0}
+            //           style={{
+            //             background:
+            //               "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+            //             width: 150,
+            //             height: 200,
+            //           }}
+            //         >
+            //           <Fab
+            //             id="basic-button"
+            //             aria-controls={open ? "basic-menu" : undefined}
+            //             aria-haspopup="true"
+            //             aria-expanded={open ? "true" : undefined}
+            //             onClick={handleClick}
+            //           >
+            //             Set 1
+            //           </Fab>
+            //           <Menu
+            //             id="basic-menu"
+            //             anchorEl={anchorEl}
+            //             open={open}
+            //             onClose={handleClose}
+            //             MenuListProps={{
+            //               "aria-labelledby": "basic-button",
+            //             }}
+            //           >
+            //             {athleteNFTs.map(
+            //               (athlete, index) =>
+            //                 athlete.id.tokenId % 10 == 0 && (
+            //                   <MenuItem onClick={() => handleSetAthlete(0)}>
+            //                     {"Athlete #" + athlete.id.tokenId}
+            //                   </MenuItem>
+            //                 )
+            //             )}
+            //             {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
+            //                 <MenuItem onClick={handleClose}>My account</MenuItem>
+            //                 <MenuItem onClick={handleClose}>Logout</MenuItem> */}
+            //           </Menu>
+            //           {lineup[0] != null && (
+            //             <Typography>{"lineup[0] = " + lineup[0]}</Typography>
+            //           )}
+            //         </Paper>
+            //       </Grid>
+            //       <Grid item>
+            //         <Paper
+            //           elevation={0}
+            //           style={{
+            //             background:
+            //               "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+            //             width: 150,
+            //             height: 200,
+            //           }}
+            //         >
+            //           <Fab
+            //             id="basic-button"
+            //             aria-controls={open ? "basic-menu" : undefined}
+            //             aria-haspopup="true"
+            //             aria-expanded={open ? "true" : undefined}
+            //             onClick={handleClick}
+            //           >
+            //             Set 2
+            //           </Fab>
+            //           {/* <Menu
+            //                 //id="basic-menu"
+            //                 anchorEl={anchorEl}
+            //                 open={open}
+            //                 onClose={handleClose}
+            //                 MenuListProps={{
+            //                 'aria-labelledby': 'basic-button',
+            //                 }}
+            //             >
+            //                 {athleteNFTs.map((athlete, index) => 
+            //                     (athlete.id.tokenId % 10 == 1 && 
+            //                         <MenuItem onClick={() => (handleSetAthlete(1))}>{"Athlete #" + athlete.id.tokenId}</MenuItem>
+            //                     )
+            //                 )
+            //                 }
+            //                 {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
+            //                 <MenuItem onClick={handleClose}>My account</MenuItem>
+            //                 <MenuItem onClick={handleClose}>Logout</MenuItem> }
+            //             </Menu>                         */}
+            //           {lineup[1] != null && (
+            //             <Typography>{"lineup[1] = " + lineup[1]}</Typography>
+            //           )}
+            //         </Paper>
+            //       </Grid>
+            //       <Grid item>
+            //         <Paper
+            //           elevation={0}
+            //           style={{
+            //             background:
+            //               "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+            //             width: 150,
+            //             height: 200,
+            //           }}
+            //         >
+            //           <Fab>Set 3</Fab>
+            //           {lineup[2] != null && (
+            //             <Typography>{"lineup[21] = " + lineup[2]}</Typography>
+            //           )}
+            //         </Paper>
+            //       </Grid>
+            //       <Grid item>
+            //         <Paper
+            //           elevation={0}
+            //           style={{
+            //             background:
+            //               "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+            //             width: 150,
+            //             height: 200,
+            //           }}
+            //         >
+            //           <Fab>Set 4</Fab>
+            //           {lineup[3] != null && (
+            //             <Typography>{"lineup[3] = " + lineup[3]}</Typography>
+            //           )}
+            //         </Paper>
+            //       </Grid>
+            //       <Grid item>
+            //         <Paper
+            //           elevation={0}
+            //           style={{
+            //             background:
+            //               "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+            //             width: 150,
+            //             height: 200,
+            //           }}
+            //         >
+            //           <Fab>Set 5</Fab>
+            //           {lineup[4] != null && (
+            //             <Typography>{"lineup[4] = " + lineup[4]}</Typography>
+            //           )}
+            //         </Paper>
+            //       </Grid>
+            //       <Fab onClick={submitLineup}>Submit Lineup</Fab>
+            //     </Grid>
+            //   </Box>
+            //     {isLeagueAdmin && (
+            //         <Box>
+            //             <Typography>
+            //                 Admin Actions
+            //             </Typography>
+            //             <ul>
+            //                 <li>Add Users to Whitelist</li>
+            //             </ul>
+            //             <>
+            //     <Typography variant="h7" color="lightgrey">
+            //       Only users added to this leagues whitelist can join.
+            //     </Typography>
+            //     <Typography variant="h6" color="white" component="div">
+            //       Invite list:
+            //     </Typography>
                 
 
-              {/* TODO: Abstract this into another component, controlled by createLeague page */}
-                <Typography variant="h6" color="white" component="div">
-                  Invite List (Private/Closed Leagues)
-                </Typography>
-                {!validAddressesStatus && ( 
-                  <p>
-                    There are invalid addresses.
-                  </p> 
-                )}
+            //   {/* TODO: Abstract this into another component, controlled by createLeague page */}
+            //     <Typography variant="h6" color="white" component="div">
+            //       Invite List (Private/Closed Leagues)
+            //     </Typography>
+            //     {!validAddressesStatus && ( 
+            //       <p>
+            //         There are invalid addresses.
+            //       </p> 
+            //     )}
 
-                {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
-                  {inviteListValues.map((element, index) => (
-                    <>
-                    <TextField
-                      variant="standard"
-                      label={"Whitelisted Address " + (index + 1)} 
-                      onChange={e => {
-                        //This submits null address when I copy and paste
-                        handlePlayerInviteInput(e, index)
-                        console.log("short list outside func: " + inviteListValues);
-                      }}
-                      value={element}
-                      key={index}
-                    />
-                    {index ? 
-                      <Button 
-                        variant="outlined"
-                        onClick={() => removePlayer(index)}
-                        size="small"
-                      >
-                        Remove
-                      </Button>
-                      : null
-                    }
-                    </>
-                  ))}
-                  <Button 
-                    variant="outlined"
-                    onClick={addNewPlayerInviteInput}
-                    size="small"
-                    disabled={!addPlayerBtnEnabled}
-                  >
-                    Add Another Address to Whitelist
-                  </Button>
-                  <Fab
-                    onClick={submitAddUsersToWhitelistClickHandler}
-                    >
-                      Submit
-                    </Fab>
+            //     {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
+            //       {inviteListValues.map((element, index) => (
+            //         <>
+            //         <TextField
+            //           variant="standard"
+            //           label={"Whitelisted Address " + (index + 1)} 
+            //           onChange={e => {
+            //             //This submits null address when I copy and paste
+            //             handlePlayerInviteInput(e, index)
+            //             console.log("short list outside func: " + inviteListValues);
+            //           }}
+            //           value={element}
+            //           key={index}
+            //         />
+            //         {index ? 
+            //           <Button 
+            //             variant="outlined"
+            //             onClick={() => removePlayer(index)}
+            //             size="small"
+            //           >
+            //             Remove
+            //           </Button>
+            //           : null
+            //         }
+            //         </>
+            //       ))}
+            //       <Button 
+            //         variant="outlined"
+            //         onClick={addNewPlayerInviteInput}
+            //         size="small"
+            //         disabled={!addPlayerBtnEnabled}
+            //       >
+            //         Add Another Address to Whitelist
+            //       </Button>
+            //       <Fab
+            //         onClick={submitAddUsersToWhitelistClickHandler}
+            //         >
+            //           Submit
+            //         </Fab>
 
-                </>
-                    </Box>
-                )}
-            </>
+            //     </>
+            //         </Box>
+            //     )}
+            // </>
           ) : (
             <>
 

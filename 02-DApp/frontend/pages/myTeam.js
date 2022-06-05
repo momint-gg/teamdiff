@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Box, Container, Typography } from "@mui/material";
 import {
@@ -19,8 +19,14 @@ import PlayerSelectModal from "../components/PlayerSelectModal";
 import Card1 from "../assets/cards/Fudge.png";
 import Card2 from "../assets/cards/Abbedagge.png";
 import Sample from "../../backend/sample.json";
-
+import { useRouter } from "next/router";
+//Web3 Imports
+import { ethers } from "ethers";
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 const atheleteData = Sample.athleteData;
+//Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 
 // TODO get data from backend
 const players = [
@@ -57,6 +63,14 @@ const players = [
 ];
 
 export default function MyTeam() {
+  //Router params
+  const router = useRouter();
+  //TODO change to matic network for prod
+  const provider = new ethers.providers.AlchemyProvider(
+    "rinkeby",
+    process.env.ALCHEMY_KEY
+  );
+
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const useStyles = makeStyles({
     cell: {
@@ -64,10 +78,128 @@ export default function MyTeam() {
     },
   });
   const classes = useStyles();
+
+  const [leagueProxyContract, setLeagueProxyContract] = useState(null);
+  const [leagueName, setLeagueName] = useState(null);
+  const [currentWeekNum, setCurrentWeekNum] = useState();
+  //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
+  const [isLeagueMember, setIsLeagueMember] = useState(false);
+
   const [currentPlayer, setCurrentPlayer] = useState({});
   const [stateModalOpen, setStateModalOpen] = useState(false);
   const [subModalOpen, setSubModalOpen] = useState(false);
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
 
+  const [athleteNFTs, setAthleteNFTs] = useState([]);
+  const [nftResp, setNFTResp] = useState(null);
+  const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
+
+  useEffect(() => {
+    // setIsCreatingLeague(false);
+    // setHasCreatedLeague(true);
+    // setHasJoinedLeague(true)
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        // setIsLoading(true);
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+          //TODO this doesn't update screen when switching accounts :/
+        }
+        else {
+          setIsConnected(false);
+
+        }
+        // setIsLoading(false);
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, [isConnected]);
+
+
+    useEffect(() => {
+      setAthleteNFTs([]);
+      if (isConnected && router.isReady) {
+        setIsLoading(true);
+        // Initialize connections to GameItems contract
+        const LeagueProxyContract = new ethers.Contract(
+          router.query.leagueAddress,
+          LeagueOfLegendsLogicJSON.abi,
+          provider
+        );
+        setLeagueProxyContract(LeagueProxyContract);
+  
+        async function fetchData() {
+          setIsLoading(true);
+          const leagueName = await LeagueProxyContract.leagueName();
+          setLeagueName(leagueName);
+          const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
+          setIsLeagueMember(isInLeague);
+          const currentWeekNum = await LeagueProxyContract.currentWeekNum();
+          setCurrentWeekNum(currentWeekNum);
+
+          //TODO if is not league member, refresh the page
+          if(!isInLeague) {
+            router.reload(window.location.pathname)
+          }
+
+          //TODO this is slightly buggy when someone tries to switch accounts
+          setIsLoading(false);
+        }
+  
+        // declare the async data fetching function
+        const getNFTData = async () => {
+          const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+  
+          const nfts = await web3.alchemy.getNfts({
+            owner: connectedAccount,
+            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+          });
+  
+          setNFTResp(nfts);
+          for (const nft of nfts?.ownedNfts) {
+            const token = nft?.id?.tokenId;
+            const response = await web3.alchemy.getNftMetadata({
+              contractAddress: constants.CONTRACT_ADDR,
+              tokenId: token,
+            });
+            //console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
+            if (!response.title?.includes("Pack")) {
+              setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
+            }
+          }
+        };
+  
+        getNFTData().catch((error) => {
+          console.log("fetch NFT DATA error: " + error);
+        });
+        fetchData();
+      } else {
+        //alert("no account data or league Address found, please refresh.");
+        console.log("no account data or league Address found");
+        console.log("router: " + JSON.stringify(router.query, null, 2));
+        //   console.log("leagueAddress: " + leagueAddress);
+      }
+    }, [isConnected, router.isReady, connectedAccount]);
+  
   const handleStateModal = (player) => {
     setCurrentPlayer(player);
     setStateModalOpen(true);
@@ -84,127 +216,131 @@ export default function MyTeam() {
   };
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Typography
-        variant="h4"
-        color="white"
-        component="div"
+    <>
+    {leagueProxyContract && (
+      <Container
         sx={{
-          fontSize: 64,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        WashU Esports - My Team
-      </Typography>
-      <Typography
-        color="white"
-        component="div"
-        sx={{
-          fontSize: 36,
-        }}
-      >
-        Week 3: Roster Locks in 2 Days
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ background: "#473D3D" }}>
-              <TableCell className={classes.cell} align="center">
-                Position
-              </TableCell>
-              <TableCell align="center" className={classes.cell}>
-                Player
-              </TableCell>
-              <TableCell align="center" className={classes.cell}>
-                Previous Points
-              </TableCell>
-              <TableCell align="center" className={classes.cell}>
-                Opponent
-              </TableCell>
-              <TableCell align="center" className={classes.cell}>
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Object.keys(atheleteData).map((key, index) => {
-              const athelete = atheleteData[key];
-              return (
-                <TableRow
-                  key={index.toString()}
-                  sx={{ background: index % 2 ? "#473D3D" : "#8E8E8E" }}
-                >
-                  <TableCell align="center">
-                    <Typography fontSize={30}> {athelete.position}</Typography>
-                  </TableCell>
-                  <TableCell
-                    sx={{ display: "flex", alignItems: "center" }}
-                    align="center"
+        <Typography
+          variant="h4"
+          color="white"
+          component="div"
+          sx={{
+            fontSize: 64,
+          }}
+        >
+          {leagueName}
+        </Typography>
+        <Typography
+          color="white"
+          component="div"
+          sx={{
+            fontSize: 36,
+          }}
+        >
+          {"Week #" + currentWeekNum + ": Roster Locks in 2 Days"}
+        </Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ background: "#473D3D" }}>
+                <TableCell className={classes.cell} align="center">
+                  Position
+                </TableCell>
+                <TableCell align="center" className={classes.cell}>
+                  Player
+                </TableCell>
+                <TableCell align="center" className={classes.cell}>
+                  Previous Points
+                </TableCell>
+                <TableCell align="center" className={classes.cell}>
+                  Opponent
+                </TableCell>
+                <TableCell align="center" className={classes.cell}>
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Object.keys(atheleteData).map((key, index) => {
+                const athelete = atheleteData[key];
+                return (
+                  <TableRow
+                    key={index.toString()}
+                    sx={{ background: index % 2 ? "#473D3D" : "#8E8E8E" }}
                   >
-                    <Image src={logo} />
-                    <div>
-                      <Typography
-                        fontSize={30}
-                        onClick={() => handleStateModal(athelete)}
-                      >
-                        {athelete.name || ""}
-                      </Typography>
-                      <Typography component="div">{athelete.score}</Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell align="center">
-                    <div>
-                      <Typography fontSize={30}>
-                        {athelete.prevPoints}
-                      </Typography>
-                      <Typography>{athelete.vs}</Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell align="center">
-                    <div>
-                      <Typography fontSize={30} textTransform="uppercase">
-                        {athelete.opponent}
-                      </Typography>
-                      <Typography>{athelete.gameDate}</Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Button
-                      onClick={() => handleSubModal(athelete)}
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
-                        borderRadius: "50px",
-                        padding: "10px 40px",
-                        fontWeight: "600",
-                        fontSize: "20px",
-                      }}
+                    <TableCell align="center">
+                      <Typography fontSize={30}> {athelete.position}</Typography>
+                    </TableCell>
+                    <TableCell
+                      sx={{ display: "flex", alignItems: "center" }}
+                      align="center"
                     >
-                      SUB
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <PlayerStateModal
-        modalOpen={stateModalOpen}
-        stateData={Sample.statsData}
-        handleModalClose={handleStateModalClose}
-      />
-      <PlayerSelectModal
-        modalOpen={subModalOpen}
-        stateData={currentPlayer}
-        players={players}
-        handleModalClose={handleStateModalClose}
-      />
-    </Container>
+                      <Image src={logo} />
+                      <div>
+                        <Typography
+                          fontSize={30}
+                          onClick={() => handleStateModal(athelete)}
+                        >
+                          {athelete.name || ""}
+                        </Typography>
+                        <Typography component="div">{athelete.score}</Typography>
+                      </div>
+                    </TableCell>
+                    <TableCell align="center">
+                      <div>
+                        <Typography fontSize={30}>
+                          {athelete.prevPoints}
+                        </Typography>
+                        <Typography>{athelete.vs}</Typography>
+                      </div>
+                    </TableCell>
+                    <TableCell align="center">
+                      <div>
+                        <Typography fontSize={30} textTransform="uppercase">
+                          {athelete.opponent}
+                        </Typography>
+                        <Typography>{athelete.gameDate}</Typography>
+                      </div>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        onClick={() => handleSubModal(athelete)}
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
+                          borderRadius: "50px",
+                          padding: "10px 40px",
+                          fontWeight: "600",
+                          fontSize: "20px",
+                        }}
+                      >
+                        SUB
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <PlayerStateModal
+          modalOpen={stateModalOpen}
+          stateData={Sample.statsData}
+          handleModalClose={handleStateModalClose}
+        />
+        <PlayerSelectModal
+          modalOpen={subModalOpen}
+          stateData={currentPlayer}
+          players={players}
+          handleModalClose={handleStateModalClose}
+        />
+      </Container>
+    )}
+    </>
   );
 }
