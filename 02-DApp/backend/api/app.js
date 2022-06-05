@@ -1,3 +1,5 @@
+// TODO: Move all of this to main server file in DApp main
+
 require('dotenv').config();
 import bodyParser from 'body-parser';
 import cors from 'cors';
