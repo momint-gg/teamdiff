@@ -3,7 +3,7 @@
 // This script:
 // 1. Reads in from the athlete stats excel sheet
 // 2. Creates a final stats object with athlete ID, name, points, etc.
-// 3. Exports this weekly data to the athleteData folder in api for the frontend to retrieve
+// 3. Exports this data to database for the API to use
 // 4. Pushes the finalized athlete stats to the Athletes.sol contract
 
 require('dotenv').config({ path: '../.env' });
@@ -15,7 +15,6 @@ const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
 // Modules for parsing excel
 const fs = require('fs');
 const XLSX = require('xlsx');
-const path = require('path');
 
 // NOTE: In the functions folder (same directory as this file) you should put the excel file with two columns: name, points
 

@@ -22,14 +22,12 @@ app.get('/', (req, res) => {
 });
 
 // Getting all athletes for a certain week
-// Example query: GET apiURL/allAthletes/1 -- getting all for week 1
-app.get('/allAthletes/:week', (req, res) => {
-  const week = req.params['week'];
-  const json = eval(`week${week}JSON`); // Convert to var name
-  res.json(json);
-});
+// Example query: GET apiURL/allAthletes/1 (pass in just the number)
+app.get('/allAthletes/:week', (req, res) => {});
 
 // Getting an athlete's historical points and stats
+// Example query: GET /athlete/kumo (pass in all lowercase)
+app.get('/athlete/:name', (req, res) => {});
 
 // Isayah old stuff
 // app.get("/aggregated_stats", (req, res) => {
