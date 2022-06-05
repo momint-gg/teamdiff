@@ -7,6 +7,8 @@ import {
   useEnsLookup,
 } from "wagmi";
 import { useEffect, useState } from "react";
+import { useRouter } from 'next/router'
+
 import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -39,6 +41,8 @@ export default function BurnPack({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
+    //Router
+    const router = useRouter();
 
   //State Hooks
   const [mintedPackId, setMintedPackId] = useState(null);
@@ -468,7 +472,8 @@ export default function BurnPack({ setDisplay }) {
                  size="large"
                  color="white"
                  aria-label="add"
-                 // onClick={() => setDisplayCollection(true)}
+                //  target={"_blank"}
+                 onClick={() => router.push("./collection")}
                  sx={{ marginTop: 5, fontSize: 20 }}
                >
                  Go To My Collection

@@ -86,7 +86,6 @@ export default function Play() {
   }, [accountData?.address])
 
   return (
-
     <Box>
       {/* <SignMessage/> */}
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
@@ -112,7 +111,7 @@ export default function Play() {
                   )}
                   <EmojiEventsIcon fontSize={"large"} />
                 </CardContent>
-                </Fragment>
+              </Fragment>
             </Card>
             <br></br>
             <Typography
@@ -145,7 +144,7 @@ export default function Play() {
                   )}
                   <GroupAddIcon fontSize={"large"} />
                 </CardContent>
-                </Fragment>
+              </Fragment>
             </Card>
             <br></br>
             <Typography
@@ -203,7 +202,6 @@ export default function Play() {
           </Typography>
         </Box>
       )}
-
     </Box>
   );
 }
