@@ -1,5 +1,11 @@
 // Appending athletes stats to the contract
 
+// This script:
+// 1. Reads in from the athlete stats excel sheet
+// 2. Creates a final stats object with athlete ID, name, points, etc.
+// 3. Exports this weekly data to the athleteData folder in api for the frontend to retrieve
+// 4. Pushes the finalized athlete stats to the Athletes.sol contract
+
 require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/Athletes.json');
@@ -40,12 +46,12 @@ async function main() {
   for (let i = 0; i < 50; i++) {
     // Looping through all of our athletes
     const name = data[i]['Player'].toLowerCase(); // Gamer name columnn
-    const points = Math.round(data[i]['Points']); // Total points column
+    const points = Math.round(data[i]['Points']); // Total points column (rounded)
     const id = athleteToId[name];
     // console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
     if (id !== undefined) {
       // Only IDs in our league should be updated
-      finalStatsToPush.push({ id: id, points: points });
+      finalStatsToPush.push({ id: id, name: name, points: points });
     } else {
       console.log('Athlete named ', name, ' is not in TeamDiff');
     }
@@ -53,9 +59,10 @@ async function main() {
 
   // Looping through all of our athletes and if they aren't in our object, set points equal to 0
   for (let [key, value] of Object.entries(athleteToId)) {
-    if (!finalStatsToPush.hasOwnProperty(value)) {
+    if (!finalStatsToPush.hasOwnProperty(key)) {
+      // key = athlete name, value = athlete id
       // If our final stats array doesn't have this id, athlete has 0 points
-      finalStatsToPush.push({ id: value, points: 0 });
+      finalStatsToPush.push({ id: value, name: key, points: 0 });
     }
     // console.log(`${key}: ${value}`);
   }
@@ -63,30 +70,33 @@ async function main() {
   // Logging our output to see (yes I should write test cases but not enough time man)
   for (let i = 0; i < finalStatsToPush.length; i++) {
     console.log(
-      'Athlete ID: ',
+      ' Athlete ID: ',
       finalStatsToPush[i].id,
+      ' \n Athlete Name: ',
+      finalStatsToPush[i].name,
       '\n Athlete points: ',
-      finalStatsToPush[i].points
+      finalStatsToPush[i].points,
+      '\n'
     );
   }
 
   // Finally, pushing stats to the contract
-  for (let i = 0; i < 50; i++) {
-    console.log('Adding athletes stats for athlete index ', i);
+  // for (let i = 0; i < 50; i++) {
+  //   console.log('Adding athletes stats for athlete index ', i);
 
-    const addAthletesStatsTxn = await contract.appendStats(
-      finalStatsToPush[i].id, // index of athlete
-      finalStatsToPush[i].points // their points for the week
-    );
-    console.log(
-      'Adding points: ',
-      finalStatsToPush[i].points,
-      ' for athlete id ',
-      finalStatsToPush[i].id
-    );
-    // Waiting for txn to mine
-    await addAthletesStatsTxn.wait();
-  }
+  //   const addAthletesStatsTxn = await contract.appendStats(
+  //     finalStatsToPush[i].id, // index of athlete
+  //     finalStatsToPush[i].points // their points for the week
+  //   );
+  //   console.log(
+  //     'Adding points: ',
+  //     finalStatsToPush[i].points,
+  //     ' for athlete id ',
+  //     finalStatsToPush[i].id
+  //   );
+  //   // Waiting for txn to mine
+  //   await addAthletesStatsTxn.wait();
+  // }
 }
 
 const runMain = async () => {
