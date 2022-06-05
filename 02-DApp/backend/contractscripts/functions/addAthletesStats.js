@@ -120,11 +120,9 @@ async function main() {
   finalObj['athletes'] = finalStatsToPush;
   // console.log(JSON.stringify(finalObj));
 
-  // Writing this week's athlete data to API folder in JSON format for the API
-  fs.writeFileSync(
-    path.resolve(`../../api/athleteData/`, `week${week_num}.json`),
-    JSON.stringify(finalObj)
-  );
+  // TODO: Adding to database
+  // TODO 1: Adding weekly data for all athletes (/allAthletes/$week)
+  // TODO 2: Adding historical data for athletes (/athlete/$name)
 
   // Finally, pushing stats to the contract
   // for (let i = 0; i < 50; i++) {
