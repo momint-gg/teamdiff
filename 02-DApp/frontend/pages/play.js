@@ -117,6 +117,16 @@ export default function Play() {
                 </CardContent>
                 </Fragment>
             </Card>
+            <br></br>
+            <Typography
+              sx={{
+                textAlign: "center",
+                paddingLeft: 2,
+                paddingRight: 2,
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Typography>
           </Grid>
           <Grid item xs={4}>
             <Card 
@@ -140,6 +150,17 @@ export default function Play() {
                 </CardContent>
                 </Fragment>
             </Card>
+            <br></br>
+            <Typography
+              sx={{
+                textAlign: "center",
+                paddingLeft: 2,
+                paddingRight: 2
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Typography>
+
           </Grid>
           <Grid item xs={4}>
             <Card
@@ -166,6 +187,16 @@ export default function Play() {
                 <CardActions></CardActions>
               </Fragment>
             </Card>
+            <br></br>
+            <Typography
+              sx={{
+                textAlign: "center",
+                paddingLeft: 2,
+                paddingRightt: 2
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Typography>
           </Grid>
         </Grid>
       ) : (

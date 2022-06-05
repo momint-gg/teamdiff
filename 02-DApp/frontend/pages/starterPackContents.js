@@ -10,7 +10,7 @@ import {
   Button,
 } from "@mui/material";
 
-export default function StarterPackContents({ setDisplay, isMobile }) {
+export default function StarterPackContents() {
   // If we want to try to load from pinata
   // const requireContext = require.context('../../backend/pinata/final_metadata', false, /\.json$/);
   // const starterPackAthleteData = [];
@@ -19,7 +19,7 @@ export default function StarterPackContents({ setDisplay, isMobile }) {
   //   starterPackAthleteData.push(obj);
   // });
   // console.log(starterPackAthleteData)
-
+  const isMobile = false;
   // Loading from public folder
   const requireContext = require.context('../assets/cards/', false, /png$/);
   const reqArr = []
@@ -30,7 +30,7 @@ export default function StarterPackContents({ setDisplay, isMobile }) {
   if (reqArr.length >0) {
     return (
       <Box>
-        <Button
+        {/* <Button
           variant="text"
           sx={{
             backgroundColor:"transparent",
@@ -42,7 +42,7 @@ export default function StarterPackContents({ setDisplay, isMobile }) {
           onClick={() => setDisplay(false)}
         >
           ‹ GO BACK
-        </Button>
+        </Button> */}
         <Box>
         <Typography variant="h3" color="white" marginBottom={2} >
           Starter Pack Contents

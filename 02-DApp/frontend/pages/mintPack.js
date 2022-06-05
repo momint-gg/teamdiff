@@ -32,7 +32,7 @@ import profilePic from "../assets/images/starter-pack.png";
 //Router
 import { useRouter } from 'next/router';
 
-export default function MintPack({ setDisplay }) {
+export default function MintPack() {
   // Router
   const router = useRouter();
 
@@ -195,7 +195,7 @@ export default function MintPack({ setDisplay }) {
 
   return (
     <Box>
-      <Button
+      {/* <Button
           variant="text"
           sx={{
             backgroundColor:"transparent",
@@ -207,7 +207,7 @@ export default function MintPack({ setDisplay }) {
           onClick={() => setDisplay(false)}
         >
           ‹ GO BACK
-      </Button>
+      </Button> */}
       {isConnected && !hasMinted &&
       <Box
             justifyContent="center"
