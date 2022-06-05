@@ -47,6 +47,8 @@ export default function BurnPack({ setDisplay }) {
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
   const [canMint, setCanMint] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState();
@@ -74,6 +76,7 @@ export default function BurnPack({ setDisplay }) {
         else {
           setIsConnected(false);
         }
+        setIsLoading(false)
       }
       setAccountData()
       provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
@@ -132,6 +135,7 @@ export default function BurnPack({ setDisplay }) {
       const packBurnedCallback = async (athleteIndices, signer) => {
         if (signer == connectedAccount) {
           setIsMinting(false);
+          setIsTransactionDelayed(false);
           const test = [6, 33, 12, 26, 45];
           console.log("athleteIndices: " + test)
           
@@ -174,6 +178,9 @@ export default function BurnPack({ setDisplay }) {
         GameItemsJSON.abi,
         signer
       );
+      // setIsMinting(true);
+
+      // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
       //Calling burn on game items contract
       const burnTxn = await gameItemsContractWithSigner
@@ -183,17 +190,37 @@ export default function BurnPack({ setDisplay }) {
         .then((res) => {
           console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsMinting(true);
+          window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
           console.log("Minting pack in progress...");
         })
         .catch((error) => {
-          alert("error: " + error.error.message);
+          alert("error: " + error.message);
         });
     
   };
 
   return (
     <Box>
-      {isConnected && !(hasMinted) &&
+        {isLoading ? (
+        <Container maxWidth="lg" justifyContent="center" alignItems="center">
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+          sx={{
+            display: "flex",
+          }}
+        >
+          <Typography variant="h5" color="white" component="div">
+            Loading
+          </Typography>
+          <br></br>
+          <CircularProgress />
+        </Box>
+      </Container>
+      ) : (
+        <>
+      {isConnected && !(hasMinted) && 
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
@@ -279,10 +306,17 @@ export default function BurnPack({ setDisplay }) {
             >
               <Typography>
                 {"\nLooks like you don't have a starter pack yet. Head "}
+                <Link>
                 <a
+                // style={{
+                //   textDecoration: "none",
+                //   textDecorationColor: "transparent"
+                // }}
+                class="primary-link"
                 href="/mintPack"> 
                   here
-                </a>                
+                </a>      
+                </Link>          
                 { " to mint one now!"}
               </Typography>
             </Box>
@@ -290,6 +324,7 @@ export default function BurnPack({ setDisplay }) {
         </Container>
       }
       {isMinting && (
+        <>
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
@@ -304,8 +339,17 @@ export default function BurnPack({ setDisplay }) {
             </Typography>
             <br></br>
             <CircularProgress />
+            <br></br>
+            {isMinting && isTransactionDelayed && (
+              
+              <Typography variant="p" textAlign={"center"}>
+                This is taking longer than normal. Please check your wallet to check the status of this transaction.
+              </Typography>
+            )}
           </Box>
         </Container>
+       
+        </>
       )}
       {hasMinted && (
         <>
@@ -464,6 +508,8 @@ export default function BurnPack({ setDisplay }) {
             Please connect your wallet to get started.
           </Typography>
         </Box>      
+      )}
+      </>
       )}
     </Box>
   );

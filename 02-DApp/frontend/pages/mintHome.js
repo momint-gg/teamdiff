@@ -2,8 +2,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
-import profilePic from "../assets/images/starter-pack.png";
-import StarterPackContents from "./starterPackContents";
+import card_and_pack from "../assets/images/card_and_pack.png";
+// import StarterPackContents from "../components/StarterPackContents";
 import MintPack from "./mintPack.js";
 import { useMediaQuery } from "react-responsive";
 //Router
@@ -12,13 +12,13 @@ import { useRouter } from 'next/router'
 export default function MintHome() {
   //Router
   const router = useRouter();
-  // const [displayMint, setDisplayMint] = useState(false);
-  // const [displayCollection, setDisplayCollection] = useState(false);
+  const [displayMint, setDisplayMint] = useState(false);
+  const [displayCollection, setDisplayCollection] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   return (
     <Box>
-      {/* {!(displayMint || displayCollection) && ( */}
+      {!(displayMint || displayCollection) && (
         <Box>
           {isMobile ? (
             <Box
@@ -80,8 +80,6 @@ export default function MintHome() {
                         color="white"
                         aria-label="add"
                         onClick={() => router.push("./starterPackContents")}
-
-                        // onClick={() => setDisplayCollection(true)}
                         sx={{ marginTop: 5, fontSize: 20 }}
                       >
                         CONTENTS
@@ -95,10 +93,10 @@ export default function MintHome() {
                     justifyContent: "center"
                   }}>
                     <Image
-                      src={profilePic}
+                      src={card_and_pack}
                       alt="Picture of the author"
-                      width="155px"
-                      height="225px"
+                      width="550px"
+                      height="550px"
                     />
                   </Box>
                 </Box>
@@ -134,8 +132,6 @@ export default function MintHome() {
                     size="large"
                     aria-label="add"
                     onClick={() => router.push("./mintPack")}
-
-                    // onClick={() => setDisplayMint(true)}
                     sx={{
                       marginTop: 5,
                       marginRight: 1,
@@ -153,8 +149,6 @@ export default function MintHome() {
                     color="white"
                     aria-label="add"
                     onClick={() => router.push("./starterPackContents")}
-
-                    // onClick={() => setDisplayCollection(true)}
                     sx={{ marginTop: 5, fontSize: 20 }}
                   >
                     CONTENTS
@@ -164,26 +158,36 @@ export default function MintHome() {
               {isMobile ? (
                 <Box>
                   <Image
-                    src={profilePic}
+                    src={card_and_pack}
                     alt="Picture of the author"
-                    width="310px"
-                    height="450px"
+                    width="550px"
+                    height="550px"
                   />
                 </Box>
               ) : (
-                <Container sx={{ marginLeft: "4rem" }}>
+                <Container
+                  sx={{ 
+                    // marginLeft: "4rem",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  <Box>
                   <Image
-                    src={profilePic}
+                    src={card_and_pack}
+                    // layout="responsive"
                     alt="Picture of the author"
-                    width="310px"
-                    height="450px"
+                    width="550px"
+                    height="550px"
                   />
+                  </Box>
                 </Container>
               )}
             </Box>
           )}{" "}
         </Box>
-      {/* )} */}
+      )}
       {/* {displayCollection && (
         <Box>
           <StarterPackContents setDisplay={setDisplayCollection} isMobile={isMobile}/>

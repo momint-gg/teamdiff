@@ -69,6 +69,8 @@ export default function LeagueDetails() {
   const [isLeagueAdmin, setIsLeagueAdmin] = useState(false);
   const [isOnWhitelist, setIsOnWhitelist] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
+
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
   const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
@@ -156,6 +158,7 @@ export default function LeagueDetails() {
     const currentAddress = await signer.getAddress();
     if(stakerAddress === currentAddress) {
       setIsJoiningLeague(false);
+      setIsTransactionDelayed(false);
       setHasJoinedLeague(true);
       console.log("pushing router");
       //TODO this is buggy, causes the window to reload like 6 times
@@ -300,7 +303,6 @@ export default function LeagueDetails() {
 
 
   const joinLeagueHandler = async () => {
-    setIsJoiningLeague(true);
     var hasCancelledTransaction = false;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
@@ -312,7 +314,7 @@ export default function LeagueDetails() {
       signer
     );
     const stakeAmount = await leagueProxyContract.stakeAmount();
-    const approvalTxn = await RinkebyUSDCContract.approve(router.query.leagueAddress, stakeAmount * 10000000)
+    const approvalTxn = await RinkebyUSDCContract.approve(router.query.leagueAddress, (stakeAmount) * 1000000 )
     .catch((error) => {
       setIsJoiningLeague(false);
       hasCancelledTransaction = true;
@@ -330,11 +332,15 @@ export default function LeagueDetails() {
       .joinLeague({
           gasLimit: 20000000
       })
-      // .then((res) => {
-      //     // console.log("txn result: " + JSON.stringify(res, null, 2));
-      //     // console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
-      //     // console.log("joined league")
-      // })
+      .then((res) => {
+          setIsJoiningLeague(true);
+
+          // console.log("txn result: " + JSON.stringify(res, null, 2));
+          // console.log("Txn: " + JSON.stringify(joinLeagueTxn, null, 2))
+          // console.log("joined league")
+          window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
+
+      })
       .catch((error) => {
         setIsJoiningLeague(false);
         console.log("Join League error: " + error.message);
@@ -383,6 +389,8 @@ export default function LeagueDetails() {
         console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsSettingLineup(true);
         console.log("Setting lineup in progress...");
+        window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
+
         //console.log("With invite values: " + inviteListValues);
       })
       .catch((error) => {
@@ -754,12 +762,21 @@ export default function LeagueDetails() {
                 </Typography>
                 <br></br>
                 <CircularProgress />
+                <br></br>
+                {isJoiningLeague && isTransactionDelayed && (
+                  
+                  <Typography variant="p" textAlign={"center"}>
+                    This is taking longer than normal. Please check your wallet to check the status of this transaction.
+                  </Typography>
+                )}
               </Box>
             </Container>
             }
             {hasJoinedLeague && 
                 <>
-              <Link
+                <Link>
+              <a
+                class="primary-link"
                 href={
                   "http://localhost:3000/leagues/"
                   + router.query.leagueAddress
@@ -767,6 +784,7 @@ export default function LeagueDetails() {
                 target={"_blank"}
                 rel="noreferrer"
               >
+                
                 <Paper
                     elevation={5}
                     sx={{
@@ -774,10 +792,11 @@ export default function LeagueDetails() {
                       flex: 1,
                       marginRight: 3,
                       padding: 2,
-                      // width: "50vw"
+                      width: "50vw",
+                      margin: "auto"
                     }}
                   >
-                    <Typography variant="h6">
+                    <Typography textAlign="center" variant="h6">
                       {"Succesfully joined league \"" + leagueName + "\""}
                       <CheckCircleIcon fontSize={"large"} sx={{marginLeft:1}} color="secondary"></CheckCircleIcon>
 
@@ -787,6 +806,7 @@ export default function LeagueDetails() {
                 <Typography align="center" variant="subtitle1">
                     Click to view league on TeamDiff
                 </Typography>        
+              </a>
               </Link>
                 <br></br>
               </>

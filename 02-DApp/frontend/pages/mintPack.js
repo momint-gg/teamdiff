@@ -45,6 +45,8 @@ export default function MintPack() {
   // State Variables
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
+  const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
+
   const [hasMinted, setHasMinted] = useState(false);
   const [packsAvailable, setPacksAvailable] = useState(null);
   const [signer, setSigner] = useState(null);
@@ -136,6 +138,7 @@ export default function MintPack() {
         console.log("signer in callback : " + signerAddress)
         if (signerAddress == connectedAccount) {
           setIsMinting(false);
+          setIsTransactionDelayed(false);
           setHasMinted(true);
         }
       };
@@ -189,6 +192,8 @@ export default function MintPack() {
         .then((res) => {
           // console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsMinting(true);
+          window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
+
           // console.log("Minting pack in progress...");
         })
         .catch((error) => {
@@ -330,7 +335,15 @@ export default function MintPack() {
             </Typography>
             <br></br>
             <CircularProgress />
+            <br></br>
+            {isMinting && isTransactionDelayed && (
+              
+              <Typography variant="p" textAlign={"center"}>
+                This is taking longer than normal. Please check your wallet to check the status of this transaction.
+              </Typography>
+            )}
           </Box>
+
         </Container>
       )}
       {hasMinted && (
@@ -382,7 +395,9 @@ export default function MintPack() {
                   }}
                 >
                   <Typography variant="h5"> Contents </Typography>
+                  <Link>
                   <a
+                    className="primary-link"
                     href={
                       "https://testnets.opensea.io/assets/" +
                       gameItemsContract.address +
@@ -394,6 +409,7 @@ export default function MintPack() {
                   >
                     View on OpenSea.
                   </a> 
+                  </Link>
                   {/* <Typography variant="subtitle2"> 
                     Note that it may take a few minutes for images and metadata to
                     properly load on OpenSea.

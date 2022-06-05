@@ -103,6 +103,8 @@ export default function CreateLeague({ setDisplay }) {
   //Contract State Hooks
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
   const [isCreatingLeague, setIsCreatingLeague] = useState(false);
+  const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
+
   const [hasCreatedLeague, setHasCreatedLeague] = useState(false);
   const [newLeagueName, setNewLeagueName] = useState(null);
   const [newLeagueAddress, setNewLeagueAddress] = useState(null);
@@ -201,6 +203,7 @@ export default function CreateLeague({ setDisplay }) {
     const currentAddress = await signer.getAddress();
     if(stakerAddress === currentAddress) {
       setIsJoiningLeague(false);
+      setIsTransactionDelayed(false);
       setHasJoinedLeague(true);
       // router.reload(window.location.pathname);
 
@@ -223,6 +226,7 @@ export default function CreateLeague({ setDisplay }) {
     if (currentAddress == newLeagueAdminAddress) {
       //Update state hooks
       setIsCreatingLeague(false);
+      setIsTransactionDelayed(false);
       setHasCreatedLeague(true);
       setNewLeagueName(newLeagueName);
       setNewLeagueAddress(newLeagueProxyAddress);
@@ -248,7 +252,7 @@ export default function CreateLeague({ setDisplay }) {
       const stakeAmount = await LeagueProxyContractWithSigner.stakeAmount();
       //TODO: set correct stakeamount
       const approvalTxn = await RinkebyUSDCContract
-      .approve(newLeagueProxyAddress, stakeAmount * 10000000)
+      .approve(newLeagueProxyAddress, stakeAmount * 1000000)
       .catch((error) => {
         //  console.log("Join League error: " + error.error.message);
          alert("Approve USDC error: " + error.message);
@@ -262,9 +266,11 @@ export default function CreateLeague({ setDisplay }) {
        .joinLeague({
          gasLimit: 1000000
        })
-       .then(
+       .then((res) => {
          console.log("joining newly created league...")
-       )
+         window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
+
+       })
        .catch((error) => {
         //  console.log("Join League error: " + error.error.message);
          alert("Join League error: " + error.message);
@@ -341,6 +347,8 @@ export default function CreateLeague({ setDisplay }) {
         .then((res) => {
           //console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
+          window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
+
           console.log("League Creation in progress...");
           //console.log("With invite values: " + inviteListValues);
           //how to tell if transaction failed?
@@ -689,6 +697,13 @@ export default function CreateLeague({ setDisplay }) {
           </Typography>
           <br></br>
           <CircularProgress />
+          <br></br>
+            {isCreatingLeague && isTransactionDelayed && (
+              
+              <Typography variant="p" textAlign={"center"}>
+                This is taking longer than normal. Please check your wallet to check the status of this transaction.
+              </Typography>
+            )}
         </Box>
       </Container>
       )}
@@ -703,7 +718,9 @@ export default function CreateLeague({ setDisplay }) {
         >
 
           <br></br>
-          <Link
+          <Link>
+          <a
+            className='primary-link'
             href={
               "https://rinkeby.etherscan.io/address/"
               + newLeagueAddress
@@ -730,6 +747,7 @@ export default function CreateLeague({ setDisplay }) {
 
                     </Typography>
               </Paper>
+            </a>
           </Link>
           <br></br> 
           {isJoiningLeague && (
@@ -747,6 +765,13 @@ export default function CreateLeague({ setDisplay }) {
                 </Typography>
                 <br></br>
                 <CircularProgress />
+                <br></br>
+                {isJoiningLeague && isTransactionDelayed && (
+                  
+                  <Typography variant="p" textAlign={"center"}>
+                    This is taking longer than normal. Please check your wallet to check the status of this transaction.
+                  </Typography>
+                )}
               </Box>
             </Container>
           )}

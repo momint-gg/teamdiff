@@ -101,7 +101,7 @@ export default function Collection() {
         console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
       });
     }
-  }, [isConnected]);
+  }, [isConnected, connectedAccount]);
 
   if (isConnected && nftResp) {
     return (
