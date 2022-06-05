@@ -1,4 +1,3 @@
-import { useAccount, useConnect } from "wagmi";
 import {
   Box,
   Button,

@@ -12,11 +12,22 @@ h7 {
   weight: 400;
 }
 
-/*class styles*/
-/* .MuiOutlinedInput-root.Mui-focused {
-    color: black;
-} */
+.primary-link {
+  color: aqua;
+  text-decoration: none!important;
+}
 
-/* .MuiInputLabel-root.Mui-focused {
-    color: white;
-  } */
+main {
+  height: "100%";
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-image: "url(/dots.png)";
+  background-color: #330D36;
+}

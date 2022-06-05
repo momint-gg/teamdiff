@@ -19,9 +19,9 @@ contract Whitelist is Ownable {
     event WhitelistedAddressAdded(address addr);
     event WhitelistedAddressRemoved(address addr);
 
-    // constructor(bool _isPublic) {
-    //     isPublic = _isPublic;
-    // }
+    constructor(bool _isPublic) {
+        isPublic = _isPublic;
+    }
 
     /**
      * @dev Throws if called by any account that's not whitelisted.

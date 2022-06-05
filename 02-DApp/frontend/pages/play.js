@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useDisconnect
+} from "wagmi";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
@@ -12,6 +13,9 @@ import {
   CardActions,
   Button,
 } from "@mui/material";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+
 import constants from "../Constants";
 import MyLeagues from "./myLeagues";
 import JoinLeague from "./joinLeague";
@@ -22,16 +26,18 @@ import { MdGroupAdd } from "react-icons/md";
 import { FaCrown } from "react-icons/fa";
 //Router
 import { useRouter } from 'next/router'
-
 import { useMediaQuery } from "react-responsive";
 
 export default function Play() {
   //Router
   const router = useRouter();
+  //WAGMI Hooks
+  const { data: accountData, isLoading, error } = useAccount({ ens: true });
+  // const { data: ensName } = useEnsName()
+  // const { data: ensAvatar } = useEnsAvatar()
+  const { disconnect } = useDisconnect()
 
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
@@ -74,14 +80,25 @@ export default function Play() {
   //   router.push(href)
   // }
 
+  useEffect(() => {
+    if(accountData)
+     console.log("account data in use: " + accountData.address);
+  }, [accountData?.address])
+
   return (
 
     <Box>
+      {/* <SignMessage/> */}
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
       {accountData ? (
-        <Grid container spacing={isMobile? 1 : 3}>
-          <Grid item xs={isMobile? 12 : 4}>
-            <Card variant="outlined" onClick={() => router.push("/myLeagues")}>
+        <Grid container spacing={3}>
+          <Grid item xs={4}>
+            <Card 
+              sx={{
+                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 20
+              }}
+              variant="outlined" onClick={() => router.push("/myLeagues")}>
             <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
@@ -89,17 +106,32 @@ export default function Play() {
                       My Leagues
                     </Typography>
                   ) : (
-                    <Typography variant="h5" color="secondary" component="div">
+                    <Typography variant="h4" color="secondary" component="div">
                       My Leagues
                     </Typography>
                   )}
-                  <FaCrown size={"3rem"} />
+                  <EmojiEventsIcon fontSize={"large"} />
                 </CardContent>
                 </Fragment>
             </Card>
+            <br></br>
+            <Typography
+              sx={{
+                textAlign: "center",
+                paddingLeft: 2,
+                paddingRight: 2,
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Typography>
           </Grid>
-          <Grid item xs={isMobile? 12 : 4}>
-            <Card variant="outlined" onClick={() =>  router.push("/joinLeague")}>
+          <Grid item xs={4}>
+            <Card 
+              sx={{
+                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 20
+              }}
+              variant="outlined" onClick={() =>  router.push("/joinLeague")}>
             <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
@@ -107,19 +139,34 @@ export default function Play() {
                       Join League
                     </Typography>
                   ) : (
-                    <Typography variant="h5" color="secondary" component="div">
+                    <Typography variant="h4" color="secondary" component="div">
                       Join League
                     </Typography>
                   )}
-                  <FaCrown size={"3rem"} />
+                  <GroupAddIcon fontSize={"large"} />
                 </CardContent>
                 </Fragment>
             </Card>
+            <br></br>
+            <Typography
+              sx={{
+                textAlign: "center",
+                paddingLeft: 2,
+                paddingRight: 2
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Typography>
+
           </Grid>
-          <Grid item xs={isMobile ? 12 : 4}>
+          <Grid item xs={4}>
             <Card
               variant="outlined"
-              onClick={() =>  router.push("/createLeague")}
+              sx={{
+                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 20
+              }}
+              onClick={() =>  router.push("/createLeagueLanding")}
             >
               <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
@@ -128,21 +175,33 @@ export default function Play() {
                       Create League
                     </Typography>
                   ) : (
-                    <Typography variant="h5" color="secondary" component="div">
+                    <Typography variant="h4" color="secondary" component="div">
                       Create League
                     </Typography>
                   )}
-                  <FaCrown size={"3rem"} />
+                  <FaCrown size={"2rem"} />
                 </CardContent>
                 <CardActions></CardActions>
               </Fragment>
             </Card>
+            <br></br>
+            <Typography
+              sx={{
+                textAlign: "center",
+                paddingLeft: 2,
+                paddingRightt: 2
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Typography>
           </Grid>
         </Grid>
       ) : (
-        <Typography>
-          Please connect wallet
-        </Typography>
+        <Box>
+          <Typography variant="h6" component="div">
+            Please connect your wallet to get started.
+          </Typography>
+        </Box>
       )}
 
     </Box>

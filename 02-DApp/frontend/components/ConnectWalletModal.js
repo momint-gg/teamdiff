@@ -1,10 +1,16 @@
-import { useAccount, useConnect } from "wagmi";
+import { useAccount, 
+        useConnect,
+        useEnsName,
+        useEnsAvatar } from "wagmi";
+import { useEffect, useState } from 'react';
+
 import { Box, Button, Modal, Typography } from "@mui/material";
 import Image from "next/image";
 import MetaMask from "../assets/images/metamask.png";
 import WalletConnect from "../assets/images/wallet-connect.png";
 import CoinbaseWallet from "../assets/images/coinbase.png";
 import { IoCloseOutline } from "react-icons/io5";
+import { ethers } from "ethers";
 
 export default function ConnectWalletModal({
   modalOpen,
@@ -12,10 +18,55 @@ export default function ConnectWalletModal({
   setModalOpen,
   isMobile,
 }) {
-  const [{ data: connectData, error: connectError }, connect] = useConnect();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
+
+  const {
+    activeConnector,
+    connect,
+    connectors,
+    error : connectError,
+    isConnecting,
+    pendingConnector,
+  } = useConnect()
+
+
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    // setIsCreatingLeague(false);
+    // setHasCreatedLeague(true);
+    // setHasJoinedLeague(true)
+    // setIsConnected(false)
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner()
+
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, []);
 
   function getConnectorImage(connector) {
     if (connector.name === "MetaMask") {
@@ -33,16 +84,16 @@ export default function ConnectWalletModal({
     setModalOpen(false);
   };
 
-  var shortenedAddress = "";
-  if (accountData?.address) {
-    shortenedAddress = `${accountData.address.slice(
-      0,
-      6
-    )}...${accountData.address.slice(
-      accountData.address.length - 4,
-      accountData.address.length
-    )}`;
-  }
+  // var shortenedAddress = "";
+  // if (accountData?.address) {
+  //   shortenedAddress = `${accountData.address.slice(
+  //     0,
+  //     6
+  //   )}...${accountData.address.slice(
+  //     accountData.address.length - 4,
+  //     accountData.address.length
+  //   )}`;
+  // }
 
   return (
     <Modal
@@ -89,7 +140,7 @@ export default function ConnectWalletModal({
                    top: "5px"
                 }}
           />
-          {connectData.connectors.map((x) => (
+          {connectors.map((x) => (
             <Button
               variant="outlined"
               color="secondary"
@@ -167,7 +218,7 @@ export default function ConnectWalletModal({
                    top: "10px"
                 }}
           />
-          {connectData.connectors.map((x) => (
+          {connectors.map((x) => (
             <Button
               variant="contained"
               disabled={!x.ready}

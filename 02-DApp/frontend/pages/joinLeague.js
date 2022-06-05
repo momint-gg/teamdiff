@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 //Component Imports
 import LeagueCard from "../components/LeagueCard";
-import LeagueDetails from "./leagueDetails";
+// import LeagueDetails from "./leagueDetails";
 //Web3 Imports
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -25,27 +25,51 @@ import {
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import WhitelistJSON from "../../backend/contractscripts/contract_info/abis/Whitelist.json";
 
 export default function JoinLeague({ setDisplay }) {
   const [publicLeagueList, setPublicLeagueList] = useState([]);
   const [pendingLeagueList, setPendingLeagueList] = useState([]);
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-  const [{ data: accountData, loading: accountDataLoading } , disconnect] = useAccount({
-    fetchEns: true,
-  });
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  const [{ data: signerData, error, loading }, getSigner] = useSigner();
   
+  useEffect(() => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          console.log("updating accounts")
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+      
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+    }, [connectedAccount]);
+
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {
     // setActiveLeagueList([]);
     setPendingLeagueList([]);
-    if (accountData) {
+    if (isConnected) {
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -61,7 +85,7 @@ export default function JoinLeague({ setDisplay }) {
         //Continue to add leagues to activeLEagueList and pendingLeagueList
           //until we hit an error (because i is out of range presumably)
         do {
-          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(accountData.address, i)
+          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(connectedAccount, i)
                                                         .catch((_error) => {
                                                           error = _error;
                                                           //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
@@ -80,7 +104,7 @@ export default function JoinLeague({ setDisplay }) {
             );
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
-            const isInLeague = await LeagueProxyContract.inLeague(accountData.address);
+            const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
             //Add League address  to appropriate state list
             if(!isInLeague) 
               setPendingLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
@@ -95,13 +119,15 @@ export default function JoinLeague({ setDisplay }) {
     else {
       console.log("no account data");
     }
-  }, [accountData?.address]);
+  }, [isConnected, connectedAccount]);
+
+
 
 
   useEffect(() => {
     // setActiveLeagueList([]);
     setPublicLeagueList([]);
-    if (accountData) {
+    if (isConnected) {
       // Initialize connections to GameItems contract
       const LeagueMakerContract = new ethers.Contract(
         CONTRACT_ADDRESSES.LeagueMaker,
@@ -126,7 +152,7 @@ export default function JoinLeague({ setDisplay }) {
 
           if(error == "none") {  
             i++;  
-            console.log("league #" + i + ": " + leagueAddress)
+            // console.log("league #" + i + ": " + leagueAddress)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
             const LeagueProxyContract = new ethers.Contract(
@@ -134,14 +160,27 @@ export default function JoinLeague({ setDisplay }) {
               LeagueOfLegendsLogicJSON.abi,
               provider
             );
+
+            const whitelistContractAddress = await LeagueProxyContract.whitelistContract();
+            // console.log("white: " + whitelistContract);
+            const WhitelistContract = new ethers.Contract(
+              whitelistContractAddress,
+              WhitelistJSON.abi,
+              provider
+            );
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
             //TODO create an instance of whitelist contract and read isPublic from that;
-            const isPublic = await LeagueProxyContract.isPublic();
-            console.log("\tIs public: " + isPublic);
-            //Add League address  to appropriate state list
+            const isPublic = await WhitelistContract.isPublic();
+            // const isPublic = await LeagueProxyContract.isPublic();
+            // console.log("\tIs public: " + isPublic);
+            const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
+
+            //Add League address  to appropriate state list if the league is public
+              //and the user is not already in the league
+            // if(isPublic && !isInLeague) 
             if(isPublic) 
-              setPublicLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
+              setPublicLeagueList(publicLeagueList => [...publicLeagueList, leagueAddress])
           }
           //console.log("error value at end:" + error);
 
@@ -153,14 +192,7 @@ export default function JoinLeague({ setDisplay }) {
     else {
       console.log("no account data");
     }
-  }, []);
-  //useEffect to update leagues on accountData change
-  // var activeListItems;
-  // var pendingListItems;
-  useEffect(() => {
-       //Create list of league cards for all active leagues
-    console.log("accountDataLoading in useEffect: " + accountDataLoading);
-  }, [accountDataLoading])
+  }, [isConnected, connectedAccount]);
 
 
   var publicListItems = publicLeagueList.map((leagueAddress, index) =>
@@ -193,8 +225,8 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         &#60; BACK
       </Fab> */}
 
-      <Typography variant="h3" color="secondary" component="div" marginTop={2}>
-        YOUR WHITELISTED LEAGUES
+      <Typography variant="h4" color="secondary" component="div" marginTop={2}>
+        Your Whitelisted Leagues
       </Typography>
       <hr
         style={{
@@ -210,8 +242,8 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
           (No Pending Leagues)
         </Typography>   
       )}
-      <Typography variant="h3" color="secondary" component="div">
-        PUBLIC LEAGUES
+      <Typography variant="h4" color="secondary" component="div">
+        Public Leagues
       </Typography>
       <hr
         style={{
@@ -221,7 +253,7 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         }}
       />
       {publicLeagueList.length > 0 ? (
-          <ul>{activeListItems}</ul>
+          <ul>{publicListItems}</ul>
       ) : (
         <Typography variant="h6" color="primary" component="div">
           (No Active Leagues)

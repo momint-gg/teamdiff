@@ -5,7 +5,7 @@ import { Box, Typography, Link } from "@mui/material";
 export default function Footer() {
   return (
     <Box
-      backgroundColor="primary.dark"
+      backgroundColor="transparent"
       sx={{
         paddingTop: "1rem",
         paddingBottom: "1rem",

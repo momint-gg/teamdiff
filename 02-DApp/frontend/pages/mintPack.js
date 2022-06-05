@@ -239,14 +239,14 @@ export default function MintPack({ setDisplay }) {
       )}
       {isMinting && (
         <Container>
-          <Typography variant="h4" color="white" component="div">Minting...</Typography>
+          <Typography variant="h5" color="white" component="div">Minting...</Typography>
           <CircularProgress />
         </Container>
       )}
       {hasMinted && (
         <Box>
           <Typography>
-            Your TeamDiff Starter Pack is all done minting!
+            Your Team Diff Starter Pack is all done minting!
           </Typography>
           <a
             href={

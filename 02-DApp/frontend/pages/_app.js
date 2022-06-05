@@ -1,17 +1,20 @@
 import React from "react";
 import Head from "next/head";
 import theme from "../styles/theme";
+import { ethers } from "ethers";
+
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import "@fontsource/exo";
 import "../styles/globalStyles.css";
-import { Provider, chain, defaultChains } from "wagmi";
+import { Provider, chain, defaultChains, createClient, WagmiConfig  } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { WalletLinkConnector } from "wagmi/connectors/walletLink";
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { Box } from "@mui/material";
 import Layout from "../components/Layout";
 import { useMediaQuery } from 'react-responsive';
+import { Html } from "next/document";
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -35,7 +38,7 @@ const connectors = ({ chainId }) => {
         qrcode: true,
       },
     }),
-    new WalletLinkConnector({
+    new CoinbaseWalletConnector({
       options: {
         appName: "Momint",
         jsonRpcUrl: `${rpcUrl}/${infuraId}`,
@@ -44,17 +47,30 @@ const connectors = ({ chainId }) => {
   ];
 };
 
+
+
 function MyApp({ Component, pageProps }) {
   const isWeb = useMediaQuery({
     query: '(min-device-width: 1224px)'
   })
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
+  const provider = new ethers.providers.AlchemyProvider(
+    "rinkeby",
+    process.env.ALCHEMY_KEY
+  );
 
+  const client = createClient({
+    autoConnect: true,
+    connectors,
+    provider,
+  })
   return (
-    <Box sx={{ backgroundColor: "#2E0744", height: "100%" }}>
-      <Provider autoConnect connectors={connectors}>
+    <Box sx={{ backgroundImage:"linear-gradient(135deg, #330D36 0%, #110412 100%)", height: "100%" }}>
+      <Provider client={client}>
         <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <main>
           <Layout isWeb={isWeb} isMobile={isMobile}>
             <link
               rel="stylesheet"
@@ -92,12 +108,14 @@ function MyApp({ Component, pageProps }) {
               <meta name="msapplication-TileColor" content="#2b5797" />
               <meta name="theme-color" content="#4b4b4b" />
             </Head>
-            <CssBaseline />
             <Component {...pageProps} />
           </Layout>
+          </main>
         </ThemeProvider>
       </Provider>
+      
     </Box>
+    // </WagmiConfig>
   );
 }
 
