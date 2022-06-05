@@ -36,9 +36,8 @@ export default function MintHome() {
                     Starter Pack
                   </Typography>
                   <Typography color="white" component="div">
-                    The starter pack is the perfect pack for a beginner. Minting
-                    this pack will provide 6 unique NFT cards, which will allow
-                    you to get right into the action.
+                    Mint a starter pack and get 5 unique athlete NFTs, which allow
+                    you to build a roster and get right into the action.
                   </Typography>
                   <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
                     <Image
@@ -98,9 +97,8 @@ export default function MintHome() {
                     Starter Pack
                   </Typography>
                   <Typography variant="h6" color="white" component="div">
-                    The starter pack is the perfect pack for a beginner. Minting
-                    this pack will provide 6 unique NFT cards, which will allow
-                    you to get right into the action.
+                  Mint a starter pack and get 5 unique athlete NFTs, which allow
+                    you to build a roster and get right into the action.
                   </Typography>
                   {/*TODO: Only show this mint button if user is logged in*/}
                   <Fab

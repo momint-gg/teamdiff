@@ -118,11 +118,11 @@ export default function JoinLeague({ setDisplay }) {
           //until we hit an error (because i is out of range presumably)
         do {
           const leagueAddress = await LeagueMakerContract.leagueAddresses(i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
-                                                        });
+          .catch((_error) => {
+            error = _error;
+            //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+            console.log("User To League Map Error: " + _error.message);
+          });
 
           if(error == "none") {  
             i++;  

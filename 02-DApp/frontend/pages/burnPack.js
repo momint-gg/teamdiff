@@ -170,7 +170,7 @@ export default function BurnPack({ setDisplay }) {
       )}
       {isMinting && (
         <Container>
-          <Typography>Your stuff is minting...</Typography>
+          <Typography variant="h4" color="white" component="div">Burning Pack...</Typography>
           <CircularProgress />
         </Container>
       )}
