@@ -19,9 +19,10 @@ const path = require('path');
 
 // NOTE: In the functions folder (same directory as this file) you should put the excel file with two columns: name, points
 
-// How to run: node addAthletesStats week_num (e.g. node addAthletesSats 1)
-async function main(week_num) {
-  args = process.argv;
+// How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
+// We should start at week 0
+async function main() {
+  const week_num = process.argv[2];
 
   // Constructing our contract
   const provider = new ethers.providers.AlchemyProvider(
@@ -120,13 +121,9 @@ async function main(week_num) {
   // console.log(JSON.stringify(finalObj));
 
   // Writing this week's athlete data to API folder in JSON format for the API
-  fs.writeFile(
-    `../athleteData/week${0}.json`,
-    JSON.stringify(finalObj),
-    'utf-8',
-    (err) => {
-      if (err) console.log(err);
-    }
+  fs.writeFileSync(
+    path.resolve(`../../api/athleteData/`, `week${week_num}.json`),
+    JSON.stringify(finalObj)
   );
 
   // Finally, pushing stats to the contract
