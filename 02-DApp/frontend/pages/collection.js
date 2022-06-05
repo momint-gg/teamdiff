@@ -85,7 +85,7 @@ export default function Collection() {
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
           const response = await web3.alchemy.getNftMetadata({
-            contractAddress: constants.CONTRACT_ADDR,
+            contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
           console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));

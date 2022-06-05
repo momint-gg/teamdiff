@@ -307,42 +307,49 @@ export default function CreateLeague({ setDisplay }) {
     //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
-    
-    //Connect to leagueMaker with connect wallet
-    const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
-    // console.log("submission values: " + (formValues.inviteListStatus === "open"));
-    //Send createLeague transaction to LeagueMaker
-    const createLeagueTxn = await leagueMakerContractWithSigner
-      .createLeague(
-          formValues.leagueName,
-          formValues.buyInCost,
-          // 10,
-          !isPrivate,
-          // false,
-          connectedAccount,
-          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
-          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
-          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
-          // "0x1379415bd9585DF37b1ea1F9E759392b1e1b9eA0",
-          CONTRACT_ADDRESSES.TestUSDC,
-          CONTRACT_ADDRESSES.Athletes,
-          CONTRACT_ADDRESSES.GameItems,
-          inviteListValues,
-          // [], 
-        {
-        gasLimit: 10000000,
-      })
-      .then((res) => {
-        //console.log("txn result: " + JSON.stringify(res, null, 2));
-        setIsCreatingLeague(true);
-        console.log("League Creation in progress...");
-        //console.log("With invite values: " + inviteListValues);
-        //how to tell if transaction failed?
-        //TODO print message to alert if it takes mroe than 60 seconds
-      })
-      .catch((error) => {
-        alert("Create League error: " + error.message);
-      });
+    console.log("league name" + formValues.leagueName)
+    if(formValues.leagueName === "") {
+      alert("Please enter valid league name.")
+    }
+    else if(formValues.token === "") {
+      alert("Please select a token.")
+    }
+    else if(formValues.buyInCost > 100) {
+      alert("Pleae enter a buy-in cost below 100 USDC.")
+    }
+    else {
+      //Connect to leagueMaker with connect wallet
+      const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
+      // console.log("submission values: " + (formValues.inviteListStatus === "open"));
+      //Send createLeague transaction to LeagueMaker
+      const createLeagueTxn = await leagueMakerContractWithSigner
+        .createLeague(
+            formValues.leagueName,
+            formValues.buyInCost,
+            // 10,
+            !isPrivate,
+            // false,
+            connectedAccount,
+            CONTRACT_ADDRESSES.TestUSDC,
+            CONTRACT_ADDRESSES.Athletes,
+            CONTRACT_ADDRESSES.GameItems,
+            inviteListValues,
+            // [], 
+          {
+          gasLimit: 10000000,
+        })
+        .then((res) => {
+          //console.log("txn result: " + JSON.stringify(res, null, 2));
+          setIsCreatingLeague(true);
+          console.log("League Creation in progress...");
+          //console.log("With invite values: " + inviteListValues);
+          //how to tell if transaction failed?
+          //TODO print message to alert if it takes mroe than 60 seconds
+        })
+        .catch((error) => {
+          alert("Create League error: " + error.message);
+        });
+    }
   }
   
 
@@ -542,7 +549,7 @@ export default function CreateLeague({ setDisplay }) {
                   id="token-select"
                   // value={"USDC"}
                   value={formValues.token}
-                  defaultValue="USDC"
+                  // defaultValue="USDC"
                   label="token"
                   name="token"
                   onChange={handleInputChange}
@@ -620,8 +627,9 @@ export default function CreateLeague({ setDisplay }) {
                       control={<Switch 
                         onChange={() => {
                           setIsPrivate(!isPrivate)
-                          if(!isPrivate) {
+                          if(isPrivate) {
                             setInviteListValues([]);
+                            // console.log("empty list")
                           }
                         }}                                                                   
                       color="secondary" />}

@@ -32,20 +32,10 @@ import profilePic from "../assets/images/starter-pack.png";
 //Router
 import { useRouter } from 'next/router';
 
-export default function MintPack({ setDisplay }) {
+export default function MintPack() {
   // Router
   const router = useRouter();
 
-  // WAGMI Hooks
-  // const [{ data: connectData, error: connectError }, connect] = useConnect();
-  // const [{ data: accountData }, disconnect] = useAccount({
-  //   fetchEns: true,
-  // });
-  // const [activeChain, chains] = useNetwork()
-
-  // const currentChain = activeChain?.data?.chain?.id
-
-  // const isPolygon = currentChain === 137
 
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -95,12 +85,17 @@ export default function MintPack({ setDisplay }) {
       provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
       provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
                                                   setIsConnected(false) })
-      provider.on("network", (newNetwork, oldNetwork) => {
+      provider.on("network", async (newNetwork, oldNetwork) => {
+        console.log("on")
         // When a Provider makes its initial connection, it emits a "network"
         // event with a null oldNetwork along with the newNetwork. So, if the
         // oldNetwork exists, it represents a changing network
         if (oldNetwork) {
-            window.location.reload();
+          console.log("changed network");
+            // window.location.reload();
+          // const { chainId } = await provider.getNetwork()
+          // setCurrentChain(chainId)
+          // setIsPolygon(chainId === 137)
         }
       });
     }, [connectedAccount]);
@@ -113,9 +108,10 @@ export default function MintPack({ setDisplay }) {
       if (currentChain === 1) {
         // in the future we can potentially switch networks for them using useNetwork wagmi hook?
         alert("Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint.")
-      } else {
-        alert("Please switch to the Polygon network to proceed with the mint!")
       }
+        // } else {
+      //   alert("Please switch to the Polygon network to proceed with the mint!")
+      // }
     }
   }
 
@@ -166,9 +162,16 @@ export default function MintPack({ setDisplay }) {
   }, [isConnected]);
 
 
-  useEffect(() => {
-    console.log("user chain changed: ", currentChain)
-  }, [currentChain])
+  // useEffect(() => {
+  //   console.log("user chain changed: ", currentChain)
+  //   // var newChainId;
+  //   const fetchData = async () => {
+  //     const { chainId } = await provider.getNetwork()
+  //     setCurrentChain(chainId)
+  //     setIsPolygon(chainId === 137)
+  //   }
+  //   fetchData();
+  // }, [currentChain])
 
   const mintStarterPack = async () => {
       // Create a new instance of the Contract with a Signer, which allows
@@ -195,7 +198,7 @@ export default function MintPack({ setDisplay }) {
 
   return (
     <Box>
-      <Button
+      {/* <Button
           variant="text"
           sx={{
             backgroundColor:"transparent",
@@ -207,7 +210,7 @@ export default function MintPack({ setDisplay }) {
           onClick={() => setDisplay(false)}
         >
           ‹ GO BACK
-      </Button>
+      </Button> */}
       {isConnected && !hasMinted &&
       <Box
             justifyContent="center"
@@ -306,7 +309,7 @@ export default function MintPack({ setDisplay }) {
                   fontSize: 16
                 }}
               >
-                Please switch to Polygon to proceed with minting.
+                Please switch to Polygon, then refresh the page, to proceed with minting.
               </Typography>
             }
           </Box>
