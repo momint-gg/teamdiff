@@ -19,7 +19,10 @@ const path = require('path');
 
 // NOTE: In the functions folder (same directory as this file) you should put the excel file with two columns: name, points
 
-async function main() {
+// How to run: node addAthletesStats week_num (e.g. node addAthletesSats 1)
+async function main(week_num) {
+  args = process.argv;
+
   // Constructing our contract
   const provider = new ethers.providers.AlchemyProvider(
     'rinkeby',
@@ -39,46 +42,92 @@ async function main() {
     }));
   };
 
+  // Getting an object key by its value
+  function getKeyByValue(object, value) {
+    return Object.keys(object).find((key) => object[key] === value);
+  }
+
   parseExcel('./week_dummy_data.xlsx').forEach((element) => {
     data = element.data;
   });
 
+  // Array to check if athlete was benched or not for the week
+  // In next step we will loop through and set any athlete that hasn't been benched to true
+  // Resulting athletes (AKA athletes who val is still false) will be added with points of 0
+  const athleteToBoolArr = new Array(50);
+  for (let i = 0; i < athleteToBoolArr.length; i++) {
+    athleteToBoolArr[i] = false;
+  }
+
+  // Looping through all of our athletes
   for (let i = 0; i < 50; i++) {
-    // Looping through all of our athletes
+    // Main stats
     const name = data[i]['Player'].toLowerCase(); // Gamer name columnn
     const points = Math.round(data[i]['Points']); // Total points column (rounded)
     const id = athleteToId[name];
+    // Minor stats
+    const avg_kills = data[i]['Avg kills'];
+    const avg_deaths = data[i]['Avg deaths'];
+    const avg_assists = data[i]['Avg assists'];
+    const CSM = data[i]['CSM'];
+    const VSPM = data[i]['VSPM'];
+    const FBpercent = data[i]['FB %'];
+    const pentakills = data[i]['Penta Kills'];
+
     // console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
     if (id !== undefined) {
       // Only IDs in our league should be updated
-      finalStatsToPush.push({ id: id, name: name, points: points });
+      finalStatsToPush.push({
+        id,
+        name,
+        points,
+        avg_kills,
+        avg_deaths,
+        avg_assists,
+        CSM,
+        VSPM,
+        FBpercent,
+        pentakills,
+      });
+      athleteToBoolArr[id] = true;
     } else {
-      console.log('Athlete named ', name, ' is not in TeamDiff');
+      // Athletes that aren't in TeamDiff (starters are benched)
+      // console.log('Athlete named ', name, ' is not in TeamDiff');
     }
   }
 
-  // Looping through all of our athletes and if they aren't in our object, set points equal to 0
-  for (let [key, value] of Object.entries(athleteToId)) {
-    if (!finalStatsToPush.hasOwnProperty(key)) {
-      // key = athlete name, value = athlete id
-      // If our final stats array doesn't have this id, athlete has 0 points
-      finalStatsToPush.push({ id: value, name: key, points: 0 });
+  for (let i = 0; i < athleteToBoolArr.length; i++) {
+    if (!athleteToBoolArr[i]) {
+      finalStatsToPush.push({
+        id: i,
+        name: getKeyByValue(athleteToId, i),
+        points: 0,
+        avg_kills: 0,
+        avg_deaths: 0,
+        avg_assists: 0,
+        CSM: 0,
+        VSPM: 0,
+        FBpercent: 0,
+        pentakills: 0,
+      });
+      // console.log('Athlete with id ', i, ' was benched for the week');
     }
-    // console.log(`${key}: ${value}`);
   }
 
-  // Logging our output to see (yes I should write test cases but not enough time man)
-  for (let i = 0; i < finalStatsToPush.length; i++) {
-    console.log(
-      ' Athlete ID: ',
-      finalStatsToPush[i].id,
-      ' \n Athlete Name: ',
-      finalStatsToPush[i].name,
-      '\n Athlete points: ',
-      finalStatsToPush[i].points,
-      '\n'
-    );
-  }
+  // Creating JSON of our final stats
+  const finalObj = {};
+  finalObj['athletes'] = finalStatsToPush;
+  // console.log(JSON.stringify(finalObj));
+
+  // Writing this week's athlete data to API folder in JSON format for the API
+  fs.writeFile(
+    `../athleteData/week${0}.json`,
+    JSON.stringify(finalObj),
+    'utf-8',
+    (err) => {
+      if (err) console.log(err);
+    }
+  );
 
   // Finally, pushing stats to the contract
   // for (let i = 0; i < 50; i++) {
