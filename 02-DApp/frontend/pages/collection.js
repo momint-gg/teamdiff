@@ -4,14 +4,14 @@ import { ethers } from "ethers";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid } from "@mui/material";
-import constants from "../Constants";
+import constants from "../constants";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 
 import ConnectWallet from "./connectWallet";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import AthleteCardModal from "../components/AthleteCardModal";
-import { useMediaQuery } from 'react-responsive';
+import { useMediaQuery } from "react-responsive";
 
 export default function Collection() {
   const [nftResp, setNFTResp] = useState(null);
@@ -70,7 +70,7 @@ export default function Collection() {
     setMenu(false);
   };
 
-  const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   useEffect(() => {
     setPackNFTs([]);
@@ -110,37 +110,14 @@ export default function Collection() {
   if (isConnected && nftResp) {
     return (
       <Box>
-        <Typography
-          variant={isMobile ? "h4" : "h2"}
-          color="secondary"
-          component="div">
-          PACKS
-        </Typography>
-        <hr
-          style={{
-            color: "white",
-            backgroundColor: "white",
-            height: 5,
-          }}
-        />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {packNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        
         <Typography
           variant={isMobile ? "h4" : "h2"}
           color="secondary"
           component="div"
           style={{ marginTop: 10 }}
         >
-          PLAYERS
+          Owned Athletes
         </Typography>
         <hr
           style={{
@@ -165,6 +142,31 @@ export default function Collection() {
           athleteData={currAthlete}
           handleModalClose={handleModalClose}
         />
+        <Typography
+          variant={isMobile ? "h4" : "h2"}
+          color="secondary"
+          component="div"
+        >
+          Owned Starter Packs
+        </Typography>
+        <hr
+          style={{
+            color: "white",
+            backgroundColor: "white",
+            height: 5,
+          }}
+        />
+        <Grid container spacing={isMobile ? 1 : 3}>
+          {packNFTs?.map((athleteData) => (
+            <Grid item xs={isMobile ? 12 : 4}>
+              <AthleteCard
+                athleteData={athleteData}
+                setAthlete={setCurrAthlete}
+                setModalOpen={setModalOpen}
+              />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     );
   } else if (isConnected) {

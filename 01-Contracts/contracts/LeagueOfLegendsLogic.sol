@@ -26,8 +26,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     bool public lineupIsLocked;
 
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
-    mapping(address => uint256[]) public userToRecord; // User to their record
-    mapping(address => uint256[]) public userToLineup; // User to their lineup
+    mapping(address => uint256[8]) public userToRecord; // User to their record
+    mapping(address => uint256[5]) public userToLineup; // User to their lineup
     mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -224,7 +224,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     // TODO: Move requires to a library to save space (MOBALogicLibrary)
     // note: this is inefficient if we want to update one position only :/
         //TODO: we should require that they cannot set duplicates
-    function setLineup(uint256[] memory athleteIds) external {
+    function setLineup(uint256[5] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
 
@@ -301,7 +301,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /*****************************************************/
     // Getter for user to weekly pts
     // When we get the mapping directly, returns incorrectly so we need to keep this!
-    function getUserRecord() external view returns (uint256[] memory) {
+    function getUserRecord() external view returns (uint256[8] memory) {
         return userToRecord[msg.sender];
     }
 
@@ -316,7 +316,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     // You need to call an index when getting a mapping. More convenient to have a getter so we can return whole lineup
-    function getLineup(address _user) public view returns (uint256[] memory) {
+    function getLineup(address _user) public view returns (uint256[5] memory) {
         return userToLineup[_user];
     }
 

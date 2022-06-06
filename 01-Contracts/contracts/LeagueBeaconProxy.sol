@@ -30,7 +30,7 @@ contract LeagueBeaconProxy is
     Ownable,
     AccessControl
 {
-    // Vars
+        using SafeMath for uint256;
 
     string public leagueName;
     uint256 public numWeeks; // Current week of the split
@@ -42,8 +42,8 @@ contract LeagueBeaconProxy is
     bool public lineupIsLocked;
 
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
-    mapping(address => uint256[]) public userToRecord; // User to their record
-    mapping(address => uint256[]) public userToLineup; // User to their lineup
+    mapping(address => uint256[8]) public userToRecord; // User to their record
+    mapping(address => uint256[5]) public userToLineup; // User to their lineup
     mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -80,10 +80,10 @@ contract LeagueBeaconProxy is
     //**************/
     //*** Events ***/
     /***************/
-    event Staked(address sender, uint256 amount);
+    event Staked(address sender, uint256 amount, address leagueAddress);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
-
+    
     /**
      * @dev Initializes the proxy with `beacon`.
      *

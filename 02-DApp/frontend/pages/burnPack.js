@@ -7,10 +7,14 @@ import {
   useEnsLookup,
 } from "wagmi";
 import { useEffect, useState } from "react";
+import { useRouter } from 'next/router'
+
 import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import Image from "next/image";
+import LoadingPrompt from "../components/LoadingPrompt";
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // import AthleteCard from "../components/AthleteCard";
 
@@ -39,6 +43,8 @@ export default function BurnPack({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
+    //Router
+    const router = useRouter();
 
   //State Hooks
   const [mintedPackId, setMintedPackId] = useState(null);
@@ -421,42 +427,43 @@ export default function BurnPack({ setDisplay }) {
                  
                   
                 ))} */}
-
-                      </Box>
-                      <hr></hr>
-                      <Typography variant="h6">
-                        Click any card to view on OpenSea
-                      </Typography>
-                    </Box>
-                    <Fab
-                      variant="extended"
-                      size="large"
-                      color="white"
-                      aria-label="add"
-                      // onClick={() => setDisplayCollection(true)}
-                      sx={{ marginTop: 5, fontSize: 20 }}
-                    >
-                      Go To My Collection
-                    </Fab>
-                  </Box>
-                  <Box sx={{
-                    flex: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
-                    <Image
-                      src={profilePic}
-                      alt="Picture of the author"
-                      // height="100%"
-                      // width="auto"
-                      width="155px"
-                      height="225px"
-                    />
-                  </Box>
-                </Box>
-              </Container>
-              {/* <Box
+                 
+               </Box>
+                <hr></hr>
+               <Typography variant="h6">
+                      Click any card to view on OpenSea 
+                </Typography>
+             </Box>
+               <Fab
+                 variant="extended"
+                 size="large"
+                 color="white"
+                 aria-label="add"
+                //  target={"_blank"}
+                 onClick={() => router.push("./collection")}
+                 sx={{ marginTop: 5, fontSize: 20 }}
+               >
+                 Go To My Collection
+               </Fab>
+           </Box>
+           <Box sx={{ 
+             flex: 2,
+             display: "flex",
+             alignItems: "center",
+             justifyContent: "center"
+           }}>
+             <Image
+               src={profilePic}
+               alt="Picture of the author"
+               // height="100%"
+               // width="auto"
+               width="155px"
+               height="225px"
+             />
+           </Box>
+          </Box>         
+       </Container>
+        {/* <Box
           sx={{
             display: "flex",
             flexDirection: "column",

@@ -19,15 +19,16 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { useState, useEffect } from "react";
 
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 //Web3 Imports
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import * as utils from "@ethersproject/hash";
 //NPM import
-import WAValidator from 'wallet-address-validator';
-
+import WAValidator from 'wallet-address-validator'; 
+//Component imports
+import MyTeam from "../myTeam.js";
 //Wagmi imports
 import {
   useAccount,
@@ -99,7 +100,7 @@ export default function LeagueDetails() {
     setAnchorEl(null);
     lineup[athleteNum] = athleteNum;
     console.log("lineup: " + lineup);
-  }
+  };
 
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
@@ -113,25 +114,24 @@ export default function LeagueDetails() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
-    const setAccountData = async () => {
-      // setIsLoading(true);
-      const signer = provider.getSigner()
-      const accounts = await provider.listAccounts();
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        // setIsLoading(true);
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress()
-        setSigner(signer)
-        setConnectedAccount(accountAddress)
-        setIsConnected(true)
-        //TODO this doesn't update screen when switching accounts :/
-      }
-      else {
-        setIsConnected(false);
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+        }
+        else {
+          setIsConnected(false);
 
       }
       // setIsLoading(false);
@@ -207,7 +207,10 @@ export default function LeagueDetails() {
           WhitelistJSON.abi,
           provider
         );
-
+        // const isOnWhitelist = await WhitelistContract.whitelist(
+        //   accountData.address
+        // );
+ 
         const isOnWhitelist = await WhitelistContract.whitelist(connectedAccount);
         setIsOnWhitelist(isOnWhitelist);
 
@@ -220,7 +223,6 @@ export default function LeagueDetails() {
         //TODO this is slightly buggy when someone tries to switch accounts
         setIsLoading(false);
       }
-
 
       // declare the async data fetching function
       const getNFTData = async () => {
@@ -249,14 +251,11 @@ export default function LeagueDetails() {
         console.log("fetch NFT DATA error: " + error);
       });
       fetchData();
-
-    }
-    else {
+    } else {
       //alert("no account data or league Address found, please refresh.");
       console.log("no account data or league Address found");
       console.log("router: " + JSON.stringify(router.query, null, 2));
-      //   console.log("leagueAddress: " + leagueAddress);
-
+      //   console.log("leagueAddLress: " + leagueAddress);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
@@ -301,7 +300,6 @@ export default function LeagueDetails() {
       setAddPlayerBtnEnabled(true)
     }
   }
-
 
   const joinLeagueHandler = async () => {
     var hasCancelledTransaction = false;
@@ -384,7 +382,7 @@ export default function LeagueDetails() {
 
     const setLineupTxn = await leagueProxyContractWithSigner
       .setLineup(lineup, {
-        gasLimit: 10000000
+        gasLimit: 10000000,
       })
       .then((res) => {
         console.log("txn result: " + JSON.stringify(res, null, 2));
@@ -397,271 +395,18 @@ export default function LeagueDetails() {
       .catch((error) => {
         alert("Set Lineup error: " + error.message);
       });
-  }
-
+  };
 
   return (
-
     <Box>
-
       {isLoading ? (
         <LoadingPrompt loading={"Your League"} />
       ) : (
         <>
-          {isLeagueMember ? (
-            <>
-              {/* <Avatar
-                  alt="League Image"
-                  src={leagueData?.image?.examplePic.src}
-                  sx={{ bgcolor: "white", position: "absolute" }}
-                /> */}
-              <Box sx={{ marginLeft: 6 }}>
-                <Typography variant="h2" color="secondary" component="div">
-                  {leagueName}
-                </Typography>
-
-                {/* <Typography variant="body1" color="white">
-                    Your current standing: {leagueData?.standing}
-                  </Typography> */}
-
-                <Typography
-                  variant="h4"
-                  color="secondary"
-                  component="div"
-                  sx={{ marginTop: 5 }}
-                >
-                  SET YOUR LINEUP!
-                </Typography>
-
-                <Grid container spacing={5}>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab
-                        id="basic-button"
-                        aria-controls={open ? 'basic-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
-                      >
-                        Set 1
-                      </Fab>
-                      <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                          'aria-labelledby': 'basic-button',
-                        }}
-                      >
-                        {athleteNFTs.map((athlete, index) =>
-                        (athlete.id.tokenId % 10 == 0 &&
-                          <MenuItem onClick={() => (handleSetAthlete(0))}>{"Athlete #" + athlete.id.tokenId}</MenuItem>
-                        )
-                        )
-                        }
-                        {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
-                            <MenuItem onClick={handleClose}>Logout</MenuItem> */}
-                      </Menu>
-                      {lineup[0] != null &&
-                        <Typography>
-                          {"lineup[0] = " + lineup[0]}
-                        </Typography>
-                      }
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab
-                        id="basic-button"
-                        aria-controls={open ? 'basic-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
-                      >
-                        Set 2
-                      </Fab>
-                      {/* <Menu
-                            //id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                            }}
-                        >
-                            {athleteNFTs.map((athlete, index) => 
-                                (athlete.id.tokenId % 10 == 1 && 
-                                    <MenuItem onClick={() => (handleSetAthlete(1))}>{"Athlete #" + athlete.id.tokenId}</MenuItem>
-                                )
-                            )
-                            }
-                            {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
-                            <MenuItem onClick={handleClose}>Logout</MenuItem> }
-                        </Menu>                         */}
-                      {lineup[1] != null &&
-                        <Typography>
-                          {"lineup[1] = " + lineup[1]}
-                        </Typography>
-                      }
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab>
-                        Set 3
-                      </Fab>
-                      {lineup[2] != null &&
-                        <Typography>
-                          {"lineup[21] = " + lineup[2]}
-                        </Typography>
-                      }
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab>
-                        Set 4
-                      </Fab>
-                      {lineup[3] != null &&
-                        <Typography>
-                          {"lineup[3] = " + lineup[3]}
-                        </Typography>
-                      }
-                    </Paper>
-                  </Grid>
-                  <Grid item>
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        width: 150,
-                        height: 200,
-                      }}
-                    >
-                      <Fab>
-                        Set 5
-                      </Fab>
-                      {lineup[4] != null &&
-                        <Typography>
-                          {"lineup[4] = " + lineup[4]}
-                        </Typography>
-                      }
-                    </Paper>
-                  </Grid>
-                  <Fab
-                    onClick={submitLineup}
-                  >
-                    Submit Lineup
-                  </Fab>
-                </Grid>
-              </Box>
-              {isLeagueAdmin && (
-                <Box>
-                  <Typography>
-                    Admin Actions
-                  </Typography>
-                  <ul>
-                    <li>Add Users to Whitelist</li>
-                  </ul>
-                  <>
-                    <Typography variant="h7" color="lightgrey">
-                      Only users added to this leagues whitelist can join.
-                    </Typography>
-                    <Typography variant="h6" color="white" component="div">
-                      Invite list:
-                    </Typography>
-
-
-                    {/* TODO: Abstract this into another component, controlled by createLeague page */}
-                    <Typography variant="h6" color="white" component="div">
-                      Invite List (Private/Closed Leagues)
-                    </Typography>
-                    {!validAddressesStatus && (
-                      <p>
-                        There are invalid addresses.
-                      </p>
-                    )}
-
-                    {/* https://bapunawarsaddam.medium.com/add-and-remove-form-fields-dynamically-using-react-and-react-hooks-3b033c3c0bf5 */}
-                    {inviteListValues.map((element, index) => (
-                      <>
-                        <TextField
-                          variant="standard"
-                          label={"Whitelisted Address " + (index + 1)}
-                          onChange={e => {
-                            //This submits null address when I copy and paste
-                            handlePlayerInviteInput(e, index)
-                            console.log("short list outside func: " + inviteListValues);
-                          }}
-                          value={element}
-                          key={index}
-                        />
-                        {index ?
-                          <Button
-                            variant="outlined"
-                            onClick={() => removePlayer(index)}
-                            size="small"
-                          >
-                            Remove
-                          </Button>
-                          : null
-                        }
-                      </>
-                    ))}
-                    <Button
-                      variant="outlined"
-                      onClick={addNewPlayerInviteInput}
-                      size="small"
-                      disabled={!addPlayerBtnEnabled}
-                    >
-                      Add Another Address to Whitelist
-                    </Button>
-                    <Fab
-                      onClick={submitAddUsersToWhitelistClickHandler}
-                    >
-                      Submit
-                    </Fab>
-
-                  </>
-                </Box>
-              )}
-            </>
+        {isLeagueMember ? (
+          <>
+            <MyTeam></MyTeam>
+          </>
           ) : (
             <>
 

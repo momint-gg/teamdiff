@@ -88,7 +88,6 @@ export default function Play() {
   }, [accountData?.address])
 
   return (
-
     <Box>
       {/* <SignMessage/> */}
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
@@ -201,7 +200,6 @@ export default function Play() {
       ) : (
         <ConnectWalletPrompt accessing={"the Play Page"} />
       )}
-
     </Box>
   );
 }

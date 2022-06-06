@@ -10,27 +10,27 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract Athletes is Ownable {
     using SafeMath for uint256;
     // Our mapping of athletes (e.g. athlete # 4 => [1, 4, 2, 3] maps the first 4 weeks of scores)
-    mapping(uint256 => uint256[]) public athleteToScores;
+    mapping(uint256 => uint256[8]) public athleteToScores;
     Athlete[] public athletes;
     uint256 numAthletes;
 
     struct Athlete {
         uint256 athleteID; // e.g. athlete #42
-        uint256[] weeklyScores; // e.g. [0,2,1,3,5,...]
+        uint256[8] weeklyScores; // e.g. [0,2,1,3,5,...]
     }
 
     struct Stats {
         uint256 kills;
     }
 
-    function appendStats(uint256 athleteId, uint256 weeklyScore)
+    function appendStats(uint256 athleteId, uint256 weeklyScore, uint256 weekNum)
         public
         onlyOwner
     {
         if (athleteToScores[athleteId].length == 0) {
             numAthletes++;
         }
-        athleteToScores[athleteId].push(weeklyScore);
+        athleteToScores[athleteId][weekNum] = weeklyScore;
     }
 
     // Can't directly return a mapping, so returning an array of Athletes
@@ -54,7 +54,7 @@ contract Athletes is Ownable {
     function getAthleteScores(uint256 index)
         public
         view
-        returns (uint256[] memory)
+        returns (uint256[8] memory)
     {
         return athleteToScores[index];
     }

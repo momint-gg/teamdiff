@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import {
@@ -100,7 +99,7 @@ export default function MyLeagues({ setDisplay }) {
         var error = "none";
 
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
           const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(connectedAccount, i)
                                                         .catch((_error) => {
@@ -134,13 +133,10 @@ export default function MyLeagues({ setDisplay }) {
             ));
           }
           //console.log("error value at end:" + error);
-
         } while (error == "none");
-
       }
       fetchData();
-    }
-    else {
+    } else {
       console.log("no account data");
     }
   }, [isConnected, connectedAccount]);
@@ -151,36 +147,36 @@ export default function MyLeagues({ setDisplay }) {
     setPendingLeagueList([]);
   }, [])
 
-  var activeListItems = activeLeagueList.map((leagueAddress, index) =>
+  var activeListItems = activeLeagueList.map((leagueAddress, index) => (
     <Box key={index}>
-    <LeagueCard
-      // leagueData={exampleData}
-      leagueAddress={leagueAddress}
-      // isJoined={true}
-      // setMountedLeagueAddress={setMountedLeagueAddress}
+      <LeagueCard
+        // leagueData={exampleData}
+        leagueAddress={leagueAddress}
+        // isJoined={true}
+        // setMountedLeagueAddress={setMountedLeagueAddress}
 
-      // setLeague={setCurrLeague}
-      // setLeagueOpen={setLeagueOpen}
-    />
-    <hr></hr>
+        // setLeague={setCurrLeague}
+        // setLeagueOpen={setLeagueOpen}
+      />
+      <hr></hr>
     </Box>
-  );
+  ));
 
   //Create list of league cards for all pending leagues
-  var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
+  var pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
     <Box key={index}>
-    <LeagueCard
-      // leagueData={exampleData}
-      leagueAddress={leagueAddress}
-      // isJoined={false}
-      // setMountedLeagueAddress={setMountedLeagueAddress}
+      <LeagueCard
+        // leagueData={exampleData}
+        leagueAddress={leagueAddress}
+        // isJoined={false}
+        // setMountedLeagueAddress={setMountedLeagueAddress}
 
-      // setLeague={setCurrLeague}
-      // setLeagueOpen={setLeagueOpen}
-    />
-    <hr></hr>
+        // setLeague={setCurrLeague}
+        // setLeagueOpen={setLeagueOpen}
+      />
+      <hr></hr>
     </Box>
-  );
+  ));
 
   return (
     <Box>
@@ -206,11 +202,11 @@ export default function MyLeagues({ setDisplay }) {
             }}
           />
           {activeLeagueList.length > 0 ? (
-              <ul>{activeListItems}</ul>
+            <ul>{activeListItems}</ul>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Active Leagues)
-            </Typography>   
+            </Typography>
           )}
           {/* <LeagueCard
                 leagueData={exampleData}
@@ -219,7 +215,6 @@ export default function MyLeagues({ setDisplay }) {
                 setLeagueOpen={setLeagueOpen}
               /> */}
 
-         
           <Typography
             variant="h4"
             color="secondary"
@@ -234,17 +229,14 @@ export default function MyLeagues({ setDisplay }) {
               backgroundColor: "secondary",
               height: 5,
             }}
-            
           />
           {pendingLeagueList.length > 0 ? (
-              <ul>{pendingListItems}</ul>
+            <ul>{pendingListItems}</ul>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Pending Leagues)
-            </Typography>   
+            </Typography>
           )}
-
-
         </Box>
       )}
       {/* {leagueOpen && (
