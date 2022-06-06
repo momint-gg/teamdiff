@@ -89,10 +89,8 @@ const data = {
 
 export default function Matchups() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [currentPlayer, setCurrentPlayer] = useState(false);
 
   const handleModalOpen = (athelete) => {
-    setCurrentPlayer(athelete);
     setModalOpen(true);
   };
 
