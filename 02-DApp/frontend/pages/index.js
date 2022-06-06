@@ -1,8 +1,8 @@
-import React from 'react'
-import { chain, defaultChains } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import Homepage from './homepage'
+import React from "react";
+import { chain, defaultChains } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import Homepage from "./homepage";
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -43,9 +43,7 @@ export default function Index(props) {
   };
 
   if (typeof window !== "undefined") {
-    return (
-      <Homepage />
-    );
+    return <Homepage />;
   }
   return null;
 }

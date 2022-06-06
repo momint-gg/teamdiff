@@ -1,8 +1,15 @@
 import {
   Box,
-  Button, Modal, Paper, Table, TableBody,
-  TableCell, TableContainer, TableHead,
-  TableRow, Typography
+  Button,
+  Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from "@mui/material";
 import Image from "next/image";
 import Card from "../assets/cards/Fudge.png";

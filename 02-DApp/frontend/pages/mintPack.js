@@ -1,15 +1,18 @@
-import * as utils from "@ethersproject/hash";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
-  CircularProgress, Container, Fab,
-  Link, Paper, Typography
+  CircularProgress,
+  Container,
+  Fab,
+  Link,
+  Paper,
+  Typography
 } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
-//Router
-import { useRouter } from 'next/router';
+// Router
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 // import CONSTANTS from "../Constants.js";
@@ -17,11 +20,9 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import profilePic from "../assets/images/starter-pack.png";
 import LoadingPrompt from "../components/LoadingPrompt";
 
-
 export default function MintPack() {
   // Router
   const router = useRouter();
-
 
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -53,32 +54,32 @@ export default function MintPack() {
     // }
     // fetchData()
     const setAccountData = async () => {
-      const signer = provider.getSigner()
+      const signer = provider.getSigner();
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress()
-        setSigner(signer)
-        setConnectedAccount(accountAddress)
-        const { chainId } = await provider.getNetwork()
-        setCurrentChain(chainId)
-        setIsPolygon(chainId === 137)
-        setIsConnected(true)
-        setIsLoading(false)
-
-      }
-      else {
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        const { chainId } = await provider.getNetwork();
+        setCurrentChain(chainId);
+        setIsPolygon(chainId === 137);
+        setIsConnected(true);
+        setIsLoading(false);
+      } else {
         setIsConnected(false);
       }
-    }
-    setAccountData()
-    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-    provider.provider.on('disconnect', () => {
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
       console.log("disconnected");
-      setIsConnected(false)
-    })
+      setIsConnected(false);
+    });
     provider.on("network", async (newNetwork, oldNetwork) => {
-      console.log("on")
+      console.log("on");
       // When a Provider makes its initial connection, it emits a "network"
       // event with a null oldNetwork along with the newNetwork. So, if the
       // oldNetwork exists, it represents a changing network
@@ -92,20 +93,19 @@ export default function MintPack() {
     });
   }, [connectedAccount]);
 
-
-
-
   const checkUserChain = () => {
     if (!currentChain || currentChain != 137) {
       if (currentChain === 1) {
         // in the future we can potentially switch networks for them using useNetwork wagmi hook?
-        alert("Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint.")
+        alert(
+          "Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint."
+        );
       }
       // } else {
       //   alert("Please switch to the Polygon network to proceed with the mint!")
       // }
     }
-  }
+  };
 
   // Use Effect for component mount
   useEffect(async () => {
@@ -125,7 +125,7 @@ export default function MintPack() {
       // Callback for when packMinted Events is fired from contract
       // const signerAddress = accountData.address;
       const packMintedCallback = (signerAddress, packID) => {
-        console.log("signer in callback : " + signerAddress)
+        console.log("signer in callback : " + signerAddress);
         if (signerAddress == connectedAccount) {
           setIsMinting(false);
           setIsTransactionDelayed(false);
@@ -136,24 +136,21 @@ export default function MintPack() {
       // A filter that matches my address as the signer of the contract call
       // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
       // console.log(hexZeroPad(connectedAccount, 32));
-      const filter = {
-        address: GameItemsContract.address,
-        topics: [
-          utils.id("packMinted(address,uint256)"),
-          // TODO something wrong with this line
-          // hexZeroPad(signerAddress, 32)
-        ],
-      };
+      // const filter = {
+      //   address: GameItemsContract.address,
+      //   topics: [
+      //     utils.id("packMinted(address,uint256)"),
+      //     // TODO something wrong with this line
+      //     // hexZeroPad(signerAddress, 32)
+      //   ],
+      // };
       // GameItemsContract.on(filter, packMintedCallback);
-      GameItemsContract.once("packMinted", packMintedCallback)
-      checkUserChain()
-
-    }
-    else {
+      GameItemsContract.once("packMinted", packMintedCallback);
+      checkUserChain();
+    } else {
       console.log("no account connected");
     }
   }, [isConnected]);
-
 
   // useEffect(() => {
   //   console.log("user chain changed: ", currentChain)
@@ -177,12 +174,14 @@ export default function MintPack() {
       signer
     );
 
-    const mintTxn = await gameItemsContractWithSigner
+    await gameItemsContractWithSigner
       .mintStarterPack()
       .then((res) => {
         // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
-        window.setTimeout(() => { setIsTransactionDelayed(true) }, 60 * 5 * 1000)
+        window.setTimeout(() => {
+          setIsTransactionDelayed(true);
+        }, 60 * 5 * 1000);
 
         // console.log("Minting pack in progress...");
       })
@@ -197,7 +196,7 @@ export default function MintPack() {
         <LoadingPrompt loading={"Burn Page"} />
       ) : (
         <>
-          {isConnected && !hasMinted &&
+          {isConnected && !hasMinted && (
             <Box
               justifyContent="center"
               alignItems="center"
@@ -230,9 +229,13 @@ export default function MintPack() {
                 />
               </Container>
             </Box>
-          }
+          )}
           {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
-            <Container maxWidth="lg" justifyContent="center" alignItems="center">
+            <Container
+              maxWidth="lg"
+              justifyContent="center"
+              alignItems="center"
+            >
               <Box
                 justifyContent="center"
                 alignItems="center"
@@ -275,7 +278,7 @@ export default function MintPack() {
                     color: "white",
                     fontSize: 20,
                   }}
-                // disabled={!isPolygon}
+                  // disabled={!isPolygon}
                 >
                   Mint
                 </Fab>
@@ -288,21 +291,26 @@ export default function MintPack() {
                   paddingTop: "20px",
                 }}
               >
-                {!isPolygon &&
+                {!isPolygon && (
                   <Typography
                     style={{
                       color: "red",
-                      fontSize: 16
+                      fontSize: 16,
                     }}
                   >
-                    Please switch to Polygon, then refresh the page, to proceed with minting.
+                    Please switch to Polygon, then refresh the page, to proceed
+                    with minting.
                   </Typography>
-                }
+                )}
               </Box>
             </Container>
           )}
           {isMinting && (
-            <Container maxWidth="lg" justifyContent="center" alignItems="center">
+            <Container
+              maxWidth="lg"
+              justifyContent="center"
+              alignItems="center"
+            >
               <Box
                 justifyContent="center"
                 alignItems="center"
@@ -318,13 +326,12 @@ export default function MintPack() {
                 <CircularProgress />
                 <br></br>
                 {isMinting && isTransactionDelayed && (
-
                   <Typography variant="p" textAlign={"center"}>
-                    This is taking longer than normal. Please check your wallet to check the status of this transaction.
+                    This is taking longer than normal. Please check your wallet
+                    to check the status of this transaction.
                   </Typography>
                 )}
               </Box>
-
             </Container>
           )}
           {hasMinted && (
@@ -340,22 +347,27 @@ export default function MintPack() {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "space-evenly"
+                  justifyContent: "space-evenly",
                 }}
               >
                 <Box
                   sx={{
-                    flex: 3
+                    flex: 3,
                   }}
                 >
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: "row",
-                      alignItems: "center"
+                      alignItems: "center",
                     }}
                   >
-                    <Typography sx={{ marginRight: 2 }} variant="h4" color="white" component="div">
+                    <Typography
+                      sx={{ marginRight: 2 }}
+                      variant="h4"
+                      color="white"
+                      component="div"
+                    >
                       Acquired Starter Pack!
                     </Typography>
                     <CheckCircleIcon color="secondary"></CheckCircleIcon>
@@ -366,13 +378,13 @@ export default function MintPack() {
                       sx={{
                         display: "flex",
                         flexDirection: "row",
-                        justifyContent: "space-between"
+                        justifyContent: "space-between",
                       }}
                     >
                       <Box
                         sx={{
                           flex: 1,
-                          marginRight: 3
+                          marginRight: 3,
                         }}
                       >
                         <Typography variant="h5"> Contents </Typography>
@@ -399,16 +411,14 @@ export default function MintPack() {
 
                       <Box
                         sx={{
-                          flex: 1
+                          flex: 1,
                         }}
                       >
                         <Typography variant="h5"> Pack #</Typography>
                         <Typography> {100 - packsAvailable} </Typography>
-
                       </Box>
                     </Box>
                   </Box>
-
 
                   <Box>
                     <Fab
@@ -440,12 +450,14 @@ export default function MintPack() {
                     </Fab>
                   </Box>
                 </Box>
-                <Box sx={{
-                  flex: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}>
+                <Box
+                  sx={{
+                    flex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <Image
                     src={profilePic}
                     alt="Picture of the author"
@@ -456,7 +468,6 @@ export default function MintPack() {
                   />
                 </Box>
               </Box>
-
             </Container>
           )}
           {!isConnected && !hasMinted && !isMinting && (
@@ -468,7 +479,9 @@ export default function MintPack() {
           )}
           {packsAvailable == 0 && (
             <Box>
-              <Typography>Sorry, all packs have already been minted :(</Typography>
+              <Typography>
+                Sorry, all packs have already been minted :(
+              </Typography>
             </Box>
           )}
         </>

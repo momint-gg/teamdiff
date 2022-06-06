@@ -1,14 +1,11 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 import Image from "next/image";
-import React from 'react';
+import React from "react";
 import { IoCloseOutline } from "react-icons/io5";
-import {
-  useConnect
-} from "wagmi";
+import { useConnect } from "wagmi";
 import CoinbaseWallet from "../assets/images/coinbase.png";
 import MetaMask from "../assets/images/metamask.png";
 import WalletConnect from "../assets/images/wallet-connect.png";
-
 
 export default function ConnectWalletModal({
   modalOpen,
@@ -16,13 +13,7 @@ export default function ConnectWalletModal({
   setModalOpen,
   isMobile,
 }) {
-
-  const {
-    connect,
-    connectors,
-    error : connectError,
-  } = useConnect()
-
+  const { connect, connectors, error: connectError } = useConnect();
 
   // const [signer, setSigner] = useState(null);
   // const [connectedAccount, setConnectedAccount] = useState(null);
@@ -51,7 +42,7 @@ export default function ConnectWalletModal({
   //         setSigner(signer)
   //         setConnectedAccount(accountAddress)
   //         // setIsConnected(true)
-      
+
   //       }
   //       else {
   //         setIsConnected(false);
@@ -59,7 +50,7 @@ export default function ConnectWalletModal({
   //     }
   //     setAccountData()
   //     provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-  //     provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+  //     provider.provider.on('disconnect', () =>  { console.log("disconnected");
   //                                                 setIsConnected(false) })
   //   }, []);
 
@@ -122,18 +113,20 @@ export default function ConnectWalletModal({
           <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bold"}>
             Connect Wallet
           </Typography>
-          <IoCloseOutline 
-          size={"3rem"} 
-          onClick={() => {
-            handleModalClose()
-            if (handleClickAway) {
-              handleClickAway()
-            }}} 
-          style={{ cursor: "pointer",
-                   position: "absolute",
-                   right: "5px",
-                   top: "5px"
-                }}
+          <IoCloseOutline
+            size={"3rem"}
+            onClick={() => {
+              handleModalClose();
+              if (handleClickAway) {
+                handleClickAway();
+              }
+            }}
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              right: "5px",
+              top: "5px",
+            }}
           />
           {connectors.map((x) => (
             <Button
@@ -200,18 +193,20 @@ export default function ConnectWalletModal({
           <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bolder"}>
             Connect Wallet
           </Typography>
-          <IoCloseOutline 
-          size={"3rem"} 
-          onClick={() => {
-            handleModalClose()
-            if (handleClickAway) {
-              handleClickAway()
-            }}} 
-          style={{ cursor: "pointer",
-                   position: "absolute",
-                   right: "10px",
-                   top: "10px"
-                }}
+          <IoCloseOutline
+            size={"3rem"}
+            onClick={() => {
+              handleModalClose();
+              if (handleClickAway) {
+                handleClickAway();
+              }
+            }}
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              right: "10px",
+              top: "10px",
+            }}
           />
           {connectors.map((x) => (
             <Button

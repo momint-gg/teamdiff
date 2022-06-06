@@ -16,51 +16,52 @@ const Layout = ({ children, isMobile }) => {
 
   return (
     // <>
-        <Box component="body" minHeight="100vh" backgroundColor="transparent"
-        sx={{
-          backgroundImage:"url(/dots.png), linear-gradient(135deg, #330D36 0%, #110412 100%)",
-          backgroundSize: "cover",
-          backgroundRepeat:"no-repeat",
-          backgroundAttachment:"scroll",
-          
-        }}
-        >
-          
-          {isMobile? 
-            <div>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                p: 1,
-                m: 1,
-                borderRadius: 1,
-                alignItems: "center",
-                backgroundColor: "transparent",
-              }}
-            >
-              <Image src={logo} alt="TeamDiff logo" width="200px" height="50px"/>
-              <WalletLogin isMobile={isMobile}/>
-            </Box>
-            <Box
-            sx={{display: "flex", m: 1}}>
+    <Box
+      component="body"
+      minHeight="100vh"
+      backgroundColor="transparent"
+      sx={{
+        backgroundImage:
+          "url(/dots.png), linear-gradient(135deg, #330D36 0%, #110412 100%)",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "scroll",
+      }}
+    >
+      {isMobile ? (
+        <div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              p: 1,
+              m: 1,
+              borderRadius: 1,
+              alignItems: "center",
+              backgroundColor: "transparent",
+            }}
+          >
+            <Image src={logo} alt="TeamDiff logo" width="200px" height="50px" />
+            <WalletLogin isMobile={isMobile} />
+          </Box>
+          <Box sx={{ display: "flex", m: 1 }}>
             {pages.map((page) => (
               <NavLink key={page.name} href={page.href} isMobile={isMobile}>
                 {page.name}
               </NavLink>
             ))}
-            </Box>
-            <hr
-              style={{
-                color: "white",
-                backgroundColor: "white",
-                height: 4,
-                marginTop: -4,
-              }}
-            /> 
-            </div>
-          : 
-          <div>
+          </Box>
+          <hr
+            style={{
+              color: "white",
+              backgroundColor: "white",
+              height: 4,
+              marginTop: -4,
+            }}
+          />
+        </div>
+      ) : (
+        <div>
           <Box
             sx={{
               display: "flex",
@@ -73,35 +74,40 @@ const Layout = ({ children, isMobile }) => {
               backgroundColor: "transparent",
             }}
           >
-            <Box sx={{flexGrow: 1}}>
-            <Link href="/"> 
-              <a>
-                <Image src={logo} alt="TeamDiff logo" width="300px" height="75px"/>
-              </a>
-            </Link>
+            <Box sx={{ flexGrow: 1 }}>
+              <Link href="/">
+                <a>
+                  <Image
+                    src={logo}
+                    alt="TeamDiff logo"
+                    width="300px"
+                    height="75px"
+                  />
+                </a>
+              </Link>
             </Box>
             {pages.map((page) => (
               <NavLink key={page.name} href={page.href} isMobile={isMobile}>
                 {page.name}
               </NavLink>
             ))}
-            <WalletLogin isMobile={isMobile}/>
+            <WalletLogin isMobile={isMobile} />
           </Box>
           <hr
-              style={{
-                color: "white",
-                backgroundColor: "white",
-                height: 4,
-                marginTop: -4,
-              }}
+            style={{
+              color: "white",
+              backgroundColor: "white",
+              height: 4,
+              marginTop: -4,
+            }}
           />
-          </div>
-        }
-          <Box sx={{ paddingLeft: 5, paddingRight: 5 }}>
-            <div>{children}</div>
-          </Box>
-          <Footer />
-        </Box>
+        </div>
+      )}
+      <Box sx={{ paddingLeft: 5, paddingRight: 5 }}>
+        <div>{children}</div>
+      </Box>
+      <Footer />
+    </Box>
     // </>
   );
 };

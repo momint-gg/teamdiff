@@ -5,15 +5,14 @@ import { ThemeProvider } from "@mui/material/styles";
 import { ethers } from "ethers";
 import Head from "next/head";
 import React from "react";
-import { useMediaQuery } from 'react-responsive';
+import { useMediaQuery } from "react-responsive";
 import { chain, createClient, defaultChains, Provider } from "wagmi";
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import Layout from "../components/Layout";
 import "../styles/globalStyles.css";
 import theme from "../styles/theme";
-
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -46,14 +45,12 @@ const connectors = ({ chainId }) => {
   ];
 };
 
-
-
 function MyApp({ Component, pageProps }) {
   const isWeb = useMediaQuery({
-    query: '(min-device-width: 1224px)'
-  })
-  const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
-  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
+    query: "(min-device-width: 1224px)",
+  });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -63,9 +60,14 @@ function MyApp({ Component, pageProps }) {
     autoConnect: true,
     connectors,
     provider,
-  })
+  });
   return (
-    <Box sx={{ backgroundImage: "linear-gradient(135deg, #330D36 0%, #110412 100%)", height: "100%" }}>
+    <Box
+      sx={{
+        backgroundImage: "linear-gradient(135deg, #330D36 0%, #110412 100%)",
+        height: "100%",
+      }}
+    >
       <Provider client={client}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
@@ -112,7 +114,6 @@ function MyApp({ Component, pageProps }) {
           </main>
         </ThemeProvider>
       </Provider>
-
     </Box>
     // </WagmiConfig>
   );

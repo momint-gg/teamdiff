@@ -1,13 +1,11 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 // import AthleteCard from "../components/AthleteCard";
-import {
-  Box, Container, Fab, Link, Paper, Typography
-} from "@mui/material";
+import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 // import CONSTANTS from "../Constants.js";
@@ -17,18 +15,16 @@ import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt";
 import constants from "../Constants";
 
-
-
 export default function BurnPack({ setDisplay }) {
-  //TODO change to matic network for prod
+  // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  //Router
+  // Router
   const router = useRouter();
 
-  //State Hooks
+  // State Hooks
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
@@ -49,28 +45,28 @@ export default function BurnPack({ setDisplay }) {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const sig ner = provider.getSigner()
     const setAccountData = async () => {
-      const signer = provider.getSigner()
+      const signer = provider.getSigner();
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress()
+        const accountAddress = await signer.getAddress();
 
-        setSigner(signer)
-        setConnectedAccount(accountAddress)
-        setIsConnected(true)
-
-      }
-      else {
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
         setIsConnected(false);
       }
-      setIsLoading(false)
-    }
-    setAccountData()
-    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-    provider.provider.on('disconnect', () => {
+      setIsLoading(false);
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
       console.log("disconnected");
-      setIsConnected(false)
-    })
+      setIsConnected(false);
+    });
   }, [connectedAccount]);
 
   // Use Effect for change in if user isConnected
@@ -85,17 +81,20 @@ export default function BurnPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
-
-      //Fetcher to retireve newly minted NFT data
+      // Fetcher to retireve newly minted NFT data
       const getNFTData = async (athleteIndices) => {
         console.log("athletic Indices in getNFTData: " + athleteIndices);
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
-        const nfts = await web3.alchemy.getNfts({
-          owner: connectedAccount,
-          contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-        }).catch((error) => {
-          console.log("get NFT DATA error: " + JSON.stringify(error, null, 2));
-        });
+        const nfts = await web3.alchemy
+          .getNfts({
+            owner: connectedAccount,
+            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+          })
+          .catch((error) => {
+            console.log(
+              "get NFT DATA error: " + JSON.stringify(error, null, 2)
+            );
+          });
 
         setNFTResp(nfts);
         for (const nft of nfts?.ownedNfts) {
@@ -105,7 +104,10 @@ export default function BurnPack({ setDisplay }) {
             tokenId: token,
           });
           console.log("Token #" + parseInt(token));
-          if (!response.title?.includes("Pack") && athleteIndices.includes(parseInt(token))) {
+          if (
+            !response.title?.includes("Pack") &&
+            athleteIndices.includes(parseInt(token))
+          ) {
             // console.log("Token #" + parseInt(token) + " metadata: " + JSON.stringify(response, null, 2));
 
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
@@ -126,13 +128,15 @@ export default function BurnPack({ setDisplay }) {
           setIsMinting(false);
           setIsTransactionDelayed(false);
           const test = [6, 33, 12, 26, 45];
-          console.log("athleteIndices: " + test)
+          console.log("athleteIndices: " + test);
 
           setHasMinted(true);
           setMintedIndices(athleteIndices);
 
           await getNFTData(athleteIndices).catch((error) => {
-            console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
+            console.log(
+              "fetch NFT DATA error: " + JSON.stringify(error, null, 2)
+            );
           });
           // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
         }
@@ -143,10 +147,13 @@ export default function BurnPack({ setDisplay }) {
       // console.log("athleteIndices: " + test)
       const fetchData = async () => {
         // console.log("connected Accotun :" + connectedAccount)
-        const balanceOfPacks = await GameItemsContract.balanceOf(connectedAccount, 50);
+        const balanceOfPacks = await GameItemsContract.balanceOf(
+          connectedAccount,
+          50
+        );
         // console.log("balance of packs" + balanceOfPacks);
         setCanMint(balanceOfPacks > 0);
-      }
+      };
       fetchData();
 
       // Listen to event for when pack burn function is called
@@ -171,7 +178,7 @@ export default function BurnPack({ setDisplay }) {
 
     // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
-    //Calling burn on game items contract
+    // Calling burn on game items contract
     const burnTxn = await gameItemsContractWithSigner
       .burnStarterPack({
         gasLimit: 10000000,
@@ -179,13 +186,14 @@ export default function BurnPack({ setDisplay }) {
       .then((res) => {
         console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
-        window.setTimeout(() => { setIsTransactionDelayed(true) }, 60 * 5 * 1000)
+        window.setTimeout(() => {
+          setIsTransactionDelayed(true);
+        }, 60 * 5 * 1000);
         console.log("Minting pack in progress...");
       })
       .catch((error) => {
         alert("error: " + error.message);
       });
-
   };
 
   return (
@@ -194,8 +202,12 @@ export default function BurnPack({ setDisplay }) {
         <LoadingPrompt loading={"Burn Page"} />
       ) : (
         <>
-          {isConnected && !(hasMinted) &&
-            <Container maxWidth="lg" justifyContent="center" alignItems="center">
+          {isConnected && !hasMinted && (
+            <Container
+              maxWidth="lg"
+              justifyContent="center"
+              alignItems="center"
+            >
               <Box
                 justifyContent="center"
                 alignItems="center"
@@ -271,11 +283,11 @@ export default function BurnPack({ setDisplay }) {
                   </Box>
                 </>
               )}
-              {!canMint &&
+              {!canMint && (
                 <Box
                   sx={{
                     display: "flex",
-                    justifyContent: "center"
+                    justifyContent: "center",
                   }}
                 >
                   <Typography>
@@ -286,21 +298,26 @@ export default function BurnPack({ setDisplay }) {
                         //   textDecoration: "none",
                         //   textDecorationColor: "transparent"
                         // }}
-                        class="primary-link"
-                        href="/mintPack">
+                        className="primary-link"
+                        href="/mintPack"
+                      >
                         here
                       </a>
                     </Link>
                     {" to mint one now!"}
                   </Typography>
                 </Box>
-              }
+              )}
             </Container>
-          }
+          )}
           {isMinting && (
             <LoadingPrompt
               completeTitle={"Burning Pack..."}
-              bottomText={isTransactionDelayed && isMinting ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""}
+              bottomText={
+                isTransactionDelayed && isMinting
+                  ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+                  : ""
+              }
             />
           )}
           {hasMinted && (
@@ -317,12 +334,12 @@ export default function BurnPack({ setDisplay }) {
                     display: "flex",
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "space-evenly"
+                    justifyContent: "space-evenly",
                   }}
                 >
                   <Box
                     sx={{
-                      flex: 3
+                      flex: 3,
                     }}
                   >
                     <Box
@@ -330,10 +347,15 @@ export default function BurnPack({ setDisplay }) {
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "flex-start"
+                        justifyContent: "flex-start",
                       }}
                     >
-                      <Typography sx={{ marginRight: 2 }} variant="h4" color="white" component="div">
+                      <Typography
+                        sx={{ marginRight: 2 }}
+                        variant="h4"
+                        color="white"
+                        component="div"
+                      >
                         Acquired 5 TeamDiff Athletes!
                       </Typography>
                       <CheckCircleIcon color="secondary"></CheckCircleIcon>
@@ -344,7 +366,7 @@ export default function BurnPack({ setDisplay }) {
                         sx={{
                           display: "flex",
                           flexDirection: "row",
-                          justifyContent: "space-between"
+                          justifyContent: "space-between",
                         }}
                       >
                         {mintedIndices?.map((index) => (
@@ -357,15 +379,15 @@ export default function BurnPack({ setDisplay }) {
                             }
                             // href=""
                             target="_blank"
-
                           >
                             <Paper
                               elevation={5}
                               sx={{
-                                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                                background:
+                                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                                 flex: 1,
                                 marginRight: 3,
-                                padding: 2
+                                padding: 2,
                               }}
                             >
                               <Typography variant="h5">
@@ -373,8 +395,6 @@ export default function BurnPack({ setDisplay }) {
                               </Typography>
                             </Paper>
                           </Link>
-
-
                         ))}
 
                         {/* {athleteNFTs?.map((athlete) => (
@@ -408,7 +428,6 @@ export default function BurnPack({ setDisplay }) {
                  
                   
                 ))} */}
-
                       </Box>
                       <hr></hr>
                       <Typography variant="h6">
@@ -427,12 +446,14 @@ export default function BurnPack({ setDisplay }) {
                       Go To My Collection
                     </Fab>
                   </Box>
-                  <Box sx={{
-                    flex: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
+                  <Box
+                    sx={{
+                      flex: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Image
                       src={profilePic}
                       alt="Picture of the author"
@@ -452,7 +473,6 @@ export default function BurnPack({ setDisplay }) {
         >
           <Typography>Your Starter Pack has been burned</Typography>
           {/* TODO: show a collection of their newly minted athlete cards on the screen */}
-
             </>
           )}
           {!isConnected && !hasMinted && !isMinting && (
