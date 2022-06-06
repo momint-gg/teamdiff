@@ -12,7 +12,6 @@ import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import {
   Box,
-  CircularProgress,
   Typography,
   Button,
   Chip,
@@ -27,6 +26,8 @@ import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/Game
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
+import LoadingPrompt from "../components/LoadingPrompt.js";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
@@ -224,7 +225,7 @@ export default function MintPack({ setDisplay }) {
               paddingTop: "20px",
             }}
           >
-          {!isPolygon && 
+            {!isPolygon &&
               <Typography
                 style={{
                   color: "red",
@@ -238,10 +239,7 @@ export default function MintPack({ setDisplay }) {
         </Container>
       )}
       {isMinting && (
-        <Container>
-          <Typography variant="h5" color="white" component="div">Minting...</Typography>
-          <CircularProgress />
-        </Container>
+        <LoadingPrompt completeTitle={"Minting Your Pack!"} />
       )}
       {hasMinted && (
         <Box>
@@ -259,6 +257,18 @@ export default function MintPack({ setDisplay }) {
           >
             View on OpenSea.
           </a>
+
+          <a
+            href={
+              "https://twitter.com/intent/tweet?text=Just%20minted%20a%20@teamdiffxyz%20starter%20pack.%20Come%20build%20your%20dream%20roster%20and%20compete%20with%20me%20for%20USDC%20tokens!%20https://opensea.io/assets/matic/" +
+              gameItemsContract.address +
+              "/50" // the pack Id is after the athletes (not 0)
+            }
+            target={"_blank"}
+            rel="noreferrer"
+          >
+            Tweet
+          </a>
           <Typography>
             Note that it may take a few minutes for images and metadata to
             properly load on OpenSea.
@@ -266,7 +276,7 @@ export default function MintPack({ setDisplay }) {
         </Box>
       )}
       {!accountData && !hasMinted && !isMinting && (
-        <div> Please connect your wallet. </div>
+        <ConnectWalletPrompt accessing={"minting a pack"} />
       )}
       {packsAvailable == 0 && (
         <Box>
