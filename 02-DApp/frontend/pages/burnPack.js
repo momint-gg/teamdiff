@@ -17,7 +17,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   Link,
   Box,
-  CircularProgress,
   Typography,
   Button,
   Chip,
@@ -205,22 +204,7 @@ export default function BurnPack({ setDisplay }) {
   return (
     <Box>
       {isLoading ? (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
-            justifyContent="center"
-            alignItems="center"
-            flexDirection="column"
-            sx={{
-              display: "flex",
-            }}
-          >
-            <Typography variant="h5" color="white" component="div">
-              Loading
-            </Typography>
-            <br></br>
-            <CircularProgress />
-          </Box>
-        </Container>
+        <LoadingPrompt loading={"Burn Page"} />
       ) : (
         <>
           {isConnected && !(hasMinted) &&
@@ -327,32 +311,10 @@ export default function BurnPack({ setDisplay }) {
             </Container>
           }
           {isMinting && (
-            <>
-              <Container maxWidth="lg" justifyContent="center" alignItems="center">
-                <Box
-                  justifyContent="center"
-                  alignItems="center"
-                  flexDirection="column"
-                  sx={{
-                    display: "flex",
-                  }}
-                >
-                  <Typography variant="h5" color="white" component="div">
-                    Burning Pack...
-                  </Typography>
-                  <br></br>
-                  <CircularProgress />
-                  <br></br>
-                  {isMinting && isTransactionDelayed && (
-
-                    <Typography variant="p" textAlign={"center"}>
-                      This is taking longer than normal. Please check your wallet to check the status of this transaction.
-                    </Typography>
-                  )}
-                </Box>
-              </Container>
-
-            </>
+            <LoadingPrompt
+              completeTitle={"Burning Pack..."}
+              bottomText={isTransactionDelayed && isMinting ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""}
+            />
           )}
           {hasMinted && (
             <>

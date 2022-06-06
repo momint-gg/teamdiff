@@ -15,7 +15,7 @@ export default function ConnectWalletPrompt({ accessing }) {
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                     Connect
                 </Typography>
-                <Typography variant="h6" sx={{ fontSize: "1.1rem", marginTop: ".4rem", marginBottom: ".4rem" }}>
+                <Typography variant="h6" sx={{ fontSize: "1.1rem", marginTop: ".4rem", marginBottom: ".4rem", overflowWrap: "break-word" }}>
                     Whether it's your first time visiting, or you're a returning pro, make sure to connect your wallet to access {accessing ? accessing : "TeamDiff"}.
                 </Typography>
                 <WalletLogin isMobile={isMobile} />
