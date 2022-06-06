@@ -259,6 +259,18 @@ export default function MintPack({ setDisplay }) {
           >
             View on OpenSea.
           </a>
+
+          <a
+            href={
+              "https://twitter.com/intent/tweet?text=Just%20minted%20a%20@teamdiffxyz%20starter%20pack.%20Come%20build%20your%20dream%20roster%20and%20compete%20with%20me%20for%20USDC%20tokens!%20https://opensea.io/assets/matic/" +
+              gameItemsContract.address +
+              "/50" // the pack Id is after the athletes (not 0)
+            }
+            target={"_blank"}
+            rel="noreferrer"
+          >
+            Tweet
+          </a>
           <Typography>
             Note that it may take a few minutes for images and metadata to
             properly load on OpenSea.
