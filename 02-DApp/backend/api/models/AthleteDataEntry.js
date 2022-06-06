@@ -33,7 +33,7 @@ const AthleteDataEntrySchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  FBPercent: {
+  FBpercent: {
     type: Number,
     required: true,
   },

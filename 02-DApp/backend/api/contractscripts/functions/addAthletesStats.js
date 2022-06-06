@@ -11,17 +11,15 @@ const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/Athletes.json');
 const { Athletes } = require('../contract_info/contractAddresses');
 const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
-
-// Modules for parsing excel
-const fs = require('fs');
 const XLSX = require('xlsx');
 
-// NOTE: In the functions folder (same directory as this file) you should put the excel file with two columns: name, points
+// MongoDB
+const mongoose = require('mongoose');
+const AthleteDataEntry = require('../../api/models/AthleteDataEntry');
 
 // How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
-// We should start at week 0
 async function main() {
-  const week_num = process.argv[2];
+  const week_num = parseInt(process.argv[2]);
 
   // Constructing our contract
   const provider = new ethers.providers.AlchemyProvider(
@@ -93,7 +91,7 @@ async function main() {
       athleteToBoolArr[id] = true;
     } else {
       // Athletes that aren't in TeamDiff (starters are benched)
-      // console.log('Athlete named ', name, ' is not in TeamDiff');
+      console.log('Athlete named ', name, ' is not in TeamDiff');
     }
   }
 
@@ -113,20 +111,32 @@ async function main() {
         pentakills: 0,
         week_num,
       });
-      // console.log('Athlete with id ', i, ' was benched for the week');
+      console.log('Athlete with id ', i, ' was benched for the week');
     }
   }
+  console.log('About to push athlete stats', finalStatsToPush);
 
-  // Creating JSON of our final stats
-  const finalObj = {};
-  finalObj['athletes'] = finalStatsToPush;
-  console.log(finalObj);
-
-  // TODO: Adding to database
-  // TODO 1: Adding weekly data for all athletes (/allAthletes/$week)
-  // TODO 2: Adding historical data for athletes (/athlete/$name)
+  await mongoose
+    .connect(process.env.MONGODB_URI, {
+      //Specific properties we want (very standard configuration)
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      // useCreateIndex: true,
+      // useFindAndModify: false,
+    })
+    .then(async () => {
+      console.log('Connected to Mongo!');
+      // Adding records to database
+      for (let i = 0; i < finalStatsToPush.length; i++) {
+        const athleteEntry = new AthleteDataEntry({ ...finalStatsToPush[i] });
+        await athleteEntry.save();
+      }
+      console.log('Successfully pushed stats to Mongo');
+    })
+    .catch((err) => console.log('Error pushing stats to Mongo', err));
 
   // Finally, pushing stats to the contract
+  console.log('Now pushing stats to contract');
   // for (let i = 0; i < 50; i++) {
   //   console.log('Adding athletes stats for athlete index ', i);
 
