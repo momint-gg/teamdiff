@@ -4,6 +4,7 @@ import {
 } from "wagmi";
 import AthleteCard from "../components/AthleteCard";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import LoadingPrompt from "../components/LoadingPrompt";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
   Box,
@@ -31,6 +32,8 @@ import { useRouter } from 'next/router'
 import { useMediaQuery } from "react-responsive";
 
 export default function Play() {
+  const test = true;
+  const test2 = true;
   //Router
   const router = useRouter();
   //WAGMI Hooks
@@ -199,7 +202,9 @@ export default function Play() {
           </Grid>
         </Grid>
       ) : (
-        <ConnectWalletPrompt accessing={"the Play Page"} />
+        // <ConnectWalletPrompt accessing={"the Play Page"} />
+        <LoadingPrompt completeTitle={"Minting Your Pack!"} />
+        // <LoadingPrompt completeTitle={"Burning Pack..."} bottomText={test && test2 ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""} />
       )}
 
     </Box>

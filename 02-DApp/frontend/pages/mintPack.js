@@ -12,7 +12,6 @@ import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import {
   Box,
-  CircularProgress,
   Typography,
   Button,
   Chip,
@@ -28,6 +27,7 @@ import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
+import LoadingPrompt from "../components/LoadingPrompt.js";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
@@ -239,10 +239,7 @@ export default function MintPack({ setDisplay }) {
         </Container>
       )}
       {isMinting && (
-        <Container>
-          <Typography variant="h5" color="white" component="div">Minting...</Typography>
-          <CircularProgress />
-        </Container>
+        <LoadingPrompt completeTitle={"Minting Your Pack!"} />
       )}
       {hasMinted && (
         <Box>

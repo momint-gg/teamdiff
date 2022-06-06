@@ -9,6 +9,7 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 
 import ConnectWallet from "./connectWallet";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import LoadingPrompt from "../components/LoadingPrompt";
 import AthleteCardModal from "../components/AthleteCardModal";
 import { useMediaQuery } from 'react-responsive';
 
@@ -168,11 +169,7 @@ export default function Collection() {
     );
   } else if (isConnected) {
     return (
-      <Box>
-        <Typography variant="h2" color="secondary" component="div">
-          Loading...
-        </Typography>
-      </Box>
+      <LoadingPrompt loading={"Your Collection"} />
     );
   }
 

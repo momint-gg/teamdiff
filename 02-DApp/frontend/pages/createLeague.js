@@ -3,9 +3,8 @@ import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import theme from '../styles/theme.js';
-import { Box, Link, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, Link, FormLabel, FormGroup, Switch, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
 // import 'bootstrap/dist/css/bootstrap.css'
-// import { Box, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel, Divider } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -40,6 +39,7 @@ import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/Le
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
 import AddToWhitelist from '../components/AddToWhitelist.js';
+import LoadingPrompt from '../components/LoadingPrompt.js';
 
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
@@ -686,29 +686,10 @@ export default function CreateLeague({ setDisplay }) {
         </>
       )}
       {isCreatingLeague && (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
-            justifyContent="center"
-            alignItems="center"
-            flexDirection="column"
-            sx={{
-              display: "flex",
-            }}
-          >
-            <Typography variant="h5" color="white" component="div">
-              League Creation in progress
-            </Typography>
-            <br></br>
-            <CircularProgress />
-            <br></br>
-            {isCreatingLeague && isTransactionDelayed && (
-
-              <Typography variant="p" textAlign={"center"}>
-                This is taking longer than normal. Please check your wallet to check the status of this transaction.
-              </Typography>
-            )}
-          </Box>
-        </Container>
+        <LoadingPrompt
+          completeTitle={"Creating Your League..."}
+          bottomText={isCreatingLeague && isTransactionDelayed ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""}
+        />
       )}
       {hasCreatedLeague && (
         <Box
@@ -754,29 +735,10 @@ export default function CreateLeague({ setDisplay }) {
           </Link>
           <br></br>
           {isJoiningLeague && (
-            <Container maxWidth="lg" justifyContent="center" alignItems="center">
-              <Box
-                justifyContent="center"
-                alignItems="center"
-                flexDirection="column"
-                sx={{
-                  display: "flex",
-                }}
-              >
-                <Typography variant="h5" color="white" component="div">
-                  {"Joining newly created league: \"" + newLeagueName + "\""}
-                </Typography>
-                <br></br>
-                <CircularProgress />
-                <br></br>
-                {isJoiningLeague && isTransactionDelayed && (
-
-                  <Typography variant="p" textAlign={"center"}>
-                    This is taking longer than normal. Please check your wallet to check the status of this transaction.
-                  </Typography>
-                )}
-              </Box>
-            </Container>
+            <LoadingPrompt
+              completeTitle={"Joining Newly Created League..."}
+              bottomText={isJoiningLeague && isTransactionDelayed ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""}
+            />
           )}
           {hasJoinedLeague && (
             <>
