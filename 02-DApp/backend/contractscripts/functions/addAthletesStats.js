@@ -88,6 +88,7 @@ async function main() {
         VSPM,
         FBpercent,
         pentakills,
+        week_num,
       });
       athleteToBoolArr[id] = true;
     } else {
@@ -96,6 +97,7 @@ async function main() {
     }
   }
 
+  // Adding the benched starters with point vals of 0
   for (let i = 0; i < athleteToBoolArr.length; i++) {
     if (!athleteToBoolArr[i]) {
       finalStatsToPush.push({
@@ -109,6 +111,7 @@ async function main() {
         VSPM: 0,
         FBpercent: 0,
         pentakills: 0,
+        week_num,
       });
       // console.log('Athlete with id ', i, ' was benched for the week');
     }
@@ -117,7 +120,7 @@ async function main() {
   // Creating JSON of our final stats
   const finalObj = {};
   finalObj['athletes'] = finalStatsToPush;
-  // console.log(JSON.stringify(finalObj));
+  console.log(finalObj);
 
   // TODO: Adding to database
   // TODO 1: Adding weekly data for all athletes (/allAthletes/$week)
