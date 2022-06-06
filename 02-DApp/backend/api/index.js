@@ -3,8 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
 const fs = require('fs');
-const mongoDB = require('./database/connection');
-const routes = require('./routes/main');
+const mongoDB = require('./api/database/connection');
+const routes = require('./api/routes/main');
 
 // Middleware
 const app = express();
