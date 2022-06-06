@@ -7,20 +7,17 @@ npm install
 ```
 
 ## Usage
+
 ```
-node app.js 
+node app.js
 ```
 
 ## Endpoints
 
-#### Base URL: 
+- (GET) /allAthletes/:week --> This will return all stats of all athletes for any given week.
+- (GET) /athlete/:name --> Returns all of an athletes stats for each week
+- (PUT) /athleteData --> Pushes the athlete data to DB
 
-http://54.209.44.47:3000/
+TODO: Write out the steps in readme- for how to push to athlete Contract & the API (run the put req endpoint)
 
-#### Get most recent aggregated stats:
-
-http://54.209.44.47:3000/aggregated_stats
-
-#### Get most recent individual player game stats:
-
-http://54.209.44.47:3000/game_stats
+#### Base URL:

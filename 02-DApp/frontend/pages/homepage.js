@@ -14,9 +14,8 @@ export default function Homepage() {
                             <h1 className={[bootstrap["display-1"], bootstrap["fw-bold"]].join(' ')}>Build Yours.</h1>
                             <h1 className={[bootstrap["display-1"], styles["fw-900"]].join(' ')}>Compete with Friends.</h1>
                             <div className={[bootstrap["mt-4"], bootstrap["me-4"], bootstrap["mb-sm-4"]].join(' ')}>
-                                <p className={bootstrap["fs-5"]}>Build up your collection of TeamDiff Genesis cards to enter fantasy esports
-                                    leagues and compete against your friends. We’re
-                                    building the future of fantasy esports, on the blockchain. Mint a starter pack now for free to unlock five LCS trading cards and join a league today!</p>
+                                <p className={bootstrap["fs-5"]}> The future of fantasy esports, on the blockchain. Mint a free TeamDiff starter pack now to unlock five LCS trading cards. Build your card collection and dream roster, then join a fantasy league
+                                    and compete against your friends for USDC tokens. </p>
                             </div>
                             <div className={[bootstrap["mt-5"], bootstrap["d-none"], bootstrap["d-md-inline"]].join(' ')}>
                                 <Link href="/mint">

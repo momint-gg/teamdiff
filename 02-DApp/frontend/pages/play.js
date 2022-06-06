@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { useAccount, useDisconnect
+import {
+  useAccount, useDisconnect
 } from "wagmi";
 import AthleteCard from "../components/AthleteCard";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
   Box,
@@ -81,8 +83,8 @@ export default function Play() {
   // }
 
   useEffect(() => {
-    if(accountData)
-     console.log("account data in use: " + accountData.address);
+    if (accountData)
+      console.log("account data in use: " + accountData.address);
   }, [accountData?.address])
 
   return (
@@ -92,13 +94,13 @@ export default function Play() {
       {accountData ? (
         <Grid container spacing={3}>
           <Grid item xs={4}>
-            <Card 
+            <Card
               sx={{
                 background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 20
               }}
               variant="outlined" onClick={() => router.push("/myLeagues")}>
-            <Fragment>
+              <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
                     <Typography color="secondary" component="div" fontSize={18}>
@@ -125,13 +127,13 @@ export default function Play() {
             </Typography>
           </Grid>
           <Grid item xs={4}>
-            <Card 
+            <Card
               sx={{
                 background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 20
               }}
-              variant="outlined" onClick={() =>  router.push("/joinLeague")}>
-            <Fragment>
+              variant="outlined" onClick={() => router.push("/joinLeague")}>
+              <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
                     <Typography color="secondary" component="div" fontSize={18}>
@@ -165,7 +167,7 @@ export default function Play() {
                 background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 20
               }}
-              onClick={() =>  router.push("/createLeagueLanding")}
+              onClick={() => router.push("/createLeagueLanding")}
             >
               <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>
@@ -196,11 +198,7 @@ export default function Play() {
           </Grid>
         </Grid>
       ) : (
-        <Box>
-          <Typography variant="h6" component="div">
-            Please connect your wallet to get started.
-          </Typography>
-        </Box>
+        <ConnectWalletPrompt accessing={"the Play Page"} />
       )}
     </Box>
   );

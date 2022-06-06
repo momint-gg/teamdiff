@@ -103,11 +103,11 @@ export default function PrivacyPolicy() {
           <p>
             <strong>Website</strong> refers to TeamDiff, accessible from{" "}
             <a
-              href="https://teamdiff.gg"
+              href="https://teamdiff.xyz"
               rel="external nofollow noopener"
               target="_blank"
             >
-              https://teamdiff.gg
+              https://teamdiff.xyz
             </a>
           </p>
         </li>
