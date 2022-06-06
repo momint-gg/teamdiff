@@ -16,7 +16,7 @@ export default function NavLink({ className, href, children, isMobile }) {
                   fontSize: "18px",
                   textDecoration: "underline",
                   fontFamily: "Exo",
-                  marginLeft: "10px",
+                  marginRight: "10px",
                   textDecorationColor: "cyan",
                   textUnderlineOffset: "10px",
                 }
@@ -25,7 +25,7 @@ export default function NavLink({ className, href, children, isMobile }) {
                   fontSize: "18px",
                   textDecoration: "none",
                   fontFamily: "Exo",
-                  marginLeft: "10px",
+                  marginRight: "10px",
                 }
             }
           >
@@ -52,7 +52,7 @@ export default function NavLink({ className, href, children, isMobile }) {
                   fontSize: "24px",
                   textDecoration: "none",
                   fontFamily: "Exo",
-                  marginRight: "15px",
+                  marginRight: "10px",
                 }
             }
           >

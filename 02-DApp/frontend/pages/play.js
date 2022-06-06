@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   useAccount, useDisconnect
 } from "wagmi";
+import { ethers } from "ethers";
 import AthleteCard from "../components/AthleteCard";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -38,6 +39,9 @@ export default function Play() {
   // const { data: ensName } = useEnsName()
   // const { data: ensAvatar } = useEnsAvatar()
   const { disconnect } = useDisconnect()
+  const [connectedAccount, setConnectedAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [signer, setSigner] = useState(null);
 
 
   const [nftResp, setNFTResp] = useState(null);
@@ -64,34 +68,41 @@ export default function Play() {
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
-  // const handleViewLeaguesClick = (e) => {
-  //   e.preventDefault()
-  //   const href= "/leagues/" + leagueAddress;
-  //   router.push(href)
-  // }
-
-  // const handleCreateLeaguClick = (e) => {
-  //   e.preventDefault()
-  //   const href= "/leagues/" + leagueAddress;
-  //   router.push(href)
-  // }
-
-  // const handleClick = (e) => {
-  //   e.preventDefault()
-  //   const href= "/leagues/" + leagueAddress;
-  //   router.push(href)
-  // }
-
   useEffect(() => {
-    if (accountData)
-      console.log("account data in use: " + accountData.address);
-  }, [accountData?.address])
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const setAccountData = async () => {
+        const signer = provider.getSigner()
+        const accounts = await provider.listAccounts();
+
+        if(accounts.length > 0) {
+          const accountAddress = await signer.getAddress()
+          setSigner(signer)
+          setConnectedAccount(accountAddress)
+          setIsConnected(true)
+        }
+        else {
+          setIsConnected(false);
+        }
+      }
+      setAccountData()
+      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
+                                                  setIsConnected(false) })
+      provider.on("network", (newNetwork, oldNetwork) => {
+        // When a Provider makes its initial connection, it emits a "network"
+        // event with a null oldNetwork along with the newNetwork. So, if the
+        // oldNetwork exists, it represents a changing network
+        if (oldNetwork) {
+            window.location.reload();
+        }
+      });
+    }, [connectedAccount]);
 
   return (
     <Box>
       {/* <SignMessage/> */}
       {/* {!(displayMyLeagues || displayCreateLeague || displayJoinLeague) && ( */}
-      {accountData ? (
+      {isConnected ? (
         <Grid container spacing={3}>
           <Grid item xs={4}>
             <Card
