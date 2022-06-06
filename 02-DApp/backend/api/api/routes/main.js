@@ -6,6 +6,15 @@ const mongoose = require('mongoose');
 const AthleteDataEntry = require('../models/AthleteDataEntry');
 const router = express.Router();
 
+// Testing to see if our API is working at all
+router.get('/', async (req, res) => {
+  try {
+    res.json('API is working!');
+  } catch (error) {
+    res.json({ message: error.message });
+  }
+});
+
 // Getting all of our athletes for a given week
 // Example use: GET /allAthletes/0
 router.get('/allAthletes/:week', async (req, res) => {
