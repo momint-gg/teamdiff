@@ -5,6 +5,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const AthleteDataEntry = require('../models/AthleteDataEntry');
 const router = express.Router();
+const athleteData = require('../athleteData/stats.json');
 
 // Getting all of our athletes for a given week
 // Example use: GET /allAthletes/0
@@ -32,21 +33,14 @@ router.get('/athlete/:name', async (req, res) => {
 
 router.put('/athleteData', async (req, res) => {
   try {
-    const sampleData = new AthleteDataEntry({
-      id: 1,
-      name: 'TEST NAME',
-      points: 0,
-      avg_kills: 0,
-      avg_deaths: 0,
-      avg_assists: 0,
-      CSM: 0,
-      VSPM: 0,
-      FBpercent: 0,
-      pentakills: 0,
-      week_num: 1,
-    });
-    await sampleData.save();
-    // res.json();
+    const data = athleteData['data'];
+    for (let i = 0; i < data.length; i++) {
+      console.log(data[i]);
+      const newAthleteDataEntry = new AthleteDataEntry({ ...data[i] });
+      const saved = await newAthleteDataEntry.save();
+      //   res.json(saved);
+    }
+    res.json({ message: 'Done adding athlete data! Check the DB now.' });
   } catch (error) {
     res.json({ error: error.message });
   }
