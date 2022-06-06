@@ -1,41 +1,23 @@
-import {
-  useAccount,
-  useConnect,
-  useSigner,
-  useProvider,
-  useContract,
-  useEnsLookup,
-} from "wagmi";
-import { useEffect, useState } from "react";
-import { useRouter } from 'next/router'
-
-import { ethers } from "ethers";
-import "bootstrap/dist/css/bootstrap.css";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import Image from "next/image";
-import LoadingPrompt from "../components/LoadingPrompt";
-
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // import AthleteCard from "../components/AthleteCard";
-
 import {
-  Link,
-  Box,
-  Typography,
-  Button,
-  Chip,
-  Container,
-  Paper,
-  Fab,
-  Grid,
+  Box, Container, Fab, Link, Paper, Typography
 } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from "react";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
-import AthleteCard from "../components/AthleteCard";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import profilePic from "../assets/images/starter-pack.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
+import LoadingPrompt from "../components/LoadingPrompt";
 import constants from "../Constants";
+
+
 
 export default function BurnPack({ setDisplay }) {
   //TODO change to matic network for prod
@@ -43,11 +25,10 @@ export default function BurnPack({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-    //Router
-    const router = useRouter();
+  //Router
+  const router = useRouter();
 
   //State Hooks
-  const [mintedPackId, setMintedPackId] = useState(null);
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
@@ -427,43 +408,43 @@ export default function BurnPack({ setDisplay }) {
                  
                   
                 ))} */}
-                 
-               </Box>
-                <hr></hr>
-               <Typography variant="h6">
-                      Click any card to view on OpenSea 
-                </Typography>
-             </Box>
-               <Fab
-                 variant="extended"
-                 size="large"
-                 color="white"
-                 aria-label="add"
-                //  target={"_blank"}
-                 onClick={() => router.push("./collection")}
-                 sx={{ marginTop: 5, fontSize: 20 }}
-               >
-                 Go To My Collection
-               </Fab>
-           </Box>
-           <Box sx={{ 
-             flex: 2,
-             display: "flex",
-             alignItems: "center",
-             justifyContent: "center"
-           }}>
-             <Image
-               src={profilePic}
-               alt="Picture of the author"
-               // height="100%"
-               // width="auto"
-               width="155px"
-               height="225px"
-             />
-           </Box>
-          </Box>         
-       </Container>
-        {/* <Box
+
+                      </Box>
+                      <hr></hr>
+                      <Typography variant="h6">
+                        Click any card to view on OpenSea
+                      </Typography>
+                    </Box>
+                    <Fab
+                      variant="extended"
+                      size="large"
+                      color="white"
+                      aria-label="add"
+                      //  target={"_blank"}
+                      onClick={() => router.push("./collection")}
+                      sx={{ marginTop: 5, fontSize: 20 }}
+                    >
+                      Go To My Collection
+                    </Fab>
+                  </Box>
+                  <Box sx={{
+                    flex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <Image
+                      src={profilePic}
+                      alt="Picture of the author"
+                      // height="100%"
+                      // width="auto"
+                      width="155px"
+                      height="225px"
+                    />
+                  </Box>
+                </Box>
+              </Container>
+              {/* <Box
           sx={{
             display: "flex",
             flexDirection: "column",

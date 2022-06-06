@@ -1,14 +1,8 @@
-import "bootstrap/dist/css/bootstrap.css";
 import {
-  Container,
-  Box,
-  Grid,
-  Fab,
-  Typography,
-  ImageList,
-  ImageListItem,
-  Button,
+  Box, ImageList,
+  ImageListItem, Typography
 } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
 
 export default function StarterPackContents() {
   // If we want to try to load from pinata

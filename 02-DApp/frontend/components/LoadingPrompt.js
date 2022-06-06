@@ -1,5 +1,5 @@
-import { Typography, Box, Card } from "@mui/material";
-import PacmanLoader from "react-spinners/PacmanLoader"
+import { Box, Card, Typography } from "@mui/material";
+import PacmanLoader from "react-spinners/PacmanLoader";
 
 export default function LoadingPrompt({ loading, bottomText, completeTitle }) {
     return (

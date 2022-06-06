@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import Image from "next/image";
-import { Box, Button, Typography, Modal, TextField } from "@mui/material";
 import { makeStyles } from "@material-ui/core";
+import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import Image from "next/image";
+import React, { useState } from "react";
 import CloseIcon from "../assets/images/close.png";
-import Card from "../assets/cards/Fudge.png";
 
 const useStyles = makeStyles(() => ({
   root: {

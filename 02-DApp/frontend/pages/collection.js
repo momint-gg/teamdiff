@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-
-import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Grid } from "@mui/material";
-import constants from "../constants";
+import { Box, Grid, Typography } from "@mui/material";
+import { ethers } from "ethers";
+import { React, useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-
-import ConnectWallet from "./connectWallet";
+import AthleteCard from "../components/AthleteCard";
+import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
-import AthleteCardModal from "../components/AthleteCardModal";
-import { useMediaQuery } from "react-responsive";
+import constants from "../constants";
+
+
 
 export default function Collection() {
   const [nftResp, setNFTResp] = useState(null);
@@ -110,7 +109,7 @@ export default function Collection() {
   if (isConnected && nftResp) {
     return (
       <Box>
-        
+
         <Typography
           variant={isMobile ? "h4" : "h2"}
           color="secondary"

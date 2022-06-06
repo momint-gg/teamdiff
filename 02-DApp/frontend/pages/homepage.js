@@ -1,8 +1,8 @@
-import bootstrap from '../styles/sass/custom_bootstrap.module.scss';
-import styles from '../styles/sass/home_styles.module.scss';
-import cardAndPack from '../assets/images/card_and_pack.png';
 import Image from "next/image";
 import Link from 'next/link';
+import cardAndPack from '../assets/images/card_and_pack.png';
+import bootstrap from '../styles/sass/custom_bootstrap.module.scss';
+import styles from '../styles/sass/home_styles.module.scss';
 
 export default function Homepage() {
     return (

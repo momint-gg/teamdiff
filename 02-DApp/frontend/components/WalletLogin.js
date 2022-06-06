@@ -1,13 +1,12 @@
-import { useAccount, 
-         useConnect,
-        useEnsAvatar, 
-        useEnsName,
-        useDisconnect } from "wagmi";
-import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
-import { useEffect, useState } from "react";
-
+import { Avatar, Box, Button, Chip, ClickAwayListener } from "@mui/material";
 import { ethers } from "ethers";
+import React, { useEffect, useState } from "react";
+import {
+  useEnsAvatar,
+  useEnsName
+} from "wagmi";
 import ConnectWalletModal from "./ConnectWalletModal";
+
 
 export default function WalletLogin({isMobile}) {
   // const { isConnected, connector, connectors, connectAsync } = useConnect()

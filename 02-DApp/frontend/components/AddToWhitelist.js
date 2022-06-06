@@ -1,19 +1,11 @@
-import { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.css';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import theme from '../styles/theme.js';
-import { Box, Link, FormLabel, FormGroup, Switch, CircularProgress, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import Input from '@mui/material/Input';
-import InputAdornment from '@mui/material/InputAdornment';
-import Grid from '@material-ui/core/Grid'
+import 'bootstrap/dist/css/bootstrap.css';
+import React, { useEffect, useState } from 'react';
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
-import WAValidator from 'wallet-address-validator'; 
+import WAValidator from 'wallet-address-validator';
+import theme from '../styles/theme.js';
 
 export default function AddToWhitelist({setInviteListValues, inviteListValues, connectedAccount}) {
     const [validAddressesStatus, setValidAddressesStatus] = useState(true)

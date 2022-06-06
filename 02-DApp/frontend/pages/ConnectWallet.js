@@ -1,13 +1,14 @@
-import { useAccount, useDisconnect
-, useConnect } from "wagmi";
-import "bootstrap/dist/css/bootstrap.css";
 import { Box, Button } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import {
+  useAccount, useConnect, useDisconnect
+} from "wagmi";
 
 export default function ConnectWallet() {
   const [{ data: connectData, error: connectError }, connect] = useConnect();
   const { data: accountData, isLoading, error } = useAccount({ ens: true })
   const { disconnect } = useDisconnect()
-       
+
   if (accountData) {
     return (
       <Box>

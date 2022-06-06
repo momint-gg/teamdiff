@@ -1,12 +1,9 @@
-import { Fragment } from "react";
 import {
   Card,
   CardContent,
-  CardMedia,
-  Typography,
-  CardActions,
-  Button,
+  Typography
 } from "@mui/material";
+import React, { Fragment } from "react";
 
 export default function StarterPackAthleteCard(athleteData) {
   const card = (

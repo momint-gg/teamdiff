@@ -1,10 +1,5 @@
 import {
-  Box,
-  Button,
-  Avatar,
-  CardMedia,
-  Typography,
-  Modal,
+  Box, CardMedia, Modal, Typography
 } from "@mui/material";
 
 export default function AthleteCardModal({

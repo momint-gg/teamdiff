@@ -1,19 +1,15 @@
+import { Box, Container, Fab, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
-import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
 import Image from "next/image";
-import { useState } from "react";
-import card_and_pack from "../assets/images/card_and_pack.png";
-// import StarterPackContents from "../components/StarterPackContents";
-import MintPack from "./mintPack.js";
-import { useMediaQuery } from "react-responsive";
 //Router
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
+import React from "react";
+import { useMediaQuery } from "react-responsive";
+import cardandpack from "../assets/images/card_and_pack.png";
 
-export default function MintHome() {
+ export default function MintHome() {
   //Router
   const router = useRouter();
-  const [displayMint, setDisplayMint] = useState(false);
-  const [displayCollection, setDisplayCollection] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   return (
@@ -92,7 +88,7 @@ export default function MintHome() {
                     justifyContent: "center"
                   }}>
                     <Image
-                      src={card_and_pack}
+                      src={cardandpack}
                       alt="Picture of the author"
                       width="550px"
                       height="550px"
@@ -156,7 +152,7 @@ export default function MintHome() {
               {isMobile ? (
                 <Box>
                   <Image
-                    src={card_and_pack}
+                    src={cardandpack}
                     alt="Picture of the author"
                     width="550px"
                     height="550px"
@@ -173,7 +169,7 @@ export default function MintHome() {
                 >
                   <Box>
                   <Image
-                    src={card_and_pack}
+                    src={cardandpack}
                     // layout="responsive"
                     alt="Picture of the author"
                     width="550px"

@@ -1,6 +1,6 @@
-import { Typography, Box, Card } from "@mui/material";
-import WalletLogin from "./WalletLogin";
+import { Box, Card, Typography } from "@mui/material";
 import { useMediaQuery } from 'react-responsive';
+import WalletLogin from "./WalletLogin";
 
 export default function ConnectWalletPrompt({ accessing }) {
     const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
