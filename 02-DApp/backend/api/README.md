@@ -9,7 +9,7 @@ npm install
 ## Usage
 
 ```
-node app.js
+node index.js
 ```
 
 ## Endpoints
@@ -20,3 +20,5 @@ node app.js
 - (DELETE) /clearWholeDB --> Clears the entire collection permanently
 
 #### Base URL:
+
+http://stuff-

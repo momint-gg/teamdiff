@@ -126,7 +126,7 @@ async function main() {
     console.log('Error: ', error);
   }
 
-  Finally, pushing stats to the contract
+  //Finally, pushing stats to the contract
   console.log('Now pushing stats to contract');
   for (let i = 0; i < 50; i++) {
     console.log('Adding athletes stats for athlete index ', i);
