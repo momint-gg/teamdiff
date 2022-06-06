@@ -1,17 +1,5 @@
 # API
 
-## Installation
-
-```
-npm install
-```
-
-## Usage
-
-```
-node index.js
-```
-
 ## Endpoints
 
 ### Endpoints for athlete data (for use by frontend)
