@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
- import { ethers } from "ethers";
+import { ethers } from "ethers";
 
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -8,6 +8,7 @@ import constants from "../Constants";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 
 import ConnectWallet from "./connectWallet";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import AthleteCardModal from "../components/AthleteCardModal";
 import { useMediaQuery } from 'react-responsive';
 
@@ -27,31 +28,33 @@ export default function Collection() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner()
 
-      // const fetchData = async () => {
-      //   const currentAddress = await signer.getAddress()
-      //   setAddressPreview(currentAddress)
-      // }
-      // fetchData()
-      const setAccountData = async () => {
-        const signer = provider.getSigner()
-        const accounts = await provider.listAccounts();
+    // const fetchData = async () => {
+    //   const currentAddress = await signer.getAddress()
+    //   setAddressPreview(currentAddress)
+    // }
+    // fetchData()
+    const setAccountData = async () => {
+      const signer = provider.getSigner()
+      const accounts = await provider.listAccounts();
 
-        if(accounts.length > 0) {
-          const accountAddress = await signer.getAddress()
-          setSigner(signer)
-          setConnectedAccount(accountAddress)
-          setIsConnected(true)
-      
-        }
-        else {
-          setIsConnected(false);
-        }
+      if (accounts.length > 0) {
+        const accountAddress = await signer.getAddress()
+        setSigner(signer)
+        setConnectedAccount(accountAddress)
+        setIsConnected(true)
+
       }
-      setAccountData()
-      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
-                                                  setIsConnected(false) })
-    }, []);
+      else {
+        setIsConnected(false);
+      }
+    }
+    setAccountData()
+    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+    provider.provider.on('disconnect', () => {
+      console.log("disconnected");
+      setIsConnected(false)
+    })
+  }, []);
 
   const handleModalOpen = () => {
     setModalOpen(true);
@@ -72,7 +75,7 @@ export default function Collection() {
     setPackNFTs([]);
     setAthleteNFTs([]);
     // declare the async data fetching function
-    if(isConnected) {
+    if (isConnected) {
       const getNFTData = async () => {
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
 
@@ -106,9 +109,9 @@ export default function Collection() {
   if (isConnected && nftResp) {
     return (
       <Box>
-        <Typography 
-          variant={isMobile? "h4" : "h2"} 
-          color="secondary" 
+        <Typography
+          variant={isMobile ? "h4" : "h2"}
+          color="secondary"
           component="div">
           PACKS
         </Typography>
@@ -119,9 +122,9 @@ export default function Collection() {
             height: 5,
           }}
         />
-        <Grid container spacing={isMobile? 1 : 3}>
+        <Grid container spacing={isMobile ? 1 : 3}>
           {packNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile? 12 : 4}>
+            <Grid item xs={isMobile ? 12 : 4}>
               <AthleteCard
                 athleteData={athleteData}
                 setAthlete={setCurrAthlete}
@@ -131,7 +134,7 @@ export default function Collection() {
           ))}
         </Grid>
         <Typography
-          variant={isMobile? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h2"}
           color="secondary"
           component="div"
           style={{ marginTop: 10 }}
@@ -145,9 +148,9 @@ export default function Collection() {
             height: 5,
           }}
         />
-        <Grid container spacing={isMobile? 1 : 3}>
+        <Grid container spacing={isMobile ? 1 : 3}>
           {athleteNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile? 12 : 4}>
+            <Grid item xs={isMobile ? 12 : 4}>
               <AthleteCard
                 athleteData={athleteData}
                 setAthlete={setCurrAthlete}
@@ -174,10 +177,6 @@ export default function Collection() {
   }
 
   return (
-    <Box>
-      <Typography variant="h6" component="div">
-        Please connect your wallet to get started.
-      </Typography>
-    </Box>
+    <ConnectWalletPrompt accessing={"your collection"} />
   );
 }

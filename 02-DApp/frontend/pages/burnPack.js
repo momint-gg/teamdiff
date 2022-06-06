@@ -30,6 +30,7 @@ import {
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import AthleteCard from "../components/AthleteCard";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import profilePic from "../assets/images/starter-pack.png";
 import constants from "../Constants";
 
@@ -62,27 +63,29 @@ export default function BurnPack({ setDisplay }) {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const sig ner = provider.getSigner()
     const setAccountData = async () => {
-        const signer = provider.getSigner()
-        const accounts = await provider.listAccounts();
+      const signer = provider.getSigner()
+      const accounts = await provider.listAccounts();
 
-        if(accounts.length > 0) {
-          const accountAddress = await signer.getAddress()
+      if (accounts.length > 0) {
+        const accountAddress = await signer.getAddress()
 
-          setSigner(signer)
-          setConnectedAccount(accountAddress)
-          setIsConnected(true)
-      
-        }
-        else {
-          setIsConnected(false);
-        }
-        setIsLoading(false)
+        setSigner(signer)
+        setConnectedAccount(accountAddress)
+        setIsConnected(true)
+
       }
-      setAccountData()
-      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
-                                                  setIsConnected(false) })
-    }, [connectedAccount]);
+      else {
+        setIsConnected(false);
+      }
+      setIsLoading(false)
+    }
+    setAccountData()
+    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+    provider.provider.on('disconnect', () => {
+      console.log("disconnected");
+      setIsConnected(false)
+    })
+  }, [connectedAccount]);
 
   // Use Effect for change in if user isConnected
   useEffect(() => {
@@ -95,7 +98,7 @@ export default function BurnPack({ setDisplay }) {
         provider
       );
       setGameItemsContract(GameItemsContract);
-      
+
 
       //Fetcher to retireve newly minted NFT data
       const getNFTData = async (athleteIndices) => {
@@ -105,7 +108,7 @@ export default function BurnPack({ setDisplay }) {
           owner: connectedAccount,
           contractAddresses: [CONTRACT_ADDRESSES.GameItems],
         }).catch((error) => {
-            console.log("get NFT DATA error: " + JSON.stringify(error, null, 2));
+          console.log("get NFT DATA error: " + JSON.stringify(error, null, 2));
         });
 
         setNFTResp(nfts);
@@ -130,7 +133,7 @@ export default function BurnPack({ setDisplay }) {
       // athleteNFTs.forEach((athlete, index) => {
       //   console.log("Token #" + parseInt(index) + " metadata: " + JSON.stringify(athlete, null, 2));
       // })
-      
+
       // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = async (athleteIndices, signer) => {
         if (signer == connectedAccount) {
@@ -138,7 +141,7 @@ export default function BurnPack({ setDisplay }) {
           setIsTransactionDelayed(false);
           const test = [6, 33, 12, 26, 45];
           console.log("athleteIndices: " + test)
-          
+
           setHasMinted(true);
           setMintedIndices(athleteIndices);
 
@@ -169,162 +172,39 @@ export default function BurnPack({ setDisplay }) {
 
   // TODO hide burn pack if they don't
   const burnStarterPack = async () => {
-      // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const signer = provider.getSigner()
-      // Create a new instance of the Contract with a Signer, which allows update methods
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const signer = provider.getSigner()
+    // Create a new instance of the Contract with a Signer, which allows update methods
 
-      const gameItemsContractWithSigner = new ethers.Contract(
-        CONTRACT_ADDRESSES.GameItems,
-        GameItemsJSON.abi,
-        signer
-      );
-      // setIsMinting(true);
+    const gameItemsContractWithSigner = new ethers.Contract(
+      CONTRACT_ADDRESSES.GameItems,
+      GameItemsJSON.abi,
+      signer
+    );
+    // setIsMinting(true);
 
-      // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
+    // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
-      //Calling burn on game items contract
-      const burnTxn = await gameItemsContractWithSigner
-        .burnStarterPack({
-          gasLimit: 10000000,
-        })
-        .then((res) => {
-          console.log("txn result: " + JSON.stringify(res, null, 2));
-          setIsMinting(true);
-          window.setTimeout(() => {setIsTransactionDelayed(true)}, 60 * 5 * 1000) 
-          console.log("Minting pack in progress...");
-        })
-        .catch((error) => {
-          alert("error: " + error.message);
-        });
-    
+    //Calling burn on game items contract
+    const burnTxn = await gameItemsContractWithSigner
+      .burnStarterPack({
+        gasLimit: 10000000,
+      })
+      .then((res) => {
+        console.log("txn result: " + JSON.stringify(res, null, 2));
+        setIsMinting(true);
+        window.setTimeout(() => { setIsTransactionDelayed(true) }, 60 * 5 * 1000)
+        console.log("Minting pack in progress...");
+      })
+      .catch((error) => {
+        alert("error: " + error.message);
+      });
+
   };
 
   return (
     <Box>
-        {isLoading ? (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-        <Box
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-          sx={{
-            display: "flex",
-          }}
-        >
-          <Typography variant="h5" color="white" component="div">
-            Loading
-          </Typography>
-          <br></br>
-          <CircularProgress />
-        </Box>
-      </Container>
-      ) : (
-        <>
-      {isConnected && !(hasMinted) && 
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
-            justifyContent="center"
-            alignItems="center"
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              "& > :not(style)": {
-                m: 1,
-                width: 260,
-                height: 350,
-              },
-            }}
-          >
-            <Paper
-              elevation={0}
-              style={{
-                background:
-                  "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                filter: "blur(35px)",
-              }}
-            />
-            <Container sx={{ position: "absolute" }}>
-              <Image
-                src={profilePic}
-                alt="Picture of the author"
-                // width="310px"
-                // height="450px"
-                position="absolute"
-              />
-            </Container>
-          </Box>
-          {!(isMinting || hasMinted) && (
-            <>
-            <Box
-              justifyContent="center"
-              alignItems="center"
-              flexDirection="column"
-              sx={{
-                display: "flex",
-              }}
-            >
-              <Typography variant="h4" color="white" component="div">
-                Burn Starter Pack
-              </Typography>
-            </Box>
-            <Box
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                paddingTop: "20px",
-              }}
-            >
-              <Fab
-                variant="extended"
-                size="large"
-                aria-label="add"
-                onClick={burnStarterPack}
-                disabled={!canMint}
-                // onClick={() => setDisplayMint(true)}
-                sx={{
-                  marginRight: 1,
-                  marginBottom: 2,
-                  background:
-                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                  color: "white",
-                  fontSize: 20,
-                }}
-              >
-                Burn 
-              </Fab>
-              </Box>
-            </>
-          )}
-            {!canMint && 
-            <Box 
-              sx={{
-                display: "flex",
-                justifyContent: "center"
-              }}
-            >
-              <Typography>
-                {"\nLooks like you don't have a starter pack yet. Head "}
-                <Link>
-                <a
-                // style={{
-                //   textDecoration: "none",
-                //   textDecorationColor: "transparent"
-                // }}
-                class="primary-link"
-                href="/mintPack"> 
-                  here
-                </a>      
-                </Link>          
-                { " to mint one now!"}
-              </Typography>
-            </Box>
-            }
-        </Container>
-      }
-      {isMinting && (
-        <>
+      {isLoading ? (
         <Container maxWidth="lg" justifyContent="center" alignItems="center">
           <Box
             justifyContent="center"
@@ -335,97 +215,220 @@ export default function BurnPack({ setDisplay }) {
             }}
           >
             <Typography variant="h5" color="white" component="div">
-              Burning Pack...
+              Loading
             </Typography>
             <br></br>
             <CircularProgress />
-            <br></br>
-            {isMinting && isTransactionDelayed && (
-              
-              <Typography variant="p" textAlign={"center"}>
-                This is taking longer than normal. Please check your wallet to check the status of this transaction.
-              </Typography>
-            )}
           </Box>
         </Container>
-       
-        </>
-      )}
-      {hasMinted && (
+      ) : (
         <>
-         <Container
-         sx={{
-           display: "flex",
-           flexDirection: "column",
-           alignItems: "center",
-         }}
-       >
-         <Box
-           sx={{
-             display: "flex",
-             flexDirection: "row",
-             alignItems: "center",
-             justifyContent: "space-evenly"
-           }}
-         >
-           <Box
-             sx={{
-               flex: 3
-             }}
-           >
-             <Box
-               sx={{
-                 display: "flex",
-                 flexDirection: "row",
-                 alignItems: "center",
-                 justifyContent: "flex-start"
-               }}
-             >
-                <Typography sx={{marginRight: 2}} variant="h4" color="white" component="div">
-                  Acquired 5 TeamDiff Athletes!
-                </Typography>
-                <CheckCircleIcon color="secondary"></CheckCircleIcon>
-             </Box>
-             <br></br>
-             <Box>
-               <Box
-                 sx={{
+          {isConnected && !(hasMinted) &&
+            <Container maxWidth="lg" justifyContent="center" alignItems="center">
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                sx={{
                   display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between"
-                 }}
-               >
-                 {mintedIndices?.map((index) => (
-                   <Link
-                   href={
-                     "https://testnets.opensea.io/assets/" +
-                     gameItemsContract.address +
-                     "/" +
-                     index
-                   }
-                  // href=""
-                   target="_blank"
-                  
-                 >
-                   <Paper
-                    elevation={5}
+                  flexWrap: "wrap",
+                  "& > :not(style)": {
+                    m: 1,
+                    width: 260,
+                    height: 350,
+                  },
+                }}
+              >
+                <Paper
+                  elevation={0}
+                  style={{
+                    background:
+                      "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                    filter: "blur(35px)",
+                  }}
+                />
+                <Container sx={{ position: "absolute" }}>
+                  <Image
+                    src={profilePic}
+                    alt="Picture of the author"
+                    // width="310px"
+                    // height="450px"
+                    position="absolute"
+                  />
+                </Container>
+              </Box>
+              {!(isMinting || hasMinted) && (
+                <>
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    flexDirection="column"
                     sx={{
-                      background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                      flex: 1,
-                      marginRight: 3,
-                      padding: 2
+                      display: "flex",
                     }}
                   >
-                    <Typography variant="h5"> 
-                      {"Athlete #" + index}
+                    <Typography variant="h4" color="white" component="div">
+                      Burn Starter Pack
                     </Typography>
-                 </Paper>
-                 </Link>
-                 
-                  
-                ))}
+                  </Box>
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    <Fab
+                      variant="extended"
+                      size="large"
+                      aria-label="add"
+                      onClick={burnStarterPack}
+                      disabled={!canMint}
+                      // onClick={() => setDisplayMint(true)}
+                      sx={{
+                        marginRight: 1,
+                        marginBottom: 2,
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                        color: "white",
+                        fontSize: 20,
+                      }}
+                    >
+                      Burn
+                    </Fab>
+                  </Box>
+                </>
+              )}
+              {!canMint &&
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography>
+                    {"\nLooks like you don't have a starter pack yet. Head "}
+                    <Link>
+                      <a
+                        // style={{
+                        //   textDecoration: "none",
+                        //   textDecorationColor: "transparent"
+                        // }}
+                        class="primary-link"
+                        href="/mintPack">
+                        here
+                      </a>
+                    </Link>
+                    {" to mint one now!"}
+                  </Typography>
+                </Box>
+              }
+            </Container>
+          }
+          {isMinting && (
+            <>
+              <Container maxWidth="lg" justifyContent="center" alignItems="center">
+                <Box
+                  justifyContent="center"
+                  alignItems="center"
+                  flexDirection="column"
+                  sx={{
+                    display: "flex",
+                  }}
+                >
+                  <Typography variant="h5" color="white" component="div">
+                    Burning Pack...
+                  </Typography>
+                  <br></br>
+                  <CircularProgress />
+                  <br></br>
+                  {isMinting && isTransactionDelayed && (
 
-                 {/* {athleteNFTs?.map((athlete) => (
+                    <Typography variant="p" textAlign={"center"}>
+                      This is taking longer than normal. Please check your wallet to check the status of this transaction.
+                    </Typography>
+                  )}
+                </Box>
+              </Container>
+
+            </>
+          )}
+          {hasMinted && (
+            <>
+              <Container
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-evenly"
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 3
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start"
+                      }}
+                    >
+                      <Typography sx={{ marginRight: 2 }} variant="h4" color="white" component="div">
+                        Acquired 5 TeamDiff Athletes!
+                      </Typography>
+                      <CheckCircleIcon color="secondary"></CheckCircleIcon>
+                    </Box>
+                    <br></br>
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "space-between"
+                        }}
+                      >
+                        {mintedIndices?.map((index) => (
+                          <Link
+                            href={
+                              "https://testnets.opensea.io/assets/" +
+                              gameItemsContract.address +
+                              "/" +
+                              index
+                            }
+                            // href=""
+                            target="_blank"
+
+                          >
+                            <Paper
+                              elevation={5}
+                              sx={{
+                                background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                                flex: 1,
+                                marginRight: 3,
+                                padding: 2
+                              }}
+                            >
+                              <Typography variant="h5">
+                                {"Athlete #" + index}
+                              </Typography>
+                            </Paper>
+                          </Link>
+
+
+                        ))}
+
+                        {/* {athleteNFTs?.map((athlete) => (
                    <Box
                     sx={{
                       flex: 1,
@@ -456,42 +459,42 @@ export default function BurnPack({ setDisplay }) {
                  
                   
                 ))} */}
-                 
-               </Box>
-                <hr></hr>
-               <Typography variant="h6">
-                      Click any card to view on OpenSea 
-                </Typography>
-             </Box>
-               <Fab
-                 variant="extended"
-                 size="large"
-                 color="white"
-                 aria-label="add"
-                 // onClick={() => setDisplayCollection(true)}
-                 sx={{ marginTop: 5, fontSize: 20 }}
-               >
-                 Go To My Collection
-               </Fab>
-           </Box>
-           <Box sx={{ 
-             flex: 2,
-             display: "flex",
-             alignItems: "center",
-             justifyContent: "center"
-           }}>
-             <Image
-               src={profilePic}
-               alt="Picture of the author"
-               // height="100%"
-               // width="auto"
-               width="155px"
-               height="225px"
-             />
-           </Box>
-          </Box>         
-       </Container>
-        {/* <Box
+
+                      </Box>
+                      <hr></hr>
+                      <Typography variant="h6">
+                        Click any card to view on OpenSea
+                      </Typography>
+                    </Box>
+                    <Fab
+                      variant="extended"
+                      size="large"
+                      color="white"
+                      aria-label="add"
+                      // onClick={() => setDisplayCollection(true)}
+                      sx={{ marginTop: 5, fontSize: 20 }}
+                    >
+                      Go To My Collection
+                    </Fab>
+                  </Box>
+                  <Box sx={{
+                    flex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <Image
+                      src={profilePic}
+                      alt="Picture of the author"
+                      // height="100%"
+                      // width="auto"
+                      width="155px"
+                      height="225px"
+                    />
+                  </Box>
+                </Box>
+              </Container>
+              {/* <Box
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -499,17 +502,13 @@ export default function BurnPack({ setDisplay }) {
         >
           <Typography>Your Starter Pack has been burned</Typography>
           {/* TODO: show a collection of their newly minted athlete cards on the screen */}
-          
+
+            </>
+          )}
+          {!isConnected && !hasMinted && !isMinting && (
+            <ConnectWalletPrompt accessing={"burning a pack"} />
+          )}
         </>
-      )}
-      {!isConnected && !hasMinted && !isMinting && (
-        <Box>
-          <Typography variant="h6" component="div">
-            Please connect your wallet to get started.
-          </Typography>
-        </Box>      
-      )}
-      </>
       )}
     </Box>
   );
