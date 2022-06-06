@@ -199,7 +199,7 @@ export default function Play() {
           </Grid>
         </Grid>
       ) : (
-        <ConnectWalletPrompt accessing={"Play Page"} />
+        <ConnectWalletPrompt accessing={"the Play Page"} />
       )}
 
     </Box>
