@@ -27,6 +27,7 @@ import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/Game
 import * as utils from "@ethersproject/hash";
 import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 
 export default function MintPack({ setDisplay }) {
   // WAGMI Hooks
@@ -224,7 +225,7 @@ export default function MintPack({ setDisplay }) {
               paddingTop: "20px",
             }}
           >
-          {!isPolygon && 
+            {!isPolygon &&
               <Typography
                 style={{
                   color: "red",
@@ -278,7 +279,7 @@ export default function MintPack({ setDisplay }) {
         </Box>
       )}
       {!accountData && !hasMinted && !isMinting && (
-        <div> Please connect your wallet. </div>
+        <ConnectWalletPrompt accessing={"minting a pack"} />
       )}
       {packsAvailable == 0 && (
         <Box>
