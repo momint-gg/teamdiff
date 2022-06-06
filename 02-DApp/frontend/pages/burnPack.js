@@ -11,6 +11,8 @@ import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import Image from "next/image";
+import LoadingPrompt from "../components/LoadingPrompt";
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // import AthleteCard from "../components/AthleteCard";
 
