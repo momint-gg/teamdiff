@@ -1,4 +1,3 @@
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 // import AthleteCard from "../components/AthleteCard";
 import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
@@ -13,7 +12,6 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt";
-import constants from "../Constants";
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
@@ -82,38 +80,38 @@ export default function BurnPack({ setDisplay }) {
       setGameItemsContract(GameItemsContract);
 
       // Fetcher to retireve newly minted NFT data
-      const getNFTData = async (athleteIndices) => {
-        console.log("athletic Indices in getNFTData: " + athleteIndices);
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
-        const nfts = await web3.alchemy
-          .getNfts({
-            owner: connectedAccount,
-            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-          })
-          .catch((error) => {
-            console.log(
-              "get NFT DATA error: " + JSON.stringify(error, null, 2)
-            );
-          });
+      // const getNFTData = async (athleteIndices) => {
+      //   console.log("athletic Indices in getNFTData: " + athleteIndices);
+      //   const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+      //   const nfts = await web3.alchemy
+      //     .getNfts({
+      //       owner: connectedAccount,
+      //       contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+      //     })
+      //     .catch((error) => {
+      //       console.log(
+      //         "get NFT DATA error: " + JSON.stringify(error, null, 2)
+      //       );
+      //     });
 
-        setNFTResp(nfts);
-        for (const nft of nfts?.ownedNfts) {
-          const token = nft?.id?.tokenId;
-          const response = await web3.alchemy.getNftMetadata({
-            contractAddress: CONTRACT_ADDRESSES.GameItems,
-            tokenId: token,
-          });
-          console.log("Token #" + parseInt(token));
-          if (
-            !response.title?.includes("Pack") &&
-            athleteIndices.includes(parseInt(token))
-          ) {
-            // console.log("Token #" + parseInt(token) + " metadata: " + JSON.stringify(response, null, 2));
+      //   setNFTResp(nfts);
+      //   for (const nft of nfts?.ownedNfts) {
+      //     const token = nft?.id?.tokenId;
+      //     const response = await web3.alchemy.getNftMetadata({
+      //       contractAddress: CONTRACT_ADDRESSES.GameItems,
+      //       tokenId: token,
+      //     });
+      //     console.log("Token #" + parseInt(token));
+      //     if (
+      //       !response.title?.includes("Pack") &&
+      //       athleteIndices.includes(parseInt(token))
+      //     ) {
+      //       // console.log("Token #" + parseInt(token) + " metadata: " + JSON.stringify(response, null, 2));
 
-            setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
-          }
-        }
-      };
+      //       setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
+      //     }
+      //   }
+      // };
       // getNFTData()
       // getNFTData([6, 33, 12, 26, 45]).catch((error) => {
       //   console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
@@ -133,11 +131,11 @@ export default function BurnPack({ setDisplay }) {
           setHasMinted(true);
           setMintedIndices(athleteIndices);
 
-          await getNFTData(athleteIndices).catch((error) => {
-            console.log(
-              "fetch NFT DATA error: " + JSON.stringify(error, null, 2)
-            );
-          });
+          // await getNFTData(athleteIndices).catch((error) => {
+          //   console.log(
+          //     "fetch NFT DATA error: " + JSON.stringify(error, null, 2)
+          //   );
+          // });
           // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
         }
       };
