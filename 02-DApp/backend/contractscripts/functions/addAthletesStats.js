@@ -12,10 +12,7 @@ const abi = require('../contract_info/abis/Athletes.json');
 const { Athletes } = require('../contract_info/contractAddresses');
 const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
 const XLSX = require('xlsx');
-
-// MongoDB
-const mongoose = require('mongoose');
-const AthleteDataEntry = require('../../api/models/AthleteDataEntry');
+const fs = require('fs');
 
 // How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
 async function main() {
@@ -114,26 +111,15 @@ async function main() {
       console.log('Athlete with id ', i, ' was benched for the week');
     }
   }
-  console.log('About to push athlete stats', finalStatsToPush);
 
-  await mongoose
-    .connect(process.env.MONGODB_URI, {
-      //Specific properties we want (very standard configuration)
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      // useCreateIndex: true,
-      // useFindAndModify: false,
-    })
-    .then(async () => {
-      console.log('Connected to Mongo!');
-      // Adding records to database
-      for (let i = 0; i < finalStatsToPush.length; i++) {
-        const athleteEntry = new AthleteDataEntry({ ...finalStatsToPush[i] });
-        await athleteEntry.save();
-      }
-      console.log('Successfully pushed stats to Mongo');
-    })
-    .catch((err) => console.log('Error pushing stats to Mongo', err));
+  // Writing stats so we can push to DB
+  fs.appendFileSync(
+    '../../api/athleteData/stats.json',
+    JSON.stringify(finalStatsToPush),
+    (err) => {
+      if (err) console.log('error: ', err);
+    }
+  );
 
   // Finally, pushing stats to the contract
   console.log('Now pushing stats to contract');
