@@ -123,22 +123,22 @@ async function main() {
 
   // Finally, pushing stats to the contract
   console.log('Now pushing stats to contract');
-  // for (let i = 0; i < 50; i++) {
-  //   console.log('Adding athletes stats for athlete index ', i);
+  for (let i = 0; i < 50; i++) {
+    console.log('Adding athletes stats for athlete index ', i);
 
-  //   const addAthletesStatsTxn = await contract.appendStats(
-  //     finalStatsToPush[i].id, // index of athlete
-  //     finalStatsToPush[i].points // their points for the week
-  //   );
-  //   console.log(
-  //     'Adding points: ',
-  //     finalStatsToPush[i].points,
-  //     ' for athlete id ',
-  //     finalStatsToPush[i].id
-  //   );
-  //   // Waiting for txn to mine
-  //   await addAthletesStatsTxn.wait();
-  // }
+    const addAthletesStatsTxn = await contract.appendStats(
+      finalStatsToPush[i].id, // index of athlete
+      finalStatsToPush[i].points // their points for the week
+    );
+    console.log(
+      'Adding points: ',
+      finalStatsToPush[i].points,
+      ' for athlete id ',
+      finalStatsToPush[i].id
+    );
+    // Waiting for txn to mine
+    await addAthletesStatsTxn.wait();
+  }
 }
 
 const runMain = async () => {
