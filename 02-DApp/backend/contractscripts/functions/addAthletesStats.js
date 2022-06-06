@@ -13,6 +13,7 @@ const { Athletes } = require('../contract_info/contractAddresses');
 const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
 const XLSX = require('xlsx');
 const fs = require('fs');
+const axios = require('axios');
 
 // How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
 async function main() {
@@ -112,16 +113,20 @@ async function main() {
     }
   }
 
-  // Writing stats so we can push to DB
-  fs.appendFileSync(
-    '../../api/athleteData/stats.json',
-    JSON.stringify(finalStatsToPush),
-    (err) => {
-      if (err) console.log('error: ', err);
-    }
-  );
+  const finalObj = {};
+  finalObj['data'] = finalStatsToPush;
 
-  // Finally, pushing stats to the contract
+  // Pushing the data to our Web2 API for frontend rendering
+  try {
+    await axios.put(
+      `http://localhost:3000/athleteData/${JSON.stringify(finalObj)}`
+    );
+    console.log('Stats pushed to Web2 API!');
+  } catch (error) {
+    console.log('Error: ', error);
+  }
+
+  Finally, pushing stats to the contract
   console.log('Now pushing stats to contract');
   for (let i = 0; i < 50; i++) {
     console.log('Adding athletes stats for athlete index ', i);

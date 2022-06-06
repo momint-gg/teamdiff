@@ -5,7 +5,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const AthleteDataEntry = require('../models/AthleteDataEntry');
 const router = express.Router();
-const athleteData = require('../athleteData/stats.json');
 
 // Getting all of our athletes for a given week
 // Example use: GET /allAthletes/0
@@ -31,9 +30,10 @@ router.get('/athlete/:name', async (req, res) => {
   }
 });
 
-router.put('/athleteData', async (req, res) => {
+router.put('/athleteData/:data', async (req, res) => {
   try {
-    const data = athleteData['data'];
+    const parsed = JSON.parse(req.params.data);
+    const data = parsed['data'];
     for (let i = 0; i < data.length; i++) {
       console.log(data[i]);
       const newAthleteDataEntry = new AthleteDataEntry({ ...data[i] });
@@ -41,6 +41,16 @@ router.put('/athleteData', async (req, res) => {
       //   res.json(saved);
     }
     res.json({ message: 'Done adding athlete data! Check the DB now.' });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+// Clearing the DB (only use if necessary! Will delete the whole database permanently)
+router.delete('/clearWholeDB', async (req, res) => {
+  try {
+    const deleted = await AthleteDataEntry.deleteMany({});
+    res.json(deleted);
   } catch (error) {
     res.json({ error: error.message });
   }
