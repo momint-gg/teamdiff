@@ -35,16 +35,16 @@ const main = async () => {
   gameContract.addUserToWhitelist("0xbd478094c0D2511Ac5e8bD214637947149bC210f")
   await txn.wait();
   console.log("Added Katie to whitelist");
-  // gameContract.addUserToWhitelist("0xbd478094c0D2511Ac5e8bD214637947149bC210f")
-  // await txn.wait();
-  // console.log("Added Katie to whitelist");
+  gameContract.addUserToWhitelist("0xC3aaa1a446ED0f2E1c9c0AcC89F47c46F30c8Bf3")
+  await txn.wait();
+  console.log("Added Reggie to whitelist");
   //Initial functions that need to be run
   console.log("First setting starting index...");
-  txn = await gameContract.setStartingIndex();
-  // txn = await gameContract.setStartingIndex({
-  //   gasLimit: 23000000,
-  //   gasPrice: 100000000
-  // });
+  // txn = await gameContract.setStartingIndex();
+  txn = await gameContract.setStartingIndex({
+    gasLimit: 23000000,
+    gasPrice: 100000000
+  });
   await txn.wait();
   console.log("Now setting token URIs...");
   txn = await gameContract.setURIs();

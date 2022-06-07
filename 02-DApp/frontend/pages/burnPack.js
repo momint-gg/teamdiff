@@ -248,7 +248,7 @@ export default function BurnPack({ setDisplay }) {
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
-                      Burn Starter Pack
+                      Open TeamDiff Starter Pack
                     </Typography>
                   </Box>
                   <Box
@@ -276,7 +276,7 @@ export default function BurnPack({ setDisplay }) {
                         fontSize: 20,
                       }}
                     >
-                      Burn
+                      Open
                     </Fab>
                   </Box>
                 </>
@@ -310,7 +310,7 @@ export default function BurnPack({ setDisplay }) {
           )}
           {isMinting && (
             <LoadingPrompt
-              completeTitle={"Burning Pack..."}
+              completeTitle={"Opening Pack..."}
               bottomText={
                 isTransactionDelayed && isMinting
                   ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
