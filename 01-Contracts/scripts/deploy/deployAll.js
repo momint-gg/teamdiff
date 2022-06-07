@@ -111,8 +111,10 @@ const main = async () => {
   [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
 
   // Deploying test USDC contract
-  TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
-  testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
+  const TestUSDCContractFactory = await hre.ethers.getContractFactory(
+    "TestUSDC"
+  );
+  const testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
   await testUsdcContract.deployed();
   testUsdcContract.connect(owner);
   console.log("Test USDC Deployed to: " + testUsdcContract.address);
@@ -121,8 +123,10 @@ const main = async () => {
   //   "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
 
   // Deploying athletes contract
-  AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
-  AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  const AthletesContractFactory = await hre.ethers.getContractFactory(
+    "Athletes"
+  );
+  const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
   await AthletesContractInstance.deployed();
   AthletesContractInstance.connect(owner);
   console.log("Athletes Deployed to: " + AthletesContractInstance.address);
@@ -132,13 +136,33 @@ const main = async () => {
   //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
 
   // Adding a sample proxy to test out proxy functionality
-  makeProxy(
-    owner,
-    testUsdcContract,
-    LeagueMakerInstance,
-    GameItemInstance,
-    AthletesContractInstance
+  // Need to prompt approval before making the league (happens after u click "create new league" button on frontend)
+  let approval = await testUsdcContract.approve(
+    LeagueMakerInstance.address,
+    10
+  ); // Insert whatever stake amount they specify
+  await approval.wait();
+  console.log("Approved!");
+
+  // Making the new proxy league
+  var txn = await LeagueMakerInstance.connect(owner).createLeague(
+    "Test proxy league", // League name
+    10, // Stake amount
+    true, // Is public
+    owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
+    testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
+    AthletesContractInstance.address, // Address of our athletes storage contract
+    gameContract.address, // GameItems contract address
+    [] //Whitelisted users
   );
+  var leagueProxyContractAddress;
+  receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      leagueProxyContractAddress = event.args[1];
+    }
+  }
+  console.log("Test league proxy deployed to:", leagueProxyContractAddress);
 
   //Adding polygonUSDC and rinkebyUSDC to contract addresses file
   textData +=
@@ -184,13 +208,14 @@ const main = async () => {
   });
 };
 
-// Function to deploy a proxy
+// Deploy a proxy
 const makeProxy = async (
   owner,
   testUsdcContract,
   LeagueMakerInstance,
   GameItemInstance,
-  AthletesContractInstance
+  AthletesContractInstance,
+  proxyName
 ) => {
   // Need to prompt approval before making the league (happens after u click "create new league" button on frontend)
   let approval = await testUsdcContract.approve(
@@ -198,13 +223,14 @@ const makeProxy = async (
     10
   ); // Insert whatever stake amount they specify
   await approval.wait();
+  console.log("Approved!");
 
   // Making the new proxy league
   var txn = await LeagueMakerInstance.connect(owner).createLeague(
-    "best league", // League name
+    "Test proxy league", // League name
     10, // Stake amount
     true, // Is public
-    // owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
+    owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
     testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
     AthletesContractInstance.address, // Address of our athletes storage contract
     GameItemInstance.address, // GameItems contract address
@@ -259,5 +285,3 @@ const runMain = async () => {
 };
 
 runMain();
-
-//Latest contract address (rinkeby) --> 0x94b90ca07014F8B67A6bCa8b1b7313d5fD8D2160 (created 2/10 4pm)
