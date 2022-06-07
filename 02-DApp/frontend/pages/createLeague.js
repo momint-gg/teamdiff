@@ -1,23 +1,39 @@
-
-import { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.css';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import theme from '../styles/theme.js';
-import { Box, Link, FormLabel, FormGroup, Switch, Typography, Button, Chip, Container, Paper, Fab, OutlinedInput, styled, outlinedInputClasses, Checkbox, FormControlLabel } from "@mui/material";
+import { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.css";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import theme from "../styles/theme.js";
+import {
+  Box,
+  Link,
+  FormLabel,
+  FormGroup,
+  Switch,
+  Typography,
+  Button,
+  Chip,
+  Container,
+  Paper,
+  Fab,
+  OutlinedInput,
+  styled,
+  outlinedInputClasses,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 // import 'bootstrap/dist/css/bootstrap.css'
-import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import Input from '@mui/material/Input';
+import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Input from "@mui/material/Input";
 // import Link from '@mui/material/Link'
-import InputAdornment from '@mui/material/InputAdornment';
-import Grid from '@material-ui/core/Grid'
+import InputAdornment from "@mui/material/InputAdornment";
+import Grid from "@material-ui/core/Grid";
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
-import WAValidator from 'wallet-address-validator';
-import ConnectWalletPrompt from '../components/ConnectWalletPrompt.js';
+import WAValidator from "wallet-address-validator";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 
 import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
@@ -26,21 +42,18 @@ import { hexZeroPad } from "@ethersproject/bytes";
 // import { Link } from "react-router-dom"
 
 //Wagmi imports
-import {
-  useAccount,
-} from "wagmi";
+import { useAccount } from "wagmi";
 
 //Router
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 //Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
-import AddToWhitelist from '../components/AddToWhitelist.js';
-import LoadingPrompt from '../components/LoadingPrompt.js';
-
+import AddToWhitelist from "../components/AddToWhitelist.js";
+import LoadingPrompt from "../components/LoadingPrompt.js";
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
 // https://codesandbox.io/s/textfield-outlined-forked-0o0bdi?file=/src/index.js
@@ -51,33 +64,33 @@ const StyledOutlinedInput = styled(OutlinedInput)`
   &.${outlinedInputClasses.focused} .${outlinedInputClasses.notchedOutline} {
     border-color: white;
   }
-`
+`;
 
 const StyledInputLabel = styled(InputLabel)`
   &.Mui-focused {
     color: white;
-  } 
-`
+  }
+`;
 
 const StyledSelect = styled(Select)`
   &.Mui-focused {
     color: white;
-  } 
+  }
   &.${outlinedInputClasses.focused} .${outlinedInputClasses.notchedOutline} {
     border-color: white;
   }
-`
+`;
 
 const StyledButton = styled(Button)`
   color: white;
-  background-color: ${props => props.theme.palette.primary.light};
+  background-color: ${(props) => props.theme.palette.primary.light};
   height: 40px;
   &:hover {
     filter: brightness(85%);
-    background-color: ${props => props.theme.palette.primary.light};
+    background-color: ${(props) => props.theme.palette.primary.light};
     // color: white;
   }
-`
+`;
 
 export default function CreateLeague({ setDisplay }) {
   const defaultValues = {
@@ -86,7 +99,7 @@ export default function CreateLeague({ setDisplay }) {
     buyInCost: "",
     payoutSplit: "default",
     whitelistedAddresses: [],
-    inviteListStatus: "open"
+    inviteListStatus: "open",
   };
 
   //WAGMI Hooks
@@ -96,7 +109,6 @@ export default function CreateLeague({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-
 
   // Router
   const router = useRouter();
@@ -109,25 +121,26 @@ export default function CreateLeague({ setDisplay }) {
   const [hasCreatedLeague, setHasCreatedLeague] = useState(false);
   const [newLeagueName, setNewLeagueName] = useState(null);
   const [newLeagueAddress, setNewLeagueAddress] = useState(null);
-  const [formValues, setFormValues] = useState(defaultValues)
+  const [formValues, setFormValues] = useState(defaultValues);
   const [isJoiningLeague, setIsJoiningLeague] = useState(false);
   const [hasJoinedLeague, setHasJoinedLeague] = useState(false);
   // const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
   //Rendering stat hooks
-  const [inviteListValues, setInviteListValues] = useState([])
+  const [inviteListValues, setInviteListValues] = useState([]);
   // const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
-  const [validAddressesStatus, setValidAddressesStatus] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [isValidBuyInCost, setIsValidBuyInCost] = useState(true)
-  const [isValidLeagueName, setIsValidLeagueName] = useState(true)
+  const [validAddressesStatus, setValidAddressesStatus] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [isValidBuyInCost, setIsValidBuyInCost] = useState(true);
+  const [isValidLeagueName, setIsValidLeagueName] = useState(true);
   const [isValidInviteList, setIsValidInviteList] = useState(true);
   const [isPrivate, setIsPrivate] = useState(false);
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const preparedInviteListValues = inviteListValues.filter((address) => address !== "")
-
+  const preparedInviteListValues = inviteListValues.filter(
+    (address) => address !== ""
+  );
 
   useEffect(() => {
     // setIsCreatingLeague(false);
@@ -136,7 +149,7 @@ export default function CreateLeague({ setDisplay }) {
     // setIsConnected(false)
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    const signer = provider.getSigner();
 
     // const fetchData = async () => {
     //   const currentAddress = await signer.getAddress()
@@ -144,28 +157,27 @@ export default function CreateLeague({ setDisplay }) {
     // }
     // fetchData()
     const setAccountData = async () => {
-      const signer = provider.getSigner()
+      const signer = provider.getSigner();
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress()
-        setSigner(signer)
-        setConnectedAccount(accountAddress)
-        setIsConnected(true)
-
-      }
-      else {
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
         setIsConnected(false);
       }
-    }
-    setAccountData()
-    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-    provider.provider.on('disconnect', () => {
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
       console.log("disconnected");
-      setIsConnected(false)
-    })
+      setIsConnected(false);
+    });
   }, []);
-
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -194,13 +206,16 @@ export default function CreateLeague({ setDisplay }) {
     // LeagueMakerContract.on(filter, leagueCreatedCallback);
     //TODO this still triggers more than once sometimes idk whyyyyy
     LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
-  }, [])
-
+  }, []);
 
   //Callback for when a STaked event is fired from leagueProxy contract (occurs when user stakes USDC to joinLeague)
-  const stakedEventCallback = async (stakerAddress, stakeAmount, leagueAddress) => {
+  const stakedEventCallback = async (
+    stakerAddress,
+    stakeAmount,
+    leagueAddress
+  ) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    const signer = provider.getSigner();
     //Check is admin of the newly created league is the currently logged in account
     //If true, proceed with league creation callback behavior
     const currentAddress = await signer.getAddress();
@@ -211,18 +226,21 @@ export default function CreateLeague({ setDisplay }) {
       // router.reload(window.location.pathname);
 
       // setStakerAddress(stakerAddress)
-    }
-    else {
+    } else {
       console.log(stakerAddress + " != " + currentAddress);
     }
-  }
+  };
 
   // Callback for when league created event is fired from league maker contract
-  const leagueCreatedCallback = async (newLeagueName, newLeagueProxyAddress, newLeagueAdminAddress, initialWhitelistAddresses) => {
-
+  const leagueCreatedCallback = async (
+    newLeagueName,
+    newLeagueProxyAddress,
+    newLeagueAdminAddress,
+    initialWhitelistAddresses
+  ) => {
     //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    const signer = provider.getSigner();
     //Check is admin of the newly created league is the currently logged in account
     //If true, proceed with league creation callback behavior
     const currentAddress = await signer.getAddress();
@@ -243,7 +261,6 @@ export default function CreateLeague({ setDisplay }) {
       );
       LeagueProxyContractWithSigner.once("Staked", stakedEventCallback);
 
-
       const RinkebyUSDCContract = new ethers.Contract(
         "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
         RinkebyUSDCJSON,
@@ -254,61 +271,57 @@ export default function CreateLeague({ setDisplay }) {
       //Required for staking
       const stakeAmount = await LeagueProxyContractWithSigner.stakeAmount();
       //TODO: set correct stakeamount
-      const approvalTxn = await RinkebyUSDCContract
-        .approve(newLeagueProxyAddress, stakeAmount * 1000000)
-        .catch((error) => {
-          //  console.log("Join League error: " + error.error.message);
-          alert("Approve USDC error: " + error.message);
-          setIsJoiningLeague(false);
+      const approvalTxn = await RinkebyUSDCContract.approve(
+        newLeagueProxyAddress,
+        stakeAmount * 1000000
+      ).catch((error) => {
+        //  console.log("Join League error: " + error.error.message);
+        alert("Approve USDC error: " + error.message);
+        setIsJoiningLeague(false);
+      });
 
-        });
-
-
-      //Send request to user to join the league 
-      const joinNewlyCreatedLeagueTxn = await LeagueProxyContractWithSigner
-        .joinLeague({
-          gasLimit: 1000000
+      //Send request to user to join the league
+      const joinNewlyCreatedLeagueTxn =
+        await LeagueProxyContractWithSigner.joinLeague({
+          gasLimit: 1000000,
         })
-        .then((res) => {
-          console.log("joining newly created league...")
-          window.setTimeout(() => { setIsTransactionDelayed(true) }, 60 * 5 * 1000)
-
-        })
-        .catch((error) => {
-          //  console.log("Join League error: " + error.error.message);
-          alert("Join League error: " + error.message);
-          setIsJoiningLeague(false);
-
-        });
-
+          .then((res) => {
+            console.log("joining newly created league...");
+            window.setTimeout(() => {
+              setIsTransactionDelayed(true);
+            }, 60 * 5 * 1000);
+          })
+          .catch((error) => {
+            //  console.log("Join League error: " + error.error.message);
+            alert("Join League error: " + error.message);
+            setIsJoiningLeague(false);
+          });
 
       //For each address on the initial whitelist, send transaction to add address to whitelist of new league
       initialWhitelistAddresses.forEach(async (whitelistAddress) => {
-        const addUsersToWhitelistTxn = await LeagueProxyContractWithSigner
-          .addUserToWhitelist(whitelistAddress, {
-            gasLimit: 10000000
-          })
-          .then(
-          // console.log("Added userr to whitelist success")
-        )
-          .catch((error) => {
-            //console.log("")
-            alert("Add User To WhiteList error: " + error.message);
-            // setIsCreatingLeague(false);
+        const addUsersToWhitelistTxn =
+          await LeagueProxyContractWithSigner.addUserToWhitelist(
+            whitelistAddress,
+            {
+              gasLimit: 10000000,
+            }
+          )
+            .then
+            // console.log("Added userr to whitelist success")
+            ()
+            .catch((error) => {
+              //console.log("")
+              alert("Add User To WhiteList error: " + error.message);
+              // setIsCreatingLeague(false);
+            });
+      });
 
-          });
-      })
-
-
-
-      // console.log("Finsihed creating league: " 
+      // console.log("Finsihed creating league: "
       //             + "\n\tname: " + newLeagueName
       //             + "\n\tproxy address: " + newLeagueProxyAddress
       //             + "\n\tadmin address: " + newLeagueAdminAddress);
       //             // + "\n\tstate of invite list: " + inviteListValues);
-
     }
-
   };
 
   //Hanlder for form submit
@@ -316,17 +329,14 @@ export default function CreateLeague({ setDisplay }) {
     //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
-    console.log("league name" + formValues.leagueName)
+    console.log("league name" + formValues.leagueName);
     if (formValues.leagueName === "") {
-      alert("Please enter valid league name.")
-    }
-    else if (formValues.token === "") {
-      alert("Please select a token.")
-    }
-    else if (formValues.buyInCost > 100) {
-      alert("Please enter a buy-in cost below 100 USDC.")
-    }
-    else {
+      alert("Please enter valid league name.");
+    } else if (formValues.token === "") {
+      alert("Please select a token.");
+    } else if (formValues.buyInCost > 100) {
+      alert("Please enter a buy-in cost below 100 USDC.");
+    } else {
       //Connect to leagueMaker with connect wallet
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
       // console.log("submission values: " + (formValues.inviteListStatus === "open"));
@@ -343,14 +353,17 @@ export default function CreateLeague({ setDisplay }) {
           CONTRACT_ADDRESSES.Athletes,
           CONTRACT_ADDRESSES.GameItems,
           inviteListValues,
-          // [], 
+          // [],
           {
             gasLimit: 10000000,
-          })
+          }
+        )
         .then((res) => {
           //console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
-          window.setTimeout(() => { setIsTransactionDelayed(true) }, 60 * 5 * 1000)
+          window.setTimeout(() => {
+            setIsTransactionDelayed(true);
+          }, 60 * 5 * 1000);
 
           console.log("League Creation in progress...");
           //console.log("With invite values: " + inviteListValues);
@@ -361,66 +374,71 @@ export default function CreateLeague({ setDisplay }) {
           alert("Create League error: " + error.message);
         });
     }
-  }
-
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     // console.log(name)
     setFormValues({
       ...formValues,
       [name]: value,
-    })
+    });
     // console.log(formValues)
   };
 
   useEffect(() => {
     if (formValues.leagueName.length > 100) {
-      setIsValidLeagueName(false)
+      setIsValidLeagueName(false);
     } else if (!isValidLeagueName) {
-      setIsValidLeagueName(true)
+      setIsValidLeagueName(true);
     }
-  }, [formValues.leagueName])
-
-
+  }, [formValues.leagueName]);
 
   useEffect(() => {
     if (formValues.buyInCost === "") {
-      setIsValidBuyInCost(true)
-    } else if (isNaN(formValues.buyInCost) || Number(formValues.buyInCost) <= 0 || Number(formValues.buyInCost) > 100) {
+      setIsValidBuyInCost(true);
+    } else if (
+      isNaN(formValues.buyInCost) ||
+      Number(formValues.buyInCost) <= 0 ||
+      Number(formValues.buyInCost) > 100
+    ) {
       // console.log("uhoh")
       // console.log(typeof formValues.buyInCost, formValues.buyInCost)
-      setIsValidBuyInCost(false)
+      setIsValidBuyInCost(false);
     } else if (!isValidBuyInCost) {
-      setIsValidBuyInCost(true)
+      setIsValidBuyInCost(true);
     }
     // console.log("--", parseInt(formValues.buyInCost))
-  }, [formValues.buyInCost])
-
+  }, [formValues.buyInCost]);
 
   const validateFormValues = () => {
-    return isValidBuyInCost && formValues.buyInCost !== "" &&
-      isValidLeagueName && formValues.leagueName !== "" &&
-      (formValues.inviteListStatus === "open" || preparedInviteListValues.length > 0 && validAddressesStatus)
-  }
+    return (
+      isValidBuyInCost &&
+      formValues.buyInCost !== "" &&
+      isValidLeagueName &&
+      formValues.leagueName !== "" &&
+      (formValues.inviteListStatus === "open" ||
+        (preparedInviteListValues.length > 0 && validAddressesStatus))
+    );
+  };
 
   useEffect(() => {
-    let flag = true
+    let flag = true;
     inviteListValues.forEach((e) => {
       if (WAValidator.validate(e, "ETH")) {
         // console.log("validated")
       } else {
         // console.log("invalid")
         if (e !== "") {
-          flag = false
-          setValidAddressesStatus(false)
+          flag = false;
+          setValidAddressesStatus(false);
         }
       }
-    })
+    });
     if (flag) {
-      setValidAddressesStatus(true)
+      setValidAddressesStatus(true);
     }
-  }, [inviteListValues])
+  }, [inviteListValues]);
 
   // const handlePlayerInviteInput = (e, i) => {
   //   let inviteListValuesNew = [...inviteListValues]
@@ -439,14 +457,13 @@ export default function CreateLeague({ setDisplay }) {
 
   //   }
 
-
   // }
 
   // const addNewPlayerInviteInput = () => {
   //   if (addPlayerBtnEnabled && inviteListValues.length >= 7) {
   //     setAddPlayerBtnEnabled(false)
   //   }
-  //   setInviteListValues(prevState => ([...prevState, ""])) 
+  //   setInviteListValues(prevState => ([...prevState, ""]))
   // }
 
   // const removePlayer = (i) => {
@@ -463,10 +480,12 @@ export default function CreateLeague({ setDisplay }) {
   // }
 
   return (
-    <Box sx={{
-      justifyContent: "center",
-      textAlign: "center"
-    }}>
+    <Box
+      sx={{
+        justifyContent: "center",
+        textAlign: "center",
+      }}
+    >
       {isConnected && !(isCreatingLeague || hasCreatedLeague) && (
         <>
           {/* <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -483,10 +502,10 @@ export default function CreateLeague({ setDisplay }) {
               // component="div"
               sx={{
                 // '& > :not(style)': { m: 1, width: '50ch' },
-                flex: 1
+                flex: 1,
               }}
-            // noValidate
-            // autoComplete="off"
+              // noValidate
+              // autoComplete="off"
             >
               <Typography variant="h4" color="white" component="div">
                 Form
@@ -496,14 +515,14 @@ export default function CreateLeague({ setDisplay }) {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  padding: "5px"
+                  padding: "5px",
                 }}
               >
                 <br></br>
                 <Typography
                   sx={{
                     minWidth: "15vw",
-                    marginRight: "2vw"
+                    marginRight: "2vw",
                   }}
                 >
                   League Name
@@ -534,29 +553,28 @@ export default function CreateLeague({ setDisplay }) {
                 </FormControl>
               </Box>
 
-
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  padding: "5px"
+                  padding: "5px",
                 }}
               >
                 <Typography
                   sx={{
                     minWidth: "15vw",
-                    marginRight: "2vw"
+                    marginRight: "2vw",
                   }}
                 >
                   Token
                 </Typography>
-                <FormControl fullWidth required >
+                <FormControl fullWidth required>
                   {/* <FormControl fullWidth required > */}
                   <InputLabel id="token-select-label">Token</InputLabel>
                   <Select
                     color="secondary"
-                    labelId='token-select-label'
+                    labelId="token-select-label"
                     id="token-select"
                     // value={"USDC"}
                     value={formValues.token}
@@ -565,7 +583,9 @@ export default function CreateLeague({ setDisplay }) {
                     name="token"
                     onChange={handleInputChange}
                   >
-                    <MenuItem key="usdc" value="usdc">USDC</MenuItem>
+                    <MenuItem key="usdc" value="usdc">
+                      USDC
+                    </MenuItem>
                     {/* <MenuItem key="eth" value="eth">eth</MenuItem>
                   <MenuItem key="other" value="other">other</MenuItem> */}
                   </Select>
@@ -577,13 +597,13 @@ export default function CreateLeague({ setDisplay }) {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  padding: "5px"
+                  padding: "5px",
                 }}
               >
                 <Typography
                   sx={{
                     minWidth: "15vw",
-                    marginRight: "2vw"
+                    marginRight: "2vw",
                   }}
                 >
                   Buy-in Cost
@@ -594,19 +614,17 @@ export default function CreateLeague({ setDisplay }) {
                     id="buy-in"
                     type="number"
                     color="secondary"
-
                     value={formValues.leaguename}
                     onChange={handleInputChange}
                     label="Buy-In Cost"
                     // hiddenLabel
                     name="buyInCost"
-                    placeholder='10'
-                    endAdornment={<InputAdornment position="end">USDC</InputAdornment>}
+                    placeholder="10"
+                    endAdornment={
+                      <InputAdornment position="end">USDC</InputAdornment>
+                    }
                     error={!isValidBuyInCost}
-                  >
-
-                  </TextField>
-
+                  ></TextField>
                 </FormControl>
               </Box>
             </Box>
@@ -618,32 +636,30 @@ export default function CreateLeague({ setDisplay }) {
                 // '& > :not(style)': { m: 1, width: '50ch' },
                 // color: "white",
                 // alignItems: "left",
-                flex: 1
+                flex: 1,
               }}
 
-            // noValidate
-            // autoComplete="off"
+              // noValidate
+              // autoComplete="off"
             >
-              <Typography
-                variant="h4"
-              >
-                Invite List (Whitelist)
-              </Typography>
+              <Typography variant="h4">Invite List (Whitelist)</Typography>
               <Box>
                 <FormControl component="fieldset">
                   <FormGroup aria-label="position" row>
-
                     <FormControlLabel
                       value="start"
-                      control={<Switch
-                        onChange={() => {
-                          setIsPrivate(!isPrivate)
-                          if (isPrivate) {
-                            setInviteListValues([]);
-                            // console.log("empty list")
-                          }
-                        }}
-                        color="secondary" />}
+                      control={
+                        <Switch
+                          onChange={() => {
+                            setIsPrivate(!isPrivate);
+                            if (isPrivate) {
+                              setInviteListValues([]);
+                              // console.log("empty list")
+                            }
+                          }}
+                          color="secondary"
+                        />
+                      }
                       label="Invite-Only"
                       labelPlacement="start"
                     />
@@ -651,14 +667,15 @@ export default function CreateLeague({ setDisplay }) {
                 </FormControl>
               </Box>
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
-              {!(isPrivate) ? (
+              {!isPrivate ? (
                 <Typography variant="h7" color="lightgrey">
                   Anybody with a wallet address can search and join this league.
                 </Typography>
               ) : (
                 <>
                   <Typography variant="h7" color="lightgrey">
-                    Only Address manually added to the whitelist can join this league
+                    Only Address manually added to the whitelist can join this
+                    league
                   </Typography>
                   <AddToWhitelist
                     setInviteListValues={setInviteListValues}
@@ -666,7 +683,6 @@ export default function CreateLeague({ setDisplay }) {
                     connectedAccount={connectedAccount}
                   ></AddToWhitelist>
                 </>
-
               )}
             </Box>
           </Box>
@@ -677,18 +693,25 @@ export default function CreateLeague({ setDisplay }) {
               float: "right",
               background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
             }}
-            onClick={() => { createLeagueSubmitHandler() }} variant="extended" size="medium"
+            onClick={() => {
+              createLeagueSubmitHandler();
+            }}
+            variant="extended"
+            size="medium"
           >
             Create League
           </Fab>
           <br></br>
-
         </>
       )}
       {isCreatingLeague && (
         <LoadingPrompt
           completeTitle={"Creating Your League..."}
-          bottomText={isCreatingLeague && isTransactionDelayed ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""}
+          bottomText={
+            isCreatingLeague && isTransactionDelayed
+              ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+              : ""
+          }
         />
       )}
       {hasCreatedLeague && (
@@ -700,35 +723,40 @@ export default function CreateLeague({ setDisplay }) {
             display: "flex",
           }}
         >
-
           <br></br>
           <Link>
             <a
-              className='primary-link'
+              className="primary-link"
               href={
-                "https://rinkeby.etherscan.io/address/"
-                + newLeagueAddress
-                + "#internaltx"
+                "https://rinkeby.etherscan.io/address/" +
+                newLeagueAddress +
+                "#internaltx"
               }
               target={"_blank"}
               rel="noreferrer"
               sx={{
-                textDecoration: "none"
+                textDecoration: "none",
               }}
             >
               <Paper
                 elevation={5}
                 sx={{
-                  background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                  background:
+                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
 
                   marginRight: 3,
-                  padding: 2
+                  padding: 2,
                 }}
               >
                 <Typography variant="h6">
-                  {"Your TeamDiff league \"" + newLeagueName + "\" has been created"}
-                  <CheckCircleIcon fontSize={"large"} sx={{ marginLeft: 1 }} color="secondary"></CheckCircleIcon>
-
+                  {'Your TeamDiff league "' +
+                    newLeagueName +
+                    '" has been created'}
+                  <CheckCircleIcon
+                    fontSize={"large"}
+                    sx={{ marginLeft: 1 }}
+                    color="secondary"
+                  ></CheckCircleIcon>
                 </Typography>
               </Paper>
             </a>
@@ -737,34 +765,38 @@ export default function CreateLeague({ setDisplay }) {
           {isJoiningLeague && (
             <LoadingPrompt
               completeTitle={"Joining Newly Created League..."}
-              bottomText={isJoiningLeague && isTransactionDelayed ? "This is taking longer than normal. Please check your wallet to check the status of this transaction." : ""}
+              bottomText={
+                isJoiningLeague && isTransactionDelayed
+                  ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+                  : ""
+              }
             />
           )}
           {hasJoinedLeague && (
             <>
-              < Link
-                href={
-                  "http://localhost:3000/leagues/"
-                  + newLeagueAddress
-                }
+              <Link
+                href={"http://localhost:3000/leagues/" + newLeagueAddress}
                 target={"_blank"}
                 rel="noreferrer"
               >
                 <Paper
                   elevation={5}
                   sx={{
-                    background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    background:
+                      "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                     flex: 1,
                     marginRight: 3,
-                    padding: 2
+                    padding: 2,
                   }}
                 >
                   <Typography variant="h6">
-                    {"Succesfully joined league: \"" + newLeagueName + "\""}
-                    <CheckCircleIcon fontSize={"large"} sx={{ marginLeft: 1 }} color="secondary"></CheckCircleIcon>
-
+                    {'Succesfully joined league: "' + newLeagueName + '"'}
+                    <CheckCircleIcon
+                      fontSize={"large"}
+                      sx={{ marginLeft: 1 }}
+                      color="secondary"
+                    ></CheckCircleIcon>
                   </Typography>
-
                 </Paper>
                 <Typography align="center" variant="subtitle1">
                   Click to view league on TeamDiff
@@ -772,7 +804,7 @@ export default function CreateLeague({ setDisplay }) {
               </Link>
               <br></br>
               <Fab
-                variant='extended'
+                variant="extended"
                 size="large"
                 // sx={{
                 //   background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
@@ -786,13 +818,11 @@ export default function CreateLeague({ setDisplay }) {
               <br></br>
             </>
           )}
-
         </Box>
       )}
       {!isConnected && !hasCreatedLeague && !isCreatingLeague && (
         <ConnectWalletPrompt accessing={"creating a league"} />
       )}
-
     </Box>
-  )
+  );
 }

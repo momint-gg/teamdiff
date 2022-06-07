@@ -19,8 +19,8 @@ import {
 import ConnectWalletModal from "../components/ConnectWalletModal";
 
 export default function Mint({ setDisplay }) {
-  const { data: accountData, isLoading, error } = useAccount({ ens: true })
-  const { disconnect } = useDisconnect()
+  const { data: accountData, isLoading, error } = useAccount({ ens: true });
+  const { disconnect } = useDisconnect();
   const [modalOpen, setModalOpen] = useState(false);
 
   if (true) {
@@ -32,9 +32,8 @@ export default function Mint({ setDisplay }) {
             backgroundColor: "transparent",
             color: "white",
             borderRadius: "50%",
-            fontSize: 18
-          }
-          }
+            fontSize: 18,
+          }}
           onClick={() => setDisplay(false)}
         >
           ‹ GO BACK

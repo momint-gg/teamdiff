@@ -1,8 +1,5 @@
-import { useAccount, 
-        useConnect,
-        useEnsName,
-        useEnsAvatar } from "wagmi";
-import { useEffect, useState } from 'react';
+import { useAccount, useConnect, useEnsName, useEnsAvatar } from "wagmi";
+import { useEffect, useState } from "react";
 
 import { Box, Button, Modal, Typography } from "@mui/material";
 import Image from "next/image";
@@ -18,16 +15,14 @@ export default function ConnectWalletModal({
   setModalOpen,
   isMobile,
 }) {
-
   const {
     activeConnector,
     connect,
     connectors,
-    error : connectError,
+    error: connectError,
     isConnecting,
     pendingConnector,
-  } = useConnect()
-
+  } = useConnect();
 
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
@@ -40,33 +35,35 @@ export default function ConnectWalletModal({
     // setIsConnected(false)
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    const signer = provider.getSigner();
 
-      // const fetchData = async () => {
-      //   const currentAddress = await signer.getAddress()
-      //   setAddressPreview(currentAddress)
-      // }
-      // fetchData()
-      const setAccountData = async () => {
-        const signer = provider.getSigner()
-        const accounts = await provider.listAccounts();
+    // const fetchData = async () => {
+    //   const currentAddress = await signer.getAddress()
+    //   setAddressPreview(currentAddress)
+    // }
+    // fetchData()
+    const setAccountData = async () => {
+      const signer = provider.getSigner();
+      const accounts = await provider.listAccounts();
 
-        if(accounts.length > 0) {
-          const accountAddress = await signer.getAddress()
-          setSigner(signer)
-          setConnectedAccount(accountAddress)
-          setIsConnected(true)
-      
-        }
-        else {
-          setIsConnected(false);
-        }
+      if (accounts.length > 0) {
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
+        setIsConnected(false);
       }
-      setAccountData()
-      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
-                                                  setIsConnected(false) })
-    }, []);
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
+      console.log("disconnected");
+      setIsConnected(false);
+    });
+  }, []);
 
   function getConnectorImage(connector) {
     if (connector.name === "MetaMask") {
@@ -127,18 +124,20 @@ export default function ConnectWalletModal({
           <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bold"}>
             Connect Wallet
           </Typography>
-          <IoCloseOutline 
-          size={"3rem"} 
-          onClick={() => {
-            handleModalClose()
-            if (handleClickAway) {
-              handleClickAway()
-            }}} 
-          style={{ cursor: "pointer",
-                   position: "absolute",
-                   right: "5px",
-                   top: "5px"
-                }}
+          <IoCloseOutline
+            size={"3rem"}
+            onClick={() => {
+              handleModalClose();
+              if (handleClickAway) {
+                handleClickAway();
+              }
+            }}
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              right: "5px",
+              top: "5px",
+            }}
           />
           {connectors.map((x) => (
             <Button
@@ -205,18 +204,20 @@ export default function ConnectWalletModal({
           <Typography color={"#1A1A1A"} fontSize={30} fontWeight={"bolder"}>
             Connect Wallet
           </Typography>
-          <IoCloseOutline 
-          size={"3rem"} 
-          onClick={() => {
-            handleModalClose()
-            if (handleClickAway) {
-              handleClickAway()
-            }}} 
-          style={{ cursor: "pointer",
-                   position: "absolute",
-                   right: "10px",
-                   top: "10px"
-                }}
+          <IoCloseOutline
+            size={"3rem"}
+            onClick={() => {
+              handleModalClose();
+              if (handleClickAway) {
+                handleClickAway();
+              }
+            }}
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              right: "10px",
+              top: "10px",
+            }}
           />
           {connectors.map((x) => (
             <Button
