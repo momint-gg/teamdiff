@@ -7,39 +7,57 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  textData += "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
+  // textData += "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
   
-  //Create GameItems Instance
-  // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
-  // //const gameContract = await gameContractFactory.deploy(...constructorArgs);
-  // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
-  //   //overriding gas bc transaction was stuck
-  //   //gasPrice: 203000000000,
-  //   gasLimit: 20000000
-  // });
-  // await gameContract.deployed();
+  // Create GameItems Instance
+  const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  //const gameContract = await gameContractFactory.deploy(...constructorArgs);
+  const gameContract = await gameContractFactory.deploy(...constructorArgs, {
+    //overriding gas bc transaction was stuck
+    //gasPrice: 203000000000,
+    gasLimit: 20000000
+  });
+  await gameContract.deployed();
 
-  // textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
-  // console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
+  textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
+  console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
   
-  // //Add users to gameitems whitelist
-  // txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
+  //Add users to gameitems whitelist
+  txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
+  await txn.wait();
+  console.log("Added Trey to whitelist");
+  gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
+  await txn.wait();
+  console.log("Added Trey2 to whitelist");
+  gameContract.addUserToWhitelist("0x69EC014c15baF1C96620B6BA02A391aBaBB9C96b")
+  await txn.wait();
+  console.log("Added Will to whitelist");
+  gameContract.addUserToWhitelist("0xbd478094c0D2511Ac5e8bD214637947149bC210f")
+  await txn.wait();
+  console.log("Added Katie to whitelist");
+  // gameContract.addUserToWhitelist("0xbd478094c0D2511Ac5e8bD214637947149bC210f")
   // await txn.wait();
-  // console.log("Added owner to whitelist");
-  // gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
-  // await txn.wait();
-  // console.log("Added user to whitelist");
-  // //Initial functions that need to be run
-  // console.log("First setting starting index...");
-  // txn = await gameContract.setStartingIndex();
-  // // txn = await gameContract.setStartingIndex({
-  // //   gasLimit: 23000000,
-  // //   gasPrice: 100000000
-  // // });
-  // await txn.wait();
-  // console.log("Now setting token URIs...");
-  // txn = await gameContract.setURIs();
-  // await txn.wait();
+  // console.log("Added Katie to whitelist");
+  //Initial functions that need to be run
+  console.log("First setting starting index...");
+  txn = await gameContract.setStartingIndex();
+  // txn = await gameContract.setStartingIndex({
+  //   gasLimit: 23000000,
+  //   gasPrice: 100000000
+  // });
+  await txn.wait();
+  console.log("Now setting token URIs...");
+  txn = await gameContract.setURIs();
+  await txn.wait();
+
+  //Set Packs ready for testing
+  txn = await gameContract.setPacksReady();
+  // txn = await gameContract.setStartingIndex({
+  //   gasLimit: 23000000,
+  //   gasPrice: 100000000
+  // });
+  await txn.wait();
+  console.log("Now setting packsReady to True");
   
 
 
@@ -55,20 +73,6 @@ const main = async () => {
     MOBALogicLibraryInstance.address
   );
   textData += "exports.MOBALogicLibrary = \'" + MOBALogicLibraryInstance.address + "\';\n";
-
-  
-  //Create League Maker Library Instance
-  // const LeagueMakerLibraryFactory = await ethers.getContractFactory(
-  //   "LeagueMakerLibrary"
-  // );
-  // const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
-  // await LeagueMakerLibraryInstance.deployed();
-  // console.log(
-  //   "LeagueMakerLibrary deployed to:",
-  //   LeagueMakerLibraryInstance.address
-  // );
-  // textData += "exports.LeagueMakerLibrary = \'" + LeagueMakerLibraryInstance.address + "\';\n";
-
 
   //Create Game Logic Instance
   const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
@@ -141,7 +145,7 @@ const main = async () => {
     if (err) {
       console.log("bad");
       throw err;
-    };
+    }
     console.log("done writing to file");
 
   })
@@ -157,7 +161,7 @@ const main = async () => {
       if (err) {
         console.log("bad");
         throw err;
-      };
+      }
       console.log("done writing to file");
   
     })

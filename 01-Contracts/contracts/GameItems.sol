@@ -32,7 +32,7 @@ contract GameItems is ERC1155, Ownable {
     string public name = "TeamDiff";
 
     // When we flip the switch and let everyone open packs
-    bool public packsReadyToOpen = true;
+    bool public packsReadyToOpen = false;
 
     // Total amount of packs minted so far
     uint256 private starterPacksMinted;
@@ -78,7 +78,9 @@ contract GameItems is ERC1155, Ownable {
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
-    mapping(address => bool) private userToHasBurnedPack;
+    mapping(address => bool) public userToHasBurnedPack;
+    mapping(address => bool) public userToHasMintedPack;
+
     //NOTE we ran into an error if we have more than 16 params passed in constructor
     constructor(
         Parameters memory params,
@@ -177,10 +179,10 @@ contract GameItems is ERC1155, Ownable {
             starterPacksMinted < MAX_PACKS,
             "All packs have already been minted!"
         );
-        // require(
-        //     balanceOf(msg.sender, starterPackId) < 1,
-        //     "Can only mint one starter pack per account"
-        // );
+        require(
+            userToHasMintedPack[msg.sender],
+            "Can only mint one starter pack per account"
+        );
 
         // Making the index 1 after the athletes end
         _mint(msg.sender, starterPackId, 1, "0x00");
@@ -194,7 +196,7 @@ contract GameItems is ERC1155, Ownable {
     // Passing in random indices here!
     function burnStarterPack() public onlyWhitelisted {
         uint256 starterPackId = NUM_ATHLETES;
-        // require(!userToHasBurnedPack[msg.sender], "You cannot burn more than 1 pack");
+        require(!userToHasBurnedPack[msg.sender], "You cannot burn more than 1 pack");
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), starterPackId) > 0,
