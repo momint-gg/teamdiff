@@ -6,60 +6,60 @@ export default function NavLink({ className, href, children, isMobile }) {
   const router = useRouter();
   return (
     <div>
-      {isMobile &&
+      {isMobile && (
         <Link href={href} passHref>
           <a
             style={
               router.pathname === href
                 ? {
-                  color: "white",
-                  fontSize: "18px",
-                  textDecoration: "underline",
-                  fontFamily: "Exo",
-                  marginRight: "10px",
-                  textDecorationColor: "cyan",
-                  textUnderlineOffset: "10px",
-                }
+                    color: "white",
+                    fontSize: "18px",
+                    textDecoration: "underline",
+                    fontFamily: "Exo",
+                    marginRight: "10px",
+                    textDecorationColor: "cyan",
+                    textUnderlineOffset: "10px",
+                  }
                 : {
-                  color: "white",
-                  fontSize: "18px",
-                  textDecoration: "none",
-                  fontFamily: "Exo",
-                  marginRight: "10px",
-                }
+                    color: "white",
+                    fontSize: "18px",
+                    textDecoration: "none",
+                    fontFamily: "Exo",
+                    marginRight: "10px",
+                  }
             }
           >
             {children}
           </a>
         </Link>
-      }
-      {!isMobile &&
+      )}
+      {!isMobile && (
         <Link href={href} passHref>
           <a
             style={
               router.pathname === href
                 ? {
-                  color: "white",
-                  fontSize: "24px",
-                  textDecoration: "underline",
-                  fontFamily: "Exo",
-                  marginRight: "10px",
-                  textDecorationColor: "cyan",
-                  textUnderlineOffset: "10px",
-                }
+                    color: "white",
+                    fontSize: "24px",
+                    textDecoration: "underline",
+                    fontFamily: "Exo",
+                    marginRight: "10px",
+                    textDecorationColor: "cyan",
+                    textUnderlineOffset: "10px",
+                  }
                 : {
-                  color: "white",
-                  fontSize: "24px",
-                  textDecoration: "none",
-                  fontFamily: "Exo",
-                  marginRight: "10px",
-                }
+                    color: "white",
+                    fontSize: "24px",
+                    textDecoration: "none",
+                    fontFamily: "Exo",
+                    marginRight: "10px",
+                  }
             }
           >
             {children}
           </a>
         </Link>
-      }
+      )}
     </div>
   );
 }

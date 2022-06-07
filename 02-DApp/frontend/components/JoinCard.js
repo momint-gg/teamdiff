@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 
 export default function JoinCard({ joinData }) {
-  
   const card = (
     <Fragment>
       <CardContent>
@@ -19,28 +18,23 @@ export default function JoinCard({ joinData }) {
           <Typography variant="h5" color="secondary" component="div">
             {joinData?.leagueName}
           </Typography>
-          {joinData?.invitedBy && 
+          {joinData?.invitedBy && (
             <Typography variant="body1" color="inherit">
-            Invited By: {joinData?.invitedBy}
+              Invited By: {joinData?.invitedBy}
             </Typography>
-          } 
-          {joinData?.publicOwner && 
+          )}
+          {joinData?.publicOwner && (
             <Typography variant="body1" color="inherit">
-            Started By: {joinData?.publicOwner}
+              Started By: {joinData?.publicOwner}
             </Typography>
-          }   
+          )}
         </Box>
       </CardContent>
     </Fragment>
   );
 
   return (
-    <Card
-      variant="outlined"
-      onClick={() => {
-      }}
-      sx = {{width:'25%'}}
-    >
+    <Card variant="outlined" onClick={() => {}} sx={{ width: "25%" }}>
       {card}
     </Card>
   );
