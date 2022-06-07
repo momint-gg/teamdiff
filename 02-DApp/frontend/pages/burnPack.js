@@ -474,7 +474,9 @@ export default function BurnPack({ setDisplay }) {
             </>
           )}
           {!isConnected && !hasMinted && !isMinting && (
-            <ConnectWalletPrompt accessing={"burning a pack"} />
+            <ConnectWalletPrompt
+              accessing={"burning a TeamDiff Starter Pack"}
+            />
           )}
         </>
       )}

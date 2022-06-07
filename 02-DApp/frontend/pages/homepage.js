@@ -64,7 +64,7 @@ export default function Homepage() {
                   bootstrap["d-md-inline"],
                 ].join(" ")}
               >
-                <Link href="/mint">
+                <Link href="/mintHome">
                   <button
                     className={[
                       bootstrap.btn,

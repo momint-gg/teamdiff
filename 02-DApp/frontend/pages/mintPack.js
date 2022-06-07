@@ -18,6 +18,7 @@ import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/Game
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import profilePic from "../assets/images/starter-pack.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 
 export default function MintPack() {
   // Router
@@ -459,9 +460,7 @@ export default function MintPack() {
       )}
       {!isConnected && !hasMinted && !isMinting && (
         <Box>
-          <Typography variant="h6" component="div">
-            Please connect your wallet to get started.
-          </Typography>
+          <ConnectWalletPrompt accessing={"minting a TeamDiff Starter Pack"} />
         </Box>
       )}
       {packsAvailable == 0 && (
