@@ -6,20 +6,20 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  textData +=
-    "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
+  // textData +=
+  //   "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
 
-  //Create GameItems Instance
-  // const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
-  // //const gameContract = await gameContractFactory.deploy(...constructorArgs);
-  // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
-  //   //overriding gas bc transaction was stuck
-  //   //gasPrice: 203000000000,
-  //   gasLimit: 20000000
-  // });
-  // await gameContract.deployed();
+  // Create GameItems Instance
+  const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  // const gameContract = await gameContractFactory.deploy(...constructorArgs);
+  const gameContract = await gameContractFactory.deploy(...constructorArgs, {
+    //overriding gas bc transaction was stuck
+    //gasPrice: 203000000000,
+    // gasLimit: 20000000,
+  });
+  await gameContract.deployed();
 
-  // textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
+  textData += "exports.GameItems = '" + gameContract.address + "';\n";
   // console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
 
   // //Add users to gameitems whitelist
@@ -54,7 +54,8 @@ const main = async () => {
   textData +=
     "exports.MOBALogicLibrary = '" + MOBALogicLibraryInstance.address + "';\n";
 
-  //Create League Maker Library Instance
+  // Create League Maker Library Instance
+  // TODO: Delete this since we don't have LeagueMakerLibrary anymore
   // const LeagueMakerLibraryFactory = await ethers.getContractFactory(
   //   "LeagueMakerLibrary"
   // );
@@ -107,27 +108,37 @@ const main = async () => {
   textData += "exports.Beacon = '" + BeaconInstance.address + "';\n";
 
   //Signers
-  // [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
+  [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
 
-  // // Deploying test USDC contract
-  // TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
-  // testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
-  // await testUsdcContract.deployed();
-  // testUsdcContract.connect(owner);
-  // console.log("Test USDC Deployed to: " + testUsdcContract.address);
-  // textData += "exports.TestUSDC = \'" + testUsdcContract.address + "\';\n";
-  textData +=
-    "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
+  // Deploying test USDC contract
+  TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
+  testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
+  await testUsdcContract.deployed();
+  testUsdcContract.connect(owner);
+  console.log("Test USDC Deployed to: " + testUsdcContract.address);
+  textData += "exports.TestUSDC = '" + testUsdcContract.address + "';\n";
+  // textData +=
+  //   "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
 
   // Deploying athletes contract
-  // AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
-  // AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
-  // await AthletesContractInstance.deployed();
-  // AthletesContractInstance.connect(owner);
-  // console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
-  // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
+  AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  await AthletesContractInstance.deployed();
+  AthletesContractInstance.connect(owner);
+  console.log("Athletes Deployed to: " + AthletesContractInstance.address);
   textData +=
-    "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
+    "exports.Athletes = '" + AthletesContractInstance.address + "';\n";
+  // textData +=
+  //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
+
+  // Adding a sample proxy to test out proxy functionality
+  makeProxy(
+    owner,
+    testUsdcContract,
+    LeagueMakerInstance,
+    GameItemInstance,
+    AthletesContractInstance
+  );
 
   //Adding polygonUSDC and rinkebyUSDC to contract addresses file
   textData +=
@@ -171,6 +182,70 @@ const main = async () => {
       console.log("done writing to file");
     });
   });
+};
+
+// Function to deploy a proxy
+const makeProxy = async (
+  owner,
+  testUsdcContract,
+  LeagueMakerInstance,
+  GameItemInstance,
+  AthletesContractInstance
+) => {
+  // Need to prompt approval before making the league (happens after u click "create new league" button on frontend)
+  let approval = await testUsdcContract.approve(
+    LeagueMakerInstance.address,
+    10
+  ); // Insert whatever stake amount they specify
+  await approval.wait();
+
+  // Making the new proxy league
+  var txn = await LeagueMakerInstance.connect(owner).createLeague(
+    "best league", // League name
+    10, // Stake amount
+    true, // Is public
+    // owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
+    testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
+    AthletesContractInstance.address, // Address of our athletes storage contract
+    GameItemInstance.address, // GameItems contract address
+    [] //Whitelisted users
+  );
+  var leagueProxyContractAddress;
+  receipt = await txn.wait();
+  for (const event of receipt.events) {
+    if (event.event != null) {
+      // console.log(`Event ${event.event} with args ${event.args}`);
+      leagueProxyContractAddress = event.args[1];
+    }
+  }
+  console.log("League proxy deployed to:", leagueProxyContractAddress);
+
+  // The actual League Proxy Instance with the above address ^
+  provider = new ethers.providers.getDefaultProvider();
+  LeagueProxyInstance = new ethers.Contract(
+    leagueProxyContractAddress,
+    LeagueOfLegendsLogicJSON.abi,
+    provider
+  );
+
+  // Create interactable contract instances
+  proxyContract = LeagueProxyInstance.connect(owner);
+  leaugeMaker = LeagueMakerInstance.connect(owner);
+  gameItems = GameItemInstance.connect(addr1);
+
+  // Creating a list of all of our proxy contracts (so we can call functions at once for all proxies)
+  const leagueAddresses = await leaugeMaker.connect(owner).getLeagueAddresses();
+
+  AllLeagueInstances = []; // all of our leagues (as CONTRACTS) so we can interact with them
+  let currProxy;
+  for (let i = 0; i < leagueAddresses.length; i++) {
+    currProxy = new ethers.Contract(
+      leagueAddresses[i],
+      LeagueOfLegendsLogicJSON.abi,
+      provider
+    );
+    AllLeagueInstances.push(currProxy);
+  }
 };
 
 const runMain = async () => {
