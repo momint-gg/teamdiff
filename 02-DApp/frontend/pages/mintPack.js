@@ -66,10 +66,10 @@ export default function MintPack() {
         setCurrentChain(chainId);
         setIsPolygon(chainId === 137);
         setIsConnected(true);
-        setIsLoading(false);
       } else {
         setIsConnected(false);
       }
+      setIsLoading(false);
     };
     setAccountData();
     provider.provider.on("accountsChanged", (accounts) => {
