@@ -222,7 +222,7 @@ export default function BurnPack({ setDisplay }) {
   return (
     <Box>
       {isLoading ? (
-        <LoadingPrompt loading={"Burn Page"} />
+        <LoadingPrompt loading={"Open Page"} />
       ) : (
         <>
           {isConnected && !hasMinted && (
@@ -273,7 +273,7 @@ export default function BurnPack({ setDisplay }) {
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
-                      Burn Starter Pack
+                      Open Starter Pack
                     </Typography>
                   </Box>
                   <Box
@@ -335,7 +335,7 @@ export default function BurnPack({ setDisplay }) {
           )}
           {isMinting && (
             <LoadingPrompt
-              completeTitle={"Burning Pack..."}
+              completeTitle={"Opening Pack..."}
               bottomText={
                 isTransactionDelayed && isMinting
                   ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
@@ -499,7 +499,7 @@ export default function BurnPack({ setDisplay }) {
             </>
           )}
           {!isConnected && !hasMinted && !isMinting && (
-            <ConnectWalletPrompt accessing={"burning a pack"} />
+            <ConnectWalletPrompt accessing={"opening a pack"} />
           )}
         </>
       )}
