@@ -11,8 +11,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 //Router
-import { useRouter } from 'next/router';
-
+import { useRouter } from "next/router";
 
 //Web3 Imports
 import { ethers } from "ethers";
@@ -21,12 +20,10 @@ import { ethers } from "ethers";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 
-
 // export default function LeagueCard({ leagueAddress, setMountedLeagueAddress, setLeague, setLeagueOpen }) {
 export default function LeagueCard({ leagueAddress }) {
   //Router
-  const router = useRouter()
-
+  const router = useRouter();
 
   //TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
@@ -37,7 +34,6 @@ export default function LeagueCard({ leagueAddress }) {
   const [leagueName, setLeagueName] = useState(null);
   const [leagueSize, setLeagueSize] = useState(1);
 
-  
   useEffect(() => {
     //console.log("leagueADdy: " + leagueAddress)
     if (leagueAddress) {
@@ -56,29 +52,28 @@ export default function LeagueCard({ leagueAddress }) {
         var error = "none";
 
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
-          const whitelistedLeague = await LeagueProxyContract.leagueMembers(i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          // console.log("User To League Map Error: " + _error.message);
-                                                        });
+          const whitelistedLeague = await LeagueProxyContract.leagueMembers(
+            i
+          ).catch((_error) => {
+            error = _error;
+            //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+            // console.log("User To League Map Error: " + _error.message);
+          });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
           }
-
         } while (error == "none");
         setLeagueSize(i);
       }
       fetchData();
-    }
-    else {
+    } else {
       console.log("no account data or league Address found");
     }
   }, []);
-  
+
   const card = (
     <Fragment>
       <CardContent>
@@ -89,7 +84,7 @@ export default function LeagueCard({ leagueAddress }) {
         /> */}
         <Box sx={{ marginLeft: 2 }}>
           <Typography variant="h5" color="secondary" component="div">
-            {leagueName? leagueName : "(Untitled)"}
+            {leagueName ? leagueName : "(Untitled)"}
           </Typography>
 
           <Typography variant="body1" color="inherit">
@@ -107,19 +102,16 @@ export default function LeagueCard({ leagueAddress }) {
   );
 
   const handleClick = (e) => {
-    e.preventDefault()
-    const href= "/leagues/" + leagueAddress;
-    router.push(href)
-  }
+    e.preventDefault();
+    const href = "/leagues/" + leagueAddress;
+    router.push(href);
+  };
 
   return (
-    <Card
-      variant="outlined"
-      onClick={handleClick}
-    >
-        {/* <Link href= {"/leagues/" + leagueAddress}> */}
-          {card}
-        {/* </Link> */}
+    <Card variant="outlined" onClick={handleClick}>
+      {/* <Link href= {"/leagues/" + leagueAddress}> */}
+      {card}
+      {/* </Link> */}
     </Card>
   );
 }

@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import {
-  Box,
-  Typography,
-  Fab,
-} from "@mui/material";
+import { Box, Typography, Fab } from "@mui/material";
 //Component Imports
 import LeagueCard from "../components/LeagueCard";
 // import LeagueDetails from "./leagueDetails";
@@ -40,30 +36,32 @@ export default function JoinLeague({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  
-  useEffect(() => {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const setAccountData = async () => {
-        const signer = provider.getSigner()
-        const accounts = await provider.listAccounts();
 
-        if(accounts.length > 0) {
-          console.log("updating accounts")
-          const accountAddress = await signer.getAddress()
-          setSigner(signer)
-          setConnectedAccount(accountAddress)
-          setIsConnected(true)
-      
-        }
-        else {
-          setIsConnected(false);
-        }
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const setAccountData = async () => {
+      const signer = provider.getSigner();
+      const accounts = await provider.listAccounts();
+
+      if (accounts.length > 0) {
+        console.log("updating accounts");
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
+        setIsConnected(false);
       }
-      setAccountData()
-      provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-      provider.provider.on('disconnect', () =>  { console.log("disconnected"); 
-                                                  setIsConnected(false) })
-    }, [connectedAccount]);
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
+      console.log("disconnected");
+      setIsConnected(false);
+    });
+  }, [connectedAccount]);
 
   //TODO how to add hook for when we change our connected wallet?
   useEffect(() => {
@@ -83,17 +81,19 @@ export default function JoinLeague({ setDisplay }) {
         var i = 0;
         var error = "none";
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
-          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(connectedAccount, i)
-                                                        .catch((_error) => {
-                                                          error = _error;
-                                                          //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-                                                          console.log("User To League Map Error: " + _error.message);
-                                                        });
+          const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(
+            connectedAccount,
+            i
+          ).catch((_error) => {
+            error = _error;
+            //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+            console.log("User To League Map Error: " + _error.message);
+          });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
             //console.log("member #" + i + ": " + leagueMembers)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
@@ -104,25 +104,24 @@ export default function JoinLeague({ setDisplay }) {
             );
             //Determine if connected wallet has joined this whitelisted League Address
             // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
-            const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
+            const isInLeague = await LeagueProxyContract.inLeague(
+              connectedAccount
+            );
             //Add League address  to appropriate state list
-            if(!isInLeague) 
-              setPendingLeagueList(pendingLeagueList => [...pendingLeagueList, whitelistedLeague])
+            if (!isInLeague)
+              setPendingLeagueList((pendingLeagueList) => [
+                ...pendingLeagueList,
+                whitelistedLeague,
+              ]);
           }
           //console.log("error value at end:" + error);
-
         } while (error == "none");
-
       }
       fetchData();
-    }
-    else {
+    } else {
       console.log("no account data");
     }
   }, [isConnected, connectedAccount]);
-
-
-
 
   useEffect(() => {
     // setActiveLeagueList([]);
@@ -141,17 +140,18 @@ export default function JoinLeague({ setDisplay }) {
         var i = 0;
         var error = "none";
         //Continue to add leagues to activeLEagueList and pendingLeagueList
-          //until we hit an error (because i is out of range presumably)
+        //until we hit an error (because i is out of range presumably)
         do {
-          const leagueAddress = await LeagueMakerContract.leagueAddresses(i)
-          .catch((_error) => {
+          const leagueAddress = await LeagueMakerContract.leagueAddresses(
+            i
+          ).catch((_error) => {
             error = _error;
             //alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
             console.log("User To League Map Error: " + _error.message);
           });
 
-          if(error == "none") {  
-            i++;  
+          if (error == "none") {
+            i++;
             // console.log("league #" + i + ": " + leagueAddress)
             //console.log("white: " + whitelistedLeague);
             //Create League Proxy Instance
@@ -161,7 +161,8 @@ export default function JoinLeague({ setDisplay }) {
               provider
             );
 
-            const whitelistContractAddress = await LeagueProxyContract.whitelistContract();
+            const whitelistContractAddress =
+              await LeagueProxyContract.whitelistContract();
             // console.log("white: " + whitelistContract);
             const WhitelistContract = new ethers.Contract(
               whitelistContractAddress,
@@ -174,45 +175,42 @@ export default function JoinLeague({ setDisplay }) {
             const isPublic = await WhitelistContract.isPublic();
             // const isPublic = await LeagueProxyContract.isPublic();
             // console.log("\tIs public: " + isPublic);
-            const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
+            const isInLeague = await LeagueProxyContract.inLeague(
+              connectedAccount
+            );
 
             //Add League address  to appropriate state list if the league is public
-              //and the user is not already in the league
-            // if(isPublic && !isInLeague) 
-            if(isPublic) 
-              setPublicLeagueList(publicLeagueList => [...publicLeagueList, leagueAddress])
+            //and the user is not already in the league
+            // if(isPublic && !isInLeague)
+            if (isPublic)
+              setPublicLeagueList((publicLeagueList) => [
+                ...publicLeagueList,
+                leagueAddress,
+              ]);
           }
           //console.log("error value at end:" + error);
-
         } while (error == "none");
-
       }
       fetchData();
-    }
-    else {
+    } else {
       console.log("no account data");
     }
   }, [isConnected, connectedAccount]);
 
+  var publicListItems = publicLeagueList.map((leagueAddress, index) => (
+    <Box key={index}>
+      <LeagueCard leagueAddress={leagueAddress} />
+      <hr></hr>
+    </Box>
+  ));
 
-  var publicListItems = publicLeagueList.map((leagueAddress, index) =>
-  <Box key={index}>
-  <LeagueCard
-    leagueAddress={leagueAddress}
-  />
-  <hr></hr>
-  </Box>
-);
-
-//Create list of league cards for all pending leagues
-var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
-  <Box key={index}>
-  <LeagueCard
-    leagueAddress={leagueAddress}
-  />
-  <hr></hr>
-  </Box>
-);
+  //Create list of league cards for all pending leagues
+  var pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
+    <Box key={index}>
+      <LeagueCard leagueAddress={leagueAddress} />
+      <hr></hr>
+    </Box>
+  ));
 
   return (
     <Box>
@@ -236,11 +234,11 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         }}
       />
       {pendingLeagueList.length > 0 ? (
-          <ul>{pendingListItems}</ul>
+        <ul>{pendingListItems}</ul>
       ) : (
         <Typography variant="h6" color="primary" component="div">
           (No Pending Leagues)
-        </Typography>   
+        </Typography>
       )}
       <Typography variant="h4" color="secondary" component="div">
         Public Leagues
@@ -253,11 +251,11 @@ var pendingListItems = pendingLeagueList.map((leagueAddress, index) =>
         }}
       />
       {publicLeagueList.length > 0 ? (
-          <ul>{publicListItems}</ul>
+        <ul>{publicListItems}</ul>
       ) : (
         <Typography variant="h6" color="primary" component="div">
           (No Active Leagues)
-        </Typography>   
+        </Typography>
       )}
     </Box>
   );

@@ -24,10 +24,9 @@ export default function Collection() {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
-
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    const signer = provider.getSigner();
 
     // const fetchData = async () => {
     //   const currentAddress = await signer.getAddress()
@@ -35,26 +34,26 @@ export default function Collection() {
     // }
     // fetchData()
     const setAccountData = async () => {
-      const signer = provider.getSigner()
+      const signer = provider.getSigner();
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress()
-        setSigner(signer)
-        setConnectedAccount(accountAddress)
-        setIsConnected(true)
-
-      }
-      else {
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
         setIsConnected(false);
       }
-    }
-    setAccountData()
-    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-    provider.provider.on('disconnect', () => {
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
       console.log("disconnected");
-      setIsConnected(false)
-    })
+      setIsConnected(false);
+    });
   }, []);
 
   const handleModalOpen = () => {
@@ -92,7 +91,12 @@ export default function Collection() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
+          console.log(
+            "Token #" +
+              token +
+              " metadata: " +
+              JSON.stringify(response, null, 2)
+          );
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
@@ -110,7 +114,6 @@ export default function Collection() {
   if (isConnected && nftResp) {
     return (
       <Box>
-        
         <Typography
           variant={isMobile ? "h4" : "h2"}
           color="secondary"
@@ -170,12 +173,8 @@ export default function Collection() {
       </Box>
     );
   } else if (isConnected) {
-    return (
-      <LoadingPrompt loading={"Your Collection"} />
-    );
+    return <LoadingPrompt loading={"Your Collection"} />;
   }
 
-  return (
-    <ConnectWalletPrompt accessing={"your collection"} />
-  );
+  return <ConnectWalletPrompt accessing={"your collection"} />;
 }

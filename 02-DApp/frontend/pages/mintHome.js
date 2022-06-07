@@ -7,7 +7,7 @@ import card_and_pack from "../assets/images/card_and_pack.png";
 import MintPack from "./mintPack.js";
 import { useMediaQuery } from "react-responsive";
 //Router
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 export default function MintHome() {
   //Router
@@ -40,20 +40,20 @@ export default function MintHome() {
                     display: "flex",
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "space-evenly"
+                    justifyContent: "space-evenly",
                   }}
                 >
                   <Box
                     sx={{
-                      flex: 2
+                      flex: 2,
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
                       Starter Pack
                     </Typography>
                     <Typography color="white" component="div">
-                    Mint a starter pack and get 5 unique athlete NFTs, which allow
-                    you to build a roster and get right into the action.
+                      Mint a starter pack and get 5 unique athlete NFTs, which
+                      allow you to build a roster and get right into the action.
                     </Typography>
                     <Box>
                       <Fab
@@ -85,12 +85,14 @@ export default function MintHome() {
                       </Fab>
                     </Box>
                   </Box>
-                  <Box sx={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Image
                       src={card_and_pack}
                       alt="Picture of the author"
@@ -99,7 +101,6 @@ export default function MintHome() {
                     />
                   </Box>
                 </Box>
-                
               </Container>
             </Box>
           ) : (
@@ -121,8 +122,8 @@ export default function MintHome() {
                     Starter Pack
                   </Typography>
                   <Typography variant="h6" color="white" component="div">
-                  Mint a starter pack and get 5 unique athlete NFTs, which allow
-                    you to build a roster and get right into the action.
+                    Mint a starter pack and get 5 unique athlete NFTs, which
+                    allow you to build a roster and get right into the action.
                   </Typography>
                   {/*TODO: Only show this mint button if user is logged in*/}
                   <Fab
@@ -164,21 +165,21 @@ export default function MintHome() {
                 </Box>
               ) : (
                 <Container
-                  sx={{ 
+                  sx={{
                     // marginLeft: "4rem",
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
                   }}
                 >
                   <Box>
-                  <Image
-                    src={card_and_pack}
-                    // layout="responsive"
-                    alt="Picture of the author"
-                    width="550px"
-                    height="550px"
-                  />
+                    <Image
+                      src={card_and_pack}
+                      // layout="responsive"
+                      alt="Picture of the author"
+                      width="550px"
+                      height="550px"
+                    />
                   </Box>
                 </Container>
               )}
