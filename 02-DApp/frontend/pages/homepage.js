@@ -253,7 +253,7 @@ export default function Homepage() {
                 fantasy league to compete to win tokens for the League of
                 Legends LCS Summer Split of 2022 and create your TeamDiff.
               </p>
-              <Link href="/createLeague">
+              <Link href="#">
                 <button
                   className={[
                     bootstrap.btn,
@@ -265,7 +265,7 @@ export default function Homepage() {
                     bootstrap["fw-bold"],
                   ].join(" ")}
                 >
-                  Create League
+                  Coming Very Soon
                 </button>
               </Link>
             </div>

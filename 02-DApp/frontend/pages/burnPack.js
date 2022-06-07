@@ -159,7 +159,7 @@ export default function BurnPack({ setDisplay }) {
     } else {
       console.log("no account data found!");
     }
-  }, [isConnected]);
+  }, [isConnected, connectedAccount]);
 
   // TODO hide burn pack if they don't
   const burnStarterPack = async () => {
@@ -186,7 +186,7 @@ export default function BurnPack({ setDisplay }) {
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
-        }, 60 * 5 * 1000);
+        }, 20 * 1000);
         console.log("Minting pack in progress...");
       })
       .catch((error) => {

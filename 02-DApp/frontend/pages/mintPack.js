@@ -186,7 +186,7 @@ export default function MintPack() {
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
-        }, 60 * 5 * 1000);
+        }, 20 * 1000);
 
         // console.log("Minting pack in progress...");
       })
