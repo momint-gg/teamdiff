@@ -44,6 +44,8 @@ export default function MintPack() {
   const [currentChain, setCurrentChain] = useState();
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyMintedPack, setHasAlreadyMintedPack] = useState();
+  const [isOnWhitelist, setIsOnWhitelist] = useState();
+  const [isPresalePhase, setIsPresalePhase] = useState();
   useEffect(() => {
     // setHasMinted(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -122,10 +124,27 @@ export default function MintPack() {
       // Grab packs available
       const packsAvail = await GameItemsContract.packsAvailable();
       setPacksAvailable(packsAvail.toNumber());
+
+      // Grab if user has already minted starter pack
       const hasAlreadyMintedPack1 = await GameItemsContract.userToHasMintedPack(
         connectedAccount
       );
       setHasAlreadyMintedPack(hasAlreadyMintedPack1);
+
+      // Grab if user is on whitelist
+      const isOnWhitelist1 = await GameItemsContract.whitelist(
+        connectedAccount
+      );
+      setIsOnWhitelist(isOnWhitelist1);
+
+      // Set if is past presale date
+      // open sale start date in UTC
+      const openDate = new Date("June 10, 2022 21:00:00");
+      // const openDate = new Date("June 3, 2022 21:00:00");
+      const today = new Date();
+      const isBeforeOpenDate = today.getTime() < openDate.getTime();
+      // console.log("isPastOpenDate: " + isBeforeOpenDate);
+      setIsPresalePhase(isBeforeOpenDate);
 
       // Callback for when packMinted Events is fired from contract
       // const signerAddress = accountData.address;
@@ -155,7 +174,7 @@ export default function MintPack() {
     } else {
       console.log("no account connected");
     }
-  }, [isConnected]);
+  }, [isConnected, connectedAccount]);
 
   // useEffect(() => {
   //   console.log("user chain changed: ", currentChain)
@@ -249,7 +268,12 @@ export default function MintPack() {
                   display: "flex",
                 }}
               >
-                <Typography variant="h3" color="white" component="div">
+                <Typography
+                  variant="h3"
+                  color="white"
+                  textAlign="center"
+                  component="div"
+                >
                   Mint TeamDiff Starter Pack
                 </Typography>
                 {packsAvailable != null && (
@@ -294,13 +318,14 @@ export default function MintPack() {
                 alignItems="center"
                 sx={{
                   display: "flex",
+                  flexDirection: "column",
                   paddingTop: "20px",
                 }}
               >
                 {hasAlreadyMintedPack ? (
                   <Typography
                     style={{
-                      // color: "red",
+                      textAlign: "center",
                       fontSize: 16,
                     }}
                   >
@@ -324,19 +349,32 @@ export default function MintPack() {
                   </Typography>
                 ) : (
                   <>
-                    {!isPolygon && (
+                    {!isOnWhitelist && isPresalePhase && (
                       <Typography
                         style={{
-                          color: "red",
+                          // color: "red",
                           fontSize: 16,
                         }}
                       >
-                        Please switch to Polygon and refresh the page to proceed
-                        with minting.
+                        {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
+                          " you think this is wrong, or come back tomorrow for public sale! "}
                       </Typography>
                     )}
                   </>
                 )}
+                {!isPolygon &&
+                  !hasAlreadyMintedPack &&
+                  !(!isOnWhitelist && isPresalePhase) && (
+                    <Typography
+                      style={{
+                        color: "red",
+                        fontSize: 16,
+                      }}
+                    >
+                      Please switch to Polygon and refresh the page to proceed
+                      with minting.
+                    </Typography>
+                  )}
               </Box>
             </Container>
           )}
