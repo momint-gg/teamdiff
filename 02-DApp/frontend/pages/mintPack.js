@@ -308,11 +308,23 @@ export default function MintPack() {
                     fontSize: 20,
                   }}
                   // disabled={!isPolygon}
-                  disabled={hasAlreadyMintedPack}
+                  disabled={
+                    hasAlreadyMintedPack || (!isOnWhitelist && isPresalePhase)
+                  }
                 >
                   Mint
                 </Fab>
               </Box>
+              <br></br>
+              {isPresalePhase && (
+                <Typography
+                  textAlign="center"
+                  variant="subtitle1"
+                  color="secondary"
+                >
+                  Presale ends June 10th, 5:00 pm EST
+                </Typography>
+              )}
               <Box
                 justifyContent="center"
                 alignItems="center"
