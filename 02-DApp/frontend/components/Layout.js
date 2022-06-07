@@ -12,7 +12,7 @@ const Layout = ({ children, isMobile }) => {
     { name: "PLAY", href: "/play" },
     { name: "COLLECTION", href: "/collection" },
     { name: "MINT", href: "/mintHome" },
-    { name: "BURN", href: "/burnPack" },
+    { name: "OPEN", href: "/burnPack" },
   ];
 
   return (
