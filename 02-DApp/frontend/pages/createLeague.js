@@ -324,7 +324,7 @@ export default function CreateLeague({ setDisplay }) {
       alert("Please select a token.")
     }
     else if (formValues.buyInCost > 100) {
-      alert("Pleae enter a buy-in cost below 100 USDC.")
+      alert("Please enter a buy-in cost below 100 USDC.")
     }
     else {
       //Connect to leagueMaker with connect wallet
