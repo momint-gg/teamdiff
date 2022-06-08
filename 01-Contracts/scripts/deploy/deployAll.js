@@ -16,7 +16,7 @@ const main = async () => {
     //overriding gas bc transaction was stuck
     //gasPrice: 203000000000,
     gasLimit: 20000000
-  });
+  });   
   await gameContract.deployed();
 
   textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
