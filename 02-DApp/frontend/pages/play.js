@@ -138,7 +138,7 @@ export default function Play() {
                 paddingRight: 2,
               }}
             >
-              View the leagues that you have already joined. Here you can set your lineups, view other players teams, see your matchups, and the standings within a league!
+              View the leagues that you have joined or created. Set your lineups, view your matchups, scout out other players' teams, and the overall standings within a league!
             </Typography>
           </Grid>
           <Grid item xs={4}>
@@ -175,7 +175,7 @@ export default function Play() {
                 paddingRight: 2,
               }}
             >
-              Join a league that you have been whitelisted to, or find a public league that you can join to compete with the lineup that you have assembled!
+              Join a public or private league (invite-only) to compete against others for bragging rights and tokens! Show off your athletes and join as many leagues as you want.
             </Typography>
           </Grid>
           <Grid item xs={4}>

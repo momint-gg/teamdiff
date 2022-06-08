@@ -87,8 +87,9 @@ function MyApp({ Component, pageProps }) {
               />
 
               <Head>
-                <title>Play TeamDiff</title>
-                <meta name="description" content="TeamDiff" />
+                <title>TeamDiff</title>
+                <meta name="description" content="On-chain Fantasy Esports" />
+                <meta property="og:image" content="../public/fav/favicon-32x32.png" />
                 {/* <link rel="icon" href="/favicon.ico" /> */}
                 {/* Favicon */}
                 <link
