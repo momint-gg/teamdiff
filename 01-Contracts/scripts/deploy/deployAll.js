@@ -184,7 +184,12 @@ const main = async () => {
   );
 
   //This copies the abi from our build folder to a dedicated folder in the backend folder
-  let contractNames = ["LeagueMaker", "LeagueOfLegendsLogic", "GameItems"];
+  let contractNames = [
+    "LeagueMaker",
+    "LeagueOfLegendsLogic",
+    "GameItems",
+    "Athletes",
+  ];
   contractNames.forEach(async (contractName) => {
     srcPath =
       "./build/contracts/contracts/" +
