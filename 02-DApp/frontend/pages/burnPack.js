@@ -12,6 +12,7 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
@@ -40,14 +41,18 @@ export default function BurnPack({ setDisplay }) {
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
       console.log("Ethereum successfully detected!");
       // Access the decentralized web!
     } else {
-      //      alert("Redirecting to MetaMask Browser to use this Dapp on Mobile...");
-      window.location.assign("https://metamask.app.link/dapp/teamdiff.xyz/");
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
       console.log("Please install MetaMask!");
     }
   }
@@ -65,7 +70,6 @@ export default function BurnPack({ setDisplay }) {
 
         if (accounts.length > 0) {
           const accountAddress = await signer.getAddress();
-
           setSigner(signer);
           setConnectedAccount(accountAddress);
           setIsConnected(true);
@@ -188,6 +192,8 @@ export default function BurnPack({ setDisplay }) {
         <LoadingPrompt loading={"Open Page"} />
       ) : (
         <>
+          {isNoMetaMask && <MetaMaskRedirectInstructions />}
+
           {isConnected && !hasMinted && (
             <Container
               maxWidth="lg"
@@ -493,7 +499,7 @@ export default function BurnPack({ setDisplay }) {
           {/* TODO: show a collection of their newly minted athlete cards on the screen */}
             </>
           )}
-          {!isConnected && !hasMinted && !isMinting && (
+          {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
             <ConnectWalletPrompt
               accessing={"opening a TeamDiff Starter pack"}
             />

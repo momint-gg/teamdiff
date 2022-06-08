@@ -12,6 +12,7 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 
 export default function MintPack() {
   // Router
@@ -39,15 +40,18 @@ export default function MintPack() {
   const [isOnWhitelist, setIsOnWhitelist] = useState();
   const [isPresalePhase, setIsPresalePhase] = useState();
   const [isPublicSalePhase, setIsPublicSalePhase] = useState();
-
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
       console.log("Ethereum successfully detected!");
       // Access the decentralized web!
     } else {
-      //      alert("Redirecting to MetaMask Browser to use this Dapp on Mobile...");
-      window.location.assign("https://metamask.app.link/dapp/teamdiff.xyz/");
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
       console.log("Please install MetaMask!");
     }
   }
@@ -243,6 +247,7 @@ export default function MintPack() {
         <LoadingPrompt loading={"Mint Page"} />
       ) : (
         <>
+          {isNoMetaMask && <MetaMaskRedirectInstructions />}
           {isConnected && !hasMinted && (
             <Box
               justifyContent="center"
@@ -579,7 +584,7 @@ export default function MintPack() {
               </Box>
             </Container>
           )}
-          {!isConnected && !hasMinted && !isMinting && (
+          {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
             <Box>
               <ConnectWalletPrompt
                 accessing={"minting a TeamDiff Starter Pack"}

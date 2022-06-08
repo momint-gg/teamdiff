@@ -8,6 +8,7 @@ import AthleteCard from "../components/AthleteCard";
 import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 import constants from "../constants";
 
 export default function Collection() {
@@ -19,15 +20,20 @@ export default function Collection() {
   // const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
       console.log("Ethereum successfully detected!");
       // Access the decentralized web!
     } else {
-      //      alert("Redirecting to MetaMask Browser to use this Dapp on Mobile...");
-      window.location.assign("https://metamask.app.link/dapp/teamdiff.xyz/");
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
       console.log("Please install MetaMask!");
     }
   }
@@ -49,6 +55,7 @@ export default function Collection() {
         } else {
           setIsConnected(false);
         }
+        setIsLoading(false);
       };
       setAccountData();
       provider.provider.on("accountsChanged", () => {
@@ -118,7 +125,11 @@ export default function Collection() {
     }
   }, [isConnected, connectedAccount]);
 
-  if (isConnected && nftResp) {
+  if (isLoading) {
+    return <LoadingPrompt loading={"Collection"} />;
+  } else if (isNoMetaMask) {
+    return <MetaMaskRedirectInstructions />;
+  } else if (isConnected && nftResp) {
     return (
       <Box>
         <Typography
