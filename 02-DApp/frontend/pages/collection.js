@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, Grid, Select } from "@mui/material";
 import constants from "../constants";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 
@@ -23,6 +23,7 @@ export default function Collection() {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [searchQuery, setSeachQuery] = useState("")
 
 
   useEffect(() => {
@@ -107,8 +108,46 @@ export default function Collection() {
     }
   }, [isConnected, connectedAccount]);
 
+  const returnSearchResults = () => {
+    return athleteNFTs.filter((athlete) => athlete.title.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+  }
+
+  // TODO!
+  const filterByResults = (props) => {
+    if (props.team) {
+      return athleteNFTs.filter((athlete) => athlete.metadata.team === props.team)
+    } else if (props.position) {
+      return athleteNFTs.filter((athlete) => athlete.metadata.position === props.position)
+    }
+  }
+
+  const getTeamFilterOptions = () => {
+    const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team) 
+    return [... new Set(allTeams)]
+  }
+
+  const ALL_POSITION_FILTER_OPTIONS = {
+    top: 'Top',
+    bottom: 'X',
+    x: 'X'
+  }
+
   if (isConnected && nftResp) {
     return (
+      // https://mui.com/material-ui/react-select/
+      // <FormControl >
+      //   <InputLabel id="team-filter">Team</InputLabel>
+      //   <Select 
+      //     labelId="team-filter"
+      //     value={teamFilterSelection}
+      //     label="Team"
+      //     onChange={handleSomethingsfdf}
+      //   >
+      //     <MenuItem value="">One</MenuItem>
+      //   </Select>
+
+      // </FormControl>
+
       <Box>
         
         <Typography

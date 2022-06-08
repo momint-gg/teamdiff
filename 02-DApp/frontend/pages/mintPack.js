@@ -79,7 +79,7 @@ export default function MintPack() {
           setConnectedAccount(accountAddress)
           const { chainId } = await provider.getNetwork()
           setCurrentChain(chainId)
-          setIsPolygon(chainId === 137)
+          setIsPolygon(true)
           setIsConnected(true)
           setIsLoading(false)
 
