@@ -130,24 +130,24 @@ async function main() {
     console.log('Error: ', error);
   }
 
-  //Finally, pushing stats to the contract
-  // console.log('Now pushing stats to contract');
-  // for (let i = 0; i < finalStatsToPush.length; i++) {
-  //   const addAthletesStatsTxn = await contract.appendStats(
-  //     finalStatsToPush[i].id, // index of athlete
-  //     finalStatsToPush[i].points, // their points for the week,
-  //     week_num // Week number passed in
-  //   );
-  //   console.log(
-  //     'Adding points: ',
-  //     finalStatsToPush[i].points,
-  //     ' for athlete id ',
-  //     finalStatsToPush[i].id,
-  //     `(${finalStatsToPush[i].name})`
-  //   );
-  //   // Waiting for txn to mine
-  //   await addAthletesStatsTxn.wait();
-  // }
+  // Finally, pushing stats to the contract
+  console.log('Now pushing stats to contract');
+  for (let i = 0; i < finalStatsToPush.length; i++) {
+    const addAthletesStatsTxn = await contract.appendStats(
+      finalStatsToPush[i].id, // index of athlete
+      finalStatsToPush[i].points, // their points for the week,
+      week_num // Week number passed in
+    );
+    console.log(
+      'Adding points: ',
+      finalStatsToPush[i].points,
+      ' for athlete id ',
+      finalStatsToPush[i].id,
+      `(${finalStatsToPush[i].name})`
+    );
+    // Waiting for txn to mine
+    await addAthletesStatsTxn.wait();
+  }
 }
 
 // Quick check to make sure contract updates
@@ -197,9 +197,9 @@ const testContract = async () => {
 
 const runMain = async () => {
   try {
-    console.log('Running main');
+    console.log('Running main...\n');
     await main();
-    console.log('Testing contract');
+    console.log('Testing contract...\n');
     await testContract();
     process.exit(0);
   } catch (error) {

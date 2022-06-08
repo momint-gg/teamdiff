@@ -16,7 +16,15 @@ export default function NavLink({ className, href, children, isMobile }) {
                     fontSize: "18px",
                     textDecoration: "underline",
                     fontFamily: "Exo",
+<<<<<<< HEAD
+<<<<<<< HEAD
                     marginRight: "10px",
+=======
+                    marginLeft: "10px",
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                    marginRight: "10px",
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     textDecorationColor: "cyan",
                     textUnderlineOffset: "10px",
                   }
@@ -25,7 +33,15 @@ export default function NavLink({ className, href, children, isMobile }) {
                     fontSize: "18px",
                     textDecoration: "none",
                     fontFamily: "Exo",
+<<<<<<< HEAD
+<<<<<<< HEAD
                     marginRight: "10px",
+=======
+                    marginLeft: "10px",
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                    marginRight: "10px",
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                   }
             }
           >
@@ -52,7 +68,15 @@ export default function NavLink({ className, href, children, isMobile }) {
                     fontSize: "24px",
                     textDecoration: "none",
                     fontFamily: "Exo",
+<<<<<<< HEAD
+<<<<<<< HEAD
                     marginRight: "10px",
+=======
+                    marginRight: "15px",
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                    marginRight: "10px",
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                   }
             }
           >

@@ -57,7 +57,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    // IERC20 public testUSDC;
+    IERC20 public testUSDC;
     IERC20 public rinkebyUSDC;
     GameItems gameItemsContract;
 
@@ -112,7 +112,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(_isPublic); // Initializing our whitelist
         rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
-        // testUSDC = IERC20(_testUSDCAddress);
+        testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
         // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
@@ -223,7 +223,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     // Setting the lineup for a user
     // TODO: Move requires to a library to save space (MOBALogicLibrary)
     // note: this is inefficient if we want to update one position only :/
-        //TODO: we should require that they cannot set duplicates
+    //TODO: we should require that they cannot set duplicates
     function setLineup(uint256[5] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
@@ -260,7 +260,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         userToLineup[msg.sender] = athleteIds;
     }
 
-
     function setAthleteInLineup(uint256 athleteId, uint256 position) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
@@ -279,23 +278,24 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         // Requiring the user has ownership of the athletes
         // for (uint256 i; i < athleteIds.length; i++) {
-            require(
-                gameItemsContract.balanceOf(msg.sender, athleteId) > 0,
-                "Caller does not own given athleteIds"
-            );
+        require(
+            gameItemsContract.balanceOf(msg.sender, athleteId) > 0,
+            "Caller does not own given athleteIds"
+        );
         // }
 
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
         // for (uint256 i; i < athleteIds.length; i++) {
-            require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
-                athleteId >= (position * 10) &&
-                    athleteId <= ((position + 1) * 10 - 1),
-                "You are setting an athlete in the wrong position!"
-            );
+        require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
+            athleteId >= (position * 10) &&
+                athleteId <= ((position + 1) * 10 - 1),
+            "You are setting an athlete in the wrong position!"
+        );
         // }
 
         userToLineup[msg.sender][position] = athleteId;
     }
+
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
@@ -323,17 +323,25 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     // User joining the league
     //TODO debug why onlyWhiteListed always reverts
     function joinLeague() public nonReentrant {
-    // function joinLeague() external onlyWhitelisted nonReentrant {
-        require((whitelistContract.whitelist(msg.sender) || whitelistContract.isPublic() || msg.sender == admin), "User is not on whitelist bro");
+        // function joinLeague() external onlyWhitelisted nonReentrant {
+        require(
+            (whitelistContract.whitelist(msg.sender) ||
+                whitelistContract.isPublic() ||
+                msg.sender == admin),
+            "User is not on whitelist bro"
+        );
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
-        require(rinkebyUSDC.balanceOf(msg.sender) > stakeAmount, "Insufficent funds for staking");
-        
+        require(
+            rinkebyUSDC.balanceOf(msg.sender) > stakeAmount,
+            "Insufficent funds for staking"
+        );
+
         //must approve for our own token
         //testUSDC.approve(msg.sender, 100);
 
         //Update mapping if contract is public, since whitelist is skipped
-        if(whitelistContract.isPublic()) {
+        if (whitelistContract.isPublic()) {
             leagueMakerContract.updateUserToLeagueMapping(msg.sender);
         }
 

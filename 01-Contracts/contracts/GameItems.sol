@@ -80,8 +80,17 @@ contract GameItems is ERC1155, Ownable {
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
+<<<<<<< HEAD
+<<<<<<< HEAD
+    mapping(address => bool) private userToHasBurnedPack;
+=======
     mapping(address => bool) public userToHasBurnedPack;
     mapping(address => bool) public userToHasMintedPack;
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    mapping(address => bool) public userToHasBurnedPack;
+    mapping(address => bool) public userToHasMintedPack;
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
     //NOTE we ran into an error if we have more than 16 params passed in constructor
     constructor(

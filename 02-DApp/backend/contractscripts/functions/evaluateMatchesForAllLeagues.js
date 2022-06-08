@@ -2,6 +2,7 @@ require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/LeagueMaker.json');
 const { LeagueMaker } = require('../contract_info/contractAddresses');
+const LeagueOfLegendsLogicJSON = require('../contract_info/abis/LeagueOfLegendsLogic.json');
 
 async function main() {
   // Constructing our contract

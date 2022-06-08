@@ -1,3 +1,48 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+import {
+  useAccount,
+  useConnect,
+  useSigner,
+  useProvider,
+  useContract,
+  useEnsLookup,
+} from "wagmi";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+
+import { ethers } from "ethers";
+=======
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import AthleteCard from "../components/AthleteCard";
+import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+<<<<<<< HEAD
+import LoadingPrompt from "../components/LoadingPrompt";
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import AthleteCard from "../components/AthleteCard";
+
+import {
+  Link,
+  Box,
+  Typography,
+  Button,
+  Chip,
+  Container,
+  Paper,
+  Fab,
+  Grid,
+} from "@mui/material";
+=======
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 // import AthleteCard from "../components/AthleteCard";
 import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
@@ -7,6 +52,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import profilePic from "../assets/images/starter-pack.png";
@@ -20,7 +66,15 @@ export default function BurnPack({ setDisplay }) {
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
+<<<<<<< HEAD
+<<<<<<< HEAD
+  //Router
+=======
   // Router
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+  // Router
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   const router = useRouter();
 
   // State Hooks
@@ -109,6 +163,53 @@ export default function BurnPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+      //Fetcher to retireve newly minted NFT data
+      const getNFTData = async (athleteIndices) => {
+        console.log("athletic Indices in getNFTData: " + athleteIndices);
+        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+        const nfts = await web3.alchemy
+          .getNfts({
+            owner: connectedAccount,
+            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+          })
+          .catch((error) => {
+            console.log(
+              "get NFT DATA error: " + JSON.stringify(error, null, 2)
+            );
+          });
+
+        setNFTResp(nfts);
+        for (const nft of nfts?.ownedNfts) {
+          const token = nft?.id?.tokenId;
+          const response = await web3.alchemy.getNftMetadata({
+            contractAddress: CONTRACT_ADDRESSES.GameItems,
+            tokenId: token,
+          });
+          console.log("Token #" + parseInt(token));
+          if (
+            !response.title?.includes("Pack") &&
+            athleteIndices.includes(parseInt(token))
+          ) {
+            // console.log("Token #" + parseInt(token) + " metadata: " + JSON.stringify(response, null, 2));
+
+            setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
+          }
+        }
+      };
+      // getNFTData()
+      // getNFTData([6, 33, 12, 26, 45]).catch((error) => {
+      //   console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
+      // });
+      // athleteNFTs.forEach((athlete, index) => {
+      //   console.log("Token #" + parseInt(index) + " metadata: " + JSON.stringify(athlete, null, 2));
+      // })
+
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = async (athleteIndices, signer) => {
         if (signer == connectedAccount) {
@@ -119,6 +220,19 @@ export default function BurnPack({ setDisplay }) {
 
           setHasMinted(true);
           setMintedIndices(athleteIndices);
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+          await getNFTData(athleteIndices).catch((error) => {
+            console.log(
+              "fetch NFT DATA error: " + JSON.stringify(error, null, 2)
+            );
+          });
+          // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
         }
       };
 
@@ -129,6 +243,12 @@ export default function BurnPack({ setDisplay }) {
           50
         );
         // console.log("balance of packs" + balanceOfPacks);
+<<<<<<< HEAD
+<<<<<<< HEAD
+        setCanMint(balanceOfPacks > 0);
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
         setOwnsStarterPack(balanceOfPacks > 0);
 
         // Grab if user has already minted starter pack
@@ -143,6 +263,10 @@ export default function BurnPack({ setDisplay }) {
         const today = new Date();
         const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
         setIsPreRevealPhase(isBeforeRevealDate);
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       };
       fetchData();
 
@@ -178,7 +302,15 @@ export default function BurnPack({ setDisplay }) {
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
+<<<<<<< HEAD
+<<<<<<< HEAD
+        }, 60 * 5 * 1000);
+=======
         }, 20 * 1000);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+        }, 20 * 1000);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
         console.log("Minting pack in progress...");
       })
       .catch((error) => {
@@ -242,7 +374,15 @@ export default function BurnPack({ setDisplay }) {
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
+<<<<<<< HEAD
+<<<<<<< HEAD
+                      Open Starter Pack
+=======
                       Open TeamDiff Starter Pack
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                      Open TeamDiff Starter Pack
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     </Typography>
                   </Box>
                   <Box
@@ -279,6 +419,32 @@ export default function BurnPack({ setDisplay }) {
                   </Box>
                 </>
               )}
+<<<<<<< HEAD
+<<<<<<< HEAD
+              {!canMint && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    color="white"
+                  >
+                    {"\nLooks like you don't have a starter pack yet. Head "}
+                    <Link>
+                      <a
+                        // style={{
+                        //   textDecoration: "none",
+                        //   textDecorationColor: "transparent"
+                        // }}
+                        class="primary-link"
+                        href="/mintPack"
+                      >
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               <Box
                 sx={{
                   display: "flex",
@@ -304,11 +470,22 @@ export default function BurnPack({ setDisplay }) {
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
                       <a className="primary-link" href="/mintPack">
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                         here
                       </a>
                     </Link>
                     {" to mint one now!"}
                   </Typography>
+<<<<<<< HEAD
+<<<<<<< HEAD
+                </Box>
+              )}
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 )}
                 {hasAlreadyBurnedPack && (
                   <Typography>
@@ -332,6 +509,10 @@ export default function BurnPack({ setDisplay }) {
                   </Typography>
                 )}
               </Box>
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             </Container>
           )}
           {isMinting && (
@@ -499,10 +680,21 @@ export default function BurnPack({ setDisplay }) {
           {/* TODO: show a collection of their newly minted athlete cards on the screen */}
             </>
           )}
+<<<<<<< HEAD
+          {!isConnected && !hasMinted && !isMinting && (
+<<<<<<< HEAD
+            <ConnectWalletPrompt accessing={"opening a pack"} />
+=======
+=======
           {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             <ConnectWalletPrompt
               accessing={"opening a TeamDiff Starter pack"}
             />
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           )}
         </>
       )}

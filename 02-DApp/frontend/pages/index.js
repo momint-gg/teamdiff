@@ -1,7 +1,21 @@
 import React from "react";
+<<<<<<< HEAD
+<<<<<<< HEAD
+import { Provider, chain, defaultChains } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
+import Box from "@mui/material/Box";
+=======
 import { chain, defaultChains } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+import { chain, defaultChains } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 import Homepage from "./homepage";
 
 // API key for Ethereum node

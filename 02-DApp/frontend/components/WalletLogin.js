@@ -1,4 +1,21 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+import {
+  useAccount,
+  useConnect,
+  useEnsAvatar,
+  useEnsName,
+  useDisconnect,
+} from "wagmi";
+import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
+import { useEffect, useState } from "react";
+
+=======
 import { Avatar, Box, Button, Chip, ClickAwayListener } from "@mui/material";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+import { Avatar, Box, Button, Chip, ClickAwayListener } from "@mui/material";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { useEnsAvatar, useEnsName } from "wagmi";
@@ -84,7 +101,15 @@ export default function WalletLogin({ isMobile }) {
 
   const setAddressPreview = (address) => {
     console.log("address: " + address);
+<<<<<<< HEAD
+<<<<<<< HEAD
+    var shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+=======
     const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       address.length - 4,
       address.length
     )}`;

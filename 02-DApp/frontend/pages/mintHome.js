@@ -5,7 +5,16 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
+<<<<<<< HEAD
+<<<<<<< HEAD
+//Router
+import { useRouter } from "next/router";
+=======
 import cardandpack from "../assets/images/card_and_pack.png";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+import cardandpack from "../assets/images/card_and_pack.png";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
 export default function MintHome() {
   // Router
@@ -40,6 +49,79 @@ export default function MintHome() {
               >
                 <Box
                   sx={{
+<<<<<<< HEAD
+<<<<<<< HEAD
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 2,
+                    }}
+                  >
+                    <Typography variant="h4" color="white" component="div">
+                      Starter Pack
+                    </Typography>
+                    <Typography color="white" component="div">
+                      Mint a starter pack and get 5 unique athlete NFTs, which
+                      allow you to build a roster and get right into the action.
+                    </Typography>
+                    <Box>
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        aria-label="add"
+                        onClick={() => router.push("./mintPack")}
+                        // onClick={() => setDisplayMint(true)}
+                        sx={{
+                          marginTop: 5,
+                          marginRight: 1,
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                          color: "white",
+                          fontSize: 20,
+                        }}
+                      >
+                        Mint
+                      </Fab>
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        color="white"
+                        aria-label="add"
+                        onClick={() => router.push("./starterPackContents")}
+                        sx={{ marginTop: 5, fontSize: 20 }}
+                      >
+                        CONTENTS
+                      </Fab>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Image
+                      src={card_and_pack}
+                      alt="Picture of the author"
+                      width="550px"
+                      height="550px"
+                    />
+                  </Box>
+                </Box>
+              </Container>
+            </Box>
+          ) : (
+            <Box
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     flex: 2,
                   }}
                 >
@@ -107,6 +189,10 @@ export default function MintHome() {
             }}
           >
             <Container
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -168,16 +254,106 @@ export default function MintHome() {
                 }}
               >
                 <Box>
+<<<<<<< HEAD
+<<<<<<< HEAD
+                  <Typography variant="h3" color="white" component="div">
+                    Starter Pack
+                  </Typography>
+                  <Typography variant="h6" color="white" component="div">
+                    Mint a starter pack and get 5 unique athlete NFTs, which
+                    allow you to build a roster and get right into the action.
+                  </Typography>
+                  {/*TODO: Only show this mint button if user is logged in*/}
+                  <Fab
+                    variant="extended"
+                    size="large"
+                    aria-label="add"
+                    onClick={() => router.push("./mintPack")}
+                    sx={{
+                      marginTop: 5,
+                      marginRight: 1,
+                      background:
+                        "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                      color: "white",
+                      fontSize: 20,
+                    }}
+                  >
+                    Mint
+                  </Fab>
+                  <Fab
+                    variant="extended"
+                    size="large"
+                    color="white"
+                    aria-label="add"
+                    onClick={() => router.push("./starterPackContents")}
+                    sx={{ marginTop: 5, fontSize: 20 }}
+                  >
+                    CONTENTS
+                  </Fab>
+                </Box>
+              </Container>
+              {isMobile ? (
+                <Box>
+                  <Image
+                    src={card_and_pack}
+=======
                   <Image
                     src={cardandpack}
                     // layout="responsive"
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                  <Image
+                    src={cardandpack}
+                    // layout="responsive"
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     alt="Picture of the author"
                     width="550px"
                     height="550px"
                   />
                 </Box>
+<<<<<<< HEAD
+<<<<<<< HEAD
+              ) : (
+                <Container
+                  sx={{
+                    // marginLeft: "4rem",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box>
+                    <Image
+                      src={card_and_pack}
+                      // layout="responsive"
+                      alt="Picture of the author"
+                      width="550px"
+                      height="550px"
+                    />
+                  </Box>
+                </Container>
+              )}
+            </Box>
+          )}{" "}
+        </Box>
+      )}
+      {/* {displayCollection && (
+        <Box>
+          <StarterPackContents setDisplay={setDisplayCollection} isMobile={isMobile}/>
+        </Box>
+      )} */}
+      {/* {displayMint && (
+        <Box>
+          <Box>
+            <MintPack setDisplay={setDisplayMint} />
+=======
               </Container>
             )}
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+              </Container>
+            )}
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           </Box>
         )}{" "}
       </Box>

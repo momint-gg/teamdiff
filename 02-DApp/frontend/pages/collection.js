@@ -39,15 +39,44 @@ export default function Collection() {
   }
 
   useEffect(() => {
+<<<<<<< HEAD
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+<<<<<<< HEAD
+    const signer = provider.getSigner();
+=======
+    // const signer = provider.getSigner();
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
     if (window.ethereum) {
       handleEthereum();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       // const signer = provider.getSigner();
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
       const setAccountData = async () => {
         const signer = provider.getSigner();
         const accounts = await provider.listAccounts();
 
+<<<<<<< HEAD
+      if (accounts.length > 0) {
+        const accountAddress = await signer.getAddress();
+<<<<<<< HEAD
+        setSigner(signer);
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
+        setIsConnected(false);
+      }
+    };
+    setAccountData();
+<<<<<<< HEAD
+    provider.provider.on("accountsChanged", (accounts) => {
+=======
+    provider.provider.on("accountsChanged", () => {
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
         if (accounts.length > 0) {
           const accountAddress = await signer.getAddress();
           setConnectedAccount(accountAddress);
@@ -57,6 +86,7 @@ export default function Collection() {
         }
         setIsLoading(false);
       };
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       setAccountData();
       provider.provider.on("accountsChanged", () => {
         setAccountData();
@@ -107,9 +137,21 @@ export default function Collection() {
           });
           console.log(
             "Token #" +
+<<<<<<< HEAD
+<<<<<<< HEAD
+            token +
+            " metadata: " +
+            JSON.stringify(response, null, 2)
+=======
               token +
               " metadata: " +
               JSON.stringify(response, null, 2)
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+              token +
+              " metadata: " +
+              JSON.stringify(response, null, 2)
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           );
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);

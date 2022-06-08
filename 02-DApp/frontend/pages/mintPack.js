@@ -1,18 +1,73 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+import {
+  useAccount,
+  useConnect,
+  useSigner,
+  useProvider,
+  useContract,
+  useEnsLookup,
+  useDisconnect,
+  useNetwork,
+} from "wagmi";
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import "bootstrap/dist/css/bootstrap.css";
+=======
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Fab,
+  Link,
+<<<<<<< HEAD
+=======
+  Paper,
+  Typography
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+} from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+<<<<<<< HEAD
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import LoadingPrompt from "../components/LoadingPrompt";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+
+=======
+=======
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 // Router
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+// import CONSTANTS from "../Constants.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import profilePic from "../assets/images/starter-pack.png";
+<<<<<<< HEAD
+//Router
+import { useRouter } from "next/router";
+=======
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import LoadingPrompt from "../components/LoadingPrompt";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
 export default function MintPack() {
   // Router
@@ -72,6 +127,30 @@ export default function MintPack() {
         const signer = provider.getSigner();
         const accounts = await provider.listAccounts();
 
+<<<<<<< HEAD
+      if (accounts.length > 0) {
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        const { chainId } = await provider.getNetwork();
+        setCurrentChain(chainId);
+        setIsPolygon(chainId === 137);
+        setIsConnected(true);
+<<<<<<< HEAD
+        setIsLoading(false);
+      } else {
+        setIsConnected(false);
+      }
+=======
+      } else {
+        setIsConnected(false);
+      }
+      setIsLoading(false);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+=======
         if (accounts.length > 0) {
           const accountAddress = await signer.getAddress();
           setSigner(signer);
@@ -85,6 +164,7 @@ export default function MintPack() {
         }
         setIsLoading(false);
       };
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       setAccountData();
       provider.provider.on("accountsChanged", (accounts) => {
         setAccountData();
@@ -201,7 +281,15 @@ export default function MintPack() {
     } else {
       console.log("no account connected");
     }
+<<<<<<< HEAD
+<<<<<<< HEAD
+  }, [isConnected]);
+=======
   }, [isConnected, connectedAccount]);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+  }, [isConnected, connectedAccount]);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
   // useEffect(() => {
   //   console.log("user chain changed: ", currentChain)
@@ -225,14 +313,30 @@ export default function MintPack() {
       signer
     );
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    const mintTxn = await gameItemsContractWithSigner
+=======
     await gameItemsContractWithSigner
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    await gameItemsContractWithSigner
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       .mintStarterPack()
       .then((res) => {
         // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
+<<<<<<< HEAD
+<<<<<<< HEAD
+        }, 60 * 5 * 1000);
+=======
         }, 20 * 1000);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+        }, 20 * 1000);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
         // console.log("Minting pack in progress...");
       })
@@ -296,6 +400,13 @@ export default function MintPack() {
                   display: "flex",
                 }}
               >
+<<<<<<< HEAD
+<<<<<<< HEAD
+                <Typography variant="h3" color="white" component="div">
+                  Mint Starter Pack
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 <Typography
                   variant="h3"
                   color="white"
@@ -303,6 +414,10 @@ export default function MintPack() {
                   component="div"
                 >
                   Mint TeamDiff Starter Pack
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 </Typography>
                 {packsAvailable != null && (
                   <Typography variant="h6" color="white" component="div">
@@ -335,16 +450,31 @@ export default function MintPack() {
                     color: "white",
                     fontSize: 20,
                   }}
+<<<<<<< HEAD
+<<<<<<< HEAD
+                // disabled={!isPolygon}
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                   // disabled={!isPolygon}
                   disabled={
                     hasAlreadyMintedPack ||
                     (!isOnWhitelist && isPresalePhase) ||
                     !(isPresalePhase || isPublicSalePhase)
                   }
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 >
                   Mint
                 </Fab>
               </Box>
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               <br></br>
               {isPresalePhase && (
                 <Typography
@@ -364,11 +494,34 @@ export default function MintPack() {
                   Presale starts at June 9th, 8:00 pm EST
                 </Typography>
               )}
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               <Box
                 justifyContent="center"
                 alignItems="center"
                 sx={{
                   display: "flex",
+<<<<<<< HEAD
+<<<<<<< HEAD
+                  paddingTop: "20px",
+                }}
+              >
+                {!isPolygon && (
+                  <Typography
+                    style={{
+                      color: "red",
+                      fontSize: 16,
+                    }}
+                  >
+                    Please switch to Polygon, then refresh the page, to proceed
+                    with minting.
+                  </Typography>
+                )}
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                   flexDirection: "column",
                   paddingTop: "20px",
                   textAlign: "center",
@@ -433,10 +586,18 @@ export default function MintPack() {
                       with minting.
                     </Typography>
                   )}
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               </Box>
             </Container>
           )}
           {isMinting && (
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             <Box sx={{ marginTop: 5 }}>
               <LoadingPrompt
                 completeTitle={"Minting Pack in Progress"}
@@ -447,6 +608,38 @@ export default function MintPack() {
                 }
               />
             </Box>
+<<<<<<< HEAD
+=======
+            <Container
+              maxWidth="lg"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+                sx={{
+                  display: "flex",
+                }}
+              >
+                <Typography variant="h5" color="white" component="div">
+                  Minting In Progress
+                </Typography>
+                <br></br>
+                <CircularProgress />
+                <br></br>
+                {isMinting && isTransactionDelayed && (
+                  <Typography variant="p" textAlign={"center"}>
+                    This is taking longer than normal. Please check your wallet
+                    to check the status of this transaction.
+                  </Typography>
+                )}
+              </Box>
+            </Container>
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           )}
           {hasMinted && (
             <Container
@@ -481,6 +674,8 @@ export default function MintPack() {
                       variant="h4"
                       color="white"
                       component="div"
+<<<<<<< HEAD
+<<<<<<< HEAD
                     >
                       Acquired Starter Pack!
                     </Typography>
@@ -495,6 +690,27 @@ export default function MintPack() {
                         justifyContent: "space-between",
                       }}
                     >
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
+                    >
+                      Acquired Starter Pack!
+                    </Typography>
+                    <CheckCircleIcon color="secondary"></CheckCircleIcon>
+                  </Box>
+                  <br></br>
+                  <Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                       <Box
                         sx={{
                           flex: 1,
@@ -584,7 +800,18 @@ export default function MintPack() {
               </Box>
             </Container>
           )}
+<<<<<<< HEAD
+          {!isConnected && !hasMinted && !isMinting && (
+<<<<<<< HEAD
+            <ConnectWalletPrompt accessing={"minting a pack"} />
+          )}
+          {packsAvailable == 0 && (
+            <Box>
+              <Typography color="primary">
+=======
+=======
           {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             <Box>
               <ConnectWalletPrompt
                 accessing={"minting a TeamDiff Starter Pack"}
@@ -594,6 +821,10 @@ export default function MintPack() {
           {packsAvailable == 0 && (
             <Box>
               <Typography>
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 Sorry, all packs have already been minted :(
               </Typography>
             </Box>

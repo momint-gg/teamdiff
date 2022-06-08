@@ -7,6 +7,45 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
+<<<<<<< HEAD
+<<<<<<< HEAD
+  // textData +=
+  //   "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
+
+  // Create GameItems Instance
+  const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  // const gameContract = await gameContractFactory.deploy(...constructorArgs);
+  const gameContract = await gameContractFactory.deploy(...constructorArgs, {
+    //overriding gas bc transaction was stuck
+    //gasPrice: 203000000000,
+    // gasLimit: 20000000,
+  });
+  await gameContract.deployed();
+
+  textData += "exports.GameItems = '" + gameContract.address + "';\n";
+  // console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
+
+  // //Add users to gameitems whitelist
+  // txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
+  // await txn.wait();
+  // console.log("Added owner to whitelist");
+  // gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
+  // await txn.wait();
+  // console.log("Added user to whitelist");
+  // //Initial functions that need to be run
+  // console.log("First setting starting index...");
+  // txn = await gameContract.setStartingIndex();
+  // // txn = await gameContract.setStartingIndex({
+  // //   gasLimit: 23000000,
+  // //   gasPrice: 100000000
+  // // });
+  // await txn.wait();
+  // console.log("Now setting token URIs...");
+  // txn = await gameContract.setURIs();
+  // await txn.wait();
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   // textData += "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
   
   // Create GameItems Instance
@@ -63,6 +102,10 @@ const main = async () => {
   console.log("Now setting packsReady to True");
   
 
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
   
   //Create MOBA Logic Library instance
@@ -75,8 +118,30 @@ const main = async () => {
     "MOBALogicLibrary deployed to:",
     MOBALogicLibraryInstance.address
   );
+<<<<<<< HEAD
+  textData +=
+    "exports.MOBALogicLibrary = '" + MOBALogicLibraryInstance.address + "';\n";
+
+<<<<<<< HEAD
+  // Create League Maker Library Instance
+  // TODO: Delete this since we don't have LeagueMakerLibrary anymore
+  // const LeagueMakerLibraryFactory = await ethers.getContractFactory(
+  //   "LeagueMakerLibrary"
+  // );
+  // const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
+  // await LeagueMakerLibraryInstance.deployed();
+  // console.log(
+  //   "LeagueMakerLibrary deployed to:",
+  //   LeagueMakerLibraryInstance.address
+  // );
+  // textData += "exports.LeagueMakerLibrary = \'" + LeagueMakerLibraryInstance.address + "\';\n";
+
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
   textData += "exports.MOBALogicLibrary = \'" + MOBALogicLibraryInstance.address + "\';\n";
 
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   //Create Game Logic Instance
   const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
     "LeagueOfLegendsLogic",
@@ -138,6 +203,14 @@ const main = async () => {
   textData += "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n"
   
   //Adding polygonUSDC and rinkebyUSDC to contract addresses file
+<<<<<<< HEAD
+<<<<<<< HEAD
+  textData +=
+    "exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';" + // When we deploy to mainnet
+    "\nexports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';";
+=======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   textData += "exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';" + // When we deploy to mainnet
   "\nexports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';";
   
@@ -150,6 +223,10 @@ const main = async () => {
       throw err;
     }
     console.log("done writing to file");
+<<<<<<< HEAD
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
   })
 

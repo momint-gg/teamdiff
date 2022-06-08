@@ -2,6 +2,7 @@ require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/LeagueMaker.json');
 const { LeagueMaker } = require('../contract_info/contractAddresses');
+const LeagueOfLegendsLogicJSON = require('../contract_info/abis/LeagueOfLegendsLogic.json');
 
 async function main() {
   // Constructing our contract
@@ -40,6 +41,12 @@ async function main() {
     currLeague = AllLeagueInstances[i].connect(rinkebySigner);
     txn = await currLeague.setLeagueEntryIsClosed();
     await txn.wait();
+
+    txn = await currLeague.leagueEntryIsClosed();
+    txn === false
+      ? console.log('League membership successfully locked!')
+      : console.log('Failed');
+    console.log('League membership is locked: ', txn);
   }
 }
 

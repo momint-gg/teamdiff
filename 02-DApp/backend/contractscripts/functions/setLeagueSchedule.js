@@ -2,6 +2,7 @@ require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const abi = require('../contract_info/abis/LeagueMaker.json');
 const { LeagueMaker } = require('../contract_info/contractAddresses');
+const LeagueOfLegendsLogicJSON = require('../contract_info/abis/LeagueOfLegendsLogic.json');
 
 async function main() {
   // Constructing our contract
@@ -33,6 +34,7 @@ async function main() {
     AllLeagueInstances.push(currProxy);
   }
 
+  const logger = ethers.BaseContract.utils.Logger;
   // Looping through all of our proxies
   let currLeague;
   let txn;
@@ -40,6 +42,9 @@ async function main() {
     currLeague = AllLeagueInstances[i].connect(rinkebySigner);
     txn = await currLeague.setLeagueSchedule();
     await txn.wait();
+
+    // let schedule = await currLeague.getScheduleForWeek(0);
+    // console.log(schedule);
   }
 }
 
