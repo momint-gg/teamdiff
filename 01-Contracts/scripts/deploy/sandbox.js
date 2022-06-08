@@ -14,6 +14,7 @@ const main = async () => {
     
 //   );
 
+  console.log("got game items address")
   //Add users to gameitems whitelist
   txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
   await txn.wait();
