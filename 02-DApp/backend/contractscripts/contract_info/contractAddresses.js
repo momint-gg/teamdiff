@@ -1,4 +1,3 @@
-exports.GameItems = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 exports.MOBALogicLibrary = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
 exports.LeagueOfLegendsLogic = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
 exports.LeagueMaker = '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9';
@@ -6,4 +5,3 @@ exports.Beacon = '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9';
 exports.TestUSDC = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707';
 exports.Athletes = '0x0165878A594ca255338adfa4d48449f69242Eb8F';
 exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
-exports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';

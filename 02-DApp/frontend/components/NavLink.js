@@ -1,6 +1,6 @@
-import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import React from "react";
 
 export default function NavLink({ className, href, children, isMobile }) {
   const router = useRouter();
@@ -16,7 +16,11 @@ export default function NavLink({ className, href, children, isMobile }) {
                     fontSize: "18px",
                     textDecoration: "underline",
                     fontFamily: "Exo",
+<<<<<<< HEAD
                     marginRight: "10px",
+=======
+                    marginLeft: "10px",
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                     textDecorationColor: "cyan",
                     textUnderlineOffset: "10px",
                   }
@@ -25,7 +29,11 @@ export default function NavLink({ className, href, children, isMobile }) {
                     fontSize: "18px",
                     textDecoration: "none",
                     fontFamily: "Exo",
+<<<<<<< HEAD
                     marginRight: "10px",
+=======
+                    marginLeft: "10px",
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                   }
             }
           >
@@ -52,7 +60,11 @@ export default function NavLink({ className, href, children, isMobile }) {
                     fontSize: "24px",
                     textDecoration: "none",
                     fontFamily: "Exo",
+<<<<<<< HEAD
                     marginRight: "10px",
+=======
+                    marginRight: "15px",
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                   }
             }
           >

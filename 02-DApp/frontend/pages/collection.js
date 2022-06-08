@@ -1,45 +1,43 @@
-import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-
-import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Grid } from "@mui/material";
-import constants from "../constants";
+import { Box, Grid, Link, Typography } from "@mui/material";
+import { ethers } from "ethers";
+import { React, useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-
-import ConnectWallet from "./connectWallet";
+import AthleteCard from "../components/AthleteCard";
+import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
-import AthleteCardModal from "../components/AthleteCardModal";
-import { useMediaQuery } from "react-responsive";
+import constants from "../constants";
 
 export default function Collection() {
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [currAthlete, setCurrAthlete] = useState(null);
-  const [signer, setSigner] = useState(null);
+  // const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
+<<<<<<< HEAD
     const signer = provider.getSigner();
+=======
+    // const signer = provider.getSigner();
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
     const setAccountData = async () => {
       const signer = provider.getSigner();
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
         const accountAddress = await signer.getAddress();
+<<<<<<< HEAD
         setSigner(signer);
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
         setConnectedAccount(accountAddress);
         setIsConnected(true);
       } else {
@@ -47,7 +45,11 @@ export default function Collection() {
       }
     };
     setAccountData();
+<<<<<<< HEAD
     provider.provider.on("accountsChanged", (accounts) => {
+=======
+    provider.provider.on("accountsChanged", () => {
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
       setAccountData();
     });
     provider.provider.on("disconnect", () => {
@@ -56,17 +58,11 @@ export default function Collection() {
     });
   }, []);
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
+  // const handleModalOpen = () => {
+  //   setModalOpen(true);
+  // };
   const handleModalClose = () => {
     setModalOpen(false);
-  };
-  const handleClick = () => {
-    setMenu((menu) => !menu);
-  };
-  const handleClickAway = () => {
-    setMenu(false);
   };
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
@@ -93,9 +89,15 @@ export default function Collection() {
           });
           console.log(
             "Token #" +
+<<<<<<< HEAD
             token +
             " metadata: " +
             JSON.stringify(response, null, 2)
+=======
+              token +
+              " metadata: " +
+              JSON.stringify(response, null, 2)
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
           );
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
@@ -115,12 +117,12 @@ export default function Collection() {
     return (
       <Box>
         <Typography
-          variant={isMobile ? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
           style={{ marginTop: 10 }}
         >
-          Owned Athletes
+          My TeamDiff Athlete Cards
         </Typography>
         <hr
           style={{
@@ -129,29 +131,49 @@ export default function Collection() {
             height: 5,
           }}
         />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {athleteNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        {athleteNFTs.length > 0 ? (
+          <Grid container spacing={isMobile ? 1 : 3}>
+            {athleteNFTs?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <>
+            <Typography>
+              {"It's pretty lonely here. "}
+              <Link>
+                <a
+                  className="primary-link"
+                  target="_blank"
+                  href={"mintPack"}
+                  rel="noreferrer"
+                >
+                  Open
+                </a>
+              </Link>
+              {" a TeamDiff Starter Pack now!"}
+            </Typography>
+            <br></br>
+          </>
+        )}
         <AthleteCardModal
           modalOpen={modalOpen}
           athleteData={currAthlete}
           handleModalClose={handleModalClose}
         />
         <Typography
-          variant={isMobile ? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
           sx={{ marginTop: 3 }}
         >
-          Owned Starter Packs
+          My TeamDiff Starter Packs
         </Typography>
         <hr
           style={{
@@ -160,17 +182,37 @@ export default function Collection() {
             height: 5,
           }}
         />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {packNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        {packNFTs.length > 0 ? (
+          <Grid container spacing={isMobile ? 1 : 3}>
+            {packNFTs?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <>
+            <Typography>
+              {"It's pretty lonely here. "}
+              <Link>
+                <a
+                  className="primary-link"
+                  target="_blank"
+                  href={"mintPack"}
+                  rel="noreferrer"
+                >
+                  Mint
+                </a>
+              </Link>
+              {" a TeamDiff Starter Pack now!"}
+            </Typography>
+            <br></br>
+          </>
+        )}
       </Box>
     );
   } else if (isConnected) {

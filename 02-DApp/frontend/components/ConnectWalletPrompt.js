@@ -1,6 +1,12 @@
-import { Typography, Box, Card } from "@mui/material";
-import WalletLogin from "./WalletLogin";
+/* eslint-disable react/no-unescaped-entities */
+import { Box, Card, Typography } from "@mui/material";
+import React from "react";
 import { useMediaQuery } from "react-responsive";
+import WalletLogin from "./WalletLogin";
+<<<<<<< HEAD
+import { useMediaQuery } from "react-responsive";
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
 export default function ConnectWalletPrompt({ accessing }) {
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
@@ -23,8 +29,12 @@ export default function ConnectWalletPrompt({ accessing }) {
           }}
         >
           Whether it's your first time visiting, or you're a returning pro, make
+<<<<<<< HEAD
           sure to connect your wallet to access{" "}
           {accessing ? accessing : "TeamDiff"}.
+=======
+          sure to connect your wallet to access {accessing || "TeamDiff"}.
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
         </Typography>
         <WalletLogin isMobile={isMobile} />
       </Card>

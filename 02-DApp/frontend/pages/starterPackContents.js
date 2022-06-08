@@ -1,4 +1,6 @@
+import { Box, ImageList, ImageListItem, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
+<<<<<<< HEAD
 import {
   Container,
   Box,
@@ -10,6 +12,8 @@ import {
   Button,
 } from "@mui/material";
 import LoadingPrompt from "../components/LoadingPrompt";
+=======
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
 export default function StarterPackContents() {
   // If we want to try to load from pinata

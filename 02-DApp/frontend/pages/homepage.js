@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import bootstrap from "../styles/sass/custom_bootstrap.module.scss";
 import styles from "../styles/sass/home_styles.module.scss";
 import cardAndPack from "../assets/images/card_and_pack.png";
 import Image from "next/image";
 import Link from "next/link";
+=======
+import Image from "next/image";
+import Link from "next/link";
+import cardAndPack from "../assets/images/card_and_pack.png";
+import bootstrap from "../styles/sass/custom_bootstrap.module.scss";
+import styles from "../styles/sass/home_styles.module.scss";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
 export default function Homepage() {
   return (
@@ -67,7 +75,11 @@ export default function Homepage() {
                 <Link href="/mintHome">
                   <button
                     className={[
+<<<<<<< HEAD
                       bootstrap["btn"],
+=======
+                      bootstrap.btn,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                       bootstrap["btn-primary"],
                       bootstrap["fs-5"],
                       bootstrap["pe-5"],
@@ -101,10 +113,17 @@ export default function Homepage() {
                 bootstrap["text-center"],
               ].join(" ")}
             >
+<<<<<<< HEAD
               <Link href="/mintHome">
                 <button
                   className={[
                     bootstrap["btn"],
+=======
+              <Link href="/mint">
+                <button
+                  className={[
+                    bootstrap.btn,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                     bootstrap["btn-primary"],
                     bootstrap["fs-5"],
                     bootstrap["pe-5"],
@@ -121,12 +140,20 @@ export default function Homepage() {
         <div className={styles["bg-how-it-works"]}>
           <div
             className={[
+<<<<<<< HEAD
               bootstrap["container"],
+=======
+              bootstrap.container,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
               bootstrap["pt-5"],
               bootstrap["pb-4"],
             ].join(" ")}
           >
+<<<<<<< HEAD
             <div className={[bootstrap["row"], bootstrap["mb-4"]].join(" ")}>
+=======
+            <div className={[bootstrap.row, bootstrap["mb-4"]].join(" ")}>
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
               <div
                 className={[
                   bootstrap["col-lg"],
@@ -159,7 +186,11 @@ export default function Homepage() {
                   height="64"
                   fill="currentColor"
                   className={[
+<<<<<<< HEAD
                     bootstrap["bi"],
+=======
+                    bootstrap.bi,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                     bootstrap["bi-collection-fill"],
                     styles["hiw-icon"],
                   ].join(" ")}
@@ -188,7 +219,11 @@ export default function Homepage() {
                   height="64"
                   fill="currentColor"
                   className={[
+<<<<<<< HEAD
                     bootstrap["bi"],
+=======
+                    bootstrap.bi,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                     bootstrap["bi-joystick"],
                     styles["hiw-icon"],
                   ].join(" ")}
@@ -218,7 +253,11 @@ export default function Homepage() {
                   height="64"
                   fill="currentColor"
                   className={[
+<<<<<<< HEAD
                     bootstrap["bi"],
+=======
+                    bootstrap.bi,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                     bootstrap["bi-coin"],
                     styles["hiw-icon"],
                   ].join(" ")}
@@ -240,7 +279,11 @@ export default function Homepage() {
         <div className={[styles["bg-second-cta"], bootstrap["pb-3"]].join(" ")}>
           <div className={bootstrap.container}>
             <div className={styles["second-cta"]}>
+<<<<<<< HEAD
               {/* <h2
+=======
+              <h2
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                 className={[bootstrap["display-3"], bootstrap["fw-bold"]].join(
                   " "
                 )}
@@ -253,6 +296,7 @@ export default function Homepage() {
                 fantasy league to compete to win tokens for the League of
                 Legends LCS Summer Split of 2022 and create your TeamDiff.
               </p>
+<<<<<<< HEAD
               <Link href="/createLeague">
                 <button
                   className={[
@@ -282,6 +326,12 @@ export default function Homepage() {
                 <button
                   className={[
                     bootstrap["btn"],
+=======
+              <Link href="#">
+                <button
+                  className={[
+                    bootstrap.btn,
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                     bootstrap["btn-outline-secondary"],
                     bootstrap["fs-5"],
                     bootstrap["pe-5"],
@@ -290,7 +340,11 @@ export default function Homepage() {
                     bootstrap["fw-bold"],
                   ].join(" ")}
                 >
+<<<<<<< HEAD
                   Open Pack
+=======
+                  Coming Very Soon
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                 </button>
               </Link>
             </div>

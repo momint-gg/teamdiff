@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   useAccount,
   useConnect,
@@ -8,7 +9,12 @@ import {
 import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
 import { useEffect, useState } from "react";
 
+=======
+import { Avatar, Box, Button, Chip, ClickAwayListener } from "@mui/material";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 import { ethers } from "ethers";
+import React, { useEffect, useState } from "react";
+import { useEnsAvatar, useEnsName } from "wagmi";
 import ConnectWalletModal from "./ConnectWalletModal";
 
 export default function WalletLogin({ isMobile }) {
@@ -69,7 +75,11 @@ export default function WalletLogin({ isMobile }) {
 
   const setAddressPreview = (address) => {
     console.log("address: " + address);
+<<<<<<< HEAD
     var shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+=======
+    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
       address.length - 4,
       address.length
     )}`;

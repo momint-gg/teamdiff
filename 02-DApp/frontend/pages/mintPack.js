@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   useAccount,
   useConnect,
@@ -11,30 +12,45 @@ import {
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
+=======
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 import {
   Box,
   CircularProgress,
-  Typography,
-  Button,
-  Chip,
   Container,
-  Paper,
   Fab,
   Link,
+<<<<<<< HEAD
+=======
+  Paper,
+  Typography
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
 import Image from "next/image";
+<<<<<<< HEAD
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LoadingPrompt from "../components/LoadingPrompt";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 
+=======
+// Router
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
-import * as utils from "@ethersproject/hash";
-import { hexZeroPad } from "@ethersproject/bytes";
 import profilePic from "../assets/images/starter-pack.png";
+<<<<<<< HEAD
 //Router
 import { useRouter } from "next/router";
+=======
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import LoadingPrompt from "../components/LoadingPrompt";
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
 export default function MintPack() {
   // Router
@@ -58,7 +74,10 @@ export default function MintPack() {
   const [isConnected, setIsConnected] = useState(false);
   const [currentChain, setCurrentChain] = useState();
   const [isPolygon, setIsPolygon] = useState();
-
+  const [hasAlreadyMintedPack, setHasAlreadyMintedPack] = useState();
+  const [isOnWhitelist, setIsOnWhitelist] = useState();
+  const [isPresalePhase, setIsPresalePhase] = useState();
+  const [isPublicSalePhase, setIsPublicSalePhase] = useState();
   useEffect(() => {
     // setHasMinted(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -81,10 +100,17 @@ export default function MintPack() {
         setCurrentChain(chainId);
         setIsPolygon(chainId === 137);
         setIsConnected(true);
+<<<<<<< HEAD
         setIsLoading(false);
       } else {
         setIsConnected(false);
       }
+=======
+      } else {
+        setIsConnected(false);
+      }
+      setIsLoading(false);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
     };
     setAccountData();
     provider.provider.on("accountsChanged", (accounts) => {
@@ -138,6 +164,31 @@ export default function MintPack() {
       const packsAvail = await GameItemsContract.packsAvailable();
       setPacksAvailable(packsAvail.toNumber());
 
+      // Grab if user has already minted starter pack
+      const hasAlreadyMintedPack1 = await GameItemsContract.userToHasMintedPack(
+        connectedAccount
+      );
+      setHasAlreadyMintedPack(hasAlreadyMintedPack1);
+
+      // Grab if user is on whitelist
+      const isOnWhitelist1 = await GameItemsContract.whitelist(
+        connectedAccount
+      );
+      setIsOnWhitelist(isOnWhitelist1);
+
+      // Set if is past presale date
+      // open sale start date in UTC
+      const presaleEndDate = new Date("June 10, 2022 21:00:00");
+      const presaleStartDate = new Date("June 10, 2022 00:00:00");
+      const today = new Date();
+      const isPresale =
+        today.getTime() < presaleEndDate.getTime() &&
+        today.getTime() > presaleStartDate.getTime();
+      const isPublicSale = today.getTime() > presaleEndDate.getTime();
+      // console.log("ispublic: " + isPublicSale);
+      setIsPresalePhase(isPresale);
+      setIsPublicSalePhase(isPublicSale);
+
       // Callback for when packMinted Events is fired from contract
       // const signerAddress = accountData.address;
       const packMintedCallback = (signerAddress, packID) => {
@@ -152,21 +203,25 @@ export default function MintPack() {
       // A filter that matches my address as the signer of the contract call
       // NOTE: this filtering has not been implemented, we instead filter on the frontend to match events with sessions
       // console.log(hexZeroPad(connectedAccount, 32));
-      const filter = {
-        address: GameItemsContract.address,
-        topics: [
-          utils.id("packMinted(address,uint256)"),
-          // TODO something wrong with this line
-          // hexZeroPad(signerAddress, 32)
-        ],
-      };
+      // const filter = {
+      //   address: GameItemsContract.address,
+      //   topics: [
+      //     utils.id("packMinted(address,uint256)"),
+      //     // TODO something wrong with this line
+      //     // hexZeroPad(signerAddress, 32)
+      //   ],
+      // };
       // GameItemsContract.on(filter, packMintedCallback);
       GameItemsContract.once("packMinted", packMintedCallback);
       checkUserChain();
     } else {
       console.log("no account connected");
     }
+<<<<<<< HEAD
   }, [isConnected]);
+=======
+  }, [isConnected, connectedAccount]);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
   // useEffect(() => {
   //   console.log("user chain changed: ", currentChain)
@@ -190,14 +245,22 @@ export default function MintPack() {
       signer
     );
 
+<<<<<<< HEAD
     const mintTxn = await gameItemsContractWithSigner
+=======
+    await gameItemsContractWithSigner
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
       .mintStarterPack()
       .then((res) => {
         // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
+<<<<<<< HEAD
         }, 60 * 5 * 1000);
+=======
+        }, 20 * 1000);
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 
         // console.log("Minting pack in progress...");
       })
@@ -260,8 +323,18 @@ export default function MintPack() {
                   display: "flex",
                 }}
               >
+<<<<<<< HEAD
                 <Typography variant="h3" color="white" component="div">
                   Mint Starter Pack
+=======
+                <Typography
+                  variant="h3"
+                  color="white"
+                  textAlign="center"
+                  component="div"
+                >
+                  Mint TeamDiff Starter Pack
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                 </Typography>
                 {packsAvailable != null && (
                   <Typography variant="h6" color="white" component="div">
@@ -294,16 +367,48 @@ export default function MintPack() {
                     color: "white",
                     fontSize: 20,
                   }}
+<<<<<<< HEAD
                 // disabled={!isPolygon}
+=======
+                  // disabled={!isPolygon}
+                  disabled={
+                    hasAlreadyMintedPack ||
+                    (!isOnWhitelist && isPresalePhase) ||
+                    !(isPresalePhase || isPublicSalePhase)
+                  }
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                 >
                   Mint
                 </Fab>
               </Box>
+<<<<<<< HEAD
+=======
+              <br></br>
+              {isPresalePhase && (
+                <Typography
+                  textAlign="center"
+                  variant="subtitle1"
+                  color="secondary"
+                >
+                  Presale ends June 10th, 5:00 pm EST
+                </Typography>
+              )}
+              {!(isPresalePhase || isPublicSalePhase) && (
+                <Typography
+                  textAlign="center"
+                  variant="subtitle1"
+                  color="secondary"
+                >
+                  Presale starts at June 9th, 8:00 pm EST
+                </Typography>
+              )}
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
               <Box
                 justifyContent="center"
                 alignItems="center"
                 sx={{
                   display: "flex",
+<<<<<<< HEAD
                   paddingTop: "20px",
                 }}
               >
@@ -318,10 +423,77 @@ export default function MintPack() {
                     with minting.
                   </Typography>
                 )}
+=======
+                  flexDirection: "column",
+                  paddingTop: "20px",
+                  textAlign: "center",
+                }}
+              >
+                {hasAlreadyMintedPack ? (
+                  <Typography>
+                    {
+                      "Oops! Looks like you have already minted 1 TeamDiff Starter Pack. Trade for more cards on "
+                    }
+                    <Link>
+                      <a
+                        className="primary-link"
+                        target="_blank"
+                        href={
+                          "https://testnets.opensea.io/assets/" +
+                          gameItemsContract.address
+                        }
+                        rel="noreferrer"
+                      >
+                        OpenSea
+                      </a>
+                    </Link>
+                    {" or wait until our next drop."}
+                  </Typography>
+                ) : (
+                  <>
+                    {!isOnWhitelist && isPresalePhase && (
+                      <Typography
+                        style={{
+                          // color: "red",
+                          fontSize: 16,
+                        }}
+                      >
+                        {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
+                          " you think this is wrong, or come back tomorrow for public sale! "}
+                      </Typography>
+                    )}
+                    {!(isPresalePhase || isPublicSalePhase) && (
+                      <Typography
+                        style={{
+                          // color: "red",
+                          fontSize: 16,
+                        }}
+                      >
+                        {"Please come back when presale begins!"}
+                      </Typography>
+                    )}
+                  </>
+                )}
+                {!isPolygon &&
+                  !hasAlreadyMintedPack &&
+                  !(!isOnWhitelist && isPresalePhase) &&
+                  (isPresalePhase || isPublicSalePhase) && (
+                    <Typography
+                      style={{
+                        color: "red",
+                        fontSize: 16,
+                      }}
+                    >
+                      Please switch to Polygon and refresh the page to proceed
+                      with minting.
+                    </Typography>
+                  )}
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
               </Box>
             </Container>
           )}
           {isMinting && (
+<<<<<<< HEAD
             <Box sx={{ marginTop: 5 }}>
               <LoadingPrompt
                 completeTitle={"Minting Pack in Progress"}
@@ -332,6 +504,35 @@ export default function MintPack() {
                 }
               />
             </Box>
+=======
+            <Container
+              maxWidth="lg"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+                sx={{
+                  display: "flex",
+                }}
+              >
+                <Typography variant="h5" color="white" component="div">
+                  Minting In Progress
+                </Typography>
+                <br></br>
+                <CircularProgress />
+                <br></br>
+                {isMinting && isTransactionDelayed && (
+                  <Typography variant="p" textAlign={"center"}>
+                    This is taking longer than normal. Please check your wallet
+                    to check the status of this transaction.
+                  </Typography>
+                )}
+              </Box>
+            </Container>
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
           )}
           {hasMinted && (
             <Container
@@ -366,6 +567,7 @@ export default function MintPack() {
                       variant="h4"
                       color="white"
                       component="div"
+<<<<<<< HEAD
                     >
                       Acquired Starter Pack!
                     </Typography>
@@ -380,6 +582,22 @@ export default function MintPack() {
                         justifyContent: "space-between",
                       }}
                     >
+=======
+                    >
+                      Acquired Starter Pack!
+                    </Typography>
+                    <CheckCircleIcon color="secondary"></CheckCircleIcon>
+                  </Box>
+                  <br></br>
+                  <Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                       <Box
                         sx={{
                           flex: 1,
@@ -470,11 +688,23 @@ export default function MintPack() {
             </Container>
           )}
           {!isConnected && !hasMinted && !isMinting && (
+<<<<<<< HEAD
             <ConnectWalletPrompt accessing={"minting a pack"} />
           )}
           {packsAvailable == 0 && (
             <Box>
               <Typography color="primary">
+=======
+            <Box>
+              <ConnectWalletPrompt
+                accessing={"minting a TeamDiff Starter Pack"}
+              />
+            </Box>
+          )}
+          {packsAvailable == 0 && (
+            <Box>
+              <Typography>
+>>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
                 Sorry, all packs have already been minted :(
               </Typography>
             </Box>
