@@ -46,7 +46,7 @@ export default function BurnPack({ setDisplay }) {
       console.log("Ethereum successfully detected!");
       // Access the decentralized web!
     } else {
-      alert("Redirecting to MetaMask Browser to use this Dapp on Mobile...");
+      //      alert("Redirecting to MetaMask Browser to use this Dapp on Mobile...");
       window.location.assign("https://metamask.app.link/dapp/teamdiff.xyz/");
       console.log("Please install MetaMask!");
     }
