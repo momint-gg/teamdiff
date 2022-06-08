@@ -74,7 +74,8 @@ contract GameItems is ERC1155, Ownable {
     // Our whitelist
     mapping(address => bool) public whitelist;
     uint256 public numWhitelisted;
-    bool isPresalePhase = false;
+    bool isPresalePhase; // = false
+    bool isPublicSalePhase;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -107,6 +108,16 @@ contract GameItems is ERC1155, Ownable {
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {
         packsReadyToOpen = !packsReadyToOpen;
+    }
+
+    // Opening the private sale
+    function openPrivateSale() public onlyOwner {
+        isPresalePhase = true;
+    }
+
+    // Opening the public sale
+    function openPublicSale() public onlyOwner {
+        isPublicSalePhase = true;
     }
 
     /*****************************************************/
@@ -175,8 +186,8 @@ contract GameItems is ERC1155, Ownable {
     /*****************************************************/
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
-    function mintStarterPack() public  {
-        if(isPresalePhase) {
+    function mintStarterPack() public {
+        if (isPresalePhase && !isPublicSalePhase) {
             require(whitelist[msg.sender], "User is not whitelisted.");
         }
         require(
@@ -193,8 +204,6 @@ contract GameItems is ERC1155, Ownable {
         uint256 starterPackId = NUM_ATHLETES;
         _mint(msg.sender, starterPackId, 1, "0x00");
 
-
-
         starterPacksMinted += 1;
         packsAvailable -= 1;
         emit packMinted(msg.sender, starterPacksMinted);
@@ -202,9 +211,12 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
-    function burnStarterPack() public  {
+    function burnStarterPack() public {
         uint256 starterPackId = NUM_ATHLETES;
-        require(!userToHasBurnedPack[msg.sender], "You cannot burn more than 1 pack");
+        require(
+            !userToHasBurnedPack[msg.sender],
+            "You cannot burn more than 1 pack"
+        );
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), starterPackId) > 0,
