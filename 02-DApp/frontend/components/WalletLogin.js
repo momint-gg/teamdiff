@@ -31,33 +31,55 @@ export default function WalletLogin({ isMobile }) {
     setMenu(false);
   };
 
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      console.log("Please install MetaMask!");
+    }
+  }
+
   // var shortenedAddress = "";
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    if (window.ethereum) {
+      handleEthereum();
 
-    // console.log("signer: " + signer.getAddress());
-    // if(accounts.length > 0) {
-    const fetchData = async () => {
-      const accounts = await provider.listAccounts();
-      if (accounts.length > 0) {
-        // const currentAddress = "0x0x"
-        const currentAddress = await signer.getAddress();
-        setAddressPreview(currentAddress);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-        console.log("no connected accounts");
-      }
-    };
-    fetchData();
-    provider.provider.on("accountsChanged", (accounts) => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      // console.log("signer: " + signer.getAddress());
+      // if(accounts.length > 0) {
+      const fetchData = async () => {
+        const accounts = await provider.listAccounts();
+        if (accounts.length > 0) {
+          // const currentAddress = "0x0x"
+          const currentAddress = await signer.getAddress();
+          setAddressPreview(currentAddress);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+          console.log("no connected accounts");
+        }
+      };
       fetchData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", (accounts) => {
+        fetchData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, []);
 
   const setAddressPreview = (address) => {

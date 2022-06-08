@@ -40,34 +40,55 @@ export default function BurnPack({ setDisplay }) {
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      alert("Please install MetaMask to use this Dapp!");
+      console.log("Please install MetaMask!");
+    }
+  }
   useEffect(() => {
-    // setHasMinted(true);
-    // setMintedIndices([6, 33, 12, 26, 45]);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const sig ner = provider.getSigner()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+    if (window.ethereum) {
+      handleEthereum();
+      // setHasMinted(true);
+      // setMintedIndices([6, 33, 12, 26, 45]);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const sig ner = provider.getSigner()
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
 
-        setSigner(signer);
-        setConnectedAccount(accountAddress);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-      setIsLoading(false);
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+          setSigner(signer);
+          setConnectedAccount(accountAddress);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+        setIsLoading(false);
+      };
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", (accounts) => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, [connectedAccount]);
 
   // Use Effect for change in if user isConnected

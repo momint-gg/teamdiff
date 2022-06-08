@@ -47,54 +47,77 @@ export default function MintPack() {
   const [isOnWhitelist, setIsOnWhitelist] = useState();
   const [isPresalePhase, setIsPresalePhase] = useState();
   const [isPublicSalePhase, setIsPublicSalePhase] = useState();
+
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      alert("Please install MetaMask to use this Dapp!");
+      console.log("Please install MetaMask!");
+    }
+  }
+
   useEffect(() => {
-    // setHasMinted(true);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
+    if (window.ethereum) {
+      handleEthereum();
+      // setHasMinted(true);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner()
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
-        setSigner(signer);
-        setConnectedAccount(accountAddress);
-        const { chainId } = await provider.getNetwork();
-        setCurrentChain(chainId);
-        setIsPolygon(chainId === 137);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-      setIsLoading(false);
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setSigner(signer);
+          setConnectedAccount(accountAddress);
+          const { chainId } = await provider.getNetwork();
+          setCurrentChain(chainId);
+          setIsPolygon(chainId === 137);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+        setIsLoading(false);
+      };
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
-    provider.on("network", async (newNetwork, oldNetwork) => {
-      console.log("on");
-      // When a Provider makes its initial connection, it emits a "network"
-      // event with a null oldNetwork along with the newNetwork. So, if the
-      // oldNetwork exists, it represents a changing network
-      if (oldNetwork) {
-        console.log("changed network");
-        // window.location.reload();
-        // const { chainId } = await provider.getNetwork()
-        // setCurrentChain(chainId)
-        // setIsPolygon(chainId === 137)
-      }
-    });
+      provider.provider.on("accountsChanged", (accounts) => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+      provider.on("network", async (newNetwork, oldNetwork) => {
+        console.log("on");
+        // When a Provider makes its initial connection, it emits a "network"
+        // event with a null oldNetwork along with the newNetwork. So, if the
+        // oldNetwork exists, it represents a changing network
+        if (oldNetwork) {
+          console.log("changed network");
+          // window.location.reload();
+          // const { chainId } = await provider.getNetwork()
+          // setCurrentChain(chainId)
+          // setIsPolygon(chainId === 137)
+        }
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, [connectedAccount]);
 
   const checkUserChain = () => {

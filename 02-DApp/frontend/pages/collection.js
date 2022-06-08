@@ -20,30 +20,52 @@ export default function Collection() {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      alert("Please install MetaMask to use this Dapp!");
+      console.log("Please install MetaMask!");
+    }
+  }
+
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner();
+    if (window.ethereum) {
+      handleEthereum();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner();
 
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
-        setConnectedAccount(accountAddress);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", () => {
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setConnectedAccount(accountAddress);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+      };
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", () => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, []);
 
   // const handleModalOpen = () => {
