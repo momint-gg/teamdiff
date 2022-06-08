@@ -93,9 +93,9 @@ export default function Collection() {
           });
           console.log(
             "Token #" +
-              token +
-              " metadata: " +
-              JSON.stringify(response, null, 2)
+            token +
+            " metadata: " +
+            JSON.stringify(response, null, 2)
           );
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
@@ -149,6 +149,7 @@ export default function Collection() {
           variant={isMobile ? "h4" : "h2"}
           color="secondary"
           component="div"
+          sx={{ marginTop: 3 }}
         >
           Owned Starter Packs
         </Typography>
