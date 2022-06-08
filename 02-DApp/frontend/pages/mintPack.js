@@ -1,11 +1,5 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import {
-  Box, Container,
-  Fab,
-  Link,
-  Paper,
-  Typography
-} from "@mui/material";
+import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -162,8 +156,10 @@ export default function MintPack() {
 
       // Set if is past presale date
       // open sale start date in UTC
-      const presaleEndDate = new Date("June 10, 2022 21:00:00");
-      const presaleStartDate = new Date("June 10, 2022 00:00:00");
+      // const presaleEndDate = new Date("June 10, 2022 21:00:00");
+      // const presaleStartDate = new Date("June 10, 2022 00:00:00");
+      const presaleEndDate = new Date("June 7, 2022 21:00:00");
+      const presaleStartDate = new Date("June 7, 2022 00:00:00");
       const today = new Date();
       const isPresale =
         today.getTime() < presaleEndDate.getTime() &&

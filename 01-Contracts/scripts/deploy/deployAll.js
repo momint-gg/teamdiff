@@ -14,7 +14,7 @@ const main = async () => {
   //const gameContract = await gameContractFactory.deploy(...constructorArgs);
   const gameContract = await gameContractFactory.deploy(...constructorArgs, {
     //overriding gas bc transaction was stuck
-    //gasPrice: 203000000000,
+    gasPrice: 10000000,
     gasLimit: 20000000
   });
   await gameContract.deployed();
