@@ -13,10 +13,12 @@ const { Athletes } = require('../contract_info/contractAddresses');
 const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
 const XLSX = require('xlsx');
 const fs = require('fs');
+const axios = require('axios');
+const { expect } = require('chai');
 
 // How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
 async function main() {
-  const week_num = parseInt(process.argv[2]);
+  week_num = parseInt(process.argv[2]);
 
   // Constructing our contract
   const provider = new ethers.providers.AlchemyProvider(
@@ -24,7 +26,7 @@ async function main() {
     process.env.ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  const contract = new ethers.Contract(Athletes, abi.abi, rinkebySigner);
+  contract = new ethers.Contract(Athletes, abi.abi, rinkebySigner);
 
   // Parsing excel
   finalStatsToPush = [];
@@ -58,7 +60,8 @@ async function main() {
   for (let i = 0; i < 50; i++) {
     // Main stats
     const name = data[i]['Player'].toLowerCase(); // Gamer name columnn
-    const points = Math.round(data[i]['Points']); // Total points column (rounded)
+    let points = Math.round(data[i]['Points']); // Total points column (rounded)
+    if (points < 0) points = 0; // Can't push negative number to contract...
     const id = athleteToId[name];
     // Minor stats
     const avg_kills = data[i]['Avg kills'];
@@ -112,38 +115,92 @@ async function main() {
     }
   }
 
-  // Writing stats so we can push to DB
-  fs.appendFileSync(
-    '../../api/athleteData/stats.json',
-    JSON.stringify(finalStatsToPush),
-    (err) => {
-      if (err) console.log('error: ', err);
-    }
+  const finalObj = {};
+  finalObj['data'] = finalStatsToPush;
+
+  // Pushing the data to our Web2 API for frontend rendering
+  try {
+    await axios.put(
+      `https://teamdiff-backend-api.vercel.app/api/athleteData/${JSON.stringify(
+        finalObj
+      )}`
+    );
+    console.log('Stats pushed to Web2 API!');
+  } catch (error) {
+    console.log('Error: ', error);
+  }
+
+  //Finally, pushing stats to the contract
+  // console.log('Now pushing stats to contract');
+  // for (let i = 0; i < finalStatsToPush.length; i++) {
+  //   const addAthletesStatsTxn = await contract.appendStats(
+  //     finalStatsToPush[i].id, // index of athlete
+  //     finalStatsToPush[i].points, // their points for the week,
+  //     week_num // Week number passed in
+  //   );
+  //   console.log(
+  //     'Adding points: ',
+  //     finalStatsToPush[i].points,
+  //     ' for athlete id ',
+  //     finalStatsToPush[i].id,
+  //     `(${finalStatsToPush[i].name})`
+  //   );
+  //   // Waiting for txn to mine
+  //   await addAthletesStatsTxn.wait();
+  // }
+}
+
+// Quick check to make sure contract updates
+const testContract = async () => {
+  // Making sure 50 athletes
+  let txn = await contract.getAthletes();
+  console.log('Number of athletes is ', txn);
+
+  // Making sure new stats that were pushed match finalStatsToPush(just checking 5 athletess)
+  const randomIndexes = Array.from({ length: 5 }, () =>
+    Math.floor(Math.random() * 5)
   );
 
-  // Finally, pushing stats to the contract
-  console.log('Now pushing stats to contract');
-  for (let i = 0; i < 50; i++) {
-    console.log('Adding athletes stats for athlete index ', i);
-
-    const addAthletesStatsTxn = await contract.appendStats(
-      finalStatsToPush[i].id, // index of athlete
-      finalStatsToPush[i].points // their points for the week
-    );
-    console.log(
-      'Adding points: ',
-      finalStatsToPush[i].points,
-      ' for athlete id ',
-      finalStatsToPush[i].id
-    );
-    // Waiting for txn to mine
-    await addAthletesStatsTxn.wait();
+  // 5 random athletes ID and points
+  let randomAthletePoints = [];
+  for (let i = 0; i < randomIndexes.length; i++) {
+    randomAthletePoints.push({
+      id: finalStatsToPush[randomIndexes[i]].id,
+      points: finalStatsToPush[randomIndexes[i]].points,
+    });
   }
-}
+  // Checking the contract for those same IDs
+  const idsToCheck = randomAthletePoints.map((athlete) => athlete.id);
+  console.log('Random athletes selected are: ', randomAthletePoints);
+  console.log('Now checking contract for IDs ', idsToCheck);
+
+  pointsRetrievedFromContract = [];
+  for (let i = 0; i < randomAthletePoints.length; i++) {
+    txn = await contract.getAthleteScores(idsToCheck[i]);
+    // console.log(Number(txn[week_num]));
+    pointsRetrievedFromContract.push(Number(txn[week_num]));
+  }
+
+  // Checking to see if our scores from the excel sheet match the contract (if this passes, it all works!)
+  let numFails = 0;
+  for (let i = 0; i < pointsRetrievedFromContract.length; i++) {
+    if (pointsRetrievedFromContract[i] !== randomAthletePoints[i].points) {
+      numFails++;
+    }
+  }
+
+  console.log('\n');
+  numFails === 0
+    ? console.log('Test succeeded! \n')
+    : console.log('Test failed ', numFails, 'times.\n');
+};
 
 const runMain = async () => {
   try {
+    console.log('Running main');
     await main();
+    console.log('Testing contract');
+    await testContract();
     process.exit(0);
   } catch (error) {
     console.log(error);

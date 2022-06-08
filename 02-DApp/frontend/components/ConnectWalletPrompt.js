@@ -25,7 +25,8 @@ export default function ConnectWalletPrompt({ accessing }) {
           }}
         >
           Whether it's your first time visiting, or you're a returning pro, make
-          sure to connect your wallet to access {accessing || "TeamDiff"}.
+          sure to connect your wallet to access{" "}
+          {accessing ? accessing : "TeamDiff"}.
         </Typography>
         <WalletLogin isMobile={isMobile} />
       </Card>

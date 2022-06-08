@@ -1,5 +1,6 @@
 import { Box, ImageList, ImageListItem, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
+import LoadingPrompt from "../components/LoadingPrompt";
 
 export default function StarterPackContents() {
   // If we want to try to load from pinata
@@ -82,10 +83,6 @@ export default function StarterPackContents() {
     );
   }
   return (
-    <Box>
-      <Typography variant="h2" color="secondary" component="div">
-        Please wait while we load colleciton
-      </Typography>
-    </Box>
+    <LoadingPrompt loading="Collection Page" />
   );
 }

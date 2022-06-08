@@ -13,7 +13,7 @@ module.exports = [
     697, // Chainlink sub ID
   ],
   // Note: You should run the whitelist test to see if these URIs work correctly in mint flow
-  "https://gateway.pinata.cloud/ipfs/QmU6abUW6Jegr2VHUafpAvGCdGA3h7UL1ih4ZL9TV6YcHq/", // athleteURI (pinata url)
+  "https://gateway.pinata.cloud/ipfs/QmaP39XjaR4YKniP8vnyGRdiKc3DcZ1PLqjqHDx5mc6dqN/", // athleteURI (pinata url)
   "https://gateway.pinata.cloud/ipfs/QmXgkKXsTyW9QJCHWsgrt2BW7p5csfFE21eWtmbd5Gzbjr/", // starterPackURI (pinata url)
   "", // boosterPackURI (v2)
 ];

@@ -15,8 +15,6 @@ athleteImages = {
     'https://gateway.pinata.cloud/ipfs/QmSRWW6xugkewMeJBLTKSBMnkgPFMp1bxKSvwhtV8H6EGN/',
   Ablazeolive:
     'https://gateway.pinata.cloud/ipfs/QmbREeExE6cdo4DbmAAsejL7ffBXBLDdZL86LTA91TVuhL/',
-  Arrow:
-    'https://gateway.pinata.cloud/ipfs/QmXXB7phsQjUKhCE4TbJwLsQKo93WbdSE7NXre22nnyAgV/',
   Berserker:
     'https://gateway.pinata.cloud/ipfs/QmaSXrJ7MjF4L8mHqgqYYwbj4afFmMhUDyrcoaHYB9rp32/',
   Biofrost:
@@ -41,7 +39,7 @@ athleteImages = {
     'https://gateway.pinata.cloud/ipfs/QmXPEkp2jDUht3r7zbS2YXZJatiroJzdhnTcuDXJ6VGSrF/',
   Gamsu:
     'https://gateway.pinata.cloud/ipfs/QmRcpkboabLz9HbCWZyXGtjWmEYxMsiALC6Ujqm1t2DTaM/',
-  Hans_sama:
+  'Hans sama':
     'https://gateway.pinata.cloud/ipfs/QmQuGr9dDgjxVFH7r7ps52YRY3SLoFwNCztQegGoz5gRwh/',
   Huni: 'https://gateway.pinata.cloud/ipfs/QmVGBsn58vCohDccnoLY668w1SzExrPu6NuNuEZrAcQjjq/',
   IgNar:
@@ -63,7 +61,7 @@ athleteImages = {
   Kumo: 'https://gateway.pinata.cloud/ipfs/QmaCvxa85vxHG6V1NFDpzxsz52BYpqe8VbHvDrWprFRhKb/',
   Licorice:
     'https://gateway.pinata.cloud/ipfs/QmPNzkh8KmrVXxodBMYBMrFVd5aNKXqLBTM6S6Xt6Sv2KP/',
-  Lost: 'https://gateway.pinata.cloud/ipfs/QmYrUm1m12ZEMZyrbkQZSzWTwEx6ENeBTXEM77xiXSzKDc/',
+  Lost: 'https://gateway.pinata.cloud/ipfs/QmXpb3EbAD9PK9ZhCmcCNCk1fV73UvGymYuV6cQ98qFDJx/',
   Luger:
     'https://gateway.pinata.cloud/ipfs/QmeWpH4Hjd92xa7TkGRjnzVNVjNu6kMqDr2sqhLTnznraC/',
   Maple:
@@ -91,6 +89,8 @@ athleteImages = {
     'https://gateway.pinata.cloud/ipfs/QmbxUtes3mrAmpurS82mrMU616U7Rs8W8Kb9eGm5AvppLv/',
   Ssumday:
     'https://gateway.pinata.cloud/ipfs/QmRWi73xK1DLwJGDVPjaomfS3MSvtGGbutq88ZRFh2hMjq/',
+  Stixxay:
+    'https://gateway.pinata.cloud/ipfs/QmNj3hB17MY9usjfDJC4RpcBD8ra9Lqxzb5A2RtPifEA4E/',
   Tactical:
     'https://gateway.pinata.cloud/ipfs/QmWsho6Stga58oCKfmeiQ3wxZ3ymwsp3QmbWNioPfjhizj/',
   Vulcan:

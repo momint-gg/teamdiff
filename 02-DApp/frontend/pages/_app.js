@@ -2,17 +2,15 @@ import "@fontsource/exo";
 import { Box } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import { ethers } from "ethers";
-import Head from "next/head";
-import React from "react";
 import { useMediaQuery } from "react-responsive";
-import { chain, createClient, defaultChains, Provider } from "wagmi";
+import {
+  chain, createClient, defaultChains, Provider
+} from "wagmi";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import Layout from "../components/Layout";
 import "../styles/globalStyles.css";
-import theme from "../styles/theme";
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -50,7 +48,7 @@ function MyApp({ Component, pageProps }) {
     query: "(min-device-width: 1224px)",
   });
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
-  // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
+  const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -79,8 +77,9 @@ function MyApp({ Component, pageProps }) {
               />
 
               <Head>
-                <title>Play TeamDiff</title>
-                <meta name="description" content="TeamDiff" />
+                <title>TeamDiff</title>
+                <meta name="description" content="On-chain Fantasy Esports" />
+                <meta property="og:image" content="../public/fav/favicon-32x32.png" />
                 {/* <link rel="icon" href="/favicon.ico" /> */}
                 {/* Favicon */}
                 <link

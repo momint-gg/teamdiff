@@ -107,7 +107,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     console.log("LeageMaker deployed to:", LeagueMakerInstance.address);
 
     // Need to prompt approval before making the league (happens after u click "create new league" button on frontend)
-
     let approval = await testUsdcContract.approve(
       LeagueMakerInstance.address,
       10

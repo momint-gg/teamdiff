@@ -101,7 +101,7 @@ export default function Homepage() {
                 bootstrap["text-center"],
               ].join(" ")}
             >
-              <Link href="/mint">
+              <Link href="/mintHome">
                 <button
                   className={[
                     bootstrap.btn,
@@ -240,7 +240,7 @@ export default function Homepage() {
         <div className={[styles["bg-second-cta"], bootstrap["pb-3"]].join(" ")}>
           <div className={bootstrap.container}>
             <div className={styles["second-cta"]}>
-              <h2
+              {/* <h2
                 className={[bootstrap["display-3"], bootstrap["fw-bold"]].join(
                   " "
                 )}
@@ -253,7 +253,35 @@ export default function Homepage() {
                 fantasy league to compete to win tokens for the League of
                 Legends LCS Summer Split of 2022 and create your TeamDiff.
               </p>
-              <Link href="#">
+              <Link href="/createLeague">
+                <button
+                  className={[
+                    bootstrap["btn"],
+                    bootstrap["btn-outline-secondary"],
+                    bootstrap["fs-5"],
+                    bootstrap["pe-5"],
+                    bootstrap["ps-5"],
+                    bootstrap["mt-3"],
+                    bootstrap["fw-bold"],
+                  ].join(" ")}
+                >
+                  Create League
+                </button>
+              </Link> */}
+              <h2
+                className={[bootstrap["display-3"], bootstrap["fw-bold"]].join(
+                  " "
+                )}
+              >
+                Open your Pack
+              </h2>
+              <p className={[bootstrap["fs-5"], bootstrap["mt-3"]].join(" ")}>
+                Minting a starterpack is only the first step of your TeamDiff
+                journey. Inside the pack is five trading cards of LCS atheletes!
+                Open the pack (which will burn it in the process) to unlock five
+                athletes and begin to build your collection!
+              </p>
+              <Link href="/burnPack">
                 <button
                   className={[
                     bootstrap.btn,

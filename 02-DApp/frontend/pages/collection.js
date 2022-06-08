@@ -176,6 +176,7 @@ export default function Collection() {
           variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
+          sx={{ marginTop: 3 }}
         >
           My TeamDiff Starter Packs
         </Typography>

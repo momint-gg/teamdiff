@@ -313,26 +313,9 @@ contract GameItems is ERC1155, Ownable {
         return NFT_PER_ATHLETE;
     }
 
-    /*************************************************/
-    /************ FUNCTIONS NOT BEING USED ***********/
-    /*************************************************/
-
-    // // If setting a provenance hash, set with: (tokenId + startingIndex) % # of tokens
-    // function setProvenanceHash(string memory provenanceHash) public onlyOwner {
-    //     provenance = provenanceHash;
-    // }
-
-    // // Setting starting index block
-    // function emergencySetStartingIndexBlock() public onlyOwner {
-    //     require(startingIndex == 0, "Starting index is already set");
-
-    //     startingIndexBlock = block.number;
-    // }
-
-    /*************************************************************/
-    /************ BOOSTER PACK FUNCTIONS (not used rn) ***********/
-    /*************************************************************/
-
+    /***********************************************/
+    /************ BOOSTER PACK FUNCTIONS ***********/
+    /***********************************************/
     //  function mintBoosterPack() public {
     //         uint256 boosterPackId = NUM_ATHLETES + 1;
     //         require(

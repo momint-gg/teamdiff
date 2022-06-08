@@ -11,7 +11,7 @@ const Layout = ({ children, isMobile }) => {
   const pages = [
     { name: "MY COLLECTION", href: "/collection" },
     { name: "MINT", href: "/mintHome" },
-    { name: "BURN", href: "/burnPack" },
+    { name: "OPEN", href: "/burnPack" },
   ];
 
   return (

@@ -185,7 +185,7 @@ export default function BurnPack({ setDisplay }) {
   return (
     <Box>
       {isLoading ? (
-        <LoadingPrompt loading={"Burn Page"} />
+        <LoadingPrompt loading={"Open Page"} />
       ) : (
         <>
           {isConnected && !hasMinted && (
@@ -495,7 +495,7 @@ export default function BurnPack({ setDisplay }) {
           )}
           {!isConnected && !hasMinted && !isMinting && (
             <ConnectWalletPrompt
-              accessing={"burning a TeamDiff Starter Pack"}
+              accessing={"opening a TeamDiff Starter pack"}
             />
           )}
         </>

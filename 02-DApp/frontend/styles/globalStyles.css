@@ -14,7 +14,7 @@ h7 {
 
 .primary-link {
   color: aqua;
-  text-decoration: none!important;
+  text-decoration: none !important;
 }
 
 main {
@@ -29,7 +29,7 @@ body {
 
 html {
   background-image: "url(/dots.png)";
-  background-color: #330D36;
+  background-color: #330d36;
 }
 /* .MuiInputLabel-root.Mui-focused {
     color: white;

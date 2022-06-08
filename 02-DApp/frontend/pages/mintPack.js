@@ -1,8 +1,6 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
-  Box,
-  CircularProgress,
-  Container,
+  Box, Container,
   Fab,
   Link,
   Paper,
@@ -438,33 +436,16 @@ export default function MintPack() {
             </Container>
           )}
           {isMinting && (
-            <Container
-              maxWidth="lg"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Box
-                justifyContent="center"
-                alignItems="center"
-                flexDirection="column"
-                sx={{
-                  display: "flex",
-                }}
-              >
-                <Typography variant="h5" color="white" component="div">
-                  Minting In Progress
-                </Typography>
-                <br></br>
-                <CircularProgress />
-                <br></br>
-                {isMinting && isTransactionDelayed && (
-                  <Typography variant="p" textAlign={"center"}>
-                    This is taking longer than normal. Please check your wallet
-                    to check the status of this transaction.
-                  </Typography>
-                )}
-              </Box>
-            </Container>
+            <Box sx={{ marginTop: 5 }}>
+              <LoadingPrompt
+                completeTitle={"Minting Pack in Progress"}
+                bottomText={
+                  isMinting && isTransactionDelayed
+                    ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+                    : ""
+                }
+              />
+            </Box>
           )}
           {hasMinted && (
             <Container

@@ -38,7 +38,7 @@ const main = async () => {
   gameContract.addUserToWhitelist("0xC3aaa1a446ED0f2E1c9c0AcC89F47c46F30c8Bf3")
   await txn.wait();
   console.log("Added Reggie to whitelist");
-  gameContract.addUserToWhitelist("0x37D1431D5D423d66ad6F369EF1bB0767E71A8400 ")
+  gameContract.addUserToWhitelist("0x37D1431D5D423d66ad6F369EF1bB0767E71A8400")
   await txn.wait();
   console.log("Added Zach G to whitelist");
   //Initial functions that need to be run
