@@ -1,22 +1,9 @@
-import {
-  useAccount,
-  useConnect,
-  useSigner,
-  useProvider,
-  useContract,
-  useEnsLookup,
-  useDisconnect,
-  useNetwork,
-} from "wagmi";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import {
   Box,
-  CircularProgress,
   Typography,
-  Button,
-  Chip,
   Container,
   Paper,
   Fab,
@@ -24,10 +11,11 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import OpenSea from "../assets/images/opensea.png"
 import LoadingPrompt from "../components/LoadingPrompt";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import { useMediaQuery } from "react-responsive";
 
-// import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import * as utils from "@ethersproject/hash";
@@ -39,6 +27,8 @@ import { useRouter } from "next/router";
 export default function MintPack() {
   // Router
   const router = useRouter();
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  console.log(isMobile);
 
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -219,6 +209,8 @@ export default function MintPack() {
               sx={{
                 display: "flex",
                 flexWrap: "wrap",
+                marginBottom: 1,
+                marginTop: 4,
                 "& > :not(style)": {
                   m: 1,
                   width: 260,
@@ -234,13 +226,10 @@ export default function MintPack() {
                   filter: "blur(35px)",
                 }}
               />
-              <Container sx={{ position: "absolute" }}>
+              <Container sx={{ position: "absolute", bottom: isMobile ? "325px" : "200px" }}>
                 <Image
                   src={profilePic}
                   alt="Picture of the author"
-                  // width="310px"
-                  // height="100vw"
-                  // height="450px"
                   position="absolute"
                 />
               </Container>
@@ -293,6 +282,8 @@ export default function MintPack() {
                       "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                     color: "white",
                     fontSize: 20,
+                    paddingRight: 8,
+                    paddingLeft: 8
                   }}
                 // disabled={!isPolygon}
                 >
@@ -344,7 +335,7 @@ export default function MintPack() {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "row",
+                  flexDirection: isMobile ? "column" : "row",
                   alignItems: "center",
                   justifyContent: "space-evenly",
                 }}
@@ -359,76 +350,116 @@ export default function MintPack() {
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
+                      marginBottom: "2rem"
                     }}
                   >
                     <Typography
-                      sx={{ marginRight: 2 }}
+                      sx={{ marginRight: 2, textAlign: "center" }}
                       variant="h4"
                       color="white"
                       component="div"
                     >
                       Acquired Starter Pack!
                     </Typography>
-                    <CheckCircleIcon color="secondary"></CheckCircleIcon>
+                    {!isMobile && <CheckCircleIcon fontSize="large" sx={{ color: "#13db13" }} />}
                   </Box>
-                  <br></br>
+                  {isMobile && <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      marginBottom: 2,
+                      "& > :not(style)": {
+                        m: 1,
+                        width: 260,
+                        height: 350,
+                      },
+                    }}
+                  >
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        filter: "blur(35px)",
+                      }}
+                    />
+                    <Container sx={{ position: "absolute", bottom: "220px" }}>
+                      <Image
+                        src={profilePic}
+                        alt="TeamDiff Pack"
+                        position="absolute"
+                      />
+                    </Container>
+                  </Box>
+                  }
                   <Box>
                     <Box
                       sx={{
                         display: "flex",
-                        flexDirection: "row",
+                        flexDirection: isMobile ? "column" : "row",
                         justifyContent: "space-between",
+                        alignItems: "center",
                       }}
                     >
                       <Box
                         sx={{
                           flex: 1,
                           marginRight: 3,
+                          textAlign: "center",
+                          marginBottom: isMobile ? "1rem" : "0"
                         }}
                       >
-                        <Typography variant="h5"> Contents </Typography>
-                        <Link>
-                          <a
-                            className="primary-link"
-                            href={
-                              "https://testnets.opensea.io/assets/" +
-                              gameItemsContract.address +
-                              "/50" // the pack Id is after the athletes (not 0)
-                            }
-                            // href="#"
-                            target={"_blank"}
-                            rel="noreferrer"
-                          >
-                            View on OpenSea.
-                          </a>
-                        </Link>
-                        {/* <Typography variant="subtitle2"> 
-                      Note that it may take a few minutes for images and metadata to
-                      properly load on OpenSea.
-                    </Typography>                */}
+                        <Typography color="primary" variant="h5"> Pack #</Typography>
+                        <Typography variant="h5" color="secondary" sx={{ fontWeight: "bold" }}> {100 - packsAvailable} </Typography>
                       </Box>
-
                       <Box
                         sx={{
-                          flex: 1,
+                          flex: 3,
+                          textAlign: "center"
                         }}
                       >
-                        <Typography variant="h5"> Pack #</Typography>
-                        <Typography> {100 - packsAvailable} </Typography>
+                        <Link
+                          href={
+                            "https://testnets.opensea.io/assets/" +
+                            gameItemsContract.address +
+                            "/50" // the pack Id is after the athletes (not 0)
+                          }
+                          sx={{ textDecoration: "none" }}
+                          target={"_blank"}
+                        >
+                          <Fab
+                            variant="extended"
+                            size="large"
+                            aria-label="add"
+                            color={"info"}
+                            sx={{ fontSize: 20, color: "white" }}
+                          >
+                            <Image
+                              src={OpenSea}
+                              alt={"opensea"}
+                              width="30rem"
+                              height="30rem"
+                            />
+                            <Box sx={{ marginLeft: 1 }}>
+                              View on OpenSea
+                            </Box>
+                          </Fab>
+                        </Link>
                       </Box>
                     </Box>
                   </Box>
 
-                  <Box>
+                  <Box sx={{ textAlign: "center" }}>
                     <Fab
                       variant="extended"
                       size="large"
                       aria-label="add"
                       onClick={() => router.push("./burnPack")}
-                      // onClick={() => setDisplayMint(true)}
                       sx={{
-                        marginTop: 5,
-                        marginRight: 1,
+                        marginTop: isMobile ? 3 : 5,
+                        marginRight: isMobile ? 0 : 2,
                         background:
                           "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                         color: "white",
@@ -443,29 +474,44 @@ export default function MintPack() {
                       color="white"
                       aria-label="add"
                       onClick={() => router.push("./collection")}
-                      sx={{ marginTop: 5, fontSize: 20 }}
+                      sx={{ marginTop: isMobile ? 3 : 5, fontSize: 20 }}
                     >
                       Go To My Collection
                     </Fab>
                   </Box>
                 </Box>
-                <Box
+                {!isMobile && <Box
+                  justifyContent="center"
+                  alignItems="center"
                   sx={{
-                    flex: 2,
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    flexWrap: "wrap",
+                    marginLeft: 5,
+                    marginTop: 2,
+                    "& > :not(style)": {
+                      m: 1,
+                      width: 260,
+                      height: 350,
+                    },
                   }}
                 >
-                  <Image
-                    src={profilePic}
-                    alt="Picture of the author"
-                    // height="100%"
-                    // width="auto"
-                    width="155px"
-                    height="225px"
+                  <Paper
+                    elevation={0}
+                    style={{
+                      background:
+                        "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                      filter: "blur(35px)",
+                    }}
                   />
+                  <Container sx={{ position: "absolute", bottom: "200px" }}>
+                    <Image
+                      src={profilePic}
+                      alt="TeamDiff Pack"
+                      position="absolute"
+                    />
+                  </Container>
                 </Box>
+                }
               </Box>
             </Container>
           )}
