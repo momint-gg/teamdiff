@@ -11,3 +11,5 @@ artifacts
 *.dbg.json
 build\contracts\contracts\*
 01-Contracts\build\contracts\contracts\*
+#Adding build to gitignore
+build
