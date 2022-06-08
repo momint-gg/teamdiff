@@ -174,6 +174,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public onlyWhitelisted {
+        // Making the index 1 after the athlet  es end
         uint256 starterPackId = NUM_ATHLETES;
         require(
             starterPacksMinted < MAX_PACKS,
@@ -185,7 +186,6 @@ contract GameItems is ERC1155, Ownable {
         );
         userToHasMintedPack[msg.sender] = true;
 
-        // Making the index 1 after the athletes end
         _mint(msg.sender, starterPackId, 1, "0x00");
 
         starterPacksMinted += 1;

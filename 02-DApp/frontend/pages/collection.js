@@ -1,5 +1,5 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Link, Typography } from "@mui/material";
 import { ethers } from "ethers";
 import { React, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
@@ -99,12 +99,12 @@ export default function Collection() {
     return (
       <Box>
         <Typography
-          variant={isMobile ? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
           style={{ marginTop: 10 }}
         >
-          Owned Athletes
+          My TeamDiff Athlete Cards
         </Typography>
         <hr
           style={{
@@ -113,28 +113,48 @@ export default function Collection() {
             height: 5,
           }}
         />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {athleteNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        {athleteNFTs.length > 0 ? (
+          <Grid container spacing={isMobile ? 1 : 3}>
+            {athleteNFTs?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <>
+            <Typography>
+              {"It's pretty lonely here. "}
+              <Link>
+                <a
+                  className="primary-link"
+                  target="_blank"
+                  href={"mintPack"}
+                  rel="noreferrer"
+                >
+                  Open
+                </a>
+              </Link>
+              {" a TeamDiff Starter Pack now!"}
+            </Typography>
+            <br></br>
+          </>
+        )}
         <AthleteCardModal
           modalOpen={modalOpen}
           athleteData={currAthlete}
           handleModalClose={handleModalClose}
         />
         <Typography
-          variant={isMobile ? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
         >
-          Owned Starter Packs
+          My TeamDiff Starter Packs
         </Typography>
         <hr
           style={{
@@ -143,17 +163,37 @@ export default function Collection() {
             height: 5,
           }}
         />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {packNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        {packNFTs.length > 0 ? (
+          <Grid container spacing={isMobile ? 1 : 3}>
+            {packNFTs?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <>
+            <Typography>
+              {"It's pretty lonely here. "}
+              <Link>
+                <a
+                  className="primary-link"
+                  target="_blank"
+                  href={"mintPack"}
+                  rel="noreferrer"
+                >
+                  Mint
+                </a>
+              </Link>
+              {" a TeamDiff Starter Pack now!"}
+            </Typography>
+            <br></br>
+          </>
+        )}
       </Box>
     );
   } else if (isConnected) {

@@ -27,15 +27,18 @@ export default function BurnPack({ setDisplay }) {
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
-  const [canMint, setCanMint] = useState(false);
+  const [ownsStarterPack, setOwnsStarterPack] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState();
-  const [nftResp, setNFTResp] = useState(null);
-  // const [packNFTs, setPackNFTs] = useState([]);
-  const [athleteNFTs, setAthleteNFTs] = useState([]);
+  // const [nftResp, setNFTResp] = useState(null);
+  // // const [packNFTs, setPackNFTs] = useState([]);
+  // const [athleteNFTs, setAthleteNFTs] = useState([]);
+  const [isPreRevealPhase, setIsPreRevealPhase] = useState();
+  const [isPolygon, setIsPolygon] = useState();
+  const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
   useEffect(() => {
     // setHasMinted(true);
@@ -79,47 +82,6 @@ export default function BurnPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
-      // Fetcher to retireve newly minted NFT data
-      // const getNFTData = async (athleteIndices) => {
-      //   console.log("athletic Indices in getNFTData: " + athleteIndices);
-      //   const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
-      //   const nfts = await web3.alchemy
-      //     .getNfts({
-      //       owner: connectedAccount,
-      //       contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-      //     })
-      //     .catch((error) => {
-      //       console.log(
-      //         "get NFT DATA error: " + JSON.stringify(error, null, 2)
-      //       );
-      //     });
-
-      //   setNFTResp(nfts);
-      //   for (const nft of nfts?.ownedNfts) {
-      //     const token = nft?.id?.tokenId;
-      //     const response = await web3.alchemy.getNftMetadata({
-      //       contractAddress: CONTRACT_ADDRESSES.GameItems,
-      //       tokenId: token,
-      //     });
-      //     console.log("Token #" + parseInt(token));
-      //     if (
-      //       !response.title?.includes("Pack") &&
-      //       athleteIndices.includes(parseInt(token))
-      //     ) {
-      //       // console.log("Token #" + parseInt(token) + " metadata: " + JSON.stringify(response, null, 2));
-
-      //       setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
-      //     }
-      //   }
-      // };
-      // getNFTData()
-      // getNFTData([6, 33, 12, 26, 45]).catch((error) => {
-      //   console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
-      // });
-      // athleteNFTs.forEach((athlete, index) => {
-      //   console.log("Token #" + parseInt(index) + " metadata: " + JSON.stringify(athlete, null, 2));
-      // })
-
       // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = async (athleteIndices, signer) => {
         if (signer == connectedAccount) {
@@ -130,19 +92,9 @@ export default function BurnPack({ setDisplay }) {
 
           setHasMinted(true);
           setMintedIndices(athleteIndices);
-
-          // await getNFTData(athleteIndices).catch((error) => {
-          //   console.log(
-          //     "fetch NFT DATA error: " + JSON.stringify(error, null, 2)
-          //   );
-          // });
-          // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
         }
       };
 
-      // packBurnedCallback([6, 33, 12, 26, 45], "0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
-      // const test = [6, 33, 12, 26, 45];
-      // console.log("athleteIndices: " + test)
       const fetchData = async () => {
         // console.log("connected Accotun :" + connectedAccount)
         const balanceOfPacks = await GameItemsContract.balanceOf(
@@ -150,7 +102,20 @@ export default function BurnPack({ setDisplay }) {
           50
         );
         // console.log("balance of packs" + balanceOfPacks);
-        setCanMint(balanceOfPacks > 0);
+        setOwnsStarterPack(balanceOfPacks > 0);
+
+        // Grab if user has already minted starter pack
+        const hasAlreadyBurnedPack1 =
+          await GameItemsContract.userToHasBurnedPack(connectedAccount);
+        setHasAlreadyBurnedPack(hasAlreadyBurnedPack1);
+
+        // Set if is past presale date
+        // open sale start date in UTC
+        const revealStartDate = new Date("June 13, 2022 21:00:00");
+        // const revealStartDate = new Date("June 6, 2022 21:00:00");
+        const today = new Date();
+        const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
+        setIsPreRevealPhase(isBeforeRevealDate);
       };
       fetchData();
 
@@ -265,7 +230,11 @@ export default function BurnPack({ setDisplay }) {
                       size="large"
                       aria-label="add"
                       onClick={burnStarterPack}
-                      disabled={!canMint}
+                      disabled={
+                        !ownsStarterPack ||
+                        hasAlreadyBurnedPack ||
+                        isPreRevealPhase
+                      }
                       // onClick={() => setDisplayMint(true)}
                       sx={{
                         marginRight: 1,
@@ -281,31 +250,59 @@ export default function BurnPack({ setDisplay }) {
                   </Box>
                 </>
               )}
-              {!canMint && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  textAlign: "center",
+                }}
+              >
+                {isPreRevealPhase && (
+                  <>
+                    <Typography variant="subtitle1" color="secondary">
+                      Revealing TeamDiff Starter Packs unlocks June 13th, 5:00
+                      pm EST
+                    </Typography>
+                    <Typography>
+                      Come back after the reveal date to open your pack!
+                    </Typography>
+                  </>
+                )}
+                <br></br>
+                {!ownsStarterPack && !hasAlreadyBurnedPack && (
                   <Typography>
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
-                      <a
-                        // style={{
-                        //   textDecoration: "none",
-                        //   textDecorationColor: "transparent"
-                        // }}
-                        className="primary-link"
-                        href="/mintPack"
-                      >
+                      <a className="primary-link" href="/mintPack">
                         here
                       </a>
                     </Link>
                     {" to mint one now!"}
                   </Typography>
-                </Box>
-              )}
+                )}
+                {hasAlreadyBurnedPack && (
+                  <Typography>
+                    {
+                      "Oops! Looks like you have already opened 1 TeamDiff Starter Pack. Trade for more cards on "
+                    }
+                    <Link>
+                      <a
+                        className="primary-link"
+                        target="_blank"
+                        href={
+                          "https://testnets.opensea.io/assets/" +
+                          gameItemsContract.address
+                        }
+                        rel="noreferrer"
+                      >
+                        OpenSea
+                      </a>
+                    </Link>
+                    {" or wait until our next drop."}
+                  </Typography>
+                )}
+              </Box>
             </Container>
           )}
           {isMinting && (

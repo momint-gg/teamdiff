@@ -46,6 +46,7 @@ export default function MintPack() {
   const [hasAlreadyMintedPack, setHasAlreadyMintedPack] = useState();
   const [isOnWhitelist, setIsOnWhitelist] = useState();
   const [isPresalePhase, setIsPresalePhase] = useState();
+  const [isPublicSalePhase, setIsPublicSalePhase] = useState();
   useEffect(() => {
     // setHasMinted(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -139,12 +140,16 @@ export default function MintPack() {
 
       // Set if is past presale date
       // open sale start date in UTC
-      const openDate = new Date("June 10, 2022 21:00:00");
-      // const openDate = new Date("June 3, 2022 21:00:00");
+      const presaleEndDate = new Date("June 10, 2022 21:00:00");
+      const presaleStartDate = new Date("June 10, 2022 00:00:00");
       const today = new Date();
-      const isBeforeOpenDate = today.getTime() < openDate.getTime();
-      // console.log("isPastOpenDate: " + isBeforeOpenDate);
-      setIsPresalePhase(isBeforeOpenDate);
+      const isPresale =
+        today.getTime() < presaleEndDate.getTime() &&
+        today.getTime() > presaleStartDate.getTime();
+      const isPublicSale = today.getTime() > presaleEndDate.getTime();
+      // console.log("ispublic: " + isPublicSale);
+      setIsPresalePhase(isPresale);
+      setIsPublicSalePhase(isPublicSale);
 
       // Callback for when packMinted Events is fired from contract
       // const signerAddress = accountData.address;
@@ -309,7 +314,9 @@ export default function MintPack() {
                   }}
                   // disabled={!isPolygon}
                   disabled={
-                    hasAlreadyMintedPack || (!isOnWhitelist && isPresalePhase)
+                    hasAlreadyMintedPack ||
+                    (!isOnWhitelist && isPresalePhase) ||
+                    !(isPresalePhase || isPublicSalePhase)
                   }
                 >
                   Mint
@@ -325,6 +332,15 @@ export default function MintPack() {
                   Presale ends June 10th, 5:00 pm EST
                 </Typography>
               )}
+              {!(isPresalePhase || isPublicSalePhase) && (
+                <Typography
+                  textAlign="center"
+                  variant="subtitle1"
+                  color="secondary"
+                >
+                  Presale starts at June 9th, 8:00 pm EST
+                </Typography>
+              )}
               <Box
                 justifyContent="center"
                 alignItems="center"
@@ -332,15 +348,11 @@ export default function MintPack() {
                   display: "flex",
                   flexDirection: "column",
                   paddingTop: "20px",
+                  textAlign: "center",
                 }}
               >
                 {hasAlreadyMintedPack ? (
-                  <Typography
-                    style={{
-                      textAlign: "center",
-                      fontSize: 16,
-                    }}
-                  >
+                  <Typography>
                     {
                       "Oops! Looks like you have already minted 1 TeamDiff Starter Pack. Trade for more cards on "
                     }
@@ -372,11 +384,22 @@ export default function MintPack() {
                           " you think this is wrong, or come back tomorrow for public sale! "}
                       </Typography>
                     )}
+                    {!(isPresalePhase || isPublicSalePhase) && (
+                      <Typography
+                        style={{
+                          // color: "red",
+                          fontSize: 16,
+                        }}
+                      >
+                        {"Please come back when presale begins!"}
+                      </Typography>
+                    )}
                   </>
                 )}
                 {!isPolygon &&
                   !hasAlreadyMintedPack &&
-                  !(!isOnWhitelist && isPresalePhase) && (
+                  !(!isOnWhitelist && isPresalePhase) &&
+                  (isPresalePhase || isPublicSalePhase) && (
                     <Typography
                       style={{
                         color: "red",
