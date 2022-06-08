@@ -108,8 +108,8 @@ export default function Play() {
             <Card
               sx={{
                 background:
-                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                borderRadius: 20,
+                  "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 2,
               }}
               variant="outlined"
               onClick={() => router.push("/myLeagues")}
@@ -131,24 +131,22 @@ export default function Play() {
             </Card>
             <br></br>
             <Typography
+              color="primary"
               sx={{
                 textAlign: "center",
                 paddingLeft: 2,
                 paddingRight: 2,
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              View the leagues that you have already joined. Here you can set your lineups, view other players teams, see your matchups, and the standings within a league!
             </Typography>
           </Grid>
           <Grid item xs={4}>
             <Card
               sx={{
                 background:
-                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                borderRadius: 20,
+                  "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 2,
               }}
               variant="outlined"
               onClick={() => router.push("/joinLeague")}
@@ -170,16 +168,14 @@ export default function Play() {
             </Card>
             <br></br>
             <Typography
+              color="primary"
               sx={{
                 textAlign: "center",
                 paddingLeft: 2,
                 paddingRight: 2,
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              Join a league that you have been whitelisted to, or find a public league that you can join to compete with the lineup that you have assembled!
             </Typography>
           </Grid>
           <Grid item xs={4}>
@@ -187,8 +183,8 @@ export default function Play() {
               variant="outlined"
               sx={{
                 background:
-                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                borderRadius: 20,
+                  "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
+                borderRadius: 2,
               }}
               onClick={() => router.push("/createLeagueLanding")}
             >
@@ -210,16 +206,14 @@ export default function Play() {
             </Card>
             <br></br>
             <Typography
+              color="primary"
               sx={{
                 textAlign: "center",
                 paddingLeft: 2,
                 paddingRightt: 2,
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              Create either a public or private league to compete against your friends and prove that you've assembled the better roster!
             </Typography>
           </Grid>
         </Grid>

@@ -25,6 +25,7 @@ import {
 import Image from "next/image";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LoadingPrompt from "../components/LoadingPrompt";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
@@ -208,7 +209,7 @@ export default function MintPack() {
   return (
     <Box>
       {isLoading ? (
-        <LoadingPrompt loading={"Burn Page"} />
+        <LoadingPrompt loading={"Mint Page"} />
       ) : (
         <>
           {isConnected && !hasMinted && (
@@ -293,7 +294,7 @@ export default function MintPack() {
                     color: "white",
                     fontSize: 20,
                   }}
-                  // disabled={!isPolygon}
+                // disabled={!isPolygon}
                 >
                   Mint
                 </Fab>
@@ -321,33 +322,16 @@ export default function MintPack() {
             </Container>
           )}
           {isMinting && (
-            <Container
-              maxWidth="lg"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Box
-                justifyContent="center"
-                alignItems="center"
-                flexDirection="column"
-                sx={{
-                  display: "flex",
-                }}
-              >
-                <Typography variant="h5" color="white" component="div">
-                  Minting In Progress
-                </Typography>
-                <br></br>
-                <CircularProgress />
-                <br></br>
-                {isMinting && isTransactionDelayed && (
-                  <Typography variant="p" textAlign={"center"}>
-                    This is taking longer than normal. Please check your wallet
-                    to check the status of this transaction.
-                  </Typography>
-                )}
-              </Box>
-            </Container>
+            <Box sx={{ marginTop: 5 }}>
+              <LoadingPrompt
+                completeTitle={"Minting Pack in Progress"}
+                bottomText={
+                  isMinting && isTransactionDelayed
+                    ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+                    : ""
+                }
+              />
+            </Box>
           )}
           {hasMinted && (
             <Container
@@ -486,15 +470,11 @@ export default function MintPack() {
             </Container>
           )}
           {!isConnected && !hasMinted && !isMinting && (
-            <Box>
-              <Typography variant="h6" component="div">
-                Please connect your wallet to get started.
-              </Typography>
-            </Box>
+            <ConnectWalletPrompt accessing={"minting a pack"} />
           )}
           {packsAvailable == 0 && (
             <Box>
-              <Typography>
+              <Typography color="primary">
                 Sorry, all packs have already been minted :(
               </Typography>
             </Box>
