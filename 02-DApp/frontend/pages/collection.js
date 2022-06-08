@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-
+import { FormControl, MenuItem, TextField } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid, Select } from "@mui/material";
@@ -24,6 +25,11 @@ export default function Collection() {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [searchQuery, setSeachQuery] = useState("")
+  const [isPreparingAthletes, setIsPreparingAthletes] = useState(true)
+  const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([])
+  const [teamFilterSelection, setTeamFilterSelection] = useState('')
+  const [teamPositionSelection, setTeamPositionSelection] = useState('')
+  const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState(athleteNFTs)
 
 
   useEffect(() => {
@@ -73,7 +79,7 @@ export default function Collection() {
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
-  useEffect(() => {
+  useEffect(async () => {
     setPackNFTs([]);
     setAthleteNFTs([]);
     // declare the async data fetching function
@@ -93,120 +99,229 @@ export default function Collection() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
+          // console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
+            setAthleteNFTsWrapper((athleteNFTsWrapper) => [...athleteNFTsWrapper, response]);
           }
         }
       };
 
-      getNFTData().catch((error) => {
+      await getNFTData().catch((error) => {
         console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
       });
+      console.log('done with preparing atheletes')
+      // console.log(athleteNFTs, 'hmm')
+      // setAthleteNFTsWrapper(athleteNFTs)
+      setIsPreparingAthletes(false)
     }
   }, [isConnected, connectedAccount]);
 
-  const returnSearchResults = () => {
-    return athleteNFTs.filter((athlete) => athlete.title.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
-  }
+  // const returnSearchResults = () => {
+  //   return athleteNFTs.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+  // }
 
   // TODO!
-  const filterByResults = (props) => {
-    if (props.team) {
-      return athleteNFTs.filter((athlete) => athlete.metadata.team === props.team)
-    } else if (props.position) {
-      return athleteNFTs.filter((athlete) => athlete.metadata.position === props.position)
+  const filterResults = (inputs) => {
+    let athleteNFTsCopy = [...athleteNFTs]
+    if (inputs.team) {
+      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
+        const attributesRaw = athlete.metadata.attributes
+        for (const a of attributesRaw) {
+          if (a["trait_type"].toLowerCase() === "team" && a["value"] === inputs.team) {
+            return true
+          }
+        }
+        return false
+      })
+    } 
+    if (inputs.position) {
+      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
+        const attributesRaw = athlete.metadata.attributes
+        for (const a of attributesRaw) {
+          if (a["trait_type"].toLowerCase() === "position" && a["value"] === inputs.position) {
+            return true
+          }
+        }
+        return false
+      })
     }
+    if (inputs.query) {
+      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+    }
+
+    return athleteNFTsCopy
   }
 
   const getTeamFilterOptions = () => {
-    const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team) 
-    return [... new Set(allTeams)]
+    const arr = []
+    for (const athlete of athleteNFTs) {
+      const attributesRaw = athlete.metadata.attributes
+      console.log(attributesRaw, "***")
+      for (const a of attributesRaw) {
+        if (a["trait_type"].toLowerCase() === "team") {
+          arr.push(a["value"])
+        }
+      }
+    }
+    // const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team) 
+    console.log(arr, 'lll')
+    return [... new Set(arr)]
   }
 
-  const ALL_POSITION_FILTER_OPTIONS = {
-    top: 'Top',
-    bottom: 'X',
-    x: 'X'
+  useEffect(() => {
+    if (!isPreparingAthletes) {
+      setAllTeamFilterOptions(getTeamFilterOptions())
+      console.log('useeffect')
+      setTimeout(() => {
+        console.log(allTeamFilterOptions)
+      }, 1000)
+    }
+  }, [isPreparingAthletes])
+  // const allTeamFilterOptions = getTeamFilterOptions()
+
+  // const ALL_POSITION_FILTER_OPTIONS = {
+  //   top: 'Top',
+  //   adc: 'ADC',
+  //   mid: 'Mid',
+  //   jungle: 'Jungle',
+  //   support: 'Support'
+  // }
+
+  const ALL_POSITION_FILTER_OPTIONS = [
+    'Top',
+    'ADC',
+    'Mid',
+    'Jungle',
+    'Support'
+  ]
+
+  // handles any change in filter/query
+  useEffect(() => {
+    const filteredResults = filterResults({
+      team: teamFilterSelection,
+      query: searchQuery,
+      position: teamPositionSelection
+    })
+    console.log(filteredResults, 'filtered')
+    setAthleteNFTsWrapper(filteredResults)
+  }, [teamFilterSelection, searchQuery, teamPositionSelection])
+
+  const handleTeamFilterChange = (e) => {
+    const { name, value } = e.target
+    setTeamFilterSelection(value)
   }
 
-  if (isConnected && nftResp) {
+  const handlePositionFilterChange = (e) => {
+    setTeamPositionSelection(e.target.value)
+  }
+
+  const handleQueryChange = (e) => {
+    setSeachQuery(e.target.value)
+  }
+
+  if (isConnected && nftResp && allTeamFilterOptions.length !== 0) {
     return (
       // https://mui.com/material-ui/react-select/
-      // <FormControl >
-      //   <InputLabel id="team-filter">Team</InputLabel>
-      //   <Select 
-      //     labelId="team-filter"
-      //     value={teamFilterSelection}
-      //     label="Team"
-      //     onChange={handleSomethingsfdf}
-      //   >
-      //     <MenuItem value="">One</MenuItem>
-      //   </Select>
+      <>
 
-      // </FormControl>
+        <Box>
 
-      <Box>
-        
-        <Typography
-          variant={isMobile ? "h4" : "h2"}
-          color="secondary"
-          component="div"
-          style={{ marginTop: 10 }}
-        >
-          Owned Athletes
-        </Typography>
-        <hr
-          style={{
-            color: "white",
-            backgroundColor: "white",
-            height: 5,
-          }}
-        />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {athleteNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
-        <AthleteCardModal
-          modalOpen={modalOpen}
-          athleteData={currAthlete}
-          handleModalClose={handleModalClose}
-        />
-        <Typography
-          variant={isMobile ? "h4" : "h2"}
-          color="secondary"
-          component="div"
-        >
-          Owned Starter Packs
-        </Typography>
-        <hr
-          style={{
-            color: "white",
-            backgroundColor: "white",
-            height: 5,
-          }}
-        />
-        <Grid container spacing={isMobile ? 1 : 3}>
-          {packNFTs?.map((athleteData) => (
-            <Grid item xs={isMobile ? 12 : 4}>
-              <AthleteCard
-                athleteData={athleteData}
-                setAthlete={setCurrAthlete}
-                setModalOpen={setModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+          <Typography
+            variant={isMobile ? "h4" : "h2"}
+            color="secondary"
+            component="div"
+            style={{ marginTop: 10 }}
+          >
+            Owned Athletes
+          </Typography>
+          <hr
+            style={{
+              color: "white",
+              backgroundColor: "white",
+              height: 5,
+            }} />
+          <TextField 
+            label="Name"
+            value={searchQuery}
+            onChange={handleQueryChange}
+            />
+          <FormControl sx={{ minWidth: 250 }} >
+          <InputLabel id="position-filter">Position</InputLabel>
+          <Select
+            labelId="position-filter"
+            value={teamPositionSelection}
+            label="Position"
+            onChange={handlePositionFilterChange}
+          >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
+              <MenuItem value={positionOption}>{positionOption}</MenuItem>
+            ))}
+            
+          </Select>
+
+        </FormControl>
+          <FormControl sx={{ minWidth: 250 }} >
+          <InputLabel id="team-filter">Team</InputLabel>
+          <Select
+            labelId="team-filter"
+            value={teamFilterSelection}
+            label="Team"
+            onChange={handleTeamFilterChange}
+          >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+            {allTeamFilterOptions.map((teamOption => (
+              <MenuItem value={teamOption}>{teamOption}</MenuItem>
+            )))}
+            
+          </Select>
+
+        </FormControl>
+          <Grid container spacing={isMobile ? 1 : 3}>
+            {athleteNFTsWrapper?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen} />
+              </Grid>
+            ))}
+          </Grid>
+          <AthleteCardModal
+            modalOpen={modalOpen}
+            athleteData={currAthlete}
+            handleModalClose={handleModalClose} />
+          <Typography
+            variant={isMobile ? "h4" : "h2"}
+            color="secondary"
+            component="div"
+          >
+            Owned Starter Packs
+          </Typography>
+          <hr
+            style={{
+              color: "white",
+              backgroundColor: "white",
+              height: 5,
+            }} />
+          <Grid container spacing={isMobile ? 1 : 3}>
+            {packNFTs?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen} />
+              </Grid>
+            ))}
+          </Grid>
+        </Box></>
     );
   } else if (isConnected) {
     return (
