@@ -313,7 +313,10 @@ export default function BurnPack({ setDisplay }) {
                     justifyContent: "center",
                   }}
                 >
-                  <Typography>
+                  <Typography
+                    variant="h6"
+                    color="white"
+                  >
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
                       <a
