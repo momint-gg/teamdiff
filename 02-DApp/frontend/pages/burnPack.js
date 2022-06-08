@@ -134,8 +134,8 @@ export default function BurnPack({ setDisplay }) {
 
         // Set if is past presale date
         // open sale start date in UTC
-        // const revealStartDate = new Date("June 13, 2022 21:00:00");
-        const revealStartDate = new Date("June 6, 2022 21:00:00");
+        const revealStartDate = new Date("June 13, 2022 21:00:00");
+        // const revealStartDate = new Date("June 6, 2022 21:00:00");
         const today = new Date();
         const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
         setIsPreRevealPhase(isBeforeRevealDate);
