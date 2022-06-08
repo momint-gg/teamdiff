@@ -38,9 +38,10 @@ export default function MintHome() {
                 <Box
                   sx={{
                     display: "flex",
-                    flexDirection: "row",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "space-evenly",
+                    textAlign: "center"
                   }}
                 >
                   <Box
@@ -51,6 +52,21 @@ export default function MintHome() {
                     <Typography variant="h4" color="white" component="div">
                       Starter Pack
                     </Typography>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Image
+                        src={card_and_pack}
+                        alt="Picture of the author"
+                        width="550px"
+                        height="550px"
+                      />
+                    </Box>
                     <Typography color="white" component="div">
                       Mint a starter pack and get 5 unique athlete NFTs, which
                       allow you to build a roster and get right into the action.
@@ -61,7 +77,6 @@ export default function MintHome() {
                         size="large"
                         aria-label="add"
                         onClick={() => router.push("./mintPack")}
-                        // onClick={() => setDisplayMint(true)}
                         sx={{
                           marginTop: 5,
                           marginRight: 1,
@@ -69,6 +84,8 @@ export default function MintHome() {
                             "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                           color: "white",
                           fontSize: 20,
+                          paddingRight: 6,
+                          paddingLeft: 6
                         }}
                       >
                         Mint
@@ -79,26 +96,11 @@ export default function MintHome() {
                         color="white"
                         aria-label="add"
                         onClick={() => router.push("./starterPackContents")}
-                        sx={{ marginTop: 5, fontSize: 20 }}
+                        sx={{ marginTop: 3, fontSize: 20 }}
                       >
                         CONTENTS
                       </Fab>
                     </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      flex: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Image
-                      src={card_and_pack}
-                      alt="Picture of the author"
-                      width="550px"
-                      height="550px"
-                    />
                   </Box>
                 </Box>
               </Container>
@@ -109,6 +111,7 @@ export default function MintHome() {
                 display: "flex",
                 flexDirection: "row",
                 alignContent: "space-between",
+                textAlign: "center"
               }}
             >
               <Container
@@ -118,7 +121,7 @@ export default function MintHome() {
                 }}
               >
                 <Box>
-                  <Typography variant="h3" color="white" component="div">
+                  <Typography variant="h3" color="white" component="div" sx={{ marginBottom: 3 }}>
                     Starter Pack
                   </Typography>
                   <Typography variant="h6" color="white" component="div">
@@ -133,11 +136,13 @@ export default function MintHome() {
                     onClick={() => router.push("./mintPack")}
                     sx={{
                       marginTop: 5,
-                      marginRight: 1,
+                      marginRight: 3,
                       background:
                         "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                       color: "white",
                       fontSize: 20,
+                      paddingRight: 6,
+                      paddingLeft: 6
                     }}
                   >
                     Mint
