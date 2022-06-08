@@ -504,8 +504,8 @@ export default function CreateLeague({ setDisplay }) {
                 // '& > :not(style)': { m: 1, width: '50ch' },
                 flex: 1,
               }}
-              // noValidate
-              // autoComplete="off"
+            // noValidate
+            // autoComplete="off"
             >
               <Typography variant="h4" color="white" component="div">
                 Form
@@ -639,10 +639,10 @@ export default function CreateLeague({ setDisplay }) {
                 flex: 1,
               }}
 
-              // noValidate
-              // autoComplete="off"
+            // noValidate
+            // autoComplete="off"
             >
-              <Typography variant="h4">Invite List (Whitelist)</Typography>
+              <Typography variant="h4" color="primary">Invite List (Whitelist)</Typography>
               <Box>
                 <FormControl component="fieldset">
                   <FormGroup aria-label="position" row>
@@ -657,9 +657,9 @@ export default function CreateLeague({ setDisplay }) {
                               // console.log("empty list")
                             }
                           }}
-                          color="secondary"
                         />
                       }
+                      sx={{ color: "white" }}
                       label="Invite-Only"
                       labelPlacement="start"
                     />
