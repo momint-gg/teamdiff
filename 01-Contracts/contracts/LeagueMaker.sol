@@ -73,6 +73,7 @@ contract LeagueMaker is Ownable {
             _stakeAmount <= maxBuyIn,
             "You must have a league buy-in of less than 100 USDC."
         );
+        require(bytes(_name).length > 0, "Name length must be > 0.");
 
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,bool,address,address,address,address,address,address,address)",

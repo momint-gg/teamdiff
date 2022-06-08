@@ -191,7 +191,6 @@ contract GameItems is ERC1155, Ownable {
     /*****************************************************/
     /************ STARTER PACK MINTING/BURNING ***********/
     /*****************************************************/
-
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public {
         if (isPresalePhase && !isPublicSalePhase) {
@@ -261,9 +260,9 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    /***********************************************/
-    /************ BOOSTER PACK FUNCTIONS ***********/
-    /***********************************************/
+    /*****************************************************/
+    /************ BOOSTER PACK MINTING/BURNING ***********/
+    /*****************************************************/
     function mintBoosterPack() public {
         require(boosterPacksReadyToOpen, "Booster packs cannot be opened yet!");
         require(
@@ -334,7 +333,6 @@ contract GameItems is ERC1155, Ownable {
     /**********************************************/
     /************ SETTING URIS, INDICES ***********/
     /**********************************************/
-
     // Setting starting Index -- will do every time?
     function setStartingIndex() public onlyOwner {
         // Setting the starting index
