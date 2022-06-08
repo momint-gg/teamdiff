@@ -25,6 +25,7 @@ contract GameItems is ERC1155, Ownable {
     uint256 private MAX_STARTER_PACK_BALANCE;
     uint256 private MAX_BOOSTER_PACK_BALANCE;
     uint256 private MAX_PACKS;
+    uint256 private MAX_BOOSTER_PACKS; // Should we set this?
     uint256 private NUM_ATHLETES;
     uint256 private NFT_PER_ATHLETE;
     uint256 chainlinkSubId;
@@ -32,7 +33,8 @@ contract GameItems is ERC1155, Ownable {
     string public name = "TeamDiff";
 
     // When we flip the switch and let everyone open packs
-    bool public packsReadyToOpen = false;
+    bool public packsReadyToOpen;
+    bool public boosterPacksReadyToOpen;
 
     // Total amount of packs minted so far
     uint256 private starterPacksMinted;
@@ -80,8 +82,9 @@ contract GameItems is ERC1155, Ownable {
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
-    mapping(address => bool) public userToHasBurnedPack;
-    mapping(address => bool) public userToHasMintedPack;
+    mapping(address => bool) public userToHasBurnedStarterPack;
+    mapping(address => bool) public userToHasMintedStarterPack;
+    mapping(address => uint256) public usersBoosterPacksMinted;
 
     //NOTE we ran into an error if we have more than 16 params passed in constructor
     constructor(
@@ -117,6 +120,11 @@ contract GameItems is ERC1155, Ownable {
     // Opening the public sale
     function openPublicSale() public onlyOwner {
         isPublicSalePhase = true;
+    }
+
+    // Allowing booster packs to be opened
+    function allowBoosterPacks() public onlyOwner {
+        boosterPacksReadyToOpen = true;
     }
 
     /*****************************************************/
@@ -194,10 +202,10 @@ contract GameItems is ERC1155, Ownable {
             "All packs have already been minted!"
         );
         require(
-            !userToHasMintedPack[msg.sender],
+            !userToHasMintedStarterPack[msg.sender],
             "Can only mint one starter pack per account"
         );
-        userToHasMintedPack[msg.sender] = true;
+        userToHasMintedStarterPack[msg.sender] = true;
 
         // Making the index 1 after the athlet  es end
         uint256 starterPackId = NUM_ATHLETES;
@@ -213,7 +221,7 @@ contract GameItems is ERC1155, Ownable {
     function burnStarterPack() public {
         uint256 starterPackId = NUM_ATHLETES;
         require(
-            !userToHasBurnedPack[msg.sender],
+            !userToHasBurnedStarterPack[msg.sender],
             "You cannot burn more than 1 pack"
         );
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
@@ -222,7 +230,7 @@ contract GameItems is ERC1155, Ownable {
             "Starter pack does not exist in users wallet"
         );
 
-        userToHasBurnedPack[msg.sender] = true;
+        userToHasBurnedStarterPack[msg.sender] = true;
 
         // Indices for players in the pack, 1 of each position
         uint256[5] memory indices = generateStarterPackIndices();
@@ -251,6 +259,76 @@ contract GameItems is ERC1155, Ownable {
             supplyOfToken[index] += 1;
             numAthletes += 1;
         }
+    }
+
+    /***********************************************/
+    /************ BOOSTER PACK FUNCTIONS ***********/
+    /***********************************************/
+    function mintBoosterPack() public {
+        require(boosterPacksReadyToOpen, "Booster packs cannot be opened yet!");
+        require(
+            boosterPacksMinted < MAX_BOOSTER_PACKS, // TODO: Set MAX_BOOSTER_PACKS Value in constructor
+            "All booster packs have already been minted!"
+        );
+        require(
+            usersBoosterPacksMinted[msg.sender] <= 2,
+            "Can only mint two booster packs per account"
+        );
+        usersBoosterPacksMinted[msg.sender]++;
+        uint256 boosterPackId = NUM_ATHLETES + 1;
+
+        _mint(msg.sender, boosterPackId, 1, "");
+
+        boosterPacksMinted += 1;
+        emit packMinted(msg.sender, boosterPacksMinted);
+    }
+
+    function burnBoosterPack() public {
+        uint256 boosterPackId = NUM_ATHLETES + 1;
+        require(boosterPacksReadyToOpen, "Packs aren't ready to open yet!");
+        require(
+            balanceOf(address(msg.sender), boosterPackId) > 0,
+            "No remaining booster packs!"
+        );
+
+        uint256[3] memory indices = generateBoosterPackIndices();
+
+        for (uint8 i = 0; i < indices.length; i++) {
+            mintAthlete(indices[i]);
+        }
+
+        _burn(address(msg.sender), boosterPackId, 1);
+    }
+
+    //Generate pseudo random booster pack indices
+    function generateBoosterPackIndices()
+        private
+        view
+        returns (uint256[3] memory)
+    {
+        uint256[3] memory indices;
+        uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
+
+        for (uint256 i = 0; i < 3; i++) {
+            startI = startI % 5;
+            uint256 start = startI * 10;
+            uint256 end = startI * 10 + 9;
+
+            indices[i] = ((uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp,
+                        msg.sender,
+                        block.difficulty,
+                        i,
+                        boosterPacksMinted
+                    )
+                )
+            ) % (end - start + 1)) + start);
+
+            startI += 1;
+        }
+        return indices;
     }
 
     /**********************************************/
@@ -300,6 +378,7 @@ contract GameItems is ERC1155, Ownable {
 
         //Setting pack URIs after the athletes (i.e. 49.json = last athlete, 50.json = starter pack)
         setTokenUri(NUM_ATHLETES, string(abi.encodePacked(starterPackURI)));
+        setTokenUri(NUM_ATHLETES + 1, string(abi.encodePacked(boosterPackURI)));
     }
 
     // Generate pseudo random starter pack indices (randomness not super important here)
@@ -330,73 +409,4 @@ contract GameItems is ERC1155, Ownable {
     function getNFTPerAthlete() public view returns (uint256) {
         return NFT_PER_ATHLETE;
     }
-
-    /***********************************************/
-    /************ BOOSTER PACK FUNCTIONS ***********/
-    /***********************************************/
-    //  function mintBoosterPack() public {
-    //         uint256 boosterPackId = NUM_ATHLETES + 1;
-    //         require(
-    //             boosterPacksMinted < MAX_PACKS,
-    //             "All packs have already been minted!"
-    //         );
-    //         require(
-    //             balanceOf(msg.sender, boosterPackId) < 2,
-    //             "Can only mint two booster packs per account"
-    //         );
-
-    //         _mint(msg.sender, boosterPackId, 1, "");
-
-    //         boosterPacksMinted += 1;
-    //         emit packMinted(msg.sender, boosterPacksMinted);
-    //     }
-
-    // function burnBoosterPack() public {
-    //     uint256 boosterPackId = NUM_ATHLETES + 1;
-
-    //     require(packsReadyToOpen, "Packs aren't ready to open yet!");
-    //     require(
-    //         balanceOf(address(msg.sender), boosterPackId) > 0,
-    //         "No remaining booster packs!"
-    //     );
-
-    //     uint256[3] memory indices = generateBoosterPackIndices();
-
-    //     for (uint8 i = 0; i < indices.length; i++) {
-    //         mintAthlete(indices[i]);
-    //     }
-
-    //     _burn(address(msg.sender), boosterPackId, 1);
-    // }
-
-    // //Generate pseudo random booster pack indices
-    // function generateBoosterPackIndices()
-    //     private
-    //     view
-    //     returns (uint256[3] memory)
-    // {
-    //     uint256[3] memory indices;
-    //     uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
-
-    //     for (uint256 i = 0; i < 3; i++) {
-    //         startI = startI % 5;
-    //         uint256 start = startI * 10;
-    //         uint256 end = startI * 10 + 9;
-
-    //         indices[i] = ((uint256(
-    //             keccak256(
-    //                 abi.encodePacked(
-    //                     block.timestamp,
-    //                     msg.sender,
-    //                     block.difficulty,
-    //                     i,
-    //                     boosterPacksMinted
-    //                 )
-    //             )
-    //         ) % (end - start + 1)) + start);
-
-    //         startI += 1;
-    //     }
-    //     return indices;
-    // }
 }

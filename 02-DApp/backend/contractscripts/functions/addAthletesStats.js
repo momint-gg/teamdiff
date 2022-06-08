@@ -14,7 +14,6 @@ const athleteToId = require('../athleteToId'); // Mapping athlete to their ID
 const XLSX = require('xlsx');
 const fs = require('fs');
 const axios = require('axios');
-const { expect } = require('chai');
 
 // How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
 async function main() {
