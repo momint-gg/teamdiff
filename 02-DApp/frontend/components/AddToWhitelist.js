@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -34,6 +35,8 @@ import Grid from "@material-ui/core/Grid";
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 import { Box, Button, Container, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import "bootstrap/dist/css/bootstrap.css";
@@ -42,7 +45,10 @@ import React, { useEffect, useState } from "react";
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
 import theme from "../styles/theme.js";
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
 export default function AddToWhitelist({
   setInviteListValues,
@@ -70,10 +76,14 @@ export default function AddToWhitelist({
 
   const handlePlayerInviteInput = (e, i) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     let inviteListValuesNew = [...inviteListValues];
 =======
     const inviteListValuesNew = [...inviteListValues];
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    const inviteListValuesNew = [...inviteListValues];
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
     // const currentAddress = await signer.getAddress()
@@ -87,10 +97,14 @@ export default function AddToWhitelist({
     } else {
       inviteListValuesNew[i] = e.target.value;
 <<<<<<< HEAD
+<<<<<<< HEAD
       //setInviteListValues([...inviteListValues], e);
 =======
       // setInviteListValues([...inviteListValues], e);
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+      // setInviteListValues([...inviteListValues], e);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       setInviteListValues(inviteListValuesNew);
       // console.log("short list in func: " + inviteListValues);
     }
@@ -105,10 +119,14 @@ export default function AddToWhitelist({
 
   const removePlayer = (i) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     let inviteListValuesNew = [...inviteListValues];
 =======
     const inviteListValuesNew = [...inviteListValues];
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    const inviteListValuesNew = [...inviteListValues];
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
     inviteListValuesNew.splice(i, 1);
     setInviteListValues(inviteListValuesNew);
     if (!addPlayerBtnEnabled && inviteListValuesNew.length < 8) {
@@ -148,10 +166,14 @@ export default function AddToWhitelist({
               label={"Whitelisted Address " + (index + 1)}
               onChange={(e) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 //This submits null address when I copy and paste
 =======
                 // This submits null address when I copy and paste
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                // This submits null address when I copy and paste
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 handlePlayerInviteInput(e, index);
                 // console.log("short list outside func: " + inviteListValues);
               }}

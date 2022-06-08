@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {
   useAccount,
   useConnect,
@@ -41,11 +42,23 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import AthleteCard from "../components/AthleteCard";
+import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
@@ -54,10 +67,14 @@ export default function BurnPack({ setDisplay }) {
     process.env.ALCHEMY_KEY
   );
 <<<<<<< HEAD
+<<<<<<< HEAD
   //Router
 =======
   // Router
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+  // Router
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   const router = useRouter();
 
   // State Hooks
@@ -78,34 +95,60 @@ export default function BurnPack({ setDisplay }) {
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
-  useEffect(() => {
-    // setHasMinted(true);
-    // setMintedIndices([6, 33, 12, 26, 45]);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const sig ner = provider.getSigner()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
-
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
-
-        setSigner(signer);
-        setConnectedAccount(accountAddress);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      setIsNoMetaMask(true);
       setIsLoading(false);
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      console.log("Please install MetaMask!");
+    }
+  }
+
+  useEffect(() => {
+    if (window.ethereum) {
+      handleEthereum();
+      // setHasMinted(true);
+      // setMintedIndices([6, 33, 12, 26, 45]);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const sig ner = provider.getSigner()
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
+
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setSigner(signer);
+          setConnectedAccount(accountAddress);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+        setIsLoading(false);
+      };
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", (accounts) => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, [connectedAccount]);
 
   // Use Effect for change in if user isConnected
@@ -120,6 +163,7 @@ export default function BurnPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       //Fetcher to retireve newly minted NFT data
       const getNFTData = async (athleteIndices) => {
@@ -164,6 +208,8 @@ export default function BurnPack({ setDisplay }) {
 
 =======
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = async (athleteIndices, signer) => {
         if (signer == connectedAccount) {
@@ -175,6 +221,7 @@ export default function BurnPack({ setDisplay }) {
           setHasMinted(true);
           setMintedIndices(athleteIndices);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
           await getNFTData(athleteIndices).catch((error) => {
             console.log(
@@ -184,6 +231,8 @@ export default function BurnPack({ setDisplay }) {
           // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
 =======
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
         }
       };
 
@@ -195,8 +244,11 @@ export default function BurnPack({ setDisplay }) {
         );
         // console.log("balance of packs" + balanceOfPacks);
 <<<<<<< HEAD
+<<<<<<< HEAD
         setCanMint(balanceOfPacks > 0);
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
         setOwnsStarterPack(balanceOfPacks > 0);
 
         // Grab if user has already minted starter pack
@@ -211,7 +263,10 @@ export default function BurnPack({ setDisplay }) {
         const today = new Date();
         const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
         setIsPreRevealPhase(isBeforeRevealDate);
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       };
       fetchData();
 
@@ -248,10 +303,14 @@ export default function BurnPack({ setDisplay }) {
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
 <<<<<<< HEAD
+<<<<<<< HEAD
         }, 60 * 5 * 1000);
 =======
         }, 20 * 1000);
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+        }, 20 * 1000);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
         console.log("Minting pack in progress...");
       })
       .catch((error) => {
@@ -265,6 +324,8 @@ export default function BurnPack({ setDisplay }) {
         <LoadingPrompt loading={"Open Page"} />
       ) : (
         <>
+          {isNoMetaMask && <MetaMaskRedirectInstructions />}
+
           {isConnected && !hasMinted && (
             <Container
               maxWidth="lg"
@@ -314,10 +375,14 @@ export default function BurnPack({ setDisplay }) {
                   >
                     <Typography variant="h4" color="white" component="div">
 <<<<<<< HEAD
+<<<<<<< HEAD
                       Open Starter Pack
 =======
                       Open TeamDiff Starter Pack
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                      Open TeamDiff Starter Pack
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     </Typography>
                   </Box>
                   <Box
@@ -355,6 +420,7 @@ export default function BurnPack({ setDisplay }) {
                 </>
               )}
 <<<<<<< HEAD
+<<<<<<< HEAD
               {!canMint && (
                 <Box
                   sx={{
@@ -377,6 +443,8 @@ export default function BurnPack({ setDisplay }) {
                         href="/mintPack"
                       >
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               <Box
                 sx={{
                   display: "flex",
@@ -402,16 +470,22 @@ export default function BurnPack({ setDisplay }) {
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
                       <a className="primary-link" href="/mintPack">
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                         here
                       </a>
                     </Link>
                     {" to mint one now!"}
                   </Typography>
 <<<<<<< HEAD
+<<<<<<< HEAD
                 </Box>
               )}
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 )}
                 {hasAlreadyBurnedPack && (
                   <Typography>
@@ -435,7 +509,10 @@ export default function BurnPack({ setDisplay }) {
                   </Typography>
                 )}
               </Box>
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             </Container>
           )}
           {isMinting && (
@@ -603,14 +680,21 @@ export default function BurnPack({ setDisplay }) {
           {/* TODO: show a collection of their newly minted athlete cards on the screen */}
             </>
           )}
+<<<<<<< HEAD
           {!isConnected && !hasMinted && !isMinting && (
 <<<<<<< HEAD
             <ConnectWalletPrompt accessing={"opening a pack"} />
 =======
+=======
+          {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             <ConnectWalletPrompt
-              accessing={"burning a TeamDiff Starter Pack"}
+              accessing={"opening a TeamDiff Starter pack"}
             />
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           )}
         </>
       )}

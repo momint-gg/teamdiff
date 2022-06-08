@@ -8,6 +8,7 @@ import AthleteCard from "../components/AthleteCard";
 import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 import constants from "../constants";
 
 export default function Collection() {
@@ -19,19 +20,44 @@ export default function Collection() {
   // const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      console.log("Please install MetaMask!");
+    }
+  }
 
   useEffect(() => {
+<<<<<<< HEAD
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 <<<<<<< HEAD
     const signer = provider.getSigner();
 =======
     // const signer = provider.getSigner();
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    if (window.ethereum) {
+      handleEthereum();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner();
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
+<<<<<<< HEAD
       if (accounts.length > 0) {
         const accountAddress = await signer.getAddress();
 <<<<<<< HEAD
@@ -50,12 +76,34 @@ export default function Collection() {
 =======
     provider.provider.on("accountsChanged", () => {
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setConnectedAccount(accountAddress);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+        setIsLoading(false);
+      };
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", () => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, []);
 
   // const handleModalOpen = () => {
@@ -90,6 +138,7 @@ export default function Collection() {
           console.log(
             "Token #" +
 <<<<<<< HEAD
+<<<<<<< HEAD
             token +
             " metadata: " +
             JSON.stringify(response, null, 2)
@@ -98,6 +147,11 @@ export default function Collection() {
               " metadata: " +
               JSON.stringify(response, null, 2)
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+              token +
+              " metadata: " +
+              JSON.stringify(response, null, 2)
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           );
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
@@ -113,7 +167,11 @@ export default function Collection() {
     }
   }, [isConnected, connectedAccount]);
 
-  if (isConnected && nftResp) {
+  if (isLoading) {
+    return <LoadingPrompt loading={"Collection"} />;
+  } else if (isNoMetaMask) {
+    return <MetaMaskRedirectInstructions />;
+  } else if (isConnected && nftResp) {
     return (
       <Box>
         <Typography

@@ -1,9 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useAccount, useConnect, useEnsName, useEnsAvatar } from "wagmi";
 import { useEffect, useState } from "react";
 
 =======
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 import { Box, Button, Modal, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
@@ -20,6 +23,7 @@ export default function ConnectWalletModal({
   isMobile,
 }) {
 <<<<<<< HEAD
+<<<<<<< HEAD
   const {
     activeConnector,
     connect,
@@ -29,12 +33,17 @@ export default function ConnectWalletModal({
     pendingConnector,
   } = useConnect();
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   const { connect, connectors, error: connectError } = useConnect();
 
   // const [signer, setSigner] = useState(null);
   // const [connectedAccount, setConnectedAccount] = useState(null);
   // const [isConnected, setIsConnected] = useState(false);
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
   // useEffect(() => {
   //   // setIsCreatingLeague(false);
@@ -45,6 +54,7 @@ export default function ConnectWalletModal({
   //   const provider = new ethers.providers.Web3Provider(window.ethereum);
   //   const signer = provider.getSigner()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
@@ -77,6 +87,8 @@ export default function ConnectWalletModal({
     });
   }, []);
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   //     // const fetchData = async () => {
   //     //   const currentAddress = await signer.getAddress()
   //     //   setAddressPreview(currentAddress)
@@ -102,7 +114,10 @@ export default function ConnectWalletModal({
   //     provider.provider.on('disconnect', () =>  { console.log("disconnected");
   //                                                 setIsConnected(false) })
   //   }, []);
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
   function getConnectorImage(connector) {
     if (connector.name === "MetaMask") {

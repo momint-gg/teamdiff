@@ -74,16 +74,22 @@ contract GameItems is ERC1155, Ownable {
     // Our whitelist
     mapping(address => bool) public whitelist;
     uint256 public numWhitelisted;
+    bool isPresalePhase = false;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
+<<<<<<< HEAD
 <<<<<<< HEAD
     mapping(address => bool) private userToHasBurnedPack;
 =======
     mapping(address => bool) public userToHasBurnedPack;
     mapping(address => bool) public userToHasMintedPack;
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    mapping(address => bool) public userToHasBurnedPack;
+    mapping(address => bool) public userToHasMintedPack;
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
     //NOTE we ran into an error if we have more than 16 params passed in constructor
     constructor(
@@ -177,9 +183,10 @@ contract GameItems is ERC1155, Ownable {
     /*****************************************************/
 
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
-    function mintStarterPack() public onlyWhitelisted {
-        // Making the index 1 after the athlet  es end
-        uint256 starterPackId = NUM_ATHLETES;
+    function mintStarterPack() public  {
+        if(isPresalePhase) {
+            require(whitelist[msg.sender], "User is not whitelisted.");
+        }
         require(
             starterPacksMinted < MAX_PACKS,
             "All packs have already been minted!"
@@ -190,7 +197,11 @@ contract GameItems is ERC1155, Ownable {
         );
         userToHasMintedPack[msg.sender] = true;
 
+        // Making the index 1 after the athlet  es end
+        uint256 starterPackId = NUM_ATHLETES;
         _mint(msg.sender, starterPackId, 1, "0x00");
+
+
 
         starterPacksMinted += 1;
         packsAvailable -= 1;
@@ -199,7 +210,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
-    function burnStarterPack() public onlyWhitelisted {
+    function burnStarterPack() public  {
         uint256 starterPackId = NUM_ATHLETES;
         require(!userToHasBurnedPack[msg.sender], "You cannot burn more than 1 pack");
         require(packsReadyToOpen, "Packs aren't ready to open yet!");

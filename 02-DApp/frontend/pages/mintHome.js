@@ -6,11 +6,15 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 <<<<<<< HEAD
+<<<<<<< HEAD
 //Router
 import { useRouter } from "next/router";
 =======
 import cardandpack from "../assets/images/card_and_pack.png";
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+import cardandpack from "../assets/images/card_and_pack.png";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
 export default function MintHome() {
   // Router
@@ -45,6 +49,7 @@ export default function MintHome() {
               >
                 <Box
                   sx={{
+<<<<<<< HEAD
 <<<<<<< HEAD
                     display: "flex",
                     flexDirection: "row",
@@ -115,6 +120,8 @@ export default function MintHome() {
           ) : (
             <Box
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     flex: 2,
                   }}
                 >
@@ -182,7 +189,10 @@ export default function MintHome() {
             }}
           >
             <Container
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -245,6 +255,7 @@ export default function MintHome() {
               >
                 <Box>
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <Typography variant="h3" color="white" component="div">
                     Starter Pack
                   </Typography>
@@ -290,11 +301,17 @@ export default function MintHome() {
                     src={cardandpack}
                     // layout="responsive"
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+                  <Image
+                    src={cardandpack}
+                    // layout="responsive"
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     alt="Picture of the author"
                     width="550px"
                     height="550px"
                   />
                 </Box>
+<<<<<<< HEAD
 <<<<<<< HEAD
               ) : (
                 <Container
@@ -333,6 +350,10 @@ export default function MintHome() {
               </Container>
             )}
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+              </Container>
+            )}
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           </Box>
         )}{" "}
       </Box>

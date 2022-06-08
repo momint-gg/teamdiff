@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {
   useAccount,
   useConnect,
@@ -36,10 +37,18 @@ import LoadingPrompt from "../components/LoadingPrompt";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 
 =======
+=======
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 // Router
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
@@ -51,6 +60,14 @@ import { useRouter } from "next/router";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+// import CONSTANTS from "../Constants.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import profilePic from "../assets/images/starter-pack.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import LoadingPrompt from "../components/LoadingPrompt";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
 export default function MintPack() {
   // Router
@@ -78,20 +95,39 @@ export default function MintPack() {
   const [isOnWhitelist, setIsOnWhitelist] = useState();
   const [isPresalePhase, setIsPresalePhase] = useState();
   const [isPublicSalePhase, setIsPublicSalePhase] = useState();
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      console.log("Please install MetaMask!");
+    }
+  }
+
   useEffect(() => {
-    // setHasMinted(true);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
+    if (window.ethereum) {
+      handleEthereum();
+      // setHasMinted(true);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const signer = provider.getSigner()
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      // const fetchData = async () => {
+      //   const currentAddress = await signer.getAddress()
+      //   setAddressPreview(currentAddress)
+      // }
+      // fetchData()
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
+<<<<<<< HEAD
       if (accounts.length > 0) {
         const accountAddress = await signer.getAddress();
         setSigner(signer);
@@ -114,25 +150,51 @@ export default function MintPack() {
     };
     setAccountData();
     provider.provider.on("accountsChanged", (accounts) => {
+=======
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setSigner(signer);
+          setConnectedAccount(accountAddress);
+          const { chainId } = await provider.getNetwork();
+          setCurrentChain(chainId);
+          setIsPolygon(chainId === 137);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+        setIsLoading(false);
+      };
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
-    provider.on("network", async (newNetwork, oldNetwork) => {
-      console.log("on");
-      // When a Provider makes its initial connection, it emits a "network"
-      // event with a null oldNetwork along with the newNetwork. So, if the
-      // oldNetwork exists, it represents a changing network
-      if (oldNetwork) {
-        console.log("changed network");
-        // window.location.reload();
-        // const { chainId } = await provider.getNetwork()
-        // setCurrentChain(chainId)
-        // setIsPolygon(chainId === 137)
-      }
-    });
+      provider.provider.on("accountsChanged", (accounts) => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+      provider.on("network", async (newNetwork, oldNetwork) => {
+        console.log("on");
+        // When a Provider makes its initial connection, it emits a "network"
+        // event with a null oldNetwork along with the newNetwork. So, if the
+        // oldNetwork exists, it represents a changing network
+        if (oldNetwork) {
+          console.log("changed network");
+          // window.location.reload();
+          // const { chainId } = await provider.getNetwork()
+          // setCurrentChain(chainId)
+          // setIsPolygon(chainId === 137)
+        }
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, [connectedAccount]);
 
   const checkUserChain = () => {
@@ -180,6 +242,8 @@ export default function MintPack() {
       // open sale start date in UTC
       const presaleEndDate = new Date("June 10, 2022 21:00:00");
       const presaleStartDate = new Date("June 10, 2022 00:00:00");
+      // const presaleEndDate = new Date("June 7, 2022 21:00:00");
+      // const presaleStartDate = new Date("June 7, 2022 00:00:00");
       const today = new Date();
       const isPresale =
         today.getTime() < presaleEndDate.getTime() &&
@@ -218,10 +282,14 @@ export default function MintPack() {
       console.log("no account connected");
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
   }, [isConnected]);
 =======
   }, [isConnected, connectedAccount]);
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+  }, [isConnected, connectedAccount]);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
   // useEffect(() => {
   //   console.log("user chain changed: ", currentChain)
@@ -246,10 +314,14 @@ export default function MintPack() {
     );
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     const mintTxn = await gameItemsContractWithSigner
 =======
     await gameItemsContractWithSigner
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+    await gameItemsContractWithSigner
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
       .mintStarterPack()
       .then((res) => {
         // console.log("txn result: " + JSON.stringify(res, null, 2));
@@ -257,10 +329,14 @@ export default function MintPack() {
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
 <<<<<<< HEAD
+<<<<<<< HEAD
         }, 60 * 5 * 1000);
 =======
         }, 20 * 1000);
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+        }, 20 * 1000);
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
         // console.log("Minting pack in progress...");
       })
@@ -275,6 +351,7 @@ export default function MintPack() {
         <LoadingPrompt loading={"Mint Page"} />
       ) : (
         <>
+          {isNoMetaMask && <MetaMaskRedirectInstructions />}
           {isConnected && !hasMinted && (
             <Box
               justifyContent="center"
@@ -324,9 +401,12 @@ export default function MintPack() {
                 }}
               >
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <Typography variant="h3" color="white" component="div">
                   Mint Starter Pack
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 <Typography
                   variant="h3"
                   color="white"
@@ -334,7 +414,10 @@ export default function MintPack() {
                   component="div"
                 >
                   Mint TeamDiff Starter Pack
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 </Typography>
                 {packsAvailable != null && (
                   <Typography variant="h6" color="white" component="div">
@@ -368,21 +451,30 @@ export default function MintPack() {
                     fontSize: 20,
                   }}
 <<<<<<< HEAD
+<<<<<<< HEAD
                 // disabled={!isPolygon}
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                   // disabled={!isPolygon}
                   disabled={
                     hasAlreadyMintedPack ||
                     (!isOnWhitelist && isPresalePhase) ||
                     !(isPresalePhase || isPublicSalePhase)
                   }
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 >
                   Mint
                 </Fab>
               </Box>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               <br></br>
               {isPresalePhase && (
                 <Typography
@@ -402,12 +494,16 @@ export default function MintPack() {
                   Presale starts at June 9th, 8:00 pm EST
                 </Typography>
               )}
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               <Box
                 justifyContent="center"
                 alignItems="center"
                 sx={{
                   display: "flex",
+<<<<<<< HEAD
 <<<<<<< HEAD
                   paddingTop: "20px",
                 }}
@@ -424,6 +520,8 @@ export default function MintPack() {
                   </Typography>
                 )}
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                   flexDirection: "column",
                   paddingTop: "20px",
                   textAlign: "center",
@@ -488,12 +586,18 @@ export default function MintPack() {
                       with minting.
                     </Typography>
                   )}
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
               </Box>
             </Container>
           )}
           {isMinting && (
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             <Box sx={{ marginTop: 5 }}>
               <LoadingPrompt
                 completeTitle={"Minting Pack in Progress"}
@@ -504,6 +608,7 @@ export default function MintPack() {
                 }
               />
             </Box>
+<<<<<<< HEAD
 =======
             <Container
               maxWidth="lg"
@@ -533,6 +638,8 @@ export default function MintPack() {
               </Box>
             </Container>
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
           )}
           {hasMinted && (
             <Container
@@ -568,6 +675,7 @@ export default function MintPack() {
                       color="white"
                       component="div"
 <<<<<<< HEAD
+<<<<<<< HEAD
                     >
                       Acquired Starter Pack!
                     </Typography>
@@ -583,6 +691,8 @@ export default function MintPack() {
                       }}
                     >
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                     >
                       Acquired Starter Pack!
                     </Typography>
@@ -597,7 +707,10 @@ export default function MintPack() {
                         justifyContent: "space-between",
                       }}
                     >
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                       <Box
                         sx={{
                           flex: 1,
@@ -687,6 +800,7 @@ export default function MintPack() {
               </Box>
             </Container>
           )}
+<<<<<<< HEAD
           {!isConnected && !hasMinted && !isMinting && (
 <<<<<<< HEAD
             <ConnectWalletPrompt accessing={"minting a pack"} />
@@ -695,6 +809,9 @@ export default function MintPack() {
             <Box>
               <Typography color="primary">
 =======
+=======
+          {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
             <Box>
               <ConnectWalletPrompt
                 accessing={"minting a TeamDiff Starter Pack"}
@@ -704,7 +821,10 @@ export default function MintPack() {
           {packsAvailable == 0 && (
             <Box>
               <Typography>
+<<<<<<< HEAD
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
                 Sorry, all packs have already been minted :(
               </Typography>
             </Box>

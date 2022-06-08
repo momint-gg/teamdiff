@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import "@fontsource/exo";
 import "../styles/globalStyles.css";
 import {
@@ -20,9 +21,11 @@ import Layout from "../components/Layout";
 import { useMediaQuery } from "react-responsive";
 import { Html } from "next/document";
 =======
+=======
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 import { ethers } from "ethers";
 import Head from "next/head";
-import React from "react";
+import { default as React } from "react";
 import { useMediaQuery } from "react-responsive";
 import { chain, createClient, defaultChains, Provider } from "wagmi";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
@@ -30,8 +33,12 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import Layout from "../components/Layout";
 import "../styles/globalStyles.css";
+<<<<<<< HEAD
 import theme from "../styles/theme";
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+import theme from "../styles/theme.js";
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
 
 // API key for Ethereum node
 const infuraId = process.env.INFURA_ID;
@@ -70,10 +77,14 @@ function MyApp({ Component, pageProps }) {
   });
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 <<<<<<< HEAD
+<<<<<<< HEAD
   const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
 =======
   // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
 >>>>>>> fdc5de6948a85e3c2a4a1f580a42519b29241625
+=======
+  const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
+>>>>>>> 7de5241516b0e35b8dc1ee588fe246d8ad8b9aad
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -102,8 +113,12 @@ function MyApp({ Component, pageProps }) {
               />
 
               <Head>
-                <title>Play TeamDiff</title>
-                <meta name="description" content="TeamDiff" />
+                <title>TeamDiff</title>
+                <meta name="description" content="On-chain Fantasy Esports" />
+                <meta
+                  property="og:image"
+                  content="../public/fav/favicon-32x32.png"
+                />
                 {/* <link rel="icon" href="/favicon.ico" /> */}
                 {/* Favicon */}
                 <link
