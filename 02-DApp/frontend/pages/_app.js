@@ -51,9 +51,13 @@ function MyApp({ Component, pageProps }) {
   });
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
 
   const client = createClient({

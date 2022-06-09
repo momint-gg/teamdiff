@@ -61,7 +61,7 @@ async function main() {
   
   //#3
   //const provider = new ethers.providers.getDefaultProvider();
-  // const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.ALCHEMY_KEY)
+  // const provider = new ethers.providers.AlchemyProvider("rinkeby", process.env.RINKEBY_ALCHEMY_KEY)
 
   // const LeagueProxyInstance = new ethers.Contract(
   //     leagueProxyContractAddress,

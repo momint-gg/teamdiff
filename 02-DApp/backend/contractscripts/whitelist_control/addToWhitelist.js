@@ -12,7 +12,7 @@ const main = async () => {
   // TODO: Change to matic
   const provider = new ethers.providers.AlchemyProvider(
     'rinkeby',
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);

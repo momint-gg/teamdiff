@@ -3,6 +3,7 @@
   "scripts": {
     "test-all": "mocha --exit --recursive",
     "deploy-rinkeby": "hardhat run scripts/deploy/deployAll.js --network rinkeby",
+    "deploy-polygon": "hardhat run scripts/deploy/deployAll.js --network polygon",
     "verify-rinkeby": "hardhat verify --network rinkeby"
   },
   "devDependencies": {

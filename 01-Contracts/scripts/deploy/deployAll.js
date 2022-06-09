@@ -11,12 +11,12 @@ const main = async () => {
   
   // Create GameItems Instance
   const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
-  // const gameContract = await gameContractFactory.deploy(...constructorArgs);
-  const gameContract = await gameContractFactory.deploy(...constructorArgs, {
-    //overriding gas bc transaction was stuck
-    // gasPrice: 10000000,
-    gasLimit: 30000000
-  });
+  const gameContract = await gameContractFactory.deploy(...constructorArgs);
+  // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
+  //   //overriding gas bc transaction was stuck
+  //   // gasPrice: 1000000000,
+  //   gasLimit: 20000000
+  // });
   await gameContract.deployed();
 
   textData += "exports.GameItems = \'" + gameContract.address + "\';\n";
@@ -31,23 +31,23 @@ const main = async () => {
   console.log("Added Trey2 to whitelist");
   gameContract.addUserToWhitelist("0x69EC014c15baF1C96620B6BA02A391aBaBB9C96b")
   await txn.wait();
-  console.log("Added Will to whitelist");
-  gameContract.addUserToWhitelist("0xbd478094c0D2511Ac5e8bD214637947149bC210f")
-  await txn.wait();
-  console.log("Added Katie to whitelist");
-  gameContract.addUserToWhitelist("0xC3aaa1a446ED0f2E1c9c0AcC89F47c46F30c8Bf3")
-  await txn.wait();
-  console.log("Added Reggie to whitelist");
-  gameContract.addUserToWhitelist("0x37D1431D5D423d66ad6F369EF1bB0767E71A8400")
-  await txn.wait();
-  console.log("Added Zach G to whitelist");
+  // console.log("Added Will to whitelist");
+  // gameContract.addUserToWhitelist("0xbd478094c0D2511Ac5e8bD214637947149bC210f")
+  // await txn.wait();
+  // console.log("Added Katie to whitelist");
+  // gameContract.addUserToWhitelist("0xC3aaa1a446ED0f2E1c9c0AcC89F47c46F30c8Bf3")
+  // await txn.wait();
+  // console.log("Added Reggie to whitelist");
+  // gameContract.addUserToWhitelist("0x37D1431D5D423d66ad6F369EF1bB0767E71A8400")
+  // await txn.wait();
+  // console.log("Added Zach G to whitelist");
   //Initial functions that need to be run
   console.log("First setting starting index...");
-  // txn = await gameContract.setStartingIndex();
-  txn = await gameContract.setStartingIndex({
-    gasLimit: 23000000,
-    gasPrice: 100000000
-  });
+  txn = await gameContract.setStartingIndex();
+  // txn = await gameContract.setStartingIndex({
+  //   gasLimit: 25000000,
+  //   gasPrice: 30000000000
+  // });
   await txn.wait();
   console.log("Now setting token URIs...");
   txn = await gameContract.setURIs();

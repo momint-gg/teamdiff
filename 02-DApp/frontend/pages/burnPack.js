@@ -32,9 +32,13 @@ function getAthleteImage(id) {
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   // Router
   const router = useRouter();
@@ -161,6 +165,7 @@ export default function BurnPack({ setDisplay }) {
         const today = new Date();
         const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
         setIsPreRevealPhase(isBeforeRevealDate);
+        console.log("isPreveal: " + isBeforeRevealDate);
       };
       fetchData();
 
