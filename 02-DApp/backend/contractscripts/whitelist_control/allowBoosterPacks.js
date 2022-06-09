@@ -1,4 +1,5 @@
-// Opening up the private sale for everyone (to be run on 6/9)
+// Allowing booster packs to be opened (to be run on TBD)
+
 require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const { GameItems } = require('../contract_info/contractAddresses');

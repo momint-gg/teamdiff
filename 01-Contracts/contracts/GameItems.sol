@@ -100,6 +100,7 @@ contract GameItems is ERC1155, Ownable {
         MAX_STARTER_PACK_BALANCE = params._maxStarterPackBalance;
         MAX_BOOSTER_PACK_BALANCE = params._maxBoosterPackBalance;
         MAX_PACKS = params._maxPacks;
+        MAX_BOOSTER_PACKS = 500; //
         athleteURI = _athleteURI;
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
@@ -271,6 +272,10 @@ contract GameItems is ERC1155, Ownable {
         require(
             boosterPacksMinted < MAX_BOOSTER_PACKS, // TODO: Set MAX_BOOSTER_PACKS Value in constructor
             "All booster packs have already been minted!"
+        );
+        require(
+            userToHasMintedStarterPack[msg.sender],
+            "You must have minted a starter pack to mint a booster pack."
         );
         require(
             usersBoosterPacksMinted[msg.sender] <= 2,

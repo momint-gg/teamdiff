@@ -1,4 +1,5 @@
 // Opening up the private sale for everyone (to be run on 6/9)
+
 require('dotenv').config({ path: '../.env' });
 const { ethers } = require('ethers');
 const { GameItems } = require('../contract_info/contractAddresses');
