@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import cardAndPack from "../assets/images/card_and_pack.png";
 import bootstrap from "../styles/sass/custom_bootstrap.module.scss";
 import styles from "../styles/sass/home_styles.module.scss";
@@ -64,7 +63,7 @@ export default function Homepage() {
                   bootstrap["d-md-inline"],
                 ].join(" ")}
               >
-                <Link href="/mintHome">
+                {/* <Link href="/mintHome">
                   <button
                     className={[
                       bootstrap.btn,
@@ -77,7 +76,7 @@ export default function Homepage() {
                   >
                     Mint Starter Pack
                   </button>
-                </Link>
+                </Link> */}
               </div>
             </div>
             <div
@@ -101,7 +100,7 @@ export default function Homepage() {
                 bootstrap["text-center"],
               ].join(" ")}
             >
-              <Link href="/mintHome">
+              {/* <Link href="/mintHome">
                 <button
                   className={[
                     bootstrap.btn,
@@ -114,7 +113,7 @@ export default function Homepage() {
                 >
                   Mint Starter Pack
                 </button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
@@ -281,7 +280,7 @@ export default function Homepage() {
                 Open the pack (which will burn it in the process) to unlock five
                 athletes and begin to build your collection!
               </p>
-              <Link href="/burnPack">
+              {/* <Link href="/burnPack">
                 <button
                   className={[
                     bootstrap.btn,
@@ -295,7 +294,7 @@ export default function Homepage() {
                 >
                   Coming Very Soon
                 </button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>

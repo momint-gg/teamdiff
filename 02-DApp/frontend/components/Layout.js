@@ -8,11 +8,12 @@ import Footer from "./Footer";
 import NavLink from "./NavLink";
 
 const Layout = ({ children, isMobile }) => {
-  const pages = [
-    { name: "MY COLLECTION", href: "/collection" },
-    { name: "MINT", href: "/mintHome" },
-    { name: "OPEN", href: "/burnPack" },
-  ];
+  // const pages = [
+  //   { name: "MY COLLECTION", href: "/collection" },
+  //   { name: "MINT", href: "/mintHome" },
+  //   { name: "OPEN", href: "/burnPack" },
+  // ];
+  const pages = [];
 
   return (
     // <>
