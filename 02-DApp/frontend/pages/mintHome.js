@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.css";
-import { Container, Box, Typography, Button, Paper, Fab } from "@mui/material";
+import { Container, Box, Typography, Button, Paper, Fab, Link } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
 import card_and_pack from "../assets/images/card_and_pack.png";
@@ -100,6 +100,25 @@ export default function MintHome() {
                       >
                         CONTENTS
                       </Fab>
+                      <Box sx={{ marginTop: 3 }}>
+                        <Typography variant="h6" color="primary" component="div">
+                          Don't know how to mint? Check out this
+                          <Link sx={{ marginLeft: 1 }}>
+                            <a target="_blank" href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64">
+                              guide
+                            </a>
+                          </Link>!
+                        </Typography>
+                      </Box>
+                      <Fab
+                        variant="extended"
+                        size="medium"
+                        aria-label="add"
+                        onClick={() => router.push("./terms-of-service")}
+                        sx={{ backgroundColor: "#c9c9c9", marginTop: 2, fontSize: 18 }}
+                      >
+                        Mint Terms of Service
+                      </Fab>
                     </Box>
                   </Box>
                 </Box>
@@ -135,7 +154,7 @@ export default function MintHome() {
                     aria-label="add"
                     onClick={() => router.push("./mintPack")}
                     sx={{
-                      marginTop: 5,
+                      marginTop: 3,
                       marginRight: 3,
                       background:
                         "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
@@ -153,9 +172,28 @@ export default function MintHome() {
                     color="white"
                     aria-label="add"
                     onClick={() => router.push("./starterPackContents")}
-                    sx={{ marginTop: 5, fontSize: 20 }}
+                    sx={{ marginTop: 3, fontSize: 20 }}
                   >
                     CONTENTS
+                  </Fab>
+                  <Box sx={{ marginTop: 3 }}>
+                    <Typography variant="h6" color="primary" component="div">
+                      Don't know how to mint? Check out this
+                      <Link sx={{ marginLeft: 1 }}>
+                        <a target="_blank" href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64">
+                          guide
+                        </a>
+                      </Link>!
+                    </Typography>
+                  </Box>
+                  <Fab
+                    variant="extended"
+                    size="medium"
+                    aria-label="add"
+                    onClick={() => router.push("./terms-of-service")}
+                    sx={{ backgroundColor: "#c9c9c9", marginTop: 2, fontSize: 18 }}
+                  >
+                    Mint Terms of Service
                   </Fab>
                 </Box>
               </Container>
