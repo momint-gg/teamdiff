@@ -1,4 +1,8 @@
 {
   "_format": "hh-sol-dbg-1",
+<<<<<<< HEAD
   "buildInfo": "../../build-info/0d85f4b0d915a70e4699401a73179ac4.json"
+=======
+  "buildInfo": "../../build-info/200dd4b5860d0bf7f8cf160de5743e2f.json"
+>>>>>>> 2585085... Testing, added a require to booster packs
 }
