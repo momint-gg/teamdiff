@@ -10,9 +10,10 @@ const web3 = require('web3');
 const main = async () => {
   // Constructing our contract
   // TODO: Change to matic
+  // console.log('Game items address is ', GameItems);
   const provider = new ethers.providers.AlchemyProvider(
     'rinkeby',
-    process.env.RINKEBY_ALCHEMY_KEY
+    process.env.ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);
@@ -35,13 +36,28 @@ const main = async () => {
   // Adding to WL array
   const firstAddy = '0x37D1431D5D423d66ad6F369EF1bB0767E71A8400';
   whitelist.push(firstAddy);
+
   for (let i = 0; i < data.length; i++) {
     if (data[i][firstAddy].length > 0) whitelist.push(data[i][firstAddy]);
   }
   console.log(whitelist);
 
   // Adding users to whitelist
-  let txn = await contract.addUsersToWhitelist([...whitelist]);
+  let txn = await contract.addUsersToWhitelist(whitelist.slice(0, 500));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(500, 1000));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(1000, 1500));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(1500, 2000));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(2000, 2500));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(2500, 3000));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(3000, 3500));
+  await txn.wait();
+  txn = await contract.addUsersToWhitelist(whitelist.slice(3500, data.length));
   await txn.wait();
 
   // Checking length of whitelist
