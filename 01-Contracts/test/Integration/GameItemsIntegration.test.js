@@ -1,4 +1,5 @@
 // Testing our GameItems functionality
+// (Should run on hardhat for expects to work)
 
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
@@ -84,7 +85,11 @@ describe("Testing whitelist for GameItems", async () => {
     let txn = await GameItem.connect(owner).allowBoosterPacks();
     await txn.wait();
     // Minting a booster pack
-
+    txn = await GameItem.connect(owner).mintBoosterPack();
+    await txn.wait();
     // Making sure invalid people can't mint em (need to have minted a starter pack)
+    expect(GameItem.connect(addr1).mintBoosterPack()).to.be.revertedWith(
+      "You must have minted a starter pack to mint a booster pack."
+    );
   });
 });

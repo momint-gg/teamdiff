@@ -15,7 +15,6 @@ import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 
-
 export default function MintPack() {
   // Router
   const router = useRouter();
@@ -319,42 +318,40 @@ export default function MintPack() {
                 )}
               </Box>
               {isPolygon && (
-              <Box
-                justifyContent="center"
-                alignItems="center"
-                sx={{
-                  display: "flex",
-                  paddingTop: "20px",
-                }}
-              >
-                <Fab
-                  variant="extended"
-                  size="large"
-                  aria-label="add"
-                  onClick={mintStarterPack}
-                  // onClick={() => setDisplayMint(true)}
+                <Box
+                  justifyContent="center"
+                  alignItems="center"
                   sx={{
-                    marginRight: 1,
-                    background:
-                      "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                    color: "white",
-                    fontSize: 20,
-                    paddingRight: 8,
-                    paddingLeft: 8
+                    display: "flex",
+                    paddingTop: "20px",
                   }}
-<<<<<<< HEAD
-                  // disabled={!isPolygon}
-                  disabled={
-                    hasAlreadyMintedPack ||
-                    (!isOnWhitelist && isPresalePhase) ||
-                    !(isPresalePhase || isPublicSalePhase)
-                  }
-=======
->>>>>>> master
                 >
-                  Mint
-                </Fab>
-              </Box>
+                  <Fab
+                    variant="extended"
+                    size="large"
+                    aria-label="add"
+                    onClick={mintStarterPack}
+                    // onClick={() => setDisplayMint(true)}
+                    sx={{
+                      marginRight: 1,
+                      background:
+                        "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                      color: "white",
+                      fontSize: 20,
+                      paddingRight: 8,
+                      paddingLeft: 8,
+                    }}
+                    // disabled={!isPolygon}
+                    disabled={
+                      hasAlreadyMintedPack ||
+                      (!isOnWhitelist && isPresalePhase) ||
+                      !(isPresalePhase || isPublicSalePhase)
+                    }
+                  >
+                    Mint
+                  </Fab>
+                </Box>
+              )}
               <br></br>
               {isPresalePhase && (
                 <Typography
@@ -484,7 +481,7 @@ export default function MintPack() {
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
-                      marginBottom: "2rem"
+                      marginBottom: "2rem",
                     }}
                   >
                     <Typography
@@ -495,39 +492,45 @@ export default function MintPack() {
                     >
                       Acquired Starter Pack!
                     </Typography>
-                    {!isMobile && <CheckCircleIcon fontSize="large" sx={{ color: "#13db13" }} />}
-                  </Box>
-                  {isMobile && <Box
-                    justifyContent="center"
-                    alignItems="center"
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      marginBottom: 4,
-                      "& > :not(style)": {
-                        m: 1,
-                        width: 260,
-                        height: 330,
-                      },
-                    }}
-                  >
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        filter: "blur(35px)",
-                      }}
-                    />
-                    <Container sx={{ position: "absolute" }}>
-                      <Image
-                        src={profilePic}
-                        alt="TeamDiff Pack"
-                        position="absolute"
+                    {!isMobile && (
+                      <CheckCircleIcon
+                        fontSize="large"
+                        sx={{ color: "#13db13" }}
                       />
-                    </Container>
+                    )}
                   </Box>
-                  }
+                  {isMobile && (
+                    <Box
+                      justifyContent="center"
+                      alignItems="center"
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        marginBottom: 4,
+                        "& > :not(style)": {
+                          m: 1,
+                          width: 260,
+                          height: 330,
+                        },
+                      }}
+                    >
+                      <Paper
+                        elevation={0}
+                        style={{
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                          filter: "blur(35px)",
+                        }}
+                      />
+                      <Container sx={{ position: "absolute" }}>
+                        <Image
+                          src={profilePic}
+                          alt="TeamDiff Pack"
+                          position="absolute"
+                        />
+                      </Container>
+                    </Box>
+                  )}
                   <Box>
                     <Box
                       sx={{
@@ -542,16 +545,26 @@ export default function MintPack() {
                           flex: 1,
                           marginRight: 3,
                           textAlign: "center",
-                          marginBottom: isMobile ? "1rem" : "0"
+                          marginBottom: isMobile ? "1rem" : "0",
                         }}
                       >
-                        <Typography color="primary" variant="h5"> Pack #</Typography>
-                        <Typography variant="h5" color="secondary" sx={{ fontWeight: "bold" }}> {100 - packsAvailable} </Typography>
+                        <Typography color="primary" variant="h5">
+                          {" "}
+                          Pack #
+                        </Typography>
+                        <Typography
+                          variant="h5"
+                          color="secondary"
+                          sx={{ fontWeight: "bold" }}
+                        >
+                          {" "}
+                          {100 - packsAvailable}{" "}
+                        </Typography>
                       </Box>
                       <Box
                         sx={{
                           flex: 3,
-                          textAlign: "center"
+                          textAlign: "center",
                         }}
                       >
                         <Link
@@ -576,9 +589,7 @@ export default function MintPack() {
                               width="30rem"
                               height="30rem"
                             />
-                            <Box sx={{ marginLeft: 1 }}>
-                              View on OpenSea
-                            </Box>
+                            <Box sx={{ marginLeft: 1 }}>View on OpenSea</Box>
                           </Fab>
                         </Link>
                       </Box>
@@ -614,38 +625,39 @@ export default function MintPack() {
                     </Fab>
                   </Box>
                 </Box>
-                {!isMobile && <Box
-                  justifyContent="center"
-                  alignItems="center"
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    marginLeft: 5,
-                    marginTop: 2,
-                    "& > :not(style)": {
-                      m: 1,
-                      width: 260,
-                      height: 320,
-                    },
-                  }}
-                >
-                  <Paper
-                    elevation={0}
-                    style={{
-                      background:
-                        "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                      filter: "blur(35px)",
+                {!isMobile && (
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      marginLeft: 5,
+                      marginTop: 2,
+                      "& > :not(style)": {
+                        m: 1,
+                        width: 260,
+                        height: 320,
+                      },
                     }}
-                  />
-                  <Container sx={{ position: "absolute" }}>
-                    <Image
-                      src={profilePic}
-                      alt="TeamDiff Pack"
-                      position="absolute"
+                  >
+                    <Paper
+                      elevation={0}
+                      style={{
+                        background:
+                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                        filter: "blur(35px)",
+                      }}
                     />
-                  </Container>
-                </Box>
-                }
+                    <Container sx={{ position: "absolute" }}>
+                      <Image
+                        src={profilePic}
+                        alt="TeamDiff Pack"
+                        position="absolute"
+                      />
+                    </Container>
+                  </Box>
+                )}
               </Box>
             </Container>
           )}
