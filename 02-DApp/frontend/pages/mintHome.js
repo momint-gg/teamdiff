@@ -84,16 +84,70 @@ export default function MintHome() {
                   sx={{
                     flex: 1,
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "space-evenly",
+                    textAlign: "center"
                   }}
                 >
-                  <Image
-                    src={cardandpack}
-                    alt="Picture of the author"
-                    width="550px"
-                    height="550px"
-                  />
+                  <Box
+                    sx={{
+                      flex: 2,
+                    }}
+                  >
+                    <Typography variant="h4" color="white" component="div">
+                      Starter Pack
+                    </Typography>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Image
+                        src={card_and_pack}
+                        alt="Picture of the author"
+                        width="550px"
+                        height="550px"
+                      />
+                    </Box>
+                    <Typography color="white" component="div">
+                      Mint a starter pack and get 5 unique athlete NFTs, which
+                      allow you to build a roster and get right into the action.
+                    </Typography>
+                    <Box>
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        aria-label="add"
+                        onClick={() => router.push("./mintPack")}
+                        sx={{
+                          marginTop: 5,
+                          marginRight: 1,
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                          color: "white",
+                          fontSize: 20,
+                          paddingRight: 6,
+                          paddingLeft: 6
+                        }}
+                      >
+                        Mint
+                      </Fab>
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        color="white"
+                        aria-label="add"
+                        onClick={() => router.push("./starterPackContents")}
+                        sx={{ marginTop: 3, fontSize: 20 }}
+                      >
+                        CONTENTS
+                      </Fab>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </Container>
@@ -110,6 +164,9 @@ export default function MintHome() {
               sx={{
                 display: "flex",
                 alignItems: "center",
+                flexDirection: "row",
+                alignContent: "space-between",
+                textAlign: "center"
               }}
             >
               <Box>
@@ -167,6 +224,46 @@ export default function MintHome() {
                   alignItems: "center",
                 }}
               >
+                <Box>
+                  <Typography variant="h3" color="white" component="div" sx={{ marginBottom: 3 }}>
+                    Starter Pack
+                  </Typography>
+                  <Typography variant="h6" color="white" component="div">
+                    Mint a starter pack and get 5 unique athlete NFTs, which
+                    allow you to build a roster and get right into the action.
+                  </Typography>
+                  {/*TODO: Only show this mint button if user is logged in*/}
+                  <Fab
+                    variant="extended"
+                    size="large"
+                    aria-label="add"
+                    onClick={() => router.push("./mintPack")}
+                    sx={{
+                      marginTop: 5,
+                      marginRight: 3,
+                      background:
+                        "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                      color: "white",
+                      fontSize: 20,
+                      paddingRight: 6,
+                      paddingLeft: 6
+                    }}
+                  >
+                    Mint
+                  </Fab>
+                  <Fab
+                    variant="extended"
+                    size="large"
+                    color="white"
+                    aria-label="add"
+                    onClick={() => router.push("./starterPackContents")}
+                    sx={{ marginTop: 5, fontSize: 20 }}
+                  >
+                    CONTENTS
+                  </Fab>
+                </Box>
+              </Container>
+              {isMobile ? (
                 <Box>
                   <Image
                     src={cardandpack}
