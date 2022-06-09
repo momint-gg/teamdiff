@@ -16,7 +16,7 @@ import Image from "next/image";
 import LoadingPrompt from "../components/LoadingPrompt";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-// import AthleteCard from "../components/AthleteCard";
+import OpenSea from "../assets/images/opensea.png"
 
 import {
   Link,
@@ -32,10 +32,16 @@ import {
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
-import AthleteCard from "../components/AthleteCard";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
-import profilePic from "../assets/images/starter-pack.png";
+import cardImage from "../assets/images/mystery_card.png";
 import constants from "../Constants";
+import { useMediaQuery } from "react-responsive";
+import AthletesToIndex from "../constants/AlthletesToIndex.json"
+
+function getAthleteImage(id) {
+  const athleteName = AthletesToIndex[id];
+  return `/cards/${athleteName}.png`
+}
 
 export default function BurnPack({ setDisplay }) {
   //TODO change to matic network for prod
@@ -45,6 +51,7 @@ export default function BurnPack({ setDisplay }) {
   );
   //Router
   const router = useRouter();
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   //State Hooks
   const [mintedPackId, setMintedPackId] = useState(null);
@@ -237,10 +244,11 @@ export default function BurnPack({ setDisplay }) {
                 sx={{
                   display: "flex",
                   flexWrap: "wrap",
+                  marginTop: 4,
                   "& > :not(style)": {
                     m: 1,
                     width: 260,
-                    height: 350,
+                    height: 300,
                   },
                 }}
               >
@@ -254,10 +262,8 @@ export default function BurnPack({ setDisplay }) {
                 />
                 <Container sx={{ position: "absolute" }}>
                   <Image
-                    src={profilePic}
+                    src={cardImage}
                     alt="Picture of the author"
-                    // width="310px"
-                    // height="450px"
                     position="absolute"
                   />
                 </Container>
@@ -270,6 +276,8 @@ export default function BurnPack({ setDisplay }) {
                     flexDirection="column"
                     sx={{
                       display: "flex",
+                      textAlign: "center",
+                      marginTop: 4
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
@@ -299,9 +307,11 @@ export default function BurnPack({ setDisplay }) {
                           "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                         color: "white",
                         fontSize: 20,
+                        paddingRight: 6,
+                        paddingLeft: 6
                       }}
                     >
-                      Burn
+                      Open
                     </Fab>
                   </Box>
                 </>
@@ -337,14 +347,16 @@ export default function BurnPack({ setDisplay }) {
             </Container>
           )}
           {isMinting && (
-            <LoadingPrompt
-              completeTitle={"Opening Pack..."}
-              bottomText={
-                isTransactionDelayed && isMinting
-                  ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
-                  : ""
-              }
-            />
+            <Box sx={{ marginTop: 5 }}>
+              <LoadingPrompt
+                completeTitle={"Opening Pack..."}
+                bottomText={
+                  isTransactionDelayed && isMinting
+                    ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+                    : ""
+                }
+              />
+            </Box>
           )}
           {hasMinted && (
             <>
@@ -353,6 +365,7 @@ export default function BurnPack({ setDisplay }) {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  textAlign: "center",
                 }}
               >
                 <Box
@@ -361,6 +374,7 @@ export default function BurnPack({ setDisplay }) {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-evenly",
+
                   }}
                 >
                   <Box
@@ -373,92 +387,63 @@ export default function BurnPack({ setDisplay }) {
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "flex-start",
+                        justifyContent: "center",
                       }}
                     >
                       <Typography
                         sx={{ marginRight: 2 }}
-                        variant="h4"
+                        variant="h3"
                         color="white"
                         component="div"
                       >
                         Acquired 5 TeamDiff Athletes!
                       </Typography>
-                      <CheckCircleIcon color="secondary"></CheckCircleIcon>
+                      {!isMobile && <CheckCircleIcon fontSize="large" sx={{ color: "#13db13" }} />}
                     </Box>
-                    <br></br>
-                    <Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        {mintedIndices?.map((index) => (
-                          <Link
-                            href={
-                              "https://testnets.opensea.io/assets/" +
-                              gameItemsContract.address +
-                              "/" +
-                              index
-                            }
-                            // href=""
-                            target="_blank"
-                          >
-                            <Paper
-                              elevation={5}
-                              sx={{
-                                background:
-                                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                                flex: 1,
-                                marginRight: 3,
-                                padding: 2,
-                              }}
-                            >
-                              <Typography variant="h5">
-                                {"Athlete #" + index}
-                              </Typography>
-                            </Paper>
-                          </Link>
-                        ))}
-
-                        {/* {athleteNFTs?.map((athlete) => (
-                   <Box
-                    sx={{
-                      flex: 1,
-                      marginRight: 3
-                    }}
-                  >
-                    <Typography variant="h5"> 
-                      {"Athlete #" + parseInt(athlete.id.tokenId) + ": " + athlete.metadata.name}
-                    </Typography>
-                    {/* <AthleteCard
-                      athleteData={athlete}
-                      // setAthlete={setCurrAthlete}
-                      // setModalOpen={setModalOpen}
-                    /> }
-                    <a
-                      href={
-                        "https://testnets.opensea.io/assets/" +
-                        gameItemsContract.address +
-                        "/" +
-                        parseInt(athlete.id.tokenId)
-                      }
-                      target="_blank"
-                      // href=""
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: 2,
+                        marginBottom: 5,
+                      }}
                     >
-                      {"View on OpenSea."}
-                    </a>
-                 </Box>
-                 
-                  
-                ))} */}
-                      </Box>
-                      <hr></hr>
-                      <Typography variant="h6">
+                      <Typography variant="h4" sx={{ color: "#cdcdcd", marginRight: 1 }}>
                         Click any card to view on OpenSea
                       </Typography>
+                      {!isMobile && <Image
+                        src={OpenSea}
+                        alt={"opensea"}
+                        width="30rem"
+                        height="30rem"
+                      />}
+                    </Box>
+                    <Box>
+                      <Grid container spacing={6}>
+                        {mintedIndices?.map((index) => (
+                          <Grid item xs={isMobile ? 12 : 4}>
+                            <Link
+                              href={
+                                "https://testnets.opensea.io/assets/" +
+                                gameItemsContract.address +
+                                "/" +
+                                index
+                              }
+                              target="_blank"
+                            >
+                              <img
+                                src={getAthleteImage(index)}
+                                alt={"image"}
+                                loading="lazy"
+                                width="300px"
+                                style={{ filter: "drop-shadow(0 0 0.75rem crimson)" }}
+                              />
+                            </Link>
+                          </Grid>
+                        ))}
+                      </Grid>
                     </Box>
                     <Fab
                       variant="extended"
@@ -467,12 +452,12 @@ export default function BurnPack({ setDisplay }) {
                       aria-label="add"
                       //  target={"_blank"}
                       onClick={() => router.push("./collection")}
-                      sx={{ marginTop: 5, fontSize: 20 }}
+                      sx={{ marginTop: 5, fontSize: 20, paddingRight: 5, paddingLeft: 5 }}
                     >
                       Go To My Collection
                     </Fab>
                   </Box>
-                  <Box
+                  {/* <Box
                     sx={{
                       flex: 2,
                       display: "flex",
@@ -481,14 +466,14 @@ export default function BurnPack({ setDisplay }) {
                     }}
                   >
                     <Image
-                      src={profilePic}
+                      src={cardImage}
                       alt="Picture of the author"
                       // height="100%"
                       // width="auto"
                       width="155px"
                       height="225px"
                     />
-                  </Box>
+                  </Box> */}
                 </Box>
               </Container>
               {/* <Box
@@ -505,7 +490,8 @@ export default function BurnPack({ setDisplay }) {
             <ConnectWalletPrompt accessing={"opening a pack"} />
           )}
         </>
-      )}
-    </Box>
+      )
+      }
+    </Box >
   );
 }
