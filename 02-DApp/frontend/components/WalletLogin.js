@@ -128,8 +128,8 @@ export default function WalletLogin({ isMobile }) {
                   variant="outlined"
                   color="secondary"
                   onClick={() => {
-                    disconnect();
-                    handleModalClose();
+                    setMenu(false);
+                    setIsConnected(false);
                   }}
                   sx={{ flexBasis: "100%", borderRadius: "40px" }}
                 >
