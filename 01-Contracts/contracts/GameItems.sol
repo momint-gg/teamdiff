@@ -193,6 +193,7 @@ contract GameItems is ERC1155, Ownable {
     /*****************************************************/
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
     function mintStarterPack() public {
+        require(isPresalePhase || isPublicSalePhase, "Private sale hasn't opened yet.")
         if (isPresalePhase && !isPublicSalePhase) {
             require(whitelist[msg.sender], "User is not whitelisted.");
         }
