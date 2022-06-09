@@ -15,5 +15,5 @@ module.exports = [
   // Note: You should run the whitelist test to see if these URIs work correctly in mint flow
   "https://gateway.pinata.cloud/ipfs/QmaP39XjaR4YKniP8vnyGRdiKc3DcZ1PLqjqHDx5mc6dqN/", // athleteURI (pinata url)
   "https://gateway.pinata.cloud/ipfs/QmXgkKXsTyW9QJCHWsgrt2BW7p5csfFE21eWtmbd5Gzbjr/", // starterPackURI (pinata url)
-  "https://gateway.pinata.cloud/ipfs/Qmbj4XMB7Ryz6GXEEWWEH3MnzufFDdd42japaMbKdgoaQx/", // boosterPackURI (pinata url)
+  "https://gateway.pinata.cloud/ipfs/Qmd3dRVFD1HA7Tjj8BSypoQFL7qfgmVUCZkzQ7yaqPFwHy/", // boosterPackURI (pinata url)
 ];
