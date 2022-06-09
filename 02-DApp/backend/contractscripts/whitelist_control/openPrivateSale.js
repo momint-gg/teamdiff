@@ -8,11 +8,14 @@ const GameItemsJSON = require('../contract_info/abis/GameItems.json');
 const main = async () => {
   // Constructing our contract
   const provider = new ethers.providers.AlchemyProvider(
-    'rinkeby',
-    process.env.ALCHEMY_KEY
+    'matic',
+    process.env.MATIC_KEY
   );
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);
+
+  let txn = await contract.openPrivateSale();
+  await txn.wait();
 };
 
 const runMain = async () => {

@@ -14,7 +14,7 @@ const main = async () => {
   const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);
 
-  let txn = await contract.openPublicSale();
+  let txn = await contract.allowBoosterPacks();
   await txn.wait();
 };
 
