@@ -56,7 +56,10 @@ describe("Testing whitelist for GameItems", async () => {
     ).to.be.revertedWith("Private sale hasn't opened yet.");
   });
 
-  it("Shouldn't let a non whitelisted user mint in the private sale phase", async () => {});
+  it("Shouldn't let a non whitelisted user mint in the private sale phase", async () => {
+    let txn = await GameItem.openPrivateSale();
+    await txn.wait();
+  });
 
   it("Should let anyone mint after the private sale phase", async () => {});
 

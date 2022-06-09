@@ -57,6 +57,10 @@ module.exports = {
       // gas: 2100000, // fixing cannot estimate gas error in League test
       // gasPrice: 8000000000,
     },
+    matic: {
+      url: process.env.MATIC_KEY,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     // localhost: {
     //   url: "http://127.0.0.1:8545"
     // },
