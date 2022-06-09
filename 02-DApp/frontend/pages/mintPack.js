@@ -273,6 +273,7 @@ export default function MintPack() {
                   </Typography>
                 )}
               </Box>
+              {isPolygon && (
               <Box
                 justifyContent="center"
                 alignItems="center"
@@ -294,11 +295,11 @@ export default function MintPack() {
                     color: "white",
                     fontSize: 20,
                   }}
-                // disabled={!isPolygon}
                 >
                   Mint
                 </Fab>
               </Box>
+              )}
               <Box
                 justifyContent="center"
                 alignItems="center"
