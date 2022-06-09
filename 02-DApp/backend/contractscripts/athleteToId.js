@@ -3,16 +3,16 @@
 
 const athletes = [
   // What order they should be fin
-  'Berserker', // id = 0, Neo's id = 1, etc...
+  'Berserker',
   'Neo',
   'Johnsun',
   'FBI',
   'Danny',
   'Hans sama',
   'Tactical',
-  'Arrow',
-  'Luger',
   'Lost',
+  'Luger',
+  'Stixxay',
   'Blaber',
   'River',
   'Josedeodo',
@@ -64,5 +64,7 @@ for (let i = 0; i < athletes.length; i++) {
   athleteToIdObject[athletes[i]] = i;
   // console.log(athleteToIdObject[athletes[i]]);
 }
+
+console.log('athleteToIds = ', athleteToIdObject);
 
 module.exports = athleteToIdObject;

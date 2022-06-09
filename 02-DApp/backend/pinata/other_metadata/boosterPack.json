@@ -1,1 +1,6 @@
-{}
+{
+  "name": "TeamDiff Booster Pack",
+  "description": "Three starting athletes in NA LCS for TeamDiff.",
+  "image": "",
+  "attributes": [{ "trait_type": "Generation", "value": "First Edition" }]
+}
