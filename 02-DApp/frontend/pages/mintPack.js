@@ -209,12 +209,12 @@ export default function MintPack() {
               sx={{
                 display: "flex",
                 flexWrap: "wrap",
-                marginBottom: 1,
+                marginBottom: 4,
                 marginTop: 4,
                 "& > :not(style)": {
                   m: 1,
                   width: 260,
-                  height: 350,
+                  height: 320,
                 },
               }}
             >
@@ -226,7 +226,7 @@ export default function MintPack() {
                   filter: "blur(35px)",
                 }}
               />
-              <Container sx={{ position: "absolute", bottom: isMobile ? "325px" : "200px" }}>
+              <Container sx={{ position: "absolute" }}>
                 <Image
                   src={profilePic}
                   alt="Picture of the author"
@@ -247,6 +247,7 @@ export default function MintPack() {
                 flexDirection="column"
                 sx={{
                   display: "flex",
+                  textAlign: "center",
                 }}
               >
                 <Typography variant="h3" color="white" component="div">
@@ -370,11 +371,11 @@ export default function MintPack() {
                     sx={{
                       display: "flex",
                       flexWrap: "wrap",
-                      marginBottom: 2,
+                      marginBottom: 4,
                       "& > :not(style)": {
                         m: 1,
                         width: 260,
-                        height: 350,
+                        height: 330,
                       },
                     }}
                   >
@@ -386,7 +387,7 @@ export default function MintPack() {
                         filter: "blur(35px)",
                       }}
                     />
-                    <Container sx={{ position: "absolute", bottom: "220px" }}>
+                    <Container sx={{ position: "absolute" }}>
                       <Image
                         src={profilePic}
                         alt="TeamDiff Pack"
@@ -492,7 +493,7 @@ export default function MintPack() {
                     "& > :not(style)": {
                       m: 1,
                       width: 260,
-                      height: 350,
+                      height: 320,
                     },
                   }}
                 >
@@ -504,7 +505,7 @@ export default function MintPack() {
                       filter: "blur(35px)",
                     }}
                   />
-                  <Container sx={{ position: "absolute", bottom: "200px" }}>
+                  <Container sx={{ position: "absolute" }}>
                     <Image
                       src={profilePic}
                       alt="TeamDiff Pack"
