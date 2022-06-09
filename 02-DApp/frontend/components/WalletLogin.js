@@ -115,7 +115,7 @@ export default function WalletLogin({ isMobile }) {
                 sx={{ height: 40, fontSize: 18 }}
               />
             )}
-            {/* {menu ? (
+            {menu ? (
               <Box
                 sx={{
                   position: "absolute",
@@ -136,7 +136,7 @@ export default function WalletLogin({ isMobile }) {
                   DISCONNECT
                 </Button>
               </Box>
-            ) : null} */}
+            ) : null}
           </Box>
         </ClickAwayListener>
       ) : (
