@@ -2,6 +2,7 @@
   "_format": "hh-sol-dbg-1",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "buildInfo": "..\\..\\build-info\\85cef2b5488280c1c20df865e7153df1.json"
 =======
 <<<<<<< HEAD
@@ -13,4 +14,7 @@
 =======
   "buildInfo": "../../build-info/daa5267c7b32083722dbf1aafeb8e18a.json"
 >>>>>>> c69430e... GameItems tests added
+=======
+  "buildInfo": "../../build-info/36e8e2f404c137a049dfc9b43addcb4d.json"
+>>>>>>> d27b919... debugging WL
 }

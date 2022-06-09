@@ -45,9 +45,9 @@ describe("Testing whitelist for GameItems", async () => {
   });
 
   it("Shouldn't let anyone mint pre sale", async () => {
-    expect(
-      GameItem.connect(owner.address).mintStarterPack()
-    ).to.be.revertedWith("Private sale hasn't opened yet.");
+    expect(GameItem.connect(owner).mintStarterPack()).to.be.revertedWith(
+      "Private sale hasn't opened yet."
+    );
   });
 
   it("Let's a user mint now.. Shouldn't let a non whitelisted user mint in the private sale phase", async () => {
@@ -61,7 +61,7 @@ describe("Testing whitelist for GameItems", async () => {
     await txn.wait();
     // Non whitelisted users can't mint packs yet
     expect(GameItem.connect(addr1).mintStarterPack()).to.be.revertedWith(
-      "User is not whitelistedd."
+      "User is not whitelisted."
     );
   });
 
@@ -87,9 +87,11 @@ describe("Testing whitelist for GameItems", async () => {
     // Minting a booster pack
     txn = await GameItem.connect(owner).mintBoosterPack();
     await txn.wait();
+
     // Making sure invalid people can't mint em (need to have minted a starter pack)
-    expect(GameItem.connect(addr1).mintBoosterPack()).to.be.revertedWith(
-      "You must have minted a starter pack to mint a booster pack."
-    );
+    // Actually deleting the below.. anyone can mint a booster pack!
+    // expect(GameItem.connect(addr1).mintBoosterPack()).to.be.revertedWith(
+    //   "You must have minted a starter pack to mint a booster pack."
+    // );
   });
 });
