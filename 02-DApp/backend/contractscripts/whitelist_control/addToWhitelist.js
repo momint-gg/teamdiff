@@ -58,7 +58,7 @@ const main = async () => {
   await txn.wait();
   txn = await contract.addUsersToWhitelist(whitelist.slice(3000, 3500));
   await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(3000, data.length));
+  txn = await contract.addUsersToWhitelist(whitelist.slice(3500, data.length));
   await txn.wait();
 
   // Checking length of whitelist
