@@ -252,11 +252,7 @@ contract GameItems is ERC1155, Ownable {
             "All booster packs have already been minted!"
         );
         require(
-            userToHasMintedStarterPack[msg.sender],
-            "You must have minted a starter pack to mint a booster pack."
-        );
-        require(
-            usersBoosterPacksMinted[msg.sender] <= 2,
+            usersBoosterPacksMinted[msg.sender] < 2,
             "Can only mint two booster packs per account"
         );
         usersBoosterPacksMinted[msg.sender]++;
