@@ -29,7 +29,7 @@ export default function Collection() {
   const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([])
   const [teamFilterSelection, setTeamFilterSelection] = useState('')
   const [teamPositionSelection, setTeamPositionSelection] = useState('')
-  const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState(athleteNFTs)
+  const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([])
 
 
   useEffect(() => {
@@ -82,6 +82,7 @@ export default function Collection() {
   useEffect(async () => {
     setPackNFTs([]);
     setAthleteNFTs([]);
+    setAthleteNFTsWrapper([]);
     // declare the async data fetching function
     if (isConnected) {
       const getNFTData = async () => {
@@ -123,7 +124,7 @@ export default function Collection() {
   //   return athleteNFTs.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
   // }
 
-  // TODO!
+
   const filterResults = (inputs) => {
     let athleteNFTsCopy = [...athleteNFTs]
     if (inputs.team) {
@@ -243,6 +244,22 @@ export default function Collection() {
               backgroundColor: "white",
               height: 5,
             }} />
+          <Box
+            sx={{
+              display: "flex",
+              gap: "30px",
+              alignItems: "center",
+            }}
+          >
+          <Typography
+            variant={isMobile ? "h6" : "h4"}
+            color="secondary.light"
+            component="div"
+            // fontSize={"50px"}
+
+          >
+            Filter Athletes:
+          </Typography>
           <TextField 
             label="Name"
             value={searchQuery}
@@ -284,7 +301,20 @@ export default function Collection() {
           </Select>
 
         </FormControl>
-          <Grid container spacing={isMobile ? 1 : 3}>
+
+          </Box>
+          <Typography
+            variant={isMobile ? "h8" : "h6"}
+            color="secondary.light"
+            component="div"
+            sx={{ 
+              marginBottom: "20px"
+             }}
+          >
+            Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
+          </Typography>
+          
+          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {athleteNFTsWrapper?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -311,7 +341,7 @@ export default function Collection() {
               backgroundColor: "white",
               height: 5,
             }} />
-          <Grid container spacing={isMobile ? 1 : 3}>
+          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {packNFTs?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
