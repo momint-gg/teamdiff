@@ -1,20 +1,4 @@
 {
   "_format": "hh-sol-dbg-1",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "buildInfo": "..\\..\\build-info\\85cef2b5488280c1c20df865e7153df1.json"
-=======
-<<<<<<< HEAD
-  "buildInfo": "../../build-info/0d85f4b0d915a70e4699401a73179ac4.json"
-=======
-  "buildInfo": "../../build-info/200dd4b5860d0bf7f8cf160de5743e2f.json"
->>>>>>> 2585085... Testing, added a require to booster packs
->>>>>>> master
-=======
-  "buildInfo": "../../build-info/daa5267c7b32083722dbf1aafeb8e18a.json"
->>>>>>> c69430e... GameItems tests added
-=======
-  "buildInfo": "../../build-info/36e8e2f404c137a049dfc9b43addcb4d.json"
->>>>>>> d27b919... debugging WL
+  "buildInfo": "..\\..\\build-info\\5f965dd39810eb49af1615260f182223.json"
 }
