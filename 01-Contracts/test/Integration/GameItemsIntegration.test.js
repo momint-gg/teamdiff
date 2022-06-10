@@ -94,4 +94,45 @@ describe("Testing whitelist for GameItems", async () => {
     //   "You must have minted a starter pack to mint a booster pack."
     // );
   });
+
+  it("Doesn't let a user mint more than one starter pack or more than 2 booster packs", async () => {
+    // Checking starter pack
+    expect(GameItem.connect(owner).mintStarterPack()).to.be.revertedWith(
+      "Can only mint one starter pack per account"
+    );
+
+    // Checking booster pack
+    let txn = await GameItem.connect(owner).mintBoosterPack();
+    await txn.wait();
+    expect(GameItem.connect(owner).mintBoosterPack()).to.be.revertedWith(
+      "Can only mint two booster packs per account"
+    );
+  });
+
+  it("Shouldn't let people burn packs before switch is flipped", async () => {
+    expect(GameItem.connect(owner).burnStarterPack()).to.be.revertedWith(
+      "Packs aren't ready to open yet!"
+    );
+    expect(GameItem.connect(owner).burnBoosterPack()).to.be.revertedWith(
+      "Booster packs cannot be opened yet!"
+    );
+  });
+
+  it("Should allow people to burn after switch is flipped", async () => {
+    let txn = await GameItem.connect(owner).allowStarterPacks();
+    await txn.wait();
+    // Now can burn a starter pack
+    txn = await GameItem.connect(owner).burnStarterPack();
+    await txn.wait();
+  });
+
+  it("Should allow people to burn after switch is flipped", async () => {
+    let txn = await GameItem.connect(owner).allowBoosterPacks();
+    await txn.wait();
+    // Now can burn a starter pack
+    txn = await GameItem.connect(owner).burnBoosterPack();
+    await txn.wait();
+  });
+
+  it("Correctly shows metadata for starter packs and booster packs", async () => {});
 });

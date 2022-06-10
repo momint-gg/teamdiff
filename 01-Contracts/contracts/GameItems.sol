@@ -25,10 +25,10 @@ contract GameItems is ERC1155, Ownable {
     uint256 private MAX_STARTER_PACK_BALANCE;
     uint256 private MAX_BOOSTER_PACK_BALANCE;
     uint256 private MAX_PACKS;
-    uint256 private MAX_BOOSTER_PACKS; // Should we set this?
+    uint256 private MAX_BOOSTER_PACKS;
     uint256 private NUM_ATHLETES;
     uint256 private NFT_PER_ATHLETE;
-    uint256 chainlinkSubId;
+    // uint256 chainlinkSubId;
     uint256 public REVEAL_TIMESTAMP = 10000;
     string public name = "TeamDiff";
 
@@ -65,6 +65,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _maxStarterPackBalance;
         uint256 _maxBoosterPackBalance;
         uint256 _maxPacks;
+        uint256 _maxBoosterPacks;
         uint256 _revealTimestamp;
         // uint64 chainlinkSubId;
     }
@@ -100,17 +101,12 @@ contract GameItems is ERC1155, Ownable {
         MAX_STARTER_PACK_BALANCE = params._maxStarterPackBalance;
         MAX_BOOSTER_PACK_BALANCE = params._maxBoosterPackBalance;
         MAX_PACKS = params._maxPacks;
-        MAX_BOOSTER_PACKS = 500; //
+        MAX_BOOSTER_PACKS = params._maxBoosterPacks;
         athleteURI = _athleteURI;
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
         REVEAL_TIMESTAMP = params._revealTimestamp;
         packsAvailable = MAX_PACKS;
-    }
-
-    // Athletes can only be minted once our "switch" has been flipped
-    function setPacksReady() public onlyOwner {
-        packsReadyToOpen = !packsReadyToOpen;
     }
 
     // Opening the private sale
@@ -121,6 +117,11 @@ contract GameItems is ERC1155, Ownable {
     // Opening the public sale
     function openPublicSale() public onlyOwner {
         isPublicSalePhase = true;
+    }
+
+    // Allowing starter packs to be opened
+    function allowStarterPacks() public onlyOwner {
+        packsReadyToOpen = true;
     }
 
     // Allowing booster packs to be opened
