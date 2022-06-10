@@ -16,6 +16,7 @@ import AthleteCardModal from "../components/AthleteCardModal";
 import { useMediaQuery } from "react-responsive";
 import OpenSea from "../assets/images/opensea.png"
 import Image from "next/image";
+import { useRouter } from "next/router";
 // import styles from "../styles/collection.module.css"
 
 // const StyledImageListItem = styled(ImageListItem)`
@@ -26,6 +27,7 @@ import Image from "next/image";
 // `
 
 export default function Collection() {
+  const router = useRouter();
   // State Hooks
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
@@ -530,26 +532,22 @@ export default function Collection() {
             You don't currently own any TeamDiff NFT's! Mint a starter pack, or purchase one on OpenSea.
           </Typography>
           <Box sx={{ marginTop: 2 }}>
-            <Link
-              href={"/mintHome"}
-              sx={{ textDecoration: "none" }}
-              target={"_blank"}
+            <Fab
+              variant="extended"
+              size="large"
+              aria-label="add"
+              onClick={() => router.push("./mintPack")}
+              sx={{
+                fontSize: 20, background:
+                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                color: "white",
+              }}
             >
-              <Fab
-                variant="extended"
-                size="large"
-                aria-label="add"
-                sx={{
-                  fontSize: 20, background:
-                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                  color: "white",
-                }}
-              >
-                Mint Starter Pack
-              </Fab>
-            </Link>
+              Mint Starter Pack
+            </Fab>
           </Box>
           <Box sx={{ marginTop: 2 }}>
+            {/* Change to opensea address */}
             <Link
               href={"/mintHome"}
               sx={{ textDecoration: "none" }}

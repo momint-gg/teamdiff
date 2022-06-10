@@ -85,10 +85,9 @@ export default function MintHome() {
                     <Fab
                       variant="extended"
                       size="large"
-                      color="white"
                       aria-label="add"
                       onClick={() => router.push("./starterPackContents")}
-                      sx={{ marginTop: 3, fontSize: 20 }}
+                      sx={{ marginTop: 3, fontSize: 20, backgroundColor: white }}
                     >
                       CONTENTS
                     </Fab>
