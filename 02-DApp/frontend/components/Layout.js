@@ -20,13 +20,12 @@ const Layout = ({ children, isMobile }) => {
     <Box
       component="body"
       minHeight="100vh"
+      minWidth="100vw"
       backgroundColor="transparent"
       sx={{
         backgroundImage:
           "url(/dots.png), linear-gradient(135deg, #330D36 0%, #110412 100%)",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "scroll",
+        backgroundSize: "contain",
       }}
     >
       {isMobile ? (

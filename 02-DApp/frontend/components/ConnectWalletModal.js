@@ -124,8 +124,8 @@ export default function ConnectWalletModal({
             style={{
               cursor: "pointer",
               position: "absolute",
-              right: "5px",
-              top: "5px",
+              right: "15px",
+              top: "10px",
             }}
           />
           {connectors.map((x) => (
@@ -204,8 +204,8 @@ export default function ConnectWalletModal({
             style={{
               cursor: "pointer",
               position: "absolute",
-              right: "10px",
-              top: "10px",
+              right: "20px",
+              top: "15px",
             }}
           />
           {connectors.map((x) => (

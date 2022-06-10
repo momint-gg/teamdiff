@@ -1,15 +1,29 @@
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Grid, Link, Typography } from "@mui/material";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { React, useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import { FormControl, MenuItem, TextField } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
 import AthleteCard from "../components/AthleteCard";
-import AthleteCardModal from "../components/AthleteCardModal";
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import { Box, Typography, Grid, Select, styled, Card, Link, Fab } from "@mui/material";
+import constants from "../constants";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageList from '@mui/material/ImageList';
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
-import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
-import constants from "../constants";
+import AthleteCardModal from "../components/AthleteCardModal";
+import { useMediaQuery } from "react-responsive";
+import OpenSea from "../assets/images/opensea.png"
+import Image from "next/image";
+// import styles from "../styles/collection.module.css"
+
+// const StyledImageListItem = styled(ImageListItem)`
+//   &:hover {
+//     cursor: pointer;
+
+//   }
+// `
 
 export default function Collection() {
   // State Hooks
@@ -42,6 +56,13 @@ export default function Collection() {
       console.log("Please install MetaMask!");
     }
   }
+  const [searchQuery, setSeachQuery] = useState("")
+  const [isPreparingAthletes, setIsPreparingAthletes] = useState(true)
+  const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([])
+  const [teamFilterSelection, setTeamFilterSelection] = useState('')
+  const [teamPositionSelection, setTeamPositionSelection] = useState('')
+  const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([])
+
 
   /**
    * Checks if browsers has injected web3 provider
@@ -91,12 +112,11 @@ export default function Collection() {
     setModalOpen(false);
   };
 
-  /**
-   * Resets the owned Pack and Athlete NFTS state, and refetches that data from connected Account, and sets it to state var
-   */
-  useEffect(() => {
+  useEffect(async () => {
     setPackNFTs([]);
     setAthleteNFTs([]);
+    setAthleteNFTsWrapper([]);
+    // declare the async data fetching function
     if (isConnected) {
       // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
@@ -126,23 +146,131 @@ export default function Collection() {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
+            setAthleteNFTsWrapper((athleteNFTsWrapper) => [...athleteNFTsWrapper, response]);
           }
         }
       };
 
-      getNFTData().catch((error) => {
+      await getNFTData().catch((error) => {
         console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
       });
+      console.log('done with preparing atheletes')
+      // console.log(athleteNFTs, 'hmm')
+      // setAthleteNFTsWrapper(athleteNFTs)
+      setIsPreparingAthletes(false)
     }
   }, [isConnected, connectedAccount]);
 
-  if (isLoading) {
-    return <LoadingPrompt loading={"Collection"} />;
-  } else if (isNoMetaMask) {
+  // const returnSearchResults = () => {
+  //   return athleteNFTs.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+  // }
+
+  const filterResults = (inputs) => {
+    let athleteNFTsCopy = [...athleteNFTs]
+    if (inputs.team) {
+      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
+        const attributesRaw = athlete.metadata.attributes
+        for (const a of attributesRaw) {
+          if (a["trait_type"].toLowerCase() === "team" && a["value"] === inputs.team) {
+            return true
+          }
+        }
+        return false
+      })
+    }
+    if (inputs.position) {
+      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
+        const attributesRaw = athlete.metadata.attributes
+        for (const a of attributesRaw) {
+          if (a["trait_type"].toLowerCase() === "position" && a["value"] === inputs.position) {
+            return true
+          }
+        }
+        return false
+      })
+    }
+    if (inputs.query) {
+      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+    }
+
+    return athleteNFTsCopy
+  }
+
+  const getTeamFilterOptions = () => {
+    const arr = []
+    for (const athlete of athleteNFTs) {
+      const attributesRaw = athlete.metadata.attributes
+      console.log(attributesRaw, "***")
+      for (const a of attributesRaw) {
+        if (a["trait_type"].toLowerCase() === "team") {
+          arr.push(a["value"])
+        }
+      }
+    }
+    // const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team)
+    console.log(arr, 'lll')
+    return [... new Set(arr)]
+  }
+
+  useEffect(() => {
+    if (!isPreparingAthletes) {
+      setAllTeamFilterOptions(getTeamFilterOptions())
+      console.log('useeffect')
+      setTimeout(() => {
+        console.log(allTeamFilterOptions)
+      }, 1000)
+    }
+  }, [isPreparingAthletes])
+  // const allTeamFilterOptions = getTeamFilterOptions()
+
+  // const ALL_POSITION_FILTER_OPTIONS = {
+  //   top: 'Top',
+  //   adc: 'ADC',
+  //   mid: 'Mid',
+  //   jungle: 'Jungle',
+  //   support: 'Support'
+  // }
+
+  const ALL_POSITION_FILTER_OPTIONS = [
+    'Top',
+    'ADC',
+    'Mid',
+    'Jungle',
+    'Support'
+  ]
+
+  // handles any change in filter/query
+  useEffect(() => {
+    const filteredResults = filterResults({
+      team: teamFilterSelection,
+      query: searchQuery,
+      position: teamPositionSelection
+    })
+    console.log(filteredResults, 'filtered')
+    setAthleteNFTsWrapper(filteredResults)
+  }, [teamFilterSelection, searchQuery, teamPositionSelection])
+
+  const handleTeamFilterChange = (e) => {
+    const { name, value } = e.target
+    setTeamFilterSelection(value)
+  }
+
+  const handlePositionFilterChange = (e) => {
+    setTeamPositionSelection(e.target.value)
+  }
+
+  const handleQueryChange = (e) => {
+    setSeachQuery(e.target.value)
+  }
+
+  if (isNoMetaMask) {
     return <MetaMaskRedirectInstructions />;
-  } else if (isConnected && nftResp) {
+  }
+  else if (isConnected && nftResp && (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)) {
     return (
+      // https://mui.com/material-ui/react-select/
       <Box>
+
         <Typography
           variant={isMobile ? "h4" : "h3"}
           color="secondary"
@@ -157,57 +285,188 @@ export default function Collection() {
             color: "white",
             backgroundColor: "white",
             height: 5,
+          }} />
+
+        <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+          <Grid item xs={12} sm={6} md={4} lg={3} >
+            <Typography
+              variant={isMobile ? "h6" : "h4"}
+              color="secondary.light"
+              component="div"
+            // fontSize={"50px"}
+
+            >
+              Filter Athletes:
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <TextField
+              label="Name"
+              value={searchQuery}
+              onChange={handleQueryChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <FormControl sx={{ minWidth: 250 }} >
+              <InputLabel id="position-filter">Position</InputLabel>
+              <Select
+                labelId="position-filter"
+                value={teamPositionSelection}
+                label="Position"
+                onChange={handlePositionFilterChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
+                  <MenuItem value={positionOption}>{positionOption}</MenuItem>
+                ))}
+
+              </Select>
+
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <FormControl sx={{ minWidth: 250 }} >
+              <InputLabel id="team-filter">Team</InputLabel>
+              <Select
+                labelId="team-filter"
+                value={teamFilterSelection}
+                label="Team"
+                onChange={handleTeamFilterChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {allTeamFilterOptions.map((teamOption => (
+                  <MenuItem value={teamOption}>{teamOption}</MenuItem>
+                )))}
+
+              </Select>
+
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        {/* <Box
+            sx={{
+              display: "flex",
+              gap: "30px",
+              alignItems: "center",
+            }}
+          >
+            
+          <Typography
+            variant={isMobile ? "h6" : "h4"}
+            color="secondary.light"
+            component="div"
+            // fontSize={"50px"}
+
+          >
+            Filter Athletes:
+          </Typography>
+          <TextField 
+            label="Name"
+            value={searchQuery}
+            onChange={handleQueryChange}
+            />
+          <FormControl sx={{ minWidth: 250 }} >
+          <InputLabel id="position-filter">Position</InputLabel>
+          <Select
+            labelId="position-filter"
+            value={teamPositionSelection}
+            label="Position"
+            onChange={handlePositionFilterChange}
+          >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
+              <MenuItem value={positionOption}>{positionOption}</MenuItem>
+            ))}
+            
+          </Select>
+
+        </FormControl>
+          <FormControl sx={{ minWidth: 250 }} >
+          <InputLabel id="team-filter">Team</InputLabel>
+          <Select
+            labelId="team-filter"
+            value={teamFilterSelection}
+            label="Team"
+            onChange={handleTeamFilterChange}
+          >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+            {allTeamFilterOptions.map((teamOption => (
+              <MenuItem value={teamOption}>{teamOption}</MenuItem>
+            )))}
+            
+          </Select>
+
+        </FormControl>
+
+          </Box> */}
+        <Typography
+          variant={isMobile ? "h8" : "h6"}
+          color="secondary.light"
+          component="div"
+          sx={{
+            marginBottom: "20px"
           }}
-        />
-        {athleteNFTs.length > 0 ? (
-          <>
-            <Typography>
-              *Note, when you first mint your TeamDiff Athlete Cards, it can
-              take IPFS (an awesome web3 tool) some time to load all the
-              metadata. Please refresh a few times in a few minutes if any cards
-              don't load.
-            </Typography>
-            <Grid container spacing={isMobile ? 1 : 3}>
-              {athleteNFTs?.map((athleteData) => (
-                <Grid item xs={isMobile ? 12 : 4}>
-                  <AthleteCard
-                    athleteData={athleteData}
-                    setAthlete={setCurrAthlete}
-                    setModalOpen={setModalOpen}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </>
-        ) : (
-          <>
-            <Typography>
-              {"It's pretty lonely here. "}
-              <Link>
-                <a
-                  className="primary-link"
-                  target="_blank"
-                  href={"mintPack"}
-                  rel="noreferrer"
-                >
-                  Open
-                </a>
-              </Link>
-              {" a TeamDiff Starter Pack now!"}
-            </Typography>
-            <br></br>
-          </>
-        )}
+        >
+          Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
+        </Typography>
+
+        <ImageList
+          sx={{
+            width: "100%",
+            borderColor: "white",
+            color: "white",
+            borderRadius: 2,
+            border: 1,
+          }}
+          cols={isMobile ? 1 : 3}
+        >
+          {athleteNFTsWrapper?.map((athleteData) => (
+            <ImageListItem sx={{ margin: "5%" }} className="athlete-image">
+              <img
+                src={"/cards/" + athleteData?.title + ".png?w=164&h=164&fit=crop&auto=format"}
+                alt={"Athlete card"}
+                loading="lazy"
+                onClick={() => {
+                  setCurrAthlete({
+                    image: "/cards/" + athleteData?.title + ".png?w=164&h=164&fit=crop&auto=format",
+                    athleteData: athleteData
+                  })
+                  setModalOpen(true)
+                }}
+
+              />
+            </ImageListItem>
+          ))}
+        </ImageList>
+
+        {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+            {athleteNFTsWrapper?.map((athleteData) => (
+              <Grid item xs={isMobile ? 12 : 4}>
+                <AthleteCard
+                  athleteData={athleteData}
+                  setAthlete={setCurrAthlete}
+                  setModalOpen={setModalOpen} />
+              </Grid>
+            ))}
+          </Grid> */}
         <AthleteCardModal
           modalOpen={modalOpen}
-          athleteData={currAthlete}
-          handleModalClose={handleModalClose}
-        />
+          image={currAthlete?.image}
+          athleteData={currAthlete?.athleteData}
+          handleModalClose={handleModalClose} />
         <Typography
           variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
-          sx={{ marginTop: 3 }}
         >
           My TeamDiff Starter Packs
         </Typography>
@@ -216,44 +475,119 @@ export default function Collection() {
             color: "white",
             backgroundColor: "white",
             height: 5,
+          }} />
+        <ImageList
+          sx={{
+            width: "100%",
+            borderColor: "white",
+            color: "white",
+            borderRadius: 2,
+            border: 1,
           }}
-        />
-        {packNFTs.length > 0 ? (
-          <Grid container spacing={isMobile ? 1 : 3}>
+          cols={isMobile ? 1 : 3}
+        >
+          {packNFTs?.map((_) => (
+            <ImageListItem sx={{ margin: "5%" }}>
+              <img
+                src={"/starter-pack.png?w=164&h=164&fit=crop&auto=format"}
+                alt={"Starter pack image"}
+                loading="lazy"
+              />
+            </ImageListItem>
+          ))}
+        </ImageList>
+        {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {packNFTs?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
                   athleteData={athleteData}
                   setAthlete={setCurrAthlete}
-                  setModalOpen={setModalOpen}
-                />
+                  setModalOpen={setModalOpen} />
               </Grid>
             ))}
-          </Grid>
-        ) : (
-          <>
-            <Typography>
-              {"It's pretty lonely here. "}
-              <Link>
-                <a
-                  className="primary-link"
-                  target="_blank"
-                  href={"mintPack"}
-                  rel="noreferrer"
-                >
-                  Mint
-                </a>
-              </Link>
-              {" a TeamDiff Starter Pack now!"}
-            </Typography>
-            <br></br>
-          </>
-        )}
-      </Box>
+          </Grid> */}
+      </Box >
     );
-  } else if (isConnected) {
-    return <LoadingPrompt loading={"Your Collection"} />;
+  }
+  else if (isConnected && nftResp) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Card
+          sx={{ textAlign: "center", padding: 3, color: "white", width: "30rem" }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            Empty Collection
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: "1.1rem",
+              marginTop: ".4rem",
+              marginBottom: ".4rem",
+              overflowWrap: "break-word",
+            }}
+          >
+            You don't currently own any TeamDiff NFT's! Mint a starter pack, or purchase one on OpenSea.
+          </Typography>
+          <Box sx={{ marginTop: 2 }}>
+            <Link
+              href={"/mintHome"}
+              sx={{ textDecoration: "none" }}
+              target={"_blank"}
+            >
+              <Fab
+                variant="extended"
+                size="large"
+                aria-label="add"
+                sx={{
+                  fontSize: 20, background:
+                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                  color: "white",
+                }}
+              >
+                Mint Starter Pack
+              </Fab>
+            </Link>
+          </Box>
+          <Box sx={{ marginTop: 2 }}>
+            <Link
+              href={"/mintHome"}
+              sx={{ textDecoration: "none" }}
+              target={"_blank"}
+            >
+              <Fab
+                variant="extended"
+                size="large"
+                color={"info"}
+                aria-label="add"
+                sx={{
+                  fontSize: 20,
+                  color: "white",
+                }}
+              >
+                <Image
+                  src={OpenSea}
+                  alt={"opensea"}
+                  width="30rem"
+                  height="30rem"
+                />
+                <Box sx={{ marginLeft: 1 }}>
+                  Buy on OpenSea
+                </Box>
+              </Fab>
+            </Link>
+          </Box>
+        </Card >
+      </Box >
+    )
+  }
+  else if (isConnected) {
+    return (
+      <LoadingPrompt loading={"Your Collection"} />
+    );
   }
 
-  return <ConnectWalletPrompt accessing={"your collection"} />;
+  return (
+    <ConnectWalletPrompt accessing={"your collection"} />
+  );
 }
