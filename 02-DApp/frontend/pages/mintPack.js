@@ -322,42 +322,42 @@ export default function MintPack() {
                   </Typography>
                 )}
               </Box>
-              {isPolygon && (
-                <Box
-                  justifyContent="center"
-                  alignItems="center"
+
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  display: "flex",
+                  paddingTop: "20px",
+                }}
+              >
+                <Fab
+                  variant="extended"
+                  size="large"
+                  aria-label="add"
+                  onClick={mintStarterPack}
+                  // onClick={() => setDisplayMint(true)}
                   sx={{
-                    display: "flex",
-                    paddingTop: "20px",
+                    marginRight: 1,
+                    background:
+                      "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    color: "white",
+                    fontSize: 20,
+                    paddingRight: 8,
+                    paddingLeft: 8,
                   }}
+                  // disabled={!isPolygon}
+                  disabled={
+                    hasAlreadyMintedPack ||
+                    (!isOnWhitelist && isPresalePhase) ||
+                    // !(isPresalePhase || isPublicSalePhase) ||
+                    !isPolygon
+                  }
                 >
-                  <Fab
-                    variant="extended"
-                    size="large"
-                    aria-label="add"
-                    onClick={mintStarterPack}
-                    // onClick={() => setDisplayMint(true)}
-                    sx={{
-                      marginRight: 1,
-                      background:
-                        "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                      color: "white",
-                      fontSize: 20,
-                      paddingRight: 8,
-                      paddingLeft: 8,
-                    }}
-                    // disabled={!isPolygon}
-                    disabled={
-                      hasAlreadyMintedPack ||
-                      (!isOnWhitelist && isPresalePhase) ||
-                      // !(isPresalePhase || isPublicSalePhase) ||
-                      !isPolygon
-                    }
-                  >
-                    Mint
-                  </Fab>
-                </Box>
-              )}
+                  Mint
+                </Fab>
+              </Box>
+
               <br></br>
               {isPresalePhase && (
                 <Typography
