@@ -388,7 +388,7 @@ export default function MintPack() {
                 }}
               >
                 {hasAlreadyMintedPack ? (
-                  <Typography>
+                  <Typography color="primary" variant="h5">
                     {
                       "Oops! Looks like you have already minted 1 TeamDiff Starter Pack. Trade for more cards on "
                     }
@@ -411,10 +411,8 @@ export default function MintPack() {
                   <>
                     {!isOnWhitelist && isPresalePhase && (
                       <Typography
-                        style={{
-                          // color: "red",
-                          fontSize: 16,
-                        }}
+                        color="primary"
+                        variant="h5"
                       >
                         {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
                           " you think this is wrong, or come back tomorrow for public sale! "}
@@ -422,10 +420,8 @@ export default function MintPack() {
                     )}
                     {!(isPresalePhase || isPublicSalePhase) && (
                       <Typography
-                        style={{
-                          // color: "red",
-                          fontSize: 16,
-                        }}
+                        color="primary"
+                        variant="h5"
                       >
                         {"Please come back when presale begins!"}
                       </Typography>
@@ -437,6 +433,7 @@ export default function MintPack() {
                   !(!isOnWhitelist && isPresalePhase) &&
                   (isPresalePhase || isPublicSalePhase) && (
                     <Typography
+                      variant="h5"
                       style={{
                         color: "red",
                         fontSize: 16,
@@ -492,7 +489,7 @@ export default function MintPack() {
                   >
                     <Typography
                       sx={{ marginRight: 2, textAlign: "center" }}
-                      variant="h4"
+                      variant="h5"
                       color="white"
                       component="div"
                     >
@@ -677,13 +674,14 @@ export default function MintPack() {
           )}
           {packsAvailable == 0 && (
             <Box>
-              <Typography>
+              <Typography color="primary" variant="h5">
                 Sorry, all packs have already been minted :(
               </Typography>
             </Box>
           )}
         </>
-      )}
-    </Box>
+      )
+      }
+    </Box >
   );
 }
