@@ -215,7 +215,12 @@ export default function BurnPack({ setDisplay }) {
         // console.log("Minting pack in progress...");
       })
       .catch((error) => {
-        alert("error: " + error.data.message);
+        if (error.data?.message) {
+          alert("error: " + error.data.message);
+        }
+        else {
+          alert("error:" + error);
+        }
       });
   };
 
@@ -328,14 +333,14 @@ export default function BurnPack({ setDisplay }) {
                       Revealing TeamDiff Starter Packs unlocks June 13th, at
                       5:00 pm EST
                     </Typography>
-                    <Typography>
+                    <Typography color="primary">
                       Come back after the reveal date to open your pack!
                     </Typography>
                   </>
                 )}
                 <br></br>
                 {!ownsStarterPack && !hasAlreadyBurnedPack && (
-                  <Typography>
+                  <Typography color="primary">
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
                       <a className="primary-link" href="/mintPack">
@@ -346,7 +351,7 @@ export default function BurnPack({ setDisplay }) {
                   </Typography>
                 )}
                 {hasAlreadyBurnedPack && (
-                  <Typography>
+                  <Typography color="primary" variant="h5">
                     {
                       "Oops! Looks like you have already opened 1 TeamDiff Starter Pack. Trade for more cards on "
                     }
@@ -434,7 +439,7 @@ export default function BurnPack({ setDisplay }) {
                         alignItems: "center",
                         justifyContent: "center",
                         marginTop: 2,
-                        marginBottom: 5,
+                        marginBottom: 2,
                       }}
                     >
                       <Typography
@@ -452,11 +457,10 @@ export default function BurnPack({ setDisplay }) {
                         />
                       )}
                     </Box>
-                    <Typography>
+                    <Typography color="primary" sx={{ marginBottom: 5 }}>
                       *Note, it can take a few minutes for the NFT metadata and
                       image to populate on OpenSea
                     </Typography>
-                    <br></br>
                     <Box>
                       <Grid container spacing={6}>
                         {mintedIndices?.map((index) => (

@@ -244,7 +244,12 @@ export default function MintPack() {
         }, 20 * 1000);
       })
       .catch((error) => {
-        alert("error: " + error.data.message);
+        if (error.data?.message) {
+          alert("error: " + error.data.message);
+        }
+        else {
+          alert("error:" + error);
+        }
         // console.log("error: " + JSON.stringify(error, null, 2));
       });
   };
