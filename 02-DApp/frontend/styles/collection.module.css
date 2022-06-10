@@ -1,0 +1,12 @@
+/* not working */
+.athlete-image:hover {
+    cursor: "pointer";
+}
+
+img.MuiImageListItem-img:hover {
+    cursor: pointer;
+}
+
+.MuiImageListItem-img:hover {
+    cursor: pointer;
+}
