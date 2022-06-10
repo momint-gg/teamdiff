@@ -7,6 +7,8 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { Box, Typography, Grid, Select } from "@mui/material";
 import constants from "../constants";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageList from '@mui/material/ImageList';
 
 import ConnectWallet from "./connectWallet";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
@@ -314,7 +316,28 @@ export default function Collection() {
             Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
           </Typography>
           
-          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+          <ImageList
+            sx={{
+              width: "100%",
+              borderColor: "white",
+              color: "white",
+              borderRadius: 2,
+              border: 1,
+            }}
+            cols={isMobile ? 1 : 3}
+            >
+            {athleteNFTsWrapper?.map((athleteData) => (
+              <ImageListItem sx={{ margin: "5%" }}>
+              <img
+                src={"/cards/"+athleteData?.title+".png?w=164&h=164&fit=crop&auto=format"}
+                alt={"Athlete card"}
+                loading="lazy"
+              />
+            </ImageListItem>
+            ))}
+          </ImageList>      
+
+          {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {athleteNFTsWrapper?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -323,7 +346,7 @@ export default function Collection() {
                   setModalOpen={setModalOpen} />
               </Grid>
             ))}
-          </Grid>
+          </Grid> */}
           <AthleteCardModal
             modalOpen={modalOpen}
             athleteData={currAthlete}
@@ -341,7 +364,27 @@ export default function Collection() {
               backgroundColor: "white",
               height: 5,
             }} />
-          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+          <ImageList
+            sx={{
+              width: "100%",
+              borderColor: "white",
+              color: "white",
+              borderRadius: 2,
+              border: 1,
+            }}
+            cols={isMobile ? 1 : 3}
+          >
+            {packNFTs?.map((_) => (
+              <ImageListItem sx={{ margin: "5%" }}>
+                <img
+                  src={"/starterPack.png?w=164&h=164&fit=crop&auto=format"}
+                  alt={"Starter pack image"}
+                  loading="lazy"
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
+          {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {packNFTs?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -350,7 +393,7 @@ export default function Collection() {
                   setModalOpen={setModalOpen} />
               </Grid>
             ))}
-          </Grid>
+          </Grid> */}
         </Box></>
     );
   } else if (isConnected) {
