@@ -12,7 +12,10 @@ const main = async () => {
     'matic',
     process.env.MATIC_KEY
   );
-  const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
+  const rinkebySigner = new ethers.Wallet(
+    process.env.TEAMDIFF_PRIVATE_KEY,
+    provider
+  );
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);
 
   let txn = await contract.allowStarterPacks();

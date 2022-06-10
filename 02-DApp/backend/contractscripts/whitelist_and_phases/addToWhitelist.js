@@ -15,7 +15,10 @@ const main = async () => {
     'rinkeby',
     process.env.ALCHEMY_KEY
   );
-  const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
+  const rinkebySigner = new ethers.Wallet(
+    process.env.TEAMDIFF_PRIVATE_KEY,
+    provider
+  );
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);
 
   // Reading WL in from excel
