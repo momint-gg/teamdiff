@@ -281,7 +281,7 @@ export default function Homepage() {
                 of LCS atheletes! Open the Starter Pack to unlock five athletes
                 and begin to build your collection!
               </p>
-              <Link href="/burnPack">
+              <Link href="/#">
                 <button
                   className={[
                     bootstrap.btn,

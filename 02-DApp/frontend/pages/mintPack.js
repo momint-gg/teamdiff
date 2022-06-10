@@ -90,6 +90,7 @@ export default function MintPack() {
           setIsConnected(true);
         } else {
           setIsConnected(false);
+          setIsLoading(false);
         }
         // setIsLoading(false);
       };
@@ -102,7 +103,6 @@ export default function MintPack() {
         setIsConnected(false);
       });
       provider.on("network", async (newNetwork, oldNetwork) => {
-        console.log("on");
         // When a Provider makes its initial connection, it emits a "network"
         // event with a null oldNetwork along with the newNetwork. So, if the
         // oldNetwork exists, it represents a changing network
@@ -197,7 +197,6 @@ export default function MintPack() {
       fetchData();
       // Callback for when packMinted Events is fired from contract
       const packMintedCallback = (signerAddress, packID) => {
-        console.log("signer in callback : " + signerAddress);
         if (signerAddress == connectedAccount) {
           setIsMinting(false);
           setIsTransactionDelayed(false);
@@ -219,7 +218,8 @@ export default function MintPack() {
       // GameItemsContract.on(filter, packMintedCallback);
       GameItemsContract.once("starterPackMinted", packMintedCallback);
     } else {
-      console.log("no account connected");
+      // console.log("no account connected");
+      setIsLoading(false);
     }
   }, [isConnected, connectedAccount]);
 

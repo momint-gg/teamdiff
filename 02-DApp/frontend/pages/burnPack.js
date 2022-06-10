@@ -67,7 +67,7 @@ export default function BurnPack({ setDisplay }) {
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
-      console.log("Ethereum successfully detected!");
+      // console.log("Ethereum successfully detected!");
       // Access the decentralized web!
     } else {
       setIsNoMetaMask(true);
@@ -75,7 +75,7 @@ export default function BurnPack({ setDisplay }) {
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
       window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
-      console.log("Please install MetaMask!");
+      // console.log("Please install MetaMask!");
     }
   }
 
@@ -101,6 +101,7 @@ export default function BurnPack({ setDisplay }) {
           setIsConnected(true);
         } else {
           setIsConnected(false);
+          setIsLoading(false);
         }
         // setIsLoading(false);
       };
@@ -109,7 +110,7 @@ export default function BurnPack({ setDisplay }) {
         setAccountData();
       });
       provider.provider.on("disconnect", () => {
-        console.log("disconnected");
+        // console.log("disconnected");
         setIsConnected(false);
       });
     } else {
@@ -147,7 +148,7 @@ export default function BurnPack({ setDisplay }) {
           setIsMinting(false);
           setIsTransactionDelayed(false);
           const test = [6, 33, 12, 26, 45];
-          console.log("athleteIndices: " + test);
+          // console.log("athleteIndices: " + test);
 
           setHasMinted(true);
           setMintedIndices(athleteIndices);
@@ -175,7 +176,7 @@ export default function BurnPack({ setDisplay }) {
         const today = new Date();
         const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
         setIsPreRevealPhase(isBeforeRevealDate);
-        console.log("isPreveal: " + isBeforeRevealDate);
+        // console.log("isPreveal: " + isBeforeRevealDate);
         setIsLoading(false);
       };
       fetchData();
@@ -183,7 +184,8 @@ export default function BurnPack({ setDisplay }) {
       // Listen to event for when pack burn function is called
       GameItemsContract.once("starterPackBurned", packBurnedCallback);
     } else {
-      console.log("no account data found!");
+      // console.log("no account data found!");
+      setIsLoading(false);
     }
   }, [isConnected, connectedAccount]);
 
@@ -205,12 +207,12 @@ export default function BurnPack({ setDisplay }) {
         gasLimit: 10000000,
       })
       .then((res) => {
-        console.log("txn result: " + JSON.stringify(res, null, 2));
+        // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
         }, 20 * 1000);
-        console.log("Minting pack in progress...");
+        // console.log("Minting pack in progress...");
       })
       .catch((error) => {
         alert("error: " + error.data.message);
