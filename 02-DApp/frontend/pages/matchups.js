@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import { Container, Typography, Box, Grid } from "@mui/material";
 import PlayerStateModal from "../components/PlayerStateModal";
@@ -89,10 +90,9 @@ const data = {
 
 export default function Matchups() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [currentPlayer, setCurrentPlayer] = useState(false);
+  const router = useRouter();
 
   const handleModalOpen = (athelete) => {
-    setCurrentPlayer(athelete);
     setModalOpen(true);
   };
 
@@ -144,7 +144,9 @@ export default function Matchups() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              cursor: "pointer",
             }}
+            onClick={() => router.push("myTeam")}
           >
             <Typography color={"white"} fontSize={48}>
               reggiecai.eth
@@ -161,7 +163,9 @@ export default function Matchups() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              cursor: "pointer",
             }}
+            onClick={() => router.push("myTeam")}
           >
             <Typography color={"white"} fontSize={48}>
               willhunter.eth
@@ -175,8 +179,9 @@ export default function Matchups() {
           </Box>
         </Box>
         <Grid>
-          {data.first.athleteData.map((athlete) => (
+          {data.first.athleteData.map((athlete, index) => (
             <Grid
+              key={index.toString()}
               sx={{
                 display: "flex",
                 alignItems: "center",
