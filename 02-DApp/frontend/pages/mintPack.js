@@ -179,8 +179,8 @@ export default function MintPack() {
 
         // Set if is past presale date
         // open sale start date in UTC
-        const presaleStartDate = new Date("June 10, 2022 00:00:00");
-        const presaleEndDate = new Date("June 10, 2022 21:00:00");
+        const presaleStartDate = new Date("June 11, 2022 00:00:00");
+        const presaleEndDate = new Date("June 11, 2022 21:00:00");
         // const presaleStartDate = new Date("June 7, 2022 00:00:00");
         // const presaleEndDate = new Date("June 10, 2022 21:00:00");
         const today = new Date();
@@ -247,7 +247,7 @@ export default function MintPack() {
         if (error.data?.message) {
           alert("error: " + error.data.message);
         } else {
-          alert("error:" + error.essage);
+          alert("error: " + error.message);
         }
         // console.log("error: " + JSON.stringify(error, null, 2));
       });
@@ -353,8 +353,8 @@ export default function MintPack() {
                   // disabled={!isPolygon}
                   disabled={
                     hasAlreadyMintedPack ||
-                    // (!isOnWhitelist && isPresalePhase) ||
-                    // !(isPresalePhase || isPublicSalePhase) ||
+                    (!isOnWhitelist && isPresalePhase) ||
+                    !(isPresalePhase || isPublicSalePhase) ||
                     !isPolygon
                   }
                 >
@@ -369,7 +369,7 @@ export default function MintPack() {
                   variant="subtitle1"
                   color="secondary"
                 >
-                  Presale ends June 10th, 5:00 pm EST
+                  Presale ends June 11th, 5:00 pm EST
                 </Typography>
               )}
               {!(isPresalePhase || isPublicSalePhase) && (

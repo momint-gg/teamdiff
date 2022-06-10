@@ -23,13 +23,13 @@ const main = async () => {
   console.log("exports.GameItems = \'" + gameContract.address + "\';\n");
   
   //Add users to gameitems whitelist
-  txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
-  await txn.wait();
-  console.log("Added Trey to whitelist");
+  // txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
+  // await txn.wait();
+  // console.log("Added Trey to whitelist");
 
-  gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
-  await txn.wait();
-  console.log("Added Trey2 to whitelist");
+  // gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
+  // await txn.wait();
+  // console.log("Added Trey2 to whitelist");
   
   // gameContract.addUserToWhitelist("0x69EC014c15baF1C96620B6BA02A391aBaBB9C96b")
   // await txn.wait();
