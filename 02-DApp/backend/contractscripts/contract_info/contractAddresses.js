@@ -1,1 +1,1 @@
-exports.GameItems = '0xf92458EEeedb6c111073131E290a97e379Fcb9Bc';
+exports.GameItems = '0x60c04e3224735C56aE82D0F224009a90Fd3B0997';
