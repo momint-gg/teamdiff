@@ -30,7 +30,7 @@ contract GameItems is ERC1155, Ownable {
     uint256 private NFT_PER_ATHLETE;
     // uint256 chainlinkSubId;
     // uint256 public REVEAL_TIMESTAMP = 10000;
-    string public name = "TeamDiff";    //do we need this?
+    // string public name = "TeamDiff";    //do we need this?
 
 
     // When we flip the switch and let everyone open packs
@@ -38,8 +38,8 @@ contract GameItems is ERC1155, Ownable {
     bool public boosterPacksReadyToOpen;
 
     // Total amount of packs minted so far
-    uint256 private starterPacksMinted;
-    uint256 private boosterPacksMinted;
+    uint256 public starterPacksMinted;
+    uint256 public boosterPacksMinted;
     // The total amount of athletes so far we've minted
     uint256 private numAthletes;
 
@@ -55,8 +55,10 @@ contract GameItems is ERC1155, Ownable {
     uint256[3] private boosterPackIndices;
 
     // Events
-    event packMinted(address signer, uint256 id);
-    event packBurned(uint256[5], address signer);
+    event starterPackMinted(address signer, uint256 id);
+    event starterPackBurned(uint256[5], address signer);
+    event boosterPackMinted(address signer, uint256 id);
+    event boosterPackBurned(uint256[3], address signer);
 
     struct Parameters {
         uint256 _numAthletes;
@@ -65,7 +67,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _boosterPackSize;
         uint256 _maxStarterPackBalance;
         uint256 _maxBoosterPackBalance;
-        uint256 _maxPacks;
+        // uint256 _maxPacks;
         // uint256 _revealTimestamp;
         // uint64 chainlinkSubId;
     }
@@ -100,7 +102,8 @@ contract GameItems is ERC1155, Ownable {
         BOOSTER_PACK_SIZE = params._boosterPackSize;
         MAX_STARTER_PACK_BALANCE = params._maxStarterPackBalance;
         MAX_BOOSTER_PACK_BALANCE = params._maxBoosterPackBalance;
-        MAX_PACKS = params._maxPacks;
+        // MAX_PACKS = params._maxPacks;
+        MAX_PACKS = params._nftPerAthlete * params._numAthletes / params._starterPackSize;
         MAX_BOOSTER_PACKS = 500; //
         athleteURI = _athleteURI;
         starterPackURI = _starterPackURI;
@@ -111,7 +114,7 @@ contract GameItems is ERC1155, Ownable {
 
     // Athletes can only be minted once our "switch" has been flipped
     function setPacksReady() public onlyOwner {
-        packsReadyToOpen = !packsReadyToOpen;
+        packsReadyToOpen = true;
     }
 
     // Opening the private sale
@@ -156,29 +159,30 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    function removeUserFromWhitelist(address _userToRemove)
-        public
-        onlyOwner
-        returns (bool success)
-    {
-        if (whitelist[_userToRemove]) {
-            whitelist[_userToRemove] = false;
-            numWhitelisted -= 1;
-            success = true;
-        }
-    }
+    //Do we need this?
+    // function removeUserFromWhitelist(address _userToRemove)
+    //     public
+    //     onlyOwner
+    //     returns (bool success)
+    // {
+    //     if (whitelist[_userToRemove]) {
+    //         whitelist[_userToRemove] = false;
+    //         numWhitelisted -= 1;
+    //         success = true;
+    //     }
+    // }
 
-    function removeUsersFromWhitelist(address[] memory addrs)
-        public
-        onlyOwner
-        returns (bool success)
-    {
-        for (uint256 i = 0; i < addrs.length; i++) {
-            if (removeUserFromWhitelist(addrs[i])) {
-                success = true;
-            }
-        }
-    }
+    // function removeUsersFromWhitelist(address[] memory addrs)
+    //     public
+    //     onlyOwner
+    //     returns (bool success)
+    // {
+    //     for (uint256 i = 0; i < addrs.length; i++) {
+    //         if (removeUserFromWhitelist(addrs[i])) {
+    //             success = true;
+    //         }
+    //     }
+    // }
 
     function getNumWhitelisted() public view returns (uint256) {
         return numWhitelisted;
@@ -218,7 +222,7 @@ contract GameItems is ERC1155, Ownable {
 
         starterPacksMinted += 1;
         packsAvailable -= 1;
-        emit packMinted(msg.sender, starterPacksMinted);
+        emit starterPackMinted(msg.sender, starterPacksMinted);
     }
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
@@ -247,7 +251,7 @@ contract GameItems is ERC1155, Ownable {
 
         _burn(msg.sender, starterPackId, 1);
 
-        emit packBurned(indices, msg.sender);
+        emit starterPackBurned(indices, msg.sender);
     }
 
     // Mints an athlete -- called when someone "burns" a pack
@@ -284,7 +288,7 @@ contract GameItems is ERC1155, Ownable {
         _mint(msg.sender, boosterPackId, 1, "");
 
         boosterPacksMinted += 1;
-        emit packMinted(msg.sender, boosterPacksMinted);
+        emit boosterPackMinted(msg.sender, boosterPacksMinted);
     }
 
     function burnBoosterPack() public {
@@ -302,6 +306,8 @@ contract GameItems is ERC1155, Ownable {
         }
 
         _burn(address(msg.sender), boosterPackId, 1);
+
+        emit boosterPackBurned(indices, msg.sender);
     }
 
     //Generate pseudo random booster pack indices
@@ -409,6 +415,7 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
+    // Do we need this?
     function getNFTPerAthlete() public view returns (uint256) {
         return NFT_PER_ATHLETE;
     }

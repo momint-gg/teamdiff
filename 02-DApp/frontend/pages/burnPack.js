@@ -85,11 +85,11 @@ export default function BurnPack({ setDisplay }) {
    */
   useEffect(() => {
     if (window.ethereum) {
+      setIsLoading(true);
       handleEthereum();
-      // setHasMinted(true);
-      // setMintedIndices([6, 33, 12, 26, 45]);
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const sig ner = provider.getSigner()
+
       const setAccountData = async () => {
         const signer = provider.getSigner();
         const accounts = await provider.listAccounts();
@@ -102,7 +102,7 @@ export default function BurnPack({ setDisplay }) {
         } else {
           setIsConnected(false);
         }
-        setIsLoading(false);
+        // setIsLoading(false);
       };
       setAccountData();
       provider.provider.on("accountsChanged", (accounts) => {
@@ -131,6 +131,8 @@ export default function BurnPack({ setDisplay }) {
   useEffect(() => {
     // setAthleteNFTs([]);
     if (isConnected) {
+      setIsLoading(true);
+
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -163,7 +165,7 @@ export default function BurnPack({ setDisplay }) {
 
         // Grab if user has already minted starter pack
         const hasAlreadyBurnedPack1 =
-          await GameItemsContract.userToHasBurnedPack(connectedAccount);
+          await GameItemsContract.userToHasBurnedStarterPack(connectedAccount);
         setHasAlreadyBurnedPack(hasAlreadyBurnedPack1);
 
         // Set if is past presale date
@@ -174,11 +176,12 @@ export default function BurnPack({ setDisplay }) {
         const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
         setIsPreRevealPhase(isBeforeRevealDate);
         console.log("isPreveal: " + isBeforeRevealDate);
+        setIsLoading(false);
       };
       fetchData();
 
       // Listen to event for when pack burn function is called
-      GameItemsContract.once("packBurned", packBurnedCallback);
+      GameItemsContract.once("starterPackBurned", packBurnedCallback);
     } else {
       console.log("no account data found!");
     }
@@ -197,7 +200,7 @@ export default function BurnPack({ setDisplay }) {
     );
 
     // Calling burn on game items contract
-    const burnTxn = await gameItemsContractWithSigner
+    await gameItemsContractWithSigner
       .burnStarterPack({
         gasLimit: 10000000,
       })
@@ -210,7 +213,7 @@ export default function BurnPack({ setDisplay }) {
         console.log("Minting pack in progress...");
       })
       .catch((error) => {
-        alert("error: " + error.message);
+        alert("error: " + error.data.message);
       });
   };
 
@@ -289,9 +292,8 @@ export default function BurnPack({ setDisplay }) {
                       aria-label="add"
                       onClick={burnStarterPack}
                       disabled={
-                        !ownsStarterPack ||
-                        hasAlreadyBurnedPack ||
-                        isPreRevealPhase
+                        !ownsStarterPack || hasAlreadyBurnedPack
+                        // || isPreRevealPhase
                       }
                       // onClick={() => setDisplayMint(true)}
                       sx={{
@@ -321,8 +323,8 @@ export default function BurnPack({ setDisplay }) {
                 {isPreRevealPhase && (
                   <>
                     <Typography variant="subtitle1" color="secondary">
-                      Revealing TeamDiff Starter Packs unlocks June 13th, 5:00
-                      pm EST
+                      Revealing TeamDiff Starter Packs unlocks June 13th, at
+                      5:00 pm EST
                     </Typography>
                     <Typography>
                       Come back after the reveal date to open your pack!
@@ -351,7 +353,7 @@ export default function BurnPack({ setDisplay }) {
                         className="primary-link"
                         target="_blank"
                         href={
-                          "https://testnets.opensea.io/assets/" +
+                          "https://opensea.io/assets/matic/" +
                           gameItemsContract.address
                         }
                         rel="noreferrer"
@@ -448,13 +450,18 @@ export default function BurnPack({ setDisplay }) {
                         />
                       )}
                     </Box>
+                    <Typography>
+                      *Note, it can take a few minutes for the NFT metadata and
+                      image to populate on OpenSea
+                    </Typography>
+                    <br></br>
                     <Box>
                       <Grid container spacing={6}>
                         {mintedIndices?.map((index) => (
                           <Grid item xs={isMobile ? 12 : 4}>
                             <Link
                               href={
-                                "https://testnets.opensea.io/assets/" +
+                                "https://opensea.io/assets/matic/" +
                                 gameItemsContract.address +
                                 "/" +
                                 index
@@ -474,6 +481,7 @@ export default function BurnPack({ setDisplay }) {
                           </Grid>
                         ))}
                       </Grid>
+                      <br></br>
                     </Box>
                     <Fab
                       variant="extended"

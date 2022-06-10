@@ -100,7 +100,7 @@ export default function Collection() {
     if (isConnected) {
       // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
           owner: connectedAccount,
@@ -151,6 +151,7 @@ export default function Collection() {
         >
           My TeamDiff Athlete Cards
         </Typography>
+
         <hr
           style={{
             color: "white",
@@ -159,17 +160,25 @@ export default function Collection() {
           }}
         />
         {athleteNFTs.length > 0 ? (
-          <Grid container spacing={isMobile ? 1 : 3}>
-            {athleteNFTs?.map((athleteData) => (
-              <Grid item xs={isMobile ? 12 : 4}>
-                <AthleteCard
-                  athleteData={athleteData}
-                  setAthlete={setCurrAthlete}
-                  setModalOpen={setModalOpen}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          <>
+            <Typography>
+              *Note, when you first mint your TeamDiff Athlete Cards, it can
+              take IPFS (an awesome web3 tool) some time to load all the
+              metadata. Please refresh a few times in a few minutes if any cards
+              don't load.
+            </Typography>
+            <Grid container spacing={isMobile ? 1 : 3}>
+              {athleteNFTs?.map((athleteData) => (
+                <Grid item xs={isMobile ? 12 : 4}>
+                  <AthleteCard
+                    athleteData={athleteData}
+                    setAthlete={setCurrAthlete}
+                    setModalOpen={setModalOpen}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </>
         ) : (
           <>
             <Typography>

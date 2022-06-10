@@ -72,16 +72,10 @@ export default function MintPack() {
    */
   useEffect(() => {
     if (window.ethereum) {
+      setIsLoading(true);
       handleEthereum();
-      // setHasMinted(true);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const signer = provider.getSigner()
 
-      // const fetchData = async () => {
-      //   const currentAddress = await signer.getAddress()
-      //   setAddressPreview(currentAddress)
-      // }
-      // fetchData()
       const setAccountData = async () => {
         const signer = provider.getSigner();
         const accounts = await provider.listAccounts();
@@ -97,7 +91,7 @@ export default function MintPack() {
         } else {
           setIsConnected(false);
         }
-        setIsLoading(false);
+        // setIsLoading(false);
       };
       setAccountData();
       provider.provider.on("accountsChanged", (accounts) => {
@@ -153,8 +147,10 @@ export default function MintPack() {
    * Sets a GameITems instance to state var
    * Grabs the connectedAccount data from GameItems
    */
-  useEffect(async () => {
+  useEffect(() => {
     if (isConnected) {
+      checkUserChain();
+
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -163,37 +159,42 @@ export default function MintPack() {
       );
       setGameItemsContract(GameItemsContract);
 
-      // Grab packs available
-      const packsAvail = await GameItemsContract.packsAvailable();
-      setPacksAvailable(packsAvail.toNumber());
+      const fetchData = async () => {
+        setIsLoading(true);
 
-      // Grab if user has already minted starter pack
-      const hasAlreadyMintedPack1 = await GameItemsContract.userToHasMintedPack(
-        connectedAccount
-      );
-      setHasAlreadyMintedPack(hasAlreadyMintedPack1);
+        // Grab packs available
+        const packsAvail = await GameItemsContract.packsAvailable();
+        setPacksAvailable(packsAvail.toNumber());
 
-      // Grab if user is on whitelist
-      const isOnWhitelist1 = await GameItemsContract.whitelist(
-        connectedAccount
-      );
-      setIsOnWhitelist(isOnWhitelist1);
+        // Grab if user has already minted starter pack
+        const hasAlreadyMintedPack1 =
+          await GameItemsContract.userToHasMintedStarterPack(connectedAccount);
+        setHasAlreadyMintedPack(hasAlreadyMintedPack1);
 
-      // Set if is past presale date
-      // open sale start date in UTC
-      const presaleEndDate = new Date("June 10, 2022 21:00:00");
-      const presaleStartDate = new Date("June 10, 2022 00:00:00");
-      // const presaleEndDate = new Date("June 7, 2022 21:00:00");
-      // const presaleStartDate = new Date("June 7, 2022 00:00:00");
-      const today = new Date();
-      const isPresale =
-        today.getTime() < presaleEndDate.getTime() &&
-        today.getTime() > presaleStartDate.getTime();
-      const isPublicSale = today.getTime() > presaleEndDate.getTime();
-      // console.log("ispublic: " + isPublicSale);
-      setIsPresalePhase(isPresale);
-      setIsPublicSalePhase(isPublicSale);
+        // Grab if user is on whitelist
+        const isOnWhitelist1 = await GameItemsContract.whitelist(
+          connectedAccount
+        );
+        setIsOnWhitelist(isOnWhitelist1);
 
+        // Set if is past presale date
+        // open sale start date in UTC
+        const presaleStartDate = new Date("June 10, 2022 00:00:00");
+        const presaleEndDate = new Date("June 10, 2022 21:00:00");
+        // const presaleStartDate = new Date("June 7, 2022 00:00:00");
+        // const presaleEndDate = new Date("June 10, 2022 21:00:00");
+        const today = new Date();
+        const isPresale =
+          today.getTime() < presaleEndDate.getTime() &&
+          today.getTime() > presaleStartDate.getTime();
+        const isPublicSale = today.getTime() > presaleEndDate.getTime();
+        // console.log("ispublic: " + isPublicSale);
+        setIsPresalePhase(isPresale);
+        setIsPublicSalePhase(isPublicSale);
+
+        setIsLoading(false);
+      };
+      fetchData();
       // Callback for when packMinted Events is fired from contract
       const packMintedCallback = (signerAddress, packID) => {
         console.log("signer in callback : " + signerAddress);
@@ -216,8 +217,7 @@ export default function MintPack() {
       //   ],
       // };
       // GameItemsContract.on(filter, packMintedCallback);
-      GameItemsContract.once("packMinted", packMintedCallback);
-      checkUserChain();
+      GameItemsContract.once("starterPackMinted", packMintedCallback);
     } else {
       console.log("no account connected");
     }
@@ -244,7 +244,8 @@ export default function MintPack() {
         }, 20 * 1000);
       })
       .catch((error) => {
-        alert("error: " + error.message);
+        alert("error: " + error.data.message);
+        // console.log("error: " + JSON.stringify(error, null, 2));
       });
   };
 
@@ -349,7 +350,8 @@ export default function MintPack() {
                     disabled={
                       hasAlreadyMintedPack ||
                       (!isOnWhitelist && isPresalePhase) ||
-                      !(isPresalePhase || isPublicSalePhase)
+                      // !(isPresalePhase || isPublicSalePhase) ||
+                      !isPolygon
                     }
                   >
                     Mint
@@ -372,7 +374,7 @@ export default function MintPack() {
                   variant="subtitle1"
                   color="secondary"
                 >
-                  Presale starts at June 9th, 8:00 pm EST
+                  Presale starts June 10th, at 8:00 pm EST
                 </Typography>
               )}
               <Box
@@ -395,7 +397,7 @@ export default function MintPack() {
                         className="primary-link"
                         target="_blank"
                         href={
-                          "https://testnets.opensea.io/assets/" +
+                          "https://opensea.io/assets/matic" +
                           gameItemsContract.address
                         }
                         rel="noreferrer"
@@ -562,7 +564,8 @@ export default function MintPack() {
                           sx={{ fontWeight: "bold" }}
                         >
                           {" "}
-                          {100 - packsAvailable}{" "}
+                          {500 - packsAvailable}{" "}
+                          {/** TODO: sett this to packs minted instead */}
                         </Typography>
                       </Box>
                       <Box
@@ -573,7 +576,7 @@ export default function MintPack() {
                       >
                         <Link
                           href={
-                            "https://testnets.opensea.io/assets/" +
+                            "https://opensea.io/assets/matic/" +
                             gameItemsContract.address +
                             "/50" // the pack Id is after the athletes (not 0)
                           }

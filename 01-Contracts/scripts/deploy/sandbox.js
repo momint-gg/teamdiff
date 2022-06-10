@@ -1,27 +1,34 @@
 const { ethers } = require("hardhat");
-const GameItemsJSON = require("../../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
 // import { providers } from "ethers";
 const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
 
 
 const main = async () => {
   console.log("sandboxing...");
+
+    // Create GameItems Instance
   const gameContract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
-  // Create GameItems Instance
-//   const gameContract = hre.ethers.Contract(
-//     CONTRACT_ADDRESSES.GameItems,
-//     GameItemsJSON.abi,
-    
-//   );
+
 
   console.log("got game items address")
-  //Add users to gameitems whitelist
-  txn = await gameContract.addUserToWhitelist("0x14D8DF624769E6075769a59490319625F50B2B17")
+
+
+  // //Set Private Sale Open ready for testing
+  // console.log("Opening private Sale");
+  // txn = await gameContract.openPrivateSale();
+  // await txn.wait();
+  
+  // //Set Public Sale Open ready for testing
+  // console.log("Opening public sale");
+  // txn = await gameContract.openPrivateSale();
+  // await txn.wait();
+
+  //Set Private Sale Open ready for testing
+  console.log("Opening burning reveal");
+  txn = await gameContract.setPacksReady();
   await txn.wait();
-  console.log("Added Trey to whitelist");
-  gameContract.addUserToWhitelist("0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
-  await txn.wait();
-  console.log("Added Trey2 to whitelist");
+
+  console.log("Sandbox script complete")
 
 };
 

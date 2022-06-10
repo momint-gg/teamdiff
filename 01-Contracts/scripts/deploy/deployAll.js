@@ -154,10 +154,10 @@ const main = async () => {
   })
 
   //This copies the abi from our build folder to a dedicated folder in the backend folder
-  let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic', "GameItems"]
+  let contractNames = ['LeagueMaker', 'MOBALogicLibrary', 'LeagueOfLegendsLogic', "GameItems", "Athletes", "Whitelist"]
   contractNames.forEach(async (contractName) => {
-    srcPath = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
-    backendPath = "../02-DApp/backend/contractscripts/contract_info/abis/" + contractName + ".json";
+    let srcPath = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
+    let backendPath = "../02-DApp/backend/contractscripts/contract_info/abis/" + contractName + ".json";
     const abiData = fs.readFileSync(srcPath)
     fs.writeFileSync(backendPath, abiData, (err) => {
       // In case of a error throw err.

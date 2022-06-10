@@ -8,7 +8,7 @@ module.exports = [
     3, // BOOSTER_PACK_SIZE
     1, // MAX_STARTER_PACK_BALANCE
     2, // MAX_BOOSTER_PACK_BALANCE
-    500, // MAX_PACKS,
+    // 500, // MAX_PACKS,
     // 10000, // REVEAL_TIMESTAMP,
     // 697, // Chainlink sub ID
   ],
