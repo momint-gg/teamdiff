@@ -82,7 +82,7 @@ describe("Testing whitelist for GameItems", async () => {
 
   it("Lets those who are valid open booster packs when time is ready ", async () => {
     // Flipping the switch to allow booster packs
-    let txn = await GameItem.connect(owner).allowBoosterPacks();
+    let txn = await GameItem.connect(owner).openBoosterPackSale();
     await txn.wait();
     // Minting a booster pack
     txn = await GameItem.connect(owner).mintBoosterPack();
@@ -133,6 +133,4 @@ describe("Testing whitelist for GameItems", async () => {
     txn = await GameItem.connect(owner).burnBoosterPack();
     await txn.wait();
   });
-
-  it("Correctly shows metadata for starter packs and booster packs", async () => {});
 });

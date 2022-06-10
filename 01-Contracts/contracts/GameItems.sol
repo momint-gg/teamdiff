@@ -77,8 +77,9 @@ contract GameItems is ERC1155, Ownable {
     // Our whitelist
     mapping(address => bool) public whitelist;
     uint256 public numWhitelisted;
-    bool isPresalePhase; // = false
+    bool isPresalePhase;
     bool isPublicSalePhase;
+    bool isBoosterPackSalePhase;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
@@ -117,6 +118,10 @@ contract GameItems is ERC1155, Ownable {
     // Opening the public sale
     function openPublicSale() public onlyOwner {
         isPublicSalePhase = true;
+    }
+
+    function openBoosterPackSale() public onlyOwner {
+        isBoosterPackSalePhase = true;
     }
 
     // Allowing starter packs to be opened
@@ -269,9 +274,9 @@ contract GameItems is ERC1155, Ownable {
     /************ BOOSTER PACK MINTING/BURNING ***********/
     /*****************************************************/
     function mintBoosterPack() public {
-        require(boosterPacksReadyToOpen, "Booster packs cannot be opened yet!");
+        require(isBoosterPackSalePhase, "Booster pack sale hasn't opened yet.");
         require(
-            boosterPacksMinted < MAX_BOOSTER_PACKS, // TODO: Set MAX_BOOSTER_PACKS Value in constructor
+            boosterPacksMinted < MAX_BOOSTER_PACKS,
             "All booster packs have already been minted!"
         );
         require(
@@ -289,7 +294,10 @@ contract GameItems is ERC1155, Ownable {
 
     function burnBoosterPack() public {
         uint256 boosterPackId = NUM_ATHLETES + 1;
-        require(boosterPacksReadyToOpen, "Packs aren't ready to open yet!");
+        require(
+            boosterPacksReadyToOpen,
+            "Booster packs aren't ready to open yet!"
+        );
         require(
             balanceOf(address(msg.sender), boosterPackId) > 0,
             "No remaining booster packs!"
@@ -302,37 +310,6 @@ contract GameItems is ERC1155, Ownable {
         }
 
         _burn(address(msg.sender), boosterPackId, 1);
-    }
-
-    //Generate pseudo random booster pack indices
-    function generateBoosterPackIndices()
-        private
-        view
-        returns (uint256[3] memory)
-    {
-        uint256[3] memory indices;
-        uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
-
-        for (uint256 i = 0; i < 3; i++) {
-            startI = startI % 5;
-            uint256 start = startI * 10;
-            uint256 end = startI * 10 + 9;
-
-            indices[i] = ((uint256(
-                keccak256(
-                    abi.encodePacked(
-                        block.timestamp,
-                        msg.sender,
-                        block.difficulty,
-                        i,
-                        boosterPacksMinted
-                    )
-                )
-            ) % (end - start + 1)) + start);
-
-            startI += 1;
-        }
-        return indices;
     }
 
     /**********************************************/
@@ -409,7 +386,34 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
-    function getNFTPerAthlete() public view returns (uint256) {
-        return NFT_PER_ATHLETE;
+    //Generate pseudo random booster pack indices
+    function generateBoosterPackIndices()
+        private
+        view
+        returns (uint256[3] memory)
+    {
+        uint256[3] memory indices;
+        uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
+
+        for (uint256 i = 0; i < 3; i++) {
+            startI = startI % 5;
+            uint256 start = startI * 10;
+            uint256 end = startI * 10 + 9;
+
+            indices[i] = ((uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp,
+                        msg.sender,
+                        block.difficulty,
+                        i,
+                        boosterPacksMinted
+                    )
+                )
+            ) % (end - start + 1)) + start);
+
+            startI += 1;
+        }
+        return indices;
     }
 }
