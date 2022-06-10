@@ -4,7 +4,7 @@ import { FormControl, MenuItem, TextField } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Grid, Select, styled } from "@mui/material";
+import { Box, Typography, Grid, Select, styled, Card, Link, Fab } from "@mui/material";
 import constants from "../constants";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import ImageListItem from '@mui/material/ImageListItem';
@@ -15,6 +15,8 @@ import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import AthleteCardModal from "../components/AthleteCardModal";
 import { useMediaQuery } from "react-responsive";
+import OpenSea from "../assets/images/opensea.png"
+import Image from "next/image";
 // import styles from "../styles/collection.module.css"
 
 // const StyledImageListItem = styled(ImageListItem)`
@@ -147,7 +149,7 @@ export default function Collection() {
         }
         return false
       })
-    } 
+    }
     if (inputs.position) {
       athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
         const attributesRaw = athlete.metadata.attributes
@@ -236,85 +238,85 @@ export default function Collection() {
   if (isConnected && nftResp && (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)) {
     return (
       // https://mui.com/material-ui/react-select/
-        <Box>
+      <Box>
 
-          <Typography
-            variant={isMobile ? "h4" : "h2"}
-            color="secondary"
-            component="div"
-            style={{ marginTop: 10 }}
-          >
-            Owned Athletes
-          </Typography>
-          <hr
-            style={{
-              color: "white",
-              backgroundColor: "white",
-              height: 5,
-            }} />
+        <Typography
+          variant={isMobile ? "h4" : "h2"}
+          color="secondary"
+          component="div"
+          style={{ marginTop: 10 }}
+        >
+          Owned Athletes
+        </Typography>
+        <hr
+          style={{
+            color: "white",
+            backgroundColor: "white",
+            height: 5,
+          }} />
 
-          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
-              <Grid item xs={12} sm={6} md={4} lg={3} >
-                <Typography
-                  variant={isMobile ? "h6" : "h4"}
-                  color="secondary.light"
-                  component="div"
-                  // fontSize={"50px"}
+        <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+          <Grid item xs={12} sm={6} md={4} lg={3} >
+            <Typography
+              variant={isMobile ? "h6" : "h4"}
+              color="secondary.light"
+              component="div"
+            // fontSize={"50px"}
 
-                >
-                  Filter Athletes:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4} lg={3}>
-                  <TextField 
-                label="Name"
-                value={searchQuery}
-                onChange={handleQueryChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <FormControl sx={{ minWidth: 250 }} >
-                <InputLabel id="position-filter">Position</InputLabel>
-                <Select
-                  labelId="position-filter"
-                  value={teamPositionSelection}
-                  label="Position"
-                  onChange={handlePositionFilterChange}
-                >
+            >
+              Filter Athletes:
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <TextField
+              label="Name"
+              value={searchQuery}
+              onChange={handleQueryChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <FormControl sx={{ minWidth: 250 }} >
+              <InputLabel id="position-filter">Position</InputLabel>
+              <Select
+                labelId="position-filter"
+                value={teamPositionSelection}
+                label="Position"
+                onChange={handlePositionFilterChange}
+              >
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
                 {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
-                    <MenuItem value={positionOption}>{positionOption}</MenuItem>
-                  ))}
-                  
-                </Select>
+                  <MenuItem value={positionOption}>{positionOption}</MenuItem>
+                ))}
 
-              </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4} lg={3}>
-                <FormControl sx={{ minWidth: 250 }} >
-                          <InputLabel id="team-filter">Team</InputLabel>
-                          <Select
-                            labelId="team-filter"
-                            value={teamFilterSelection}
-                            label="Team"
-                            onChange={handleTeamFilterChange}
-                          >
-                          <MenuItem value="">
-                            <em>None</em>
-                          </MenuItem>
-                            {allTeamFilterOptions.map((teamOption => (
-                              <MenuItem value={teamOption}>{teamOption}</MenuItem>
-                            )))}
-                            
-                          </Select>
+              </Select>
 
-                        </FormControl>
-              </Grid>
+            </FormControl>
           </Grid>
-            
-          {/* <Box
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <FormControl sx={{ minWidth: 250 }} >
+              <InputLabel id="team-filter">Team</InputLabel>
+              <Select
+                labelId="team-filter"
+                value={teamFilterSelection}
+                label="Team"
+                onChange={handleTeamFilterChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {allTeamFilterOptions.map((teamOption => (
+                  <MenuItem value={teamOption}>{teamOption}</MenuItem>
+                )))}
+
+              </Select>
+
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        {/* <Box
             sx={{
               display: "flex",
               gap: "30px",
@@ -374,47 +376,47 @@ export default function Collection() {
         </FormControl>
 
           </Box> */}
-          <Typography
-            variant={isMobile ? "h8" : "h6"}
-            color="secondary.light"
-            component="div"
-            sx={{ 
-              marginBottom: "20px"
-             }}
-          >
-            Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
-          </Typography>
-          
-          <ImageList
-            sx={{
-              width: "100%",
-              borderColor: "white",
-              color: "white",
-              borderRadius: 2,
-              border: 1,
-            }}
-            cols={isMobile ? 1 : 3}
-            >
-            {athleteNFTsWrapper?.map((athleteData) => (
-              <ImageListItem sx={{ margin: "5%" }} className="athlete-image">
+        <Typography
+          variant={isMobile ? "h8" : "h6"}
+          color="secondary.light"
+          component="div"
+          sx={{
+            marginBottom: "20px"
+          }}
+        >
+          Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
+        </Typography>
+
+        <ImageList
+          sx={{
+            width: "100%",
+            borderColor: "white",
+            color: "white",
+            borderRadius: 2,
+            border: 1,
+          }}
+          cols={isMobile ? 1 : 3}
+        >
+          {athleteNFTsWrapper?.map((athleteData) => (
+            <ImageListItem sx={{ margin: "5%" }} className="athlete-image">
               <img
-                src={"/cards/"+athleteData?.title+".png?w=164&h=164&fit=crop&auto=format"}
+                src={"/cards/" + athleteData?.title + ".png?w=164&h=164&fit=crop&auto=format"}
                 alt={"Athlete card"}
                 loading="lazy"
                 onClick={() => {
                   setCurrAthlete({
-                    image: "/cards/"+athleteData?.title+".png?w=164&h=164&fit=crop&auto=format",
+                    image: "/cards/" + athleteData?.title + ".png?w=164&h=164&fit=crop&auto=format",
                     athleteData: athleteData
                   })
                   setModalOpen(true)
                 }}
-                
+
               />
             </ImageListItem>
-            ))}
-          </ImageList>      
+          ))}
+        </ImageList>
 
-          {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+        {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {athleteNFTsWrapper?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -424,45 +426,45 @@ export default function Collection() {
               </Grid>
             ))}
           </Grid> */}
-          <AthleteCardModal
-            modalOpen={modalOpen}
-            image={currAthlete?.image}
-            athleteData={currAthlete?.athleteData}
-            handleModalClose={handleModalClose} />
-          <Typography
-            variant={isMobile ? "h4" : "h2"}
-            color="secondary"
-            component="div"
-          >
-            Owned Starter Packs
-          </Typography>
-          <hr
-            style={{
-              color: "white",
-              backgroundColor: "white",
-              height: 5,
-            }} />
-          <ImageList
-            sx={{
-              width: "100%",
-              borderColor: "white",
-              color: "white",
-              borderRadius: 2,
-              border: 1,
-            }}
-            cols={isMobile ? 1 : 3}
-          >
-            {packNFTs?.map((_) => (
-              <ImageListItem sx={{ margin: "5%" }}>
-                <img
-                  src={"/starter-pack.png?w=164&h=164&fit=crop&auto=format"}
-                  alt={"Starter pack image"}
-                  loading="lazy"
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
-          {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+        <AthleteCardModal
+          modalOpen={modalOpen}
+          image={currAthlete?.image}
+          athleteData={currAthlete?.athleteData}
+          handleModalClose={handleModalClose} />
+        <Typography
+          variant={isMobile ? "h4" : "h2"}
+          color="secondary"
+          component="div"
+        >
+          Owned Starter Packs
+        </Typography>
+        <hr
+          style={{
+            color: "white",
+            backgroundColor: "white",
+            height: 5,
+          }} />
+        <ImageList
+          sx={{
+            width: "100%",
+            borderColor: "white",
+            color: "white",
+            borderRadius: 2,
+            border: 1,
+          }}
+          cols={isMobile ? 1 : 3}
+        >
+          {packNFTs?.map((_) => (
+            <ImageListItem sx={{ margin: "5%" }}>
+              <img
+                src={"/starter-pack.png?w=164&h=164&fit=crop&auto=format"}
+                alt={"Starter pack image"}
+                loading="lazy"
+              />
+            </ImageListItem>
+          ))}
+        </ImageList>
+        {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {packNFTs?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -472,9 +474,82 @@ export default function Collection() {
               </Grid>
             ))}
           </Grid> */}
-        </Box>
+      </Box>
     );
-  } else if (isConnected) {
+  }
+  else if (isConnected && nftResp) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Card
+          sx={{ textAlign: "center", padding: 3, color: "white", width: "30rem" }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            Empty Collection
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: "1.1rem",
+              marginTop: ".4rem",
+              marginBottom: ".4rem",
+              overflowWrap: "break-word",
+            }}
+          >
+            You don't currently own any TeamDiff NFT's! Mint a starter pack, or purchase one on OpenSea.
+          </Typography>
+          <Box sx={{ marginTop: 2 }}>
+            <Link
+              href={"/mintHome"}
+              sx={{ textDecoration: "none" }}
+              target={"_blank"}
+            >
+              <Fab
+                variant="extended"
+                size="large"
+                aria-label="add"
+                sx={{
+                  fontSize: 20, background:
+                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                  color: "white",
+                }}
+              >
+                Mint Starter Pack
+              </Fab>
+            </Link>
+          </Box>
+          <Box sx={{ marginTop: 2 }}>
+            <Link
+              href={"/mintHome"}
+              sx={{ textDecoration: "none" }}
+              target={"_blank"}
+            >
+              <Fab
+                variant="extended"
+                size="large"
+                color={"info"}
+                aria-label="add"
+                sx={{
+                  fontSize: 20,
+                  color: "white",
+                }}
+              >
+                <Image
+                  src={OpenSea}
+                  alt={"opensea"}
+                  width="30rem"
+                  height="30rem"
+                />
+                <Box sx={{ marginLeft: 1 }}>
+                  Buy on OpenSea
+                </Box>
+              </Fab>
+            </Link>
+          </Box>
+        </Card >
+      </Box >
+    )
+  }
+  else if (isConnected) {
     return (
       <LoadingPrompt loading={"Your Collection"} />
     );
