@@ -233,11 +233,9 @@ export default function Collection() {
     setSeachQuery(e.target.value)
   }
 
-  if (isConnected && nftResp && allTeamFilterOptions.length !== 0) {
+  if (isConnected && nftResp && (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)) {
     return (
       // https://mui.com/material-ui/react-select/
-      <>
-
         <Box>
 
           <Typography
@@ -457,7 +455,7 @@ export default function Collection() {
             {packNFTs?.map((_) => (
               <ImageListItem sx={{ margin: "5%" }}>
                 <img
-                  src={"/starterPack.png?w=164&h=164&fit=crop&auto=format"}
+                  src={"/starter-pack.png?w=164&h=164&fit=crop&auto=format"}
                   alt={"Starter pack image"}
                   loading="lazy"
                 />
@@ -474,7 +472,7 @@ export default function Collection() {
               </Grid>
             ))}
           </Grid> */}
-        </Box></>
+        </Box>
     );
   } else if (isConnected) {
     return (
