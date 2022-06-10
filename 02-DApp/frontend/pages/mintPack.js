@@ -19,7 +19,6 @@ export default function MintPack() {
   // Router
   const router = useRouter();
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
-  console.log(isMobile);
 
   // const provider = new ethers.providers.AlchemyProvider(
   //   "rinkeby",
@@ -48,6 +47,10 @@ export default function MintPack() {
   const [isPresalePhase, setIsPresalePhase] = useState();
   const [isPublicSalePhase, setIsPublicSalePhase] = useState();
   const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  /**
+   * Handles a change in injected etheruem provider from MetaMask
+   */
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
@@ -63,6 +66,10 @@ export default function MintPack() {
     }
   }
 
+  /**
+   * Checks if browsers has injected web3 provider
+   * and if so, gets connected account data, or sets to null if no connected account
+   */
   useEffect(() => {
     if (window.ethereum) {
       handleEthereum();
@@ -124,6 +131,9 @@ export default function MintPack() {
     }
   }, [connectedAccount]);
 
+  /**
+   * Checks To ensure the user is connected to Polygon for minting
+   */
   const checkUserChain = () => {
     if (!currentChain || currentChain != 137) {
       if (currentChain === 1) {
@@ -138,7 +148,11 @@ export default function MintPack() {
     }
   };
 
-  // Use Effect for component mount
+  /**
+   * Runs when connectedAccount changes
+   * Sets a GameITems instance to state var
+   * Grabs the connectedAccount data from GameItems
+   */
   useEffect(async () => {
     if (isConnected) {
       // Initialize connections to GameItems contract
@@ -181,7 +195,6 @@ export default function MintPack() {
       setIsPublicSalePhase(isPublicSale);
 
       // Callback for when packMinted Events is fired from contract
-      // const signerAddress = accountData.address;
       const packMintedCallback = (signerAddress, packID) => {
         console.log("signer in callback : " + signerAddress);
         if (signerAddress == connectedAccount) {
@@ -210,22 +223,12 @@ export default function MintPack() {
     }
   }, [isConnected, connectedAccount]);
 
-  // useEffect(() => {
-  //   console.log("user chain changed: ", currentChain)
-  //   // var newChainId;
-  //   const fetchData = async () => {
-  //     const { chainId } = await provider.getNetwork()
-  //     setCurrentChain(chainId)
-  //     setIsPolygon(chainId === 137)
-  //   }
-  //   fetchData();
-  // }, [currentChain])
-
+  /**
+   * Creates GameItems instance with connectedAccount as signer
+   * then calls mintStarterPack from GameItems
+   */
   const mintStarterPack = async () => {
-    // Create a new instance of the Contract with a Signer, which allows
-    // update methods
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
+    // Create a new instance of the Contract with a Signer, which allows update methods
     const gameItemsContractWithSigner = new ethers.Contract(
       CONTRACT_ADDRESSES.GameItems,
       GameItemsJSON.abi,
@@ -235,13 +238,10 @@ export default function MintPack() {
     await gameItemsContractWithSigner
       .mintStarterPack()
       .then((res) => {
-        // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
         }, 20 * 1000);
-
-        // console.log("Minting pack in progress...");
       })
       .catch((error) => {
         alert("error: " + error.message);

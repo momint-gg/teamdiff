@@ -1,5 +1,4 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-// import AthleteCard from "../components/AthleteCard";
 import {
   Box,
   Container,
@@ -56,14 +55,15 @@ export default function BurnPack({ setDisplay }) {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState();
-  // const [nftResp, setNFTResp] = useState(null);
-  // // const [packNFTs, setPackNFTs] = useState([]);
-  // const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [isPreRevealPhase, setIsPreRevealPhase] = useState();
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
   const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  /**
+   * Handles a change in injected etheruem provider from MetaMask
+   */
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
@@ -79,6 +79,10 @@ export default function BurnPack({ setDisplay }) {
     }
   }
 
+  /**
+   * Checks if browsers has injected web3 provider
+   * and if so, gets connected account data, or sets to null if no connected account
+   */
   useEffect(() => {
     if (window.ethereum) {
       handleEthereum();
@@ -119,7 +123,11 @@ export default function BurnPack({ setDisplay }) {
     }
   }, [connectedAccount]);
 
-  // Use Effect for change in if user isConnected
+  /**
+   * Runs when connectedAccount changes
+   * Sets a GameITems instance to state var
+   * Grabs the connectedAccount data from GameItems
+   */
   useEffect(() => {
     // setAthleteNFTs([]);
     if (isConnected) {
@@ -176,20 +184,17 @@ export default function BurnPack({ setDisplay }) {
     }
   }, [isConnected, connectedAccount]);
 
-  // TODO hide burn pack if they don't
+  /**
+   * Creates GameITmes instance with connected Account as signer
+   * Calls burnStarterPack from GameItems Contract
+   */
   const burnStarterPack = async () => {
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
     // Create a new instance of the Contract with a Signer, which allows update methods
-
     const gameItemsContractWithSigner = new ethers.Contract(
       CONTRACT_ADDRESSES.GameItems,
       GameItemsJSON.abi,
       signer
     );
-    // setIsMinting(true);
-
-    // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
     // Calling burn on game items contract
     const burnTxn = await gameItemsContractWithSigner

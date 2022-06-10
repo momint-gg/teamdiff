@@ -28,9 +28,10 @@ contract GameItems is ERC1155, Ownable {
     uint256 private MAX_BOOSTER_PACKS; // Should we set this?
     uint256 private NUM_ATHLETES;
     uint256 private NFT_PER_ATHLETE;
-    uint256 chainlinkSubId;
-    uint256 public REVEAL_TIMESTAMP = 10000;
-    string public name = "TeamDiff";
+    // uint256 chainlinkSubId;
+    // uint256 public REVEAL_TIMESTAMP = 10000;
+    string public name = "TeamDiff";    //do we need this?
+
 
     // When we flip the switch and let everyone open packs
     bool public packsReadyToOpen;
@@ -65,7 +66,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _maxStarterPackBalance;
         uint256 _maxBoosterPackBalance;
         uint256 _maxPacks;
-        uint256 _revealTimestamp;
+        // uint256 _revealTimestamp;
         // uint64 chainlinkSubId;
     }
 
@@ -104,7 +105,7 @@ contract GameItems is ERC1155, Ownable {
         athleteURI = _athleteURI;
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
-        REVEAL_TIMESTAMP = params._revealTimestamp;
+        // REVEAL_TIMESTAMP = params._revealTimestamp;
         packsAvailable = MAX_PACKS;
     }
 

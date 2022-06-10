@@ -9,8 +9,8 @@ module.exports = [
     1, // MAX_STARTER_PACK_BALANCE
     2, // MAX_BOOSTER_PACK_BALANCE
     500, // MAX_PACKS,
-    10000, // REVEAL_TIMESTAMP,
-    697, // Chainlink sub ID
+    // 10000, // REVEAL_TIMESTAMP,
+    // 697, // Chainlink sub ID
   ],
   // Note: You should run the whitelist test to see if these URIs work correctly in mint flow
   "https://gateway.pinata.cloud/ipfs/QmaP39XjaR4YKniP8vnyGRdiKc3DcZ1PLqjqHDx5mc6dqN/", // athleteURI (pinata url)

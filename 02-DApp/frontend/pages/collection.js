@@ -12,17 +12,22 @@ import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstruct
 import constants from "../constants";
 
 export default function Collection() {
+  // State Hooks
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [currAthlete, setCurrAthlete] = useState(null);
-  // const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
   const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+
+  /**
+   * Handles a change in injected etheruem provider from MetaMask
+   */
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
@@ -38,11 +43,14 @@ export default function Collection() {
     }
   }
 
+  /**
+   * Checks if browsers has injected web3 provider
+   * and if so, gets connected account data, or sets to null if no connected account
+   */
   useEffect(() => {
     if (window.ethereum) {
       handleEthereum();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const signer = provider.getSigner();
 
       const setAccountData = async () => {
         const signer = provider.getSigner();
@@ -83,13 +91,14 @@ export default function Collection() {
     setModalOpen(false);
   };
 
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
-
+  /**
+   * Resets the owned Pack and Athlete NFTS state, and refetches that data from connected Account, and sets it to state var
+   */
   useEffect(() => {
     setPackNFTs([]);
     setAthleteNFTs([]);
-    // declare the async data fetching function
     if (isConnected) {
+      // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
 
@@ -105,12 +114,14 @@ export default function Collection() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          console.log(
-            "Token #" +
-              token +
-              " metadata: " +
-              JSON.stringify(response, null, 2)
-          );
+          // console.log(
+          //   "Token #" +
+          //     token +
+          //     " metadata: " +
+          //     JSON.stringify(response, null, 2)
+          // );
+
+          // Check metadata of ERC-1155, and assing to create State list
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
