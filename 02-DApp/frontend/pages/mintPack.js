@@ -246,9 +246,8 @@ export default function MintPack() {
       .catch((error) => {
         if (error.data?.message) {
           alert("error: " + error.data.message);
-        }
-        else {
-          alert("error:" + error);
+        } else {
+          alert("error:" + error.essage);
         }
         // console.log("error: " + JSON.stringify(error, null, 2));
       });
@@ -354,7 +353,7 @@ export default function MintPack() {
                   // disabled={!isPolygon}
                   disabled={
                     hasAlreadyMintedPack ||
-                    (!isOnWhitelist && isPresalePhase) ||
+                    // (!isOnWhitelist && isPresalePhase) ||
                     // !(isPresalePhase || isPublicSalePhase) ||
                     !isPolygon
                   }
@@ -415,19 +414,13 @@ export default function MintPack() {
                 ) : (
                   <>
                     {!isOnWhitelist && isPresalePhase && (
-                      <Typography
-                        color="primary"
-                        variant="h5"
-                      >
+                      <Typography color="primary" variant="h5">
                         {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
                           " you think this is wrong, or come back tomorrow for public sale! "}
                       </Typography>
                     )}
                     {!(isPresalePhase || isPublicSalePhase) && (
-                      <Typography
-                        color="primary"
-                        variant="h5"
-                      >
+                      <Typography color="primary" variant="h5">
                         {"Please come back when presale begins!"}
                       </Typography>
                     )}
@@ -685,8 +678,7 @@ export default function MintPack() {
             </Box>
           )}
         </>
-      )
-      }
-    </Box >
+      )}
+    </Box>
   );
 }
