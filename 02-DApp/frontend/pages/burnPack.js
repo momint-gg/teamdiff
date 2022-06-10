@@ -217,9 +217,8 @@ export default function BurnPack({ setDisplay }) {
       .catch((error) => {
         if (error.data?.message) {
           alert("error: " + error.data.message);
-        }
-        else {
-          alert("error:" + error);
+        } else {
+          alert("error:" + error.message);
         }
       });
   };
@@ -299,8 +298,9 @@ export default function BurnPack({ setDisplay }) {
                       aria-label="add"
                       onClick={burnStarterPack}
                       disabled={
-                        !ownsStarterPack || hasAlreadyBurnedPack
-                        // || isPreRevealPhase
+                        !ownsStarterPack ||
+                        hasAlreadyBurnedPack ||
+                        isPreRevealPhase
                       }
                       // onClick={() => setDisplayMint(true)}
                       sx={{

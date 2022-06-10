@@ -18,15 +18,15 @@ const main = async () => {
   // txn = await gameContract.openPrivateSale();
   // await txn.wait();
   
-  // //Set Public Sale Open ready for testing
-  // console.log("Opening public sale");
-  // txn = await gameContract.openPrivateSale();
-  // await txn.wait();
+  //Set Public Sale Open ready for testing
+  console.log("Opening public sale");
+  txn = await gameContract.openPublicSale();
+  await txn.wait();
 
   //Set Private Sale Open ready for testing
-  console.log("Opening burning reveal");
-  txn = await gameContract.setPacksReady();
-  await txn.wait();
+  // console.log("Opening burning reveal");
+  // txn = await gameContract.setPacksReady();
+  // await txn.wait();
 
   console.log("Sandbox script complete")
 

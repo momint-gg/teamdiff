@@ -179,8 +179,8 @@ export default function MintPack() {
 
         // Set if is past presale date
         // open sale start date in UTC
-        const presaleStartDate = new Date("June 10, 2022 00:00:00");
-        const presaleEndDate = new Date("June 10, 2022 21:00:00");
+        const presaleStartDate = new Date("June 11, 2022 00:00:00");
+        const presaleEndDate = new Date("June 11, 2022 21:00:00");
         // const presaleStartDate = new Date("June 7, 2022 00:00:00");
         // const presaleEndDate = new Date("June 10, 2022 21:00:00");
         const today = new Date();
@@ -246,9 +246,8 @@ export default function MintPack() {
       .catch((error) => {
         if (error.data?.message) {
           alert("error: " + error.data.message);
-        }
-        else {
-          alert("error:" + error);
+        } else {
+          alert("error: " + error.message);
         }
         // console.log("error: " + JSON.stringify(error, null, 2));
       });
@@ -327,42 +326,42 @@ export default function MintPack() {
                   </Typography>
                 )}
               </Box>
-              {isPolygon && (
-                <Box
-                  justifyContent="center"
-                  alignItems="center"
+
+              <Box
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                  display: "flex",
+                  paddingTop: "20px",
+                }}
+              >
+                <Fab
+                  variant="extended"
+                  size="large"
+                  aria-label="add"
+                  onClick={mintStarterPack}
+                  // onClick={() => setDisplayMint(true)}
                   sx={{
-                    display: "flex",
-                    paddingTop: "20px",
+                    marginRight: 1,
+                    background:
+                      "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    color: "white",
+                    fontSize: 20,
+                    paddingRight: 8,
+                    paddingLeft: 8,
                   }}
+                  // disabled={!isPolygon}
+                  disabled={
+                    hasAlreadyMintedPack ||
+                    (!isOnWhitelist && isPresalePhase) ||
+                    !(isPresalePhase || isPublicSalePhase) ||
+                    !isPolygon
+                  }
                 >
-                  <Fab
-                    variant="extended"
-                    size="large"
-                    aria-label="add"
-                    onClick={mintStarterPack}
-                    // onClick={() => setDisplayMint(true)}
-                    sx={{
-                      marginRight: 1,
-                      background:
-                        "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                      color: "white",
-                      fontSize: 20,
-                      paddingRight: 8,
-                      paddingLeft: 8,
-                    }}
-                    // disabled={!isPolygon}
-                    disabled={
-                      hasAlreadyMintedPack ||
-                      (!isOnWhitelist && isPresalePhase) ||
-                      // !(isPresalePhase || isPublicSalePhase) ||
-                      !isPolygon
-                    }
-                  >
-                    Mint
-                  </Fab>
-                </Box>
-              )}
+                  Mint
+                </Fab>
+              </Box>
+
               <br></br>
               {isPresalePhase && (
                 <Typography
@@ -370,7 +369,7 @@ export default function MintPack() {
                   variant="subtitle1"
                   color="secondary"
                 >
-                  Presale ends June 10th, 5:00 pm EST
+                  Presale ends June 11th, 5:00 pm EST
                 </Typography>
               )}
               {!(isPresalePhase || isPublicSalePhase) && (
@@ -415,19 +414,13 @@ export default function MintPack() {
                 ) : (
                   <>
                     {!isOnWhitelist && isPresalePhase && (
-                      <Typography
-                        color="primary"
-                        variant="h5"
-                      >
+                      <Typography color="primary" variant="h5">
                         {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
                           " you think this is wrong, or come back tomorrow for public sale! "}
                       </Typography>
                     )}
                     {!(isPresalePhase || isPublicSalePhase) && (
-                      <Typography
-                        color="primary"
-                        variant="h5"
-                      >
+                      <Typography color="primary" variant="h5">
                         {"Please come back when presale begins!"}
                       </Typography>
                     )}
@@ -685,8 +678,7 @@ export default function MintPack() {
             </Box>
           )}
         </>
-      )
-      }
-    </Box >
+      )}
+    </Box>
   );
 }
