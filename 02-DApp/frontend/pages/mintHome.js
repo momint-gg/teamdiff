@@ -1,19 +1,16 @@
-import { Box, Container, Fab, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
+import { Container, Box, Typography, Fab, Link } from "@mui/material";
 import Image from "next/image";
-// Router
-import { useRouter } from "next/router";
-import React from "react";
+import card_and_pack from "../assets/images/card_and_pack.png";
 import { useMediaQuery } from "react-responsive";
-import cardandpack from "../assets/images/card_and_pack.png";
+import { useRouter } from "next/router";
 
 export default function MintHome() {
-  // Router
   const router = useRouter();
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
-
   return (
     <Box>
+
       <Box>
         {isMobile ? (
           <Box
@@ -33,9 +30,10 @@ export default function MintHome() {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "row",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "space-evenly",
+                  textAlign: "center"
                 }}
               >
                 <Box
@@ -43,10 +41,25 @@ export default function MintHome() {
                     flex: 2,
                   }}
                 >
-                  <Typography variant="h4" color="white" component="div">
+                  <Typography variant="h4" color="primary" component="div">
                     Starter Pack
                   </Typography>
-                  <Typography color="white" component="div">
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Image
+                      src={card_and_pack}
+                      alt="Picture of the author"
+                      width="550px"
+                      height="550px"
+                    />
+                  </Box>
+                  <Typography color="primary" component="div">
                     Mint a starter pack and get 5 unique athlete NFTs, which
                     allow you to build a roster and get right into the action.
                   </Typography>
@@ -56,7 +69,6 @@ export default function MintHome() {
                       size="large"
                       aria-label="add"
                       onClick={() => router.push("./mintPack")}
-                      // onClick={() => setDisplayMint(true)}
                       sx={{
                         marginTop: 5,
                         marginRight: 1,
@@ -64,6 +76,8 @@ export default function MintHome() {
                           "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                         color: "white",
                         fontSize: 20,
+                        paddingRight: 6,
+                        paddingLeft: 6
                       }}
                     >
                       Mint
@@ -74,26 +88,30 @@ export default function MintHome() {
                       color="white"
                       aria-label="add"
                       onClick={() => router.push("./starterPackContents")}
-                      sx={{ marginTop: 5, fontSize: 20 }}
+                      sx={{ marginTop: 3, fontSize: 20 }}
                     >
                       CONTENTS
                     </Fab>
+                    <Box sx={{ marginTop: 3 }}>
+                      <Typography variant="h6" color="primary" component="div">
+                        Don't know how to mint? Check out this
+                        <Link sx={{ marginLeft: 1 }}>
+                          <a target="_blank" href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64">
+                            guide
+                          </a>
+                        </Link>!
+                      </Typography>
+                    </Box>
+                    <Fab
+                      variant="extended"
+                      size="medium"
+                      aria-label="add"
+                      onClick={() => router.push("./terms-of-service")}
+                      sx={{ backgroundColor: "#c9c9c9", marginTop: 2, fontSize: 18 }}
+                    >
+                      Mint Terms of Service
+                    </Fab>
                   </Box>
-                </Box>
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Image
-                    src={cardandpack}
-                    alt="Picture of the author"
-                    width="550px"
-                    height="550px"
-                  />
                 </Box>
               </Box>
             </Container>
@@ -104,6 +122,7 @@ export default function MintHome() {
               display: "flex",
               flexDirection: "row",
               alignContent: "space-between",
+              textAlign: "center"
             }}
           >
             <Container
@@ -113,26 +132,28 @@ export default function MintHome() {
               }}
             >
               <Box>
-                <Typography variant="h3" color="white" component="div">
+                <Typography variant="h3" color="primary" component="div" sx={{ marginBottom: 3 }}>
                   Starter Pack
                 </Typography>
-                <Typography variant="h6" color="white" component="div">
-                  Mint a starter pack and get 5 unique athlete NFTs, which allow
-                  you to build a roster and get right into the action.
+                <Typography variant="h6" color="primary" component="div">
+                  Mint a starter pack and get 5 unique athlete NFTs, which
+                  allow you to build a roster and get right into the action.
                 </Typography>
-                {/* TODO: Only show this mint button if user is logged in */}
+                {/*TODO: Only show this mint button if user is logged in*/}
                 <Fab
                   variant="extended"
                   size="large"
                   aria-label="add"
                   onClick={() => router.push("./mintPack")}
                   sx={{
-                    marginTop: 5,
-                    marginRight: 1,
+                    marginTop: 3,
+                    marginRight: 3,
                     background:
                       "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                     color: "white",
                     fontSize: 20,
+                    paddingRight: 6,
+                    paddingLeft: 6
                   }}
                 >
                   Mint
@@ -143,16 +164,35 @@ export default function MintHome() {
                   color="white"
                   aria-label="add"
                   onClick={() => router.push("./starterPackContents")}
-                  sx={{ marginTop: 5, fontSize: 20 }}
+                  sx={{ marginTop: 3, fontSize: 20 }}
                 >
                   CONTENTS
+                </Fab>
+                <Box sx={{ marginTop: 3 }}>
+                  <Typography variant="h6" color="primary" component="div">
+                    Don't know how to mint? Check out this
+                    <Link sx={{ marginLeft: 1 }}>
+                      <a target="_blank" href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64">
+                        guide
+                      </a>
+                    </Link>!
+                  </Typography>
+                </Box>
+                <Fab
+                  variant="extended"
+                  size="medium"
+                  aria-label="add"
+                  onClick={() => router.push("./terms-of-service")}
+                  sx={{ backgroundColor: "#c9c9c9", marginTop: 2, fontSize: 18 }}
+                >
+                  Mint Terms of Service
                 </Fab>
               </Box>
             </Container>
             {isMobile ? (
               <Box>
                 <Image
-                  src={cardandpack}
+                  src={card_and_pack}
                   alt="Picture of the author"
                   width="550px"
                   height="550px"
@@ -161,7 +201,6 @@ export default function MintHome() {
             ) : (
               <Container
                 sx={{
-                  // marginLeft: "4rem",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
@@ -169,8 +208,7 @@ export default function MintHome() {
               >
                 <Box>
                   <Image
-                    src={cardandpack}
-                    // layout="responsive"
+                    src={card_and_pack}
                     alt="Picture of the author"
                     width="550px"
                     height="550px"
