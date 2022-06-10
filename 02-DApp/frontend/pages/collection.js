@@ -4,15 +4,25 @@ import { FormControl, MenuItem, TextField } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Grid, Select } from "@mui/material";
+import { Box, Typography, Grid, Select, styled } from "@mui/material";
 import constants from "../constants";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageList from '@mui/material/ImageList';
 
 import ConnectWallet from "./connectWallet";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import AthleteCardModal from "../components/AthleteCardModal";
 import { useMediaQuery } from "react-responsive";
+// import styles from "../styles/collection.module.css"
+
+// const StyledImageListItem = styled(ImageListItem)`
+//   &:hover {
+//     cursor: pointer;
+
+//   }
+// `
 
 export default function Collection() {
   const [nftResp, setNFTResp] = useState(null);
@@ -244,13 +254,76 @@ export default function Collection() {
               backgroundColor: "white",
               height: 5,
             }} />
-          <Box
+
+          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+              <Grid item xs={12} sm={6} md={4} lg={3} >
+                <Typography
+                  variant={isMobile ? "h6" : "h4"}
+                  color="secondary.light"
+                  component="div"
+                  // fontSize={"50px"}
+
+                >
+                  Filter Athletes:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <TextField 
+                label="Name"
+                value={searchQuery}
+                onChange={handleQueryChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <FormControl sx={{ minWidth: 250 }} >
+                <InputLabel id="position-filter">Position</InputLabel>
+                <Select
+                  labelId="position-filter"
+                  value={teamPositionSelection}
+                  label="Position"
+                  onChange={handlePositionFilterChange}
+                >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
+                    <MenuItem value={positionOption}>{positionOption}</MenuItem>
+                  ))}
+                  
+                </Select>
+
+              </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
+                <FormControl sx={{ minWidth: 250 }} >
+                          <InputLabel id="team-filter">Team</InputLabel>
+                          <Select
+                            labelId="team-filter"
+                            value={teamFilterSelection}
+                            label="Team"
+                            onChange={handleTeamFilterChange}
+                          >
+                          <MenuItem value="">
+                            <em>None</em>
+                          </MenuItem>
+                            {allTeamFilterOptions.map((teamOption => (
+                              <MenuItem value={teamOption}>{teamOption}</MenuItem>
+                            )))}
+                            
+                          </Select>
+
+                        </FormControl>
+              </Grid>
+          </Grid>
+            
+          {/* <Box
             sx={{
               display: "flex",
               gap: "30px",
               alignItems: "center",
             }}
           >
+            
           <Typography
             variant={isMobile ? "h6" : "h4"}
             color="secondary.light"
@@ -302,7 +375,7 @@ export default function Collection() {
 
         </FormControl>
 
-          </Box>
+          </Box> */}
           <Typography
             variant={isMobile ? "h8" : "h6"}
             color="secondary.light"
@@ -314,7 +387,36 @@ export default function Collection() {
             Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
           </Typography>
           
-          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+          <ImageList
+            sx={{
+              width: "100%",
+              borderColor: "white",
+              color: "white",
+              borderRadius: 2,
+              border: 1,
+            }}
+            cols={isMobile ? 1 : 3}
+            >
+            {athleteNFTsWrapper?.map((athleteData) => (
+              <ImageListItem sx={{ margin: "5%" }} className="athlete-image">
+              <img
+                src={"/cards/"+athleteData?.title+".png?w=164&h=164&fit=crop&auto=format"}
+                alt={"Athlete card"}
+                loading="lazy"
+                onClick={() => {
+                  setCurrAthlete({
+                    image: "/cards/"+athleteData?.title+".png?w=164&h=164&fit=crop&auto=format",
+                    athleteData: athleteData
+                  })
+                  setModalOpen(true)
+                }}
+                
+              />
+            </ImageListItem>
+            ))}
+          </ImageList>      
+
+          {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {athleteNFTsWrapper?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -323,10 +425,11 @@ export default function Collection() {
                   setModalOpen={setModalOpen} />
               </Grid>
             ))}
-          </Grid>
+          </Grid> */}
           <AthleteCardModal
             modalOpen={modalOpen}
-            athleteData={currAthlete}
+            image={currAthlete?.image}
+            athleteData={currAthlete?.athleteData}
             handleModalClose={handleModalClose} />
           <Typography
             variant={isMobile ? "h4" : "h2"}
@@ -341,7 +444,27 @@ export default function Collection() {
               backgroundColor: "white",
               height: 5,
             }} />
-          <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
+          <ImageList
+            sx={{
+              width: "100%",
+              borderColor: "white",
+              color: "white",
+              borderRadius: 2,
+              border: 1,
+            }}
+            cols={isMobile ? 1 : 3}
+          >
+            {packNFTs?.map((_) => (
+              <ImageListItem sx={{ margin: "5%" }}>
+                <img
+                  src={"/starterPack.png?w=164&h=164&fit=crop&auto=format"}
+                  alt={"Starter pack image"}
+                  loading="lazy"
+                />
+              </ImageListItem>
+            ))}
+          </ImageList>
+          {/* <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
             {packNFTs?.map((athleteData) => (
               <Grid item xs={isMobile ? 12 : 4}>
                 <AthleteCard
@@ -350,7 +473,7 @@ export default function Collection() {
                   setModalOpen={setModalOpen} />
               </Grid>
             ))}
-          </Grid>
+          </Grid> */}
         </Box></>
     );
   } else if (isConnected) {
