@@ -1,16 +1,15 @@
+import { Box, Container, Fab, Link, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
-import { Container, Box, Typography, Fab, Link } from "@mui/material";
 import Image from "next/image";
-import card_and_pack from "../assets/images/card_and_pack.png";
-import { useMediaQuery } from "react-responsive";
 import { useRouter } from "next/router";
+import { useMediaQuery } from "react-responsive";
+import card_and_pack from "../assets/images/card_and_pack.png";
 
 export default function MintHome() {
   const router = useRouter();
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   return (
     <Box>
-
       <Box>
         {isMobile ? (
           <Box
@@ -33,7 +32,7 @@ export default function MintHome() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "space-evenly",
-                  textAlign: "center"
+                  textAlign: "center",
                 }}
               >
                 <Box
@@ -77,7 +76,7 @@ export default function MintHome() {
                         color: "white",
                         fontSize: 20,
                         paddingRight: 6,
-                        paddingLeft: 6
+                        paddingLeft: 6,
                       }}
                     >
                       Mint
@@ -87,7 +86,11 @@ export default function MintHome() {
                       size="large"
                       aria-label="add"
                       onClick={() => router.push("./starterPackContents")}
-                      sx={{ marginTop: 3, fontSize: 20, backgroundColor: white }}
+                      sx={{
+                        marginTop: 3,
+                        fontSize: 20,
+                        backgroundColor: "white",
+                      }}
                     >
                       CONTENTS
                     </Fab>
@@ -95,10 +98,15 @@ export default function MintHome() {
                       <Typography variant="h6" color="primary" component="div">
                         Don't know how to mint? Check out this
                         <Link sx={{ marginLeft: 1 }}>
-                          <a target="_blank" href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64">
+                          <a
+                            target="_blank"
+                            href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64"
+                            rel="noreferrer"
+                          >
                             guide
                           </a>
-                        </Link>!
+                        </Link>
+                        !
                       </Typography>
                     </Box>
                     <Fab
@@ -106,7 +114,11 @@ export default function MintHome() {
                       size="medium"
                       aria-label="add"
                       onClick={() => router.push("./terms-of-service")}
-                      sx={{ backgroundColor: "#c9c9c9", marginTop: 2, fontSize: 18 }}
+                      sx={{
+                        backgroundColor: "#c9c9c9",
+                        marginTop: 2,
+                        fontSize: 18,
+                      }}
                     >
                       Mint Terms of Service
                     </Fab>
@@ -121,7 +133,7 @@ export default function MintHome() {
               display: "flex",
               flexDirection: "row",
               alignContent: "space-between",
-              textAlign: "center"
+              textAlign: "center",
             }}
           >
             <Container
@@ -131,14 +143,19 @@ export default function MintHome() {
               }}
             >
               <Box>
-                <Typography variant="h3" color="primary" component="div" sx={{ marginBottom: 3 }}>
+                <Typography
+                  variant="h3"
+                  color="primary"
+                  component="div"
+                  sx={{ marginBottom: 3 }}
+                >
                   Starter Pack
                 </Typography>
                 <Typography variant="h6" color="primary" component="div">
-                  Mint a starter pack and get 5 unique athlete NFTs, which
-                  allow you to build a roster and get right into the action.
+                  Mint a starter pack and get 5 unique athlete NFTs, which allow
+                  you to build a roster and get right into the action.
                 </Typography>
-                {/*TODO: Only show this mint button if user is logged in*/}
+                {/* TODO: Only show this mint button if user is logged in */}
                 <Fab
                   variant="extended"
                   size="large"
@@ -152,7 +169,7 @@ export default function MintHome() {
                     color: "white",
                     fontSize: 20,
                     paddingRight: 6,
-                    paddingLeft: 6
+                    paddingLeft: 6,
                   }}
                 >
                   Mint
@@ -171,10 +188,15 @@ export default function MintHome() {
                   <Typography variant="h6" color="primary" component="div">
                     Don't know how to mint? Check out this
                     <Link sx={{ marginLeft: 1 }}>
-                      <a target="_blank" href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64">
+                      <a
+                        target="_blank"
+                        href="https://mirror.xyz/teamdiff.eth/tK9LpoqKvuXbFqTH5HjlL1d-4VO8wO8XfmOG_WaFN64"
+                        rel="noreferrer"
+                      >
                         guide
                       </a>
-                    </Link>!
+                    </Link>
+                    !
                   </Typography>
                 </Box>
                 <Fab
@@ -182,7 +204,11 @@ export default function MintHome() {
                   size="medium"
                   aria-label="add"
                   onClick={() => router.push("./terms-of-service")}
-                  sx={{ backgroundColor: "#c9c9c9", marginTop: 2, fontSize: 18 }}
+                  sx={{
+                    backgroundColor: "#c9c9c9",
+                    marginTop: 2,
+                    fontSize: 18,
+                  }}
                 >
                   Mint Terms of Service
                 </Fab>
