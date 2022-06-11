@@ -1,5 +1,4 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-// import AthleteCard from "../components/AthleteCard";
 import {
   Box,
   Container,
@@ -56,18 +55,19 @@ export default function BurnPack({ setDisplay }) {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState();
-  // const [nftResp, setNFTResp] = useState(null);
-  // // const [packNFTs, setPackNFTs] = useState([]);
-  // const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [isPreRevealPhase, setIsPreRevealPhase] = useState();
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
   const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  /**
+   * Handles a change in injected etheruem provider from MetaMask
+   */
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
-      console.log("Ethereum successfully detected!");
+      // console.log("Ethereum successfully detected!");
       // Access the decentralized web!
     } else {
       setIsNoMetaMask(true);
@@ -75,17 +75,21 @@ export default function BurnPack({ setDisplay }) {
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
       window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
-      console.log("Please install MetaMask!");
+      // console.log("Please install MetaMask!");
     }
   }
 
+  /**
+   * Checks if browsers has injected web3 provider
+   * and if so, gets connected account data, or sets to null if no connected account
+   */
   useEffect(() => {
     if (window.ethereum) {
+      setIsLoading(true);
       handleEthereum();
-      // setHasMinted(true);
-      // setMintedIndices([6, 33, 12, 26, 45]);
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const sig ner = provider.getSigner()
+
       const setAccountData = async () => {
         const signer = provider.getSigner();
         const accounts = await provider.listAccounts();
@@ -97,15 +101,16 @@ export default function BurnPack({ setDisplay }) {
           setIsConnected(true);
         } else {
           setIsConnected(false);
+          setIsLoading(false);
         }
-        setIsLoading(false);
+        // setIsLoading(false);
       };
       setAccountData();
       provider.provider.on("accountsChanged", (accounts) => {
         setAccountData();
       });
       provider.provider.on("disconnect", () => {
-        console.log("disconnected");
+        // console.log("disconnected");
         setIsConnected(false);
       });
     } else {
@@ -119,10 +124,16 @@ export default function BurnPack({ setDisplay }) {
     }
   }, [connectedAccount]);
 
-  // Use Effect for change in if user isConnected
+  /**
+   * Runs when connectedAccount changes
+   * Sets a GameITems instance to state var
+   * Grabs the connectedAccount data from GameItems
+   */
   useEffect(() => {
     // setAthleteNFTs([]);
     if (isConnected) {
+      setIsLoading(true);
+
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -137,7 +148,7 @@ export default function BurnPack({ setDisplay }) {
           setIsMinting(false);
           setIsTransactionDelayed(false);
           const test = [6, 33, 12, 26, 45];
-          console.log("athleteIndices: " + test);
+          // console.log("athleteIndices: " + test);
 
           setHasMinted(true);
           setMintedIndices(athleteIndices);
@@ -155,57 +166,63 @@ export default function BurnPack({ setDisplay }) {
 
         // Grab if user has already minted starter pack
         const hasAlreadyBurnedPack1 =
-          await GameItemsContract.userToHasBurnedPack(connectedAccount);
+          await GameItemsContract.userToHasBurnedStarterPack(connectedAccount);
         setHasAlreadyBurnedPack(hasAlreadyBurnedPack1);
 
         // Set if is past presale date
         // open sale start date in UTC
-        const revealStartDate = new Date("June 13, 2022 21:00:00");
-        // const revealStartDate = new Date("June 6, 2022 21:00:00");
-        const today = new Date();
-        const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
-        setIsPreRevealPhase(isBeforeRevealDate);
-        console.log("isPreveal: " + isBeforeRevealDate);
+        // const revealStartDate = new Date("June 13, 2022 21:00:00");
+        // // const revealStartDate = new Date("June 6, 2022 21:00:00");
+        // const today = new Date();
+        // const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
+        const isRevealPhase = await GameItemsContract.packsReadyToOpen();
+
+        setIsPreRevealPhase(!isRevealPhase);
+        // console.log("isPreveal: " + isRevealPhase);
+        setIsLoading(false);
       };
       fetchData();
+      // console.log("isPreveal out: " + isPreRevealPhase);
 
       // Listen to event for when pack burn function is called
-      GameItemsContract.once("packBurned", packBurnedCallback);
+      GameItemsContract.once("starterPackBurned", packBurnedCallback);
     } else {
-      console.log("no account data found!");
+      // console.log("no account data found!");
+      setIsLoading(false);
     }
   }, [isConnected, connectedAccount]);
 
-  // TODO hide burn pack if they don't
+  /**
+   * Creates GameITmes instance with connected Account as signer
+   * Calls burnStarterPack from GameItems Contract
+   */
   const burnStarterPack = async () => {
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
     // Create a new instance of the Contract with a Signer, which allows update methods
-
     const gameItemsContractWithSigner = new ethers.Contract(
       CONTRACT_ADDRESSES.GameItems,
       GameItemsJSON.abi,
       signer
     );
-    // setIsMinting(true);
-
-    // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
     // Calling burn on game items contract
-    const burnTxn = await gameItemsContractWithSigner
+    await gameItemsContractWithSigner
       .burnStarterPack({
         gasLimit: 10000000,
       })
       .then((res) => {
-        console.log("txn result: " + JSON.stringify(res, null, 2));
+        // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
         }, 20 * 1000);
-        console.log("Minting pack in progress...");
+        // console.log("Minting pack in progress...");
       })
       .catch((error) => {
-        alert("error: " + error.message);
+        if (error.data?.message) {
+          alert("error: " + error.data.message);
+        } else {
+          alert("error:" + error.message);
+        }
       });
   };
 
@@ -316,17 +333,17 @@ export default function BurnPack({ setDisplay }) {
                 {isPreRevealPhase && (
                   <>
                     <Typography variant="subtitle1" color="secondary">
-                      Revealing TeamDiff Starter Packs unlocks June 13th, 5:00
-                      pm EST
+                      Revealing TeamDiff Starter Packs unlocks June 13th, at
+                      5:00 pm EST
                     </Typography>
-                    <Typography>
+                    <Typography color="primary">
                       Come back after the reveal date to open your pack!
                     </Typography>
                   </>
                 )}
                 <br></br>
                 {!ownsStarterPack && !hasAlreadyBurnedPack && (
-                  <Typography>
+                  <Typography color="primary">
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
                       <a className="primary-link" href="/mintPack">
@@ -337,7 +354,7 @@ export default function BurnPack({ setDisplay }) {
                   </Typography>
                 )}
                 {hasAlreadyBurnedPack && (
-                  <Typography>
+                  <Typography color="primary" variant="h5">
                     {
                       "Oops! Looks like you have already opened 1 TeamDiff Starter Pack. Trade for more cards on "
                     }
@@ -346,7 +363,7 @@ export default function BurnPack({ setDisplay }) {
                         className="primary-link"
                         target="_blank"
                         href={
-                          "https://testnets.opensea.io/assets/" +
+                          "https://opensea.io/assets/matic/" +
                           gameItemsContract.address
                         }
                         rel="noreferrer"
@@ -425,7 +442,7 @@ export default function BurnPack({ setDisplay }) {
                         alignItems: "center",
                         justifyContent: "center",
                         marginTop: 2,
-                        marginBottom: 5,
+                        marginBottom: 2,
                       }}
                     >
                       <Typography
@@ -443,13 +460,17 @@ export default function BurnPack({ setDisplay }) {
                         />
                       )}
                     </Box>
+                    <Typography color="primary" sx={{ marginBottom: 5 }}>
+                      *Note, it can take a few minutes for the NFT metadata and
+                      image to populate on OpenSea
+                    </Typography>
                     <Box>
                       <Grid container spacing={6}>
                         {mintedIndices?.map((index) => (
                           <Grid item xs={isMobile ? 12 : 4}>
                             <Link
                               href={
-                                "https://testnets.opensea.io/assets/" +
+                                "https://opensea.io/assets/matic/" +
                                 gameItemsContract.address +
                                 "/" +
                                 index
@@ -469,6 +490,7 @@ export default function BurnPack({ setDisplay }) {
                           </Grid>
                         ))}
                       </Grid>
+                      <br></br>
                     </Box>
                     <Fab
                       variant="extended"

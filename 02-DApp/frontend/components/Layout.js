@@ -8,25 +8,24 @@ import Footer from "./Footer";
 import NavLink from "./NavLink";
 
 const Layout = ({ children, isMobile }) => {
-  // const pages = [
-  //   { name: "MY COLLECTION", href: "/collection" },
-  //   { name: "MINT", href: "/mintHome" },
-  //   { name: "OPEN", href: "/burnPack" },
-  // ];
-  const pages = [];
+  const pages = [
+    { name: "MY COLLECTION", href: "/collection" },
+    { name: "MINT", href: "/mintHome" },
+    { name: "OPEN", href: "/burnPack" },
+  ];
+  // const pages = [];
 
   return (
     // <>
     <Box
       component="body"
       minHeight="100vh"
+      minWidth="100vw"
       backgroundColor="transparent"
       sx={{
         backgroundImage:
           "url(/dots.png), linear-gradient(135deg, #330D36 0%, #110412 100%)",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "scroll",
+        backgroundSize: "contain",
       }}
     >
       {isMobile ? (
