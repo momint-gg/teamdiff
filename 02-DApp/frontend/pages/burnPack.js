@@ -74,7 +74,7 @@ export default function BurnPack({ setDisplay }) {
       setIsLoading(false);
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
-      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
       // console.log("Please install MetaMask!");
     }
   }
