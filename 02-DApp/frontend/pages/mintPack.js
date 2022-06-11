@@ -195,6 +195,7 @@ export default function MintPack() {
         const isPublicSale = await GameItemsContract.isPublicSalePhase();
         setIsPresalePhase(isPresale);
         setIsPublicSalePhase(isPublicSale);
+        console.log("ispublic: " + isPublicSale);
 
         setIsLoading(false);
       };
@@ -357,7 +358,7 @@ export default function MintPack() {
                   // disabled={!isPolygon}
                   disabled={
                     hasAlreadyMintedPack ||
-                    (!isOnWhitelist && isPresalePhase) ||
+                    // (!isOnWhitelist && isPresalePhase) ||
                     !(isPresalePhase || isPublicSalePhase) ||
                     !isPolygon
                   }
@@ -444,7 +445,7 @@ export default function MintPack() {
                     {`Please switch to Polygon and refresh the page to proceed 
                     with minting. If you don't already have Polygon configured
                     in your wallet, follow these instructions `}
-                    <Link 
+                    <Link
                       href="https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask#polygon-scan"
                       rel="noreferrer"
                       target="_blank"
