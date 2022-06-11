@@ -131,9 +131,7 @@ export default function Collection() {
     if (isConnected) {
       // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
-        console.log("entering getNftData function")
-        console.log(constants, 'constants')
-        console.log(constants.POLYGON_ALCHEMY_LINK)
+//         console.log("entering getNftData function")
         const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK)
         // const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK).catch(
         //   (error) => {
@@ -146,7 +144,7 @@ export default function Collection() {
         //     );
         //   }
         // );
-        console.log("finished createAlchemyweb")
+//         console.log("finished createAlchemyweb")
 
         const nfts = await web3.alchemy
           .getNfts({
@@ -321,7 +319,8 @@ export default function Collection() {
   } else if (
     isConnected &&
     nftResp &&
-    (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)
+    (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0) &&
+    !loadingError
   ) {
     return (
       // https://mui.com/material-ui/react-select/
@@ -572,7 +571,7 @@ export default function Collection() {
           </Grid> */}
       </Box>
     );
-  } else if (isConnected && nftResp) {
+  } else if (isConnected && nftResp && !loadingError) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Card
