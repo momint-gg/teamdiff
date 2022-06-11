@@ -80,9 +80,9 @@ contract GameItems is ERC1155, Ownable {
     // Our whitelist
     mapping(address => bool) public whitelist;
     uint256 public numWhitelisted;
-    bool isPresalePhase;
-    bool isPublicSalePhase;
-    bool isBoosterPackSalePhase;
+    bool public isPresalePhase;
+    bool public isPublicSalePhase;
+    bool public isBoosterPackSalePhase;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs

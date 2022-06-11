@@ -41,8 +41,9 @@ const main = async () => {
     }));
   };
 
-  parseExcel('./TeamDiff Final WL.xlsx').forEach((element) => {
-    let data = element.data;
+  let data;
+  parseExcel("./scripts/deploy/TeamDiff Final WL.xlsx").forEach((element) => {
+    data = element.data;
   });
 
   // Adding to WL array

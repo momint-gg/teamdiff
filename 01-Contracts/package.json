@@ -30,6 +30,7 @@
     "hardhat-contract-sizer": "^2.4.0",
     "hardhat-gas-reporter": "^1.0.8",
     "mocha": "^9.2.2",
-    "should": "^13.2.3"
+    "should": "^13.2.3",
+    "xlsx": "^0.18.5"
   }
 }
