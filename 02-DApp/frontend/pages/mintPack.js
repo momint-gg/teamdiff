@@ -405,7 +405,7 @@ export default function MintPack() {
                         className="primary-link"
                         target="_blank"
                         href={
-                          "https://opensea.io/assets/matic" +
+                          "https://opensea.io/assets/matic/" +
                           gameItemsContract.address
                         }
                         rel="noreferrer"
