@@ -12,11 +12,11 @@ const main = async () => {
   // TODO: Change to matic
   // console.log('Game items address is ', GameItems);
   const provider = new ethers.providers.AlchemyProvider(
-    'rinkeby',
-    process.env.ALCHEMY_KEY
+    'matic',
+    process.env.POLYGON_ALCHEMY_KEY
   );
   const rinkebySigner = new ethers.Wallet(
-    process.env.TEAMDIFF_PRIVATE_KEY,
+    process.env.PRIVATE_KEY,
     provider
   );
   contract = new ethers.Contract(GameItems, GameItemsJSON.abi, rinkebySigner);
@@ -48,20 +48,20 @@ const main = async () => {
   // Adding users to whitelist
   let txn = await contract.addUsersToWhitelist(whitelist.slice(0, 500));
   await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(500, 1000));
-  await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(1000, 1500));
-  await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(1500, 2000));
-  await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(2000, 2500));
-  await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(2500, 3000));
-  await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(3000, 3500));
-  await txn.wait();
-  txn = await contract.addUsersToWhitelist(whitelist.slice(3500, data.length));
-  await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(500, 1000));
+  // await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(1000, 1500));
+  // await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(1500, 2000));
+  // await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(2000, 2500));
+  // await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(2500, 3000));
+  // await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(3000, 3500));
+  // await txn.wait();
+  // txn = await contract.addUsersToWhitelist(whitelist.slice(3500, data.length));
+  // await txn.wait();
 
   // Checking length of whitelist
   const numWhitelisted = await contract.getNumWhitelisted();
