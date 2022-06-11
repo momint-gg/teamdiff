@@ -130,6 +130,7 @@ export default function Collection() {
         });
 
         setNFTResp(nfts);
+        console.log("nftresp", nfts);
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
           const response = await web3.alchemy.getNftMetadata({
