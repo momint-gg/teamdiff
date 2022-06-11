@@ -22,14 +22,14 @@ const main = async () => {
   // await txn.wait();
 
   //Manually add to address Open ready for testing
-  console.log("Adding User to whitelsit");
-  txn = await contract.addUserToWhitelist("0x550B8Cf3e728eb22C40D2a4a6EBE1365e06BA871");
-  await txn.wait();
+  // console.log("Adding User to whitelsit");
+  // txn = await contract.addUserToWhitelist("0x550B8Cf3e728eb22C40D2a4a6EBE1365e06BA871");
+  // await txn.wait();
   
   //Set Public Sale Open ready for testing
-  // console.log("Opening public sale");
-  // txn = await gameContract.openPublicSale();
-  // await txn.wait();
+  console.log("Opening public sale");
+  txn = await gameContract.openPublicSale();
+  await txn.wait();
 
   //Set Private Sale Open ready for testing
   // console.log("Opening burning reveal");
