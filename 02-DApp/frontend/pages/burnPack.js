@@ -171,15 +171,18 @@ export default function BurnPack({ setDisplay }) {
 
         // Set if is past presale date
         // open sale start date in UTC
-        const revealStartDate = new Date("June 13, 2022 21:00:00");
-        // const revealStartDate = new Date("June 6, 2022 21:00:00");
-        const today = new Date();
-        const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
-        setIsPreRevealPhase(isBeforeRevealDate);
-        // console.log("isPreveal: " + isBeforeRevealDate);
+        // const revealStartDate = new Date("June 13, 2022 21:00:00");
+        // // const revealStartDate = new Date("June 6, 2022 21:00:00");
+        // const today = new Date();
+        // const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
+        const isRevealPhase = await GameItemsContract.packsReadyToOpen();
+
+        setIsPreRevealPhase(!isRevealPhase);
+        // console.log("isPreveal: " + isRevealPhase);
         setIsLoading(false);
       };
       fetchData();
+      // console.log("isPreveal out: " + isPreRevealPhase);
 
       // Listen to event for when pack burn function is called
       GameItemsContract.once("starterPackBurned", packBurnedCallback);
