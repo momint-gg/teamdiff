@@ -368,7 +368,7 @@ export default function MintPack() {
               </Box>
 
               <br></br>
-              {isPresalePhase && (
+              {isPresalePhase && !isPublicSalePhase && (
                 <Typography
                   textAlign="center"
                   variant="subtitle1"
