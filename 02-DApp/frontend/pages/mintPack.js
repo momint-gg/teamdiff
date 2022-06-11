@@ -14,6 +14,7 @@ import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
+import Link from "next/link"
 
 export default function MintPack() {
   // Router
@@ -61,7 +62,7 @@ export default function MintPack() {
       setIsLoading(false);
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
-      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
       console.log("Please install MetaMask!");
     }
   }
@@ -441,8 +442,12 @@ export default function MintPack() {
                       fontSize: 16,
                     }}
                   >
-                    Please switch to Polygon and refresh the page to proceed
-                    with minting.
+                    {`Please switch to Polygon and refresh the page to proceed 
+                    with minting. If you don't already have Polygon configured
+                    in your wallet, follow these instructions `}
+                    <Link href="https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask#polygon-scan">
+                      here.
+                    </Link>
                   </Typography>
                 )}
               </Box>
