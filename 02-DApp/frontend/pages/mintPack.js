@@ -14,7 +14,6 @@ import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
-import Link from "next/link"
 
 export default function MintPack() {
   // Router
@@ -445,7 +444,11 @@ export default function MintPack() {
                     {`Please switch to Polygon and refresh the page to proceed 
                     with minting. If you don't already have Polygon configured
                     in your wallet, follow these instructions `}
-                    <Link href="https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask#polygon-scan">
+                    <Link 
+                      href="https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask#polygon-scan"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
                       here.
                     </Link>
                   </Typography>
