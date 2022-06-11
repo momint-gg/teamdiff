@@ -418,7 +418,7 @@ export default function MintPack() {
                   </Typography>
                 ) : (
                   <>
-                    {!isOnWhitelist && isPresalePhase && (
+                    {!isOnWhitelist && isPresalePhase && !isPublicSalePhase && (
                       <Typography color="primary" variant="h5">
                         {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
                           " you think this is wrong, or come back tomorrow for public sale! "}
