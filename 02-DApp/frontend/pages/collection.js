@@ -347,7 +347,7 @@ export default function Collection() {
               variant={isMobile ? "h6" : "h4"}
               color="secondary.light"
               component="div"
-              // fontSize={"50px"}
+            // fontSize={"50px"}
             >
               Filter Athletes:
             </Typography>
@@ -609,9 +609,8 @@ export default function Collection() {
             </Fab>
           </Box>
           <Box sx={{ marginTop: 2 }}>
-            {/* Change to opensea address */}
             <Link
-              href={"/mintHome"}
+              href={"https://opensea.io/collection/teamdiff"}
               sx={{ textDecoration: "none" }}
               target={"_blank"}
             >
