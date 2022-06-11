@@ -130,12 +130,12 @@ export default function MintPack() {
    */
   const checkUserChain = () => {
     if (!currentChain || currentChain != 137) {
-      if (currentChain === 1) {
-        // in the future we can potentially switch networks for them using useNetwork wagmi hook?
-        alert(
-          "Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint."
-        );
-      }
+      // if (currentChain === 1) {
+      //   // in the future we can potentially switch networks for them using useNetwork wagmi hook?
+      //   alert(
+      //     "Uh oh, you are currently on the Ethereum mainnet. Please switch to Polygon to proceed with the mint."
+      //   );
+      // }
       // } else {
       //   alert("Please switch to the Polygon network to proceed with the mint!")
       // }
@@ -430,21 +430,21 @@ export default function MintPack() {
                     )}
                   </>
                 )}
-                {!isPolygon &&
-                  !hasAlreadyMintedPack &&
-                  !(!isOnWhitelist && isPresalePhase) &&
-                  (isPresalePhase || isPublicSalePhase) && (
-                    <Typography
-                      variant="h5"
-                      style={{
-                        color: "red",
-                        fontSize: 16,
-                      }}
-                    >
-                      Please switch to Polygon and refresh the page to proceed
-                      with minting.
-                    </Typography>
-                  )}
+                {!isPolygon && (
+                  // !hasAlreadyMintedPack &&
+                  // !(!isOnWhitelist && isPresalePhase) &&
+                  // (isPresalePhase || isPublicSalePhase) && (
+                  <Typography
+                    variant="h5"
+                    style={{
+                      color: "red",
+                      fontSize: 16,
+                    }}
+                  >
+                    Please switch to Polygon and refresh the page to proceed
+                    with minting.
+                  </Typography>
+                )}
               </Box>
             </Container>
           )}
