@@ -191,10 +191,10 @@ export default function MintPack() {
         // console.log("ispublic: " + isPublicSale);
         // console.log("today: " + today.getUTCDate());
         // console.log("isPresale: " + isPresale);
-        // const isPresale = await GameItemsContract.isPresalePhase();
-        // const isPublicSale = await GameItemsContract.isPublicSale();
-        // setIsPresalePhase(isPresale);
-        // setIsPublicSalePhase(isPublicSale);
+        const isPresale = await GameItemsContract.isPresalePhase();
+        const isPublicSale = await GameItemsContract.isPublicSalePhase();
+        setIsPresalePhase(isPresale);
+        setIsPublicSalePhase(isPublicSale);
 
         setIsLoading(false);
       };

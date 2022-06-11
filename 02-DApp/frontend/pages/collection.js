@@ -142,10 +142,18 @@ export default function Collection() {
           }
         );
 
-        const nfts = await web3.alchemy.getNfts({
-          owner: connectedAccount,
-          contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-        });
+        const nfts = await web3.alchemy
+          .getNfts({
+            owner: connectedAccount,
+            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+          })
+          .catch((error) => {
+            // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
+            // setNFTData([]);
+            setIsPreparingAthletes(false);
+
+            console.log("get nfts error: " + JSON.stringify(error, null, 2));
+          });
 
         setNFTResp(nfts);
         console.log("nftresp", nfts);
@@ -176,7 +184,7 @@ export default function Collection() {
       };
 
       await getNFTData().catch((error) => {
-        alert("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
+        // alert("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
         // setNFTData([]);
         // setIsPreparingAthletes(false);
 
