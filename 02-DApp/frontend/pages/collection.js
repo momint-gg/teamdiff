@@ -25,7 +25,7 @@ import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
 import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
-import constants from "../constants";
+import constants from "../constants/index";
 // import styles from "../styles/collection.module.css"
 
 // const StyledImageListItem = styled(ImageListItem)`
@@ -63,7 +63,7 @@ export default function Collection() {
       setIsLoading(false);
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
-      window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
       console.log("Please install MetaMask!");
     }
   }
