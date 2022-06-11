@@ -214,7 +214,7 @@ export default function BurnPack({ setDisplay }) {
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
-        }, 20 * 1000);
+        }, 10 * 1000);
         // console.log("Minting pack in progress...");
       })
       .catch((error) => {

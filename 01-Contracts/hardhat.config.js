@@ -43,6 +43,7 @@ module.exports = {
     artifacts: "./build/contracts",
   },
   defaultNetwork: "hardhat",
+  
   networks: {
     hardhat: {
       // url: "http://127.0.0.1:8545",
@@ -87,6 +88,8 @@ module.exports = {
     disambiguatePaths: false,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      polygon: process.env.POLYGONSCAN_API_KEY,
+    },
   },
 };

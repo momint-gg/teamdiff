@@ -178,19 +178,6 @@ export default function MintPack() {
         setIsOnWhitelist(isOnWhitelist1);
 
         // Set if is past presale date
-        // open sale start date in UTC
-        // const presaleStartDate = new Date("June 10, 2022 23:59:59");
-        // const presaleEndDate = new Date("June 11, 2022 21:00:00");
-        // // const presaleStartDate = new Date("June 7, 2022 00:00:00");
-        // // const presaleEndDate = new Date("June 10, 2022 21:00:00");
-        // const today = new Date();
-        // const isPresale =
-        //   today.getTime() < presaleEndDate.getTime() &&
-        //   today.getTime() > presaleStartDate.getTime();
-        // const isPublicSale = today.getTime() > presaleEndDate.getTime();
-        // console.log("ispublic: " + isPublicSale);
-        // console.log("today: " + today.getUTCDate());
-        // console.log("isPresale: " + isPresale);
         const isPresale = await GameItemsContract.isPresalePhase();
         const isPublicSale = await GameItemsContract.isPublicSalePhase();
         setIsPresalePhase(isPresale);
@@ -221,7 +208,7 @@ export default function MintPack() {
       //   ],
       // };
       // GameItemsContract.on(filter, packMintedCallback);
-      GameItemsContract.once("starterPackMinted", packMintedCallback);
+      GameItemsContract.on("starterPackMinted", packMintedCallback);
     } else {
       // console.log("no account connected");
       setIsLoading(false);
@@ -246,7 +233,7 @@ export default function MintPack() {
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
-        }, 20 * 1000);
+        }, 10 * 1000);
       })
       .catch((error) => {
         if (error.data?.message) {
