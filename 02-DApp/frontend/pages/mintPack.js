@@ -44,8 +44,8 @@ export default function MintPack() {
   const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyMintedPack, setHasAlreadyMintedPack] = useState();
   const [isOnWhitelist, setIsOnWhitelist] = useState();
-  const [isPresalePhase, setIsPresalePhase] = useState();
-  const [isPublicSalePhase, setIsPublicSalePhase] = useState();
+  const [isPresalePhase, setIsPresalePhase] = useState(true);
+  const [isPublicSalePhase, setIsPublicSalePhase] = useState(false);
   const [isNoMetaMask, setIsNoMetaMask] = useState();
 
   /**
@@ -191,10 +191,10 @@ export default function MintPack() {
         // console.log("ispublic: " + isPublicSale);
         // console.log("today: " + today.getUTCDate());
         // console.log("isPresale: " + isPresale);
-        const isPresale = await GameItemsContract.isPresalePhase();
-        const isPublicSale = await GameItemsContract.isPublicSale();
-        setIsPresalePhase(isPresale);
-        setIsPublicSalePhase(isPublicSale);
+        // const isPresale = await GameItemsContract.isPresalePhase();
+        // const isPublicSale = await GameItemsContract.isPublicSale();
+        // setIsPresalePhase(isPresale);
+        // setIsPublicSalePhase(isPublicSale);
 
         setIsLoading(false);
       };

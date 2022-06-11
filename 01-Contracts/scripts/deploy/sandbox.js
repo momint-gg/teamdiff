@@ -17,9 +17,9 @@ const main = async () => {
 
 
   // //Set Private Sale Open ready for testing
-  // console.log("Opening private Sale");
-  // txn = await gameContract.openPrivateSale();
-  // await txn.wait();
+  console.log("Opening private Sale");
+  txn = await contract.openPrivateSale();
+  await txn.wait();
   
   //Set Public Sale Open ready for testing
   // console.log("Opening public sale");
@@ -31,6 +31,7 @@ const main = async () => {
   // txn = await gameContract.setPacksReady();
   // await txn.wait();
   // Reading WL in from excel
+  /*
   let whitelist = []; // Users we're going to WL
   const parseExcel = (filename) => {
     const excelData = XLSX.readFile(filename);
@@ -87,7 +88,7 @@ const main = async () => {
         "Error adding people to WL. Lengths don't match. Length of WL in contract is ",
         Number(numWhitelisted)
       );
-
+*/
   console.log("Sandbox script complete")
 
 };
