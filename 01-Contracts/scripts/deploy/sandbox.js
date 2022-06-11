@@ -28,7 +28,7 @@ const main = async () => {
   
   //Set Public Sale Open ready for testing
   console.log("Opening public sale");
-  txn = await gameContract.openPublicSale();
+  txn = await contract.openPublicSale();
   await txn.wait();
 
   //Set Private Sale Open ready for testing
