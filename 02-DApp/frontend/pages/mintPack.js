@@ -1,28 +1,20 @@
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import "bootstrap/dist/css/bootstrap.css";
-import {
-  Box,
-  Typography,
-  Container,
-  Paper,
-  Fab,
-  Link,
-} from "@mui/material";
-import Image from "next/image";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import OpenSea from "../assets/images/opensea.png"
-import LoadingPrompt from "../components/LoadingPrompt";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
-import { useMediaQuery } from "react-responsive";
-
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import * as utils from "@ethersproject/hash";
-import { hexZeroPad } from "@ethersproject/bytes";
-import profilePic from "../assets/images/starter-pack.png";
-//Router
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+// Router
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import OpenSea from "../assets/images/opensea.png";
+import profilePic from "../assets/images/starter-pack.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+import LoadingPrompt from "../components/LoadingPrompt";
+
 
 export default function MintPack() {
   // Router
@@ -198,106 +190,76 @@ export default function MintPack() {
 
   return (
     <Box>
-      {
-        !isConnected && !hasMinted && !isMinting ? (
-          <ConnectWalletPrompt accessing={"minting a pack"} />
-        )
-          :
-          <>
-            {isLoading ? (
-              <LoadingPrompt loading={"Mint Page"} />
-            ) : (
-              <>
-                {isConnected && !hasMinted && (
+      {!isConnected && !hasMinted && !isMinting ? (
+        <ConnectWalletPrompt accessing={"minting a pack"} />
+      ) : (
+        <>
+          {isLoading ? (
+            <LoadingPrompt loading={"Mint Page"} />
+          ) : (
+            <>
+              {isConnected && !hasMinted && (
+                <Box
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    marginBottom: 4,
+                    marginTop: 4,
+                    "& > :not(style)": {
+                      m: 1,
+                      width: 260,
+                      height: 320,
+                    },
+                  }}
+                >
+                  <Paper
+                    elevation={0}
+                    style={{
+                      background:
+                        "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                      filter: "blur(35px)",
+                    }}
+                  />
+                  <Container sx={{ position: "absolute" }}>
+                    <Image
+                      src={profilePic}
+                      alt="Picture of the author"
+                      position="absolute"
+                    />
+                  </Container>
+                </Box>
+              )}
+              {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
+                <Container
+                  maxWidth="lg"
+                  justifyContent="center"
+                  alignItems="center"
+                >
                   <Box
                     justifyContent="center"
                     alignItems="center"
+                    flexDirection="column"
                     sx={{
                       display: "flex",
-                      flexWrap: "wrap",
-                      marginBottom: 4,
-                      marginTop: 4,
-                      "& > :not(style)": {
-                        m: 1,
-                        width: 260,
-                        height: 320,
-                      },
+                      textAlign: "center",
                     }}
                   >
-                    <Paper
-                      elevation={0}
-                      style={{
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        filter: "blur(35px)",
-                      }}
-                    />
-                    <Container sx={{ position: "absolute" }}>
-                      <Image
-                        src={profilePic}
-                        alt="Picture of the author"
-                        position="absolute"
-                      />
-                    </Container>
-                  </Box>
-                )}
-                {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
-                  <Container
-                    maxWidth="lg"
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    <Box
-                      justifyContent="center"
-                      alignItems="center"
-                      flexDirection="column"
-                      sx={{
-                        display: "flex",
-                        textAlign: "center",
-                      }}
-                    >
-                      <Typography variant="h3" color="white" component="div">
-                        Mint Starter Pack
+                    <Typography variant="h3" color="white" component="div">
+                      Mint Starter Pack
+                    </Typography>
+                    {packsAvailable != null && (
+                      <Typography variant="h6" color="white" component="div">
+                        There are{" "}
+                        <Box fontWeight="fontWeightBold" display="inline">
+                          {packsAvailable}
+                        </Box>{" "}
+                        packs still available
                       </Typography>
-                      {packsAvailable != null && (
-                        <Typography variant="h6" color="white" component="div">
-                          There are{" "}
-                          <Box fontWeight="fontWeightBold" display="inline">
-                            {packsAvailable}
-                          </Box>{" "}
-                          packs still available
-                        </Typography>
-                      )}
-                    </Box>
-                    {isPolygon && (
-                      <Box
-                        justifyContent="center"
-                        alignItems="center"
-                        sx={{
-                          display: "flex",
-                          paddingTop: "20px",
-                        }}
-                      >
-                        <Fab
-                          variant="extended"
-                          size="large"
-                          aria-label="add"
-                          onClick={mintStarterPack}
-                          // onClick={() => setDisplayMint(true)}
-                          sx={{
-                            marginRight: 1,
-                            background:
-                              "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                            color: "white",
-                            fontSize: 20,
-                            paddingRight: 8,
-                            paddingLeft: 8
-                          }}
-                        >
-                          Mint
-                        </Fab>
-                      </Box>
                     )}
+                  </Box>
+                  {true && (
                     <Box
                       justifyContent="center"
                       alignItems="center"
@@ -306,72 +268,106 @@ export default function MintPack() {
                         paddingTop: "20px",
                       }}
                     >
-                      {!isPolygon && (
-                        <Typography
-                          style={{
-                            color: "red",
-                            fontSize: 16,
-                          }}
-                        >
-                          Please switch to Polygon, then refresh the page, to proceed
-                          with minting.
-                        </Typography>
-                      )}
+                      <Fab
+                        variant="extended"
+                        size="large"
+                        aria-label="add"
+                        onClick={mintStarterPack}
+                        // onClick={() => setDisplayMint(true)}
+                        sx={{
+                          marginRight: 1,
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                          color: "white",
+                          fontSize: 20,
+                          paddingRight: 8,
+                          paddingLeft: 8,
+                        }}
+                      >
+                        Mint
+                      </Fab>
                     </Box>
-                  </Container>
-                )}
-                {isMinting && (
-                  <Box sx={{ marginTop: 5 }}>
-                    <LoadingPrompt
-                      completeTitle={"Minting Pack in Progress"}
-                      bottomText={
-                        isMinting && isTransactionDelayed
-                          ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
-                          : ""
-                      }
-                    />
-                  </Box>
-                )}
-                {hasMinted && (
-                  <Container
+                  )}
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
                     sx={{
                       display: "flex",
-                      flexDirection: "column",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    {!isPolygon && (
+                      <Typography
+                        style={{
+                          color: "red",
+                          fontSize: 16,
+                        }}
+                      >
+                        Please switch to Polygon, then refresh the page, to
+                        proceed with minting.
+                      </Typography>
+                    )}
+                  </Box>
+                </Container>
+              )}
+              {isMinting && (
+                <Box sx={{ marginTop: 5 }}>
+                  <LoadingPrompt
+                    completeTitle={"Minting Pack in Progress"}
+                    bottomText={
+                      isMinting && isTransactionDelayed
+                        ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
+                        : ""
+                    }
+                  />
+                </Box>
+              )}
+              {hasMinted && (
+                <Container
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       alignItems: "center",
+                      justifyContent: "space-evenly",
                     }}
                   >
                     <Box
                       sx={{
-                        display: "flex",
-                        flexDirection: isMobile ? "column" : "row",
-                        alignItems: "center",
-                        justifyContent: "space-evenly",
+                        flex: 3,
                       }}
                     >
                       <Box
                         sx={{
-                          flex: 3,
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: "2rem",
                         }}
                       >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginBottom: "2rem"
-                          }}
+                        <Typography
+                          sx={{ marginRight: 2, textAlign: "center" }}
+                          variant="h4"
+                          color="white"
+                          component="div"
                         >
-                          <Typography
-                            sx={{ marginRight: 2, textAlign: "center" }}
-                            variant="h4"
-                            color="white"
-                            component="div"
-                          >
-                            Acquired Starter Pack!
-                          </Typography>
-                          {!isMobile && <CheckCircleIcon fontSize="large" sx={{ color: "#13db13" }} />}
-                        </Box>
-                        {isMobile && <Box
+                          Acquired Starter Pack!
+                        </Typography>
+                        {!isMobile && (
+                          <CheckCircleIcon
+                            fontSize="large"
+                            sx={{ color: "#13db13" }}
+                          />
+                        )}
+                      </Box>
+                      {isMobile && (
+                        <Box
                           justifyContent="center"
                           alignItems="center"
                           sx={{
@@ -401,94 +397,105 @@ export default function MintPack() {
                             />
                           </Container>
                         </Box>
-                        }
-                        <Box>
+                      )}
+                      <Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: isMobile ? "column" : "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
                           <Box
                             sx={{
-                              display: "flex",
-                              flexDirection: isMobile ? "column" : "row",
-                              justifyContent: "space-between",
-                              alignItems: "center",
+                              flex: 1,
+                              marginRight: 3,
+                              textAlign: "center",
+                              marginBottom: isMobile ? "1rem" : "0",
                             }}
                           >
-                            <Box
-                              sx={{
-                                flex: 1,
-                                marginRight: 3,
-                                textAlign: "center",
-                                marginBottom: isMobile ? "1rem" : "0"
-                              }}
+                            <Typography color="primary" variant="h5">
+                              {" "}
+                              Pack #
+                            </Typography>
+                            <Typography
+                              variant="h5"
+                              color="secondary"
+                              sx={{ fontWeight: "bold" }}
                             >
-                              <Typography color="primary" variant="h5"> Pack #</Typography>
-                              <Typography variant="h5" color="secondary" sx={{ fontWeight: "bold" }}> {100 - packsAvailable} </Typography>
-                            </Box>
-                            <Box
-                              sx={{
-                                flex: 3,
-                                textAlign: "center"
-                              }}
+                              {" "}
+                              {100 - packsAvailable}{" "}
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              flex: 3,
+                              textAlign: "center",
+                            }}
+                          >
+                            <Link
+                              href={
+                                "https://testnets.opensea.io/assets/" +
+                                gameItemsContract.address +
+                                "/50" // the pack Id is after the athletes (not 0)
+                              }
+                              sx={{ textDecoration: "none" }}
+                              target={"_blank"}
                             >
-                              <Link
-                                href={
-                                  "https://testnets.opensea.io/assets/" +
-                                  gameItemsContract.address +
-                                  "/50" // the pack Id is after the athletes (not 0)
-                                }
-                                sx={{ textDecoration: "none" }}
-                                target={"_blank"}
+                              <Fab
+                                variant="extended"
+                                size="large"
+                                aria-label="add"
+                                color={"info"}
+                                sx={{ fontSize: 20, color: "white" }}
                               >
-                                <Fab
-                                  variant="extended"
-                                  size="large"
-                                  aria-label="add"
-                                  color={"info"}
-                                  sx={{ fontSize: 20, color: "white" }}
-                                >
-                                  <Image
-                                    src={OpenSea}
-                                    alt={"opensea"}
-                                    width="30rem"
-                                    height="30rem"
-                                  />
-                                  <Box sx={{ marginLeft: 1 }}>
-                                    View on OpenSea
-                                  </Box>
-                                </Fab>
-                              </Link>
-                            </Box>
+                                <Image
+                                  src={OpenSea}
+                                  alt={"opensea"}
+                                  width="30rem"
+                                  height="30rem"
+                                />
+                                <Box sx={{ marginLeft: 1 }}>
+                                  View on OpenSea
+                                </Box>
+                              </Fab>
+                            </Link>
                           </Box>
                         </Box>
-
-                        <Box sx={{ textAlign: "center" }}>
-                          <Fab
-                            variant="extended"
-                            size="large"
-                            aria-label="add"
-                            onClick={() => router.push("./burnPack")}
-                            sx={{
-                              marginTop: isMobile ? 3 : 5,
-                              marginRight: isMobile ? 0 : 2,
-                              background:
-                                "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                              color: "white",
-                              fontSize: 20,
-                            }}
-                          >
-                            Open Pack
-                          </Fab>
-                          <Fab
-                            variant="extended"
-                            size="large"
-                            color="white"
-                            aria-label="add"
-                            onClick={() => router.push("./collection")}
-                            sx={{ marginTop: isMobile ? 3 : 5, fontSize: 20 }}
-                          >
-                            Go To My Collection
-                          </Fab>
-                        </Box>
                       </Box>
-                      {!isMobile && <Box
+
+                      <Box sx={{ textAlign: "center" }}>
+                        <Fab
+                          variant="extended"
+                          size="large"
+                          aria-label="add"
+                          onClick={() => router.push("./burnPack")}
+                          sx={{
+                            marginTop: isMobile ? 3 : 5,
+                            marginRight: isMobile ? 0 : 2,
+                            background:
+                              "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                            color: "white",
+                            fontSize: 20,
+                          }}
+                        >
+                          Open Pack
+                        </Fab>
+                        <Fab
+                          variant="extended"
+                          size="large"
+                          color="white"
+                          aria-label="add"
+                          onClick={() => router.push("./collection")}
+                          sx={{ marginTop: isMobile ? 3 : 5, fontSize: 20 }}
+                        >
+                          Go To My Collection
+                        </Fab>
+                      </Box>
+                    </Box>
+                    {!isMobile && (
+                      <Box
                         justifyContent="center"
                         alignItems="center"
                         sx={{
@@ -519,21 +526,21 @@ export default function MintPack() {
                           />
                         </Container>
                       </Box>
-                      }
-                    </Box>
-                  </Container>
-                )}
-                {packsAvailable == 0 && (
-                  <Box>
-                    <Typography color="primary">
-                      Sorry, all packs have already been minted :(
-                    </Typography>
+                    )}
                   </Box>
-                )}
-              </>
-            )}
-          </>
-      }
+                </Container>
+              )}
+              {packsAvailable == 0 && (
+                <Box>
+                  <Typography color="primary">
+                    Sorry, all packs have already been minted :(
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
+        </>
+      )}
     </Box>
   );
 }

@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import Image from "next/image";
-import { Box, Button, Typography, Modal, TextField } from "@mui/material";
 import { makeStyles } from "@material-ui/core";
+import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import Image from "next/image";
+import React, { useState } from "react";
 import CloseIcon from "../assets/images/close.png";
-import Card from "../assets/cards/Fudge.png";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -34,6 +33,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function PlayerSelectModal({
+  position,
   modalOpen,
   stateData,
   players,
@@ -41,7 +41,7 @@ export default function PlayerSelectModal({
 }) {
   const classes = useStyles();
   const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
-
+  console.log("selectedPlaer :" + JSON.stringify(stateData, null, 2));
   return (
     <Modal
       open={modalOpen}
@@ -56,7 +56,7 @@ export default function PlayerSelectModal({
     >
       <Box className="modal-container" sx={{ padding: "26px 40px !important" }}>
         <Typography variant="h4" color="white">
-          Select {stateData.position}
+          Select {position}
         </Typography>
         <Button
           style={{ position: "absolute", top: "10px", right: "10px" }}
@@ -112,7 +112,7 @@ export default function PlayerSelectModal({
                   marginLeft: "40px",
                 }}
               >
-                {players?.map((player) => (
+                {players?.map((player, index) => (
                   <Box sx={{ direction: "ltr" }}>
                     <Box
                       sx={{
@@ -135,7 +135,7 @@ export default function PlayerSelectModal({
                       {player.name}
                     </Typography>
                     <Typography color={"white"} fontSize={18}>
-                      {player.title}
+                      {player.attributes[0].value}
                     </Typography>
                   </Box>
                 ))}
@@ -148,7 +148,7 @@ export default function PlayerSelectModal({
               marginTop: "30px",
             }}
           >
-            <Image src={selectedPlayer.image} width={255} height={342} />
+            <Image src={stateData.image} width={255} height={342} />
             <Button
               onClick={() => handleSubModal(row)}
               style={{
@@ -181,7 +181,10 @@ export default function PlayerSelectModal({
                     TEAM
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.opponent}
+                    {stateData ? stateData.name : "none"}
+                    {/* {stateData
+                      ? stateData.metadata.attributes[0].value
+                      : "none"} */}
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: "20px" }}>
@@ -194,7 +197,7 @@ export default function PlayerSelectModal({
                     OPPONENT
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.score}
+                    {stateData ? "c69" : "none"}
                   </Typography>
                 </Box>
               </Box>
@@ -209,7 +212,11 @@ export default function PlayerSelectModal({
                     POSITION
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.position}
+                    {/** figure out why attributes is undefined here */}
+                    {stateData ? stateData.name : "none"}
+                    {/* {stateData
+                      ? stateData.metadata.attributes[1].value
+                      : "none"} */}
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: "20px" }}>
@@ -222,7 +229,7 @@ export default function PlayerSelectModal({
                     PREVIOUS POINTS
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.prevPoints}
+                    {stateData ? "69" : "none"}
                   </Typography>
                 </Box>
               </Box>

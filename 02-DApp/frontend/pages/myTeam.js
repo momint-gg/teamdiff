@@ -105,14 +105,19 @@ export default function MyTeam() {
   const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
   const [ownedAthletesMetadata, setOwnedAthletesMetadata] = useState([]);
+  const [currentPosition, setCurrentPosition] = useState([]);
 
   // DAte
   const d = new Date();
   const today = d.getDay() + 1;
   // Set to corresponding lock day Sun = 1, Sat = 7
   const leagueLockDay = 1;
-  const daysTillLock = leagueLockDay % today;
-
+  let daysTillLock;
+  today > leagueLockDay
+    ? // If today greater than lock day
+      (daysTillLock = 7 - today + leagueLockDay)
+    : // if today < lock day
+      (daysTillLock = leagueLockDay - today);
   const starterAthleteData = {
     top: {
       img: null,
@@ -290,13 +295,18 @@ export default function MyTeam() {
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
-  const handleStateModal = (player) => {
+  const handleStateModal = (player, position) => {
     setCurrentPlayer(player);
+    // console.log("setting pos: " + position);
+    setCurrentPosition(position);
     setStateModalOpen(true);
   };
 
-  const handleSubModal = (player) => {
+  const handleSubModal = (player, position) => {
     setCurrentPlayer(player);
+    setCurrentPosition(position);
+    // console.log("setting pos: " + position);
+
     setSubModalOpen(true);
   };
 
@@ -394,13 +404,13 @@ export default function MyTeam() {
               <TableBody>
                 {starterAthleteIds.map((id, index) => {
                   // const athelete = atheleteData[key];
-                  const athlete = ownedAthletesMetadata[43];
+                  const athlete = ownedAthletesMetadata[17];
                   // if(id != 0)
                   console.log(
                     "athlete index: " +
                       index +
                       " = " +
-                      JSON.stringify(ownedAthletesMetadata[index], null, 2)
+                      JSON.stringify(ownedAthletesMetadata[id], null, 2)
                   );
                   const positions = [
                     "Top",
@@ -432,7 +442,9 @@ export default function MyTeam() {
                         <div>
                           <Typography
                             fontSize={30}
-                            onClick={() => handleStateModal(athlete)}
+                            onClick={() =>
+                              handleStateModal(athlete, positions[index])
+                            }
                           >
                             {id != 0 ? athlete.name : "none set"}
                           </Typography>
@@ -444,24 +456,29 @@ export default function MyTeam() {
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30}>
-                            {id != 0 ? 32 : "none"}
+                            {/* todo get score from datafetch */}
+                            {id != 0 ? 69 : "none"}
                           </Typography>
-                          <Typography>{id != 0 ? 32 : "no date"}</Typography>
+                          <Typography>
+                            {id != 0 ? "69/69/69" : "no date"}
+                          </Typography>
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
-                            {id != 0 ? "c9" : "none"}
+                            {id != 0 ? "c69" : "none"}
                           </Typography>
                           <Typography>
-                            {id != 0 ? "7/12/12" : "no date"}
+                            {id != 0 ? "69/69/69" : "no date"}
                           </Typography>
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <Button
-                          onClick={() => handleSubModal(athlete)}
+                          onClick={() =>
+                            handleSubModal(athlete, positions[index])
+                          }
                           style={{
                             background:
                               "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
@@ -480,17 +497,26 @@ export default function MyTeam() {
               </TableBody>
             </Table>
           </TableContainer>
-          <PlayerStateModal
-            modalOpen={stateModalOpen}
-            stateData={Sample.statsData}
-            handleModalClose={handleStateModalClose}
-          />
-          <PlayerSelectModal
-            modalOpen={subModalOpen}
-            stateData={currentPlayer}
-            players={players}
-            handleModalClose={handleStateModalClose}
-          />
+          {!isLoading && (
+            <>
+              <PlayerStateModal
+                position={currentPosition}
+                modalOpen={stateModalOpen}
+                stateData={Sample.statsData}
+                handleModalClose={handleStateModalClose}
+              />
+              <PlayerSelectModal
+                position={currentPosition}
+                modalOpen={subModalOpen}
+                stateData={currentPlayer}
+                // players={players}
+                // TODO, set players = to a functoin getOwnedPositionAthletes(positionIndex)
+                // which returns a filtered list of athlets by position
+                players={ownedAthletesMetadata}
+                handleModalClose={handleStateModalClose}
+              />
+            </>
+          )}
         </Container>
       )}
     </>
