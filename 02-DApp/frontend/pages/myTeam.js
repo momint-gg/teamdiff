@@ -1,35 +1,38 @@
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { Box, Container, Typography } from "@mui/material";
-import {
-  Button,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
-import { makeStyles } from "@material-ui/core";
-import { useMediaQuery } from "react-responsive";
-import logo from "../assets/images/example.png";
-import PlayerStateModal from "../components/PlayerStateModal";
-import PlayerSelectModal from "../components/PlayerSelectModal";
-import Card1 from "../assets/cards/Fudge.png";
-import Card2 from "../assets/cards/Abbedagge.png";
-import Sample from "../../backend/sample.json";
-import { useRouter } from "next/router";
-//Web3 Imports
-import { ethers } from "ethers";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-const atheleteData = Sample.athleteData;
-//Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import { makeStyles } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from "@mui/material";
+// Web3 Imports
+import { ethers } from "ethers";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import AthletesJSON from "../../backend/contractscripts/contract_info/abis/Athletes.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+// Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import Sample from "../../backend/sample.json";
+import Card2 from "../assets/cards/Abbedagge.png";
+import Card1 from "../assets/cards/Fudge.png";
+import logo from "../assets/images/example.png";
+import PlayerSelectModal from "../components/PlayerSelectModal";
+import PlayerStateModal from "../components/PlayerStateModal";
 import constants from "../constants";
+
+const atheleteData = Sample.athleteData;
 
 // TODO get data from backend
 const players = [
@@ -66,9 +69,9 @@ const players = [
 ];
 
 export default function MyTeam() {
-  //Router params
+  // Router params
   const router = useRouter();
-  //TODO change to matic network for prod
+  // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -103,14 +106,14 @@ export default function MyTeam() {
   const [athleteContract, setAthleteContract] = useState();
   const [ownedAthletesMetadata, setOwnedAthletesMetadata] = useState([]);
 
-  //DAte
+  // DAte
   const d = new Date();
-  let today = d.getDay() + 1;
-  //Set to corresponding lock day Sun = 1, Sat = 7
-  let leagueLockDay = 1;
-  let daysTillLock = leagueLockDay % today;
+  const today = d.getDay() + 1;
+  // Set to corresponding lock day Sun = 1, Sat = 7
+  const leagueLockDay = 1;
+  const daysTillLock = leagueLockDay % today;
 
-  let starterAthleteData = {
+  const starterAthleteData = {
     top: {
       img: null,
       name: null,
@@ -170,7 +173,7 @@ export default function MyTeam() {
         setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
-        //TODO this doesn't update screen when switching accounts :/
+        // TODO this doesn't update screen when switching accounts :/
       } else {
         setIsConnected(false);
       }
@@ -221,9 +224,9 @@ export default function MyTeam() {
         setIsLeagueMember(isInLeague);
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
-        let starterIds = [null, null, null, null, null];
+        const starterIds = [null, null, null, null, null];
         for (let i = 0; i <= 4; i++) {
-          let id = await LeagueProxyContract.userToLineup(
+          const id = await LeagueProxyContract.userToLineup(
             connectedAccount,
             i
           ).catch((e) => console.log("error: " + e));
@@ -231,12 +234,12 @@ export default function MyTeam() {
         }
         setStarterAthleteIds(starterIds);
 
-        //TODO if is not league member, refresh the page
+        // TODO if is not league member, refresh the page
         if (!isInLeague) {
           router.reload(window.location.pathname);
         }
 
-        //TODO this is slightly buggy when someone tries to switch accounts
+        // TODO this is slightly buggy when someone tries to switch accounts
         // setIsLoading(false);
       }
 
@@ -250,7 +253,7 @@ export default function MyTeam() {
         });
 
         setNFTResp(nfts);
-        let athleteMetadata = [];
+        const athleteMetadata = [];
 
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
@@ -280,7 +283,7 @@ export default function MyTeam() {
       });
       fetchData();
     } else {
-      //alert("no account data or league Address found, please refresh.");
+      // alert("no account data or league Address found, please refresh.");
       console.log("no account data or league Address found");
       // console.log("router: " + JSON.stringify(router.query, null, 2));
       //   console.log("leagueAddress: " + leagueAddress);
@@ -429,12 +432,12 @@ export default function MyTeam() {
                         <div>
                           <Typography
                             fontSize={30}
-                            onClick={() => handleStateModal(athelete)}
+                            onClick={() => handleStateModal(athlete)}
                           >
                             {id != 0 ? athlete.name : "none set"}
                           </Typography>
                           <Typography component="div">
-                            {athlete.score}
+                            {id != 0 ? athlete.score : "n/a"}
                           </Typography>
                         </div>
                       </TableCell>
@@ -458,7 +461,7 @@ export default function MyTeam() {
                       </TableCell>
                       <TableCell align="center">
                         <Button
-                          onClick={() => handleSubModal(athelete)}
+                          onClick={() => handleSubModal(athlete)}
                           style={{
                             background:
                               "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
