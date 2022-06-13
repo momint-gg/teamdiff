@@ -89,8 +89,6 @@ export default function MyTeam() {
   const [currentWeekNum, setCurrentWeekNum] = useState();
   //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
   const [isLeagueMember, setIsLeagueMember] = useState(false);
-
-  const [currentPlayer, setCurrentPlayer] = useState();
   const [stateModalOpen, setStateModalOpen] = useState(false);
   const [subModalOpen, setSubModalOpen] = useState(false);
   const [signer, setSigner] = useState(null);
@@ -342,6 +340,7 @@ export default function MyTeam() {
     return result;
   };
 
+  // TODO create a callback function for when athlete has been set in lineup
   const submitStarterHandler = async (athleteID, positionID) => {
     // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
     // // const positionIndex = positionID;
@@ -369,7 +368,6 @@ export default function MyTeam() {
   };
 
   const handleStateModal = (player, positionIndex) => {
-    setCurrentPlayer(player);
     setSelectedPlayer(player);
     console.log("setting current player: " + JSON.stringify(player, null, 2));
     setCurrentPositionIndex(positionIndex);
@@ -377,7 +375,6 @@ export default function MyTeam() {
   };
 
   const handleSubModal = (player, positionIndex) => {
-    setCurrentPlayer(player);
     setCurrentPositionIndex(positionIndex);
     setSelectedPlayer(player);
 
@@ -451,14 +448,9 @@ export default function MyTeam() {
               <TableBody>
                 {starterAthleteIds.map((id, index) => {
                   // const athelete = atheleteData[key];
+                  // NOTE: if id == 0, that means the connectedAccount has not
+                  // set an athlete in that position for this week in their proxy
                   const athlete = ownedAthletesMetadata[id];
-                  // if(id != 0)
-                  // console.log(
-                  //   "athlete index: " +
-                  //     index +
-                  //     " = " +
-                  //     JSON.stringify(ownedAthletesMetadata[id], null, 2)
-                  // );
 
                   return (
                     <TableRow
@@ -534,7 +526,7 @@ export default function MyTeam() {
                             fontSize: "20px",
                           }}
                         >
-                          SUB
+                          {id != 0 ? "SUB" : "SET"}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -554,14 +546,9 @@ export default function MyTeam() {
               <PlayerSelectModal
                 positionIndex={currentPositionIndex}
                 modalOpen={subModalOpen}
-                stateData={currentPlayer}
-                // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
+                // stateData={currentPlayer}
                 submitStarterHandler={submitStarterHandler}
-                // players={players}
-                // TODO, set players = to a functoin getOwnedPositionAthletes(positionIndex)
-                // which returns a filtered list of athlets by position
-                // players={ownedAthletesMetadata}
-                players={getFilteredOwnedAthletes()}
+                ownedAthletesInPosition={getFilteredOwnedAthletes()}
                 currentStarterID={starterAthleteIds[currentPositionIndex]}
                 handleModalClose={handleStateModalClose}
                 setSelectedPlayer={setSelectedPlayer}

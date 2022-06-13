@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import CloseIcon from "../assets/images/close.png";
 import mystery_card from "../assets/images/mystery_card.png";
 
@@ -36,17 +36,17 @@ const useStyles = makeStyles(() => ({
 export default function PlayerSelectModal({
   positionIndex,
   modalOpen,
-  stateData,
+
   submitStarterHandler,
-  players,
+  ownedAthletesInPosition,
   currentStarterID,
   handleModalClose,
   selectedPlayer,
   setSelectedPlayer,
 }) {
   const classes = useStyles();
-  // const [selectedPlayer, setSelectedPlayer] = useState(players[currentStarterID]);
-  // const [selectedPlayerID, setSelectedPlayerId] = useState(currentStarterID);
+  // const [selectedPlayer, setSelectedPlayer] = useState(ownedAthletesInPosition[currentStarterID]);
+  const [selectedPlayerID, setSelectedPlayerId] = useState(currentStarterID);
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
   // console.log("selectedPlaer :" + JSON.stringify(selectedPlayer, null, 2));
@@ -121,33 +121,35 @@ export default function PlayerSelectModal({
                   marginLeft: "40px",
                 }}
               >
-                {players?.map((player, index) => (
+                {ownedAthletesInPosition?.map((athlete, index) => (
                   <Box sx={{ direction: "ltr" }}>
                     <Box
                       sx={{
                         border: "2px solid",
                         borderColor:
-                          player === selectedPlayer ? "#FF00FF" : "#FFFFFF",
+                          athlete === selectedPlayer ? "#FF00FF" : "#FFFFFF",
                         borderRadius: "10px",
                         padding: "20px 40px",
                         cursor: "pointer",
                       }}
                       onClick={() => {
-                        setSelectedPlayer(player);
-                        setSelectedPlayerId(players.indexOf(player));
+                        setSelectedPlayer(athlete);
+                        setSelectedPlayerId(
+                          ownedAthletesInPosition.indexOf(athlete)
+                        );
                       }}
                     >
-                      <Image src={player.image} width={118} height={158} />
+                      <Image src={athlete.image} width={118} height={158} />
                     </Box>
                     <Typography
                       color={"white"}
                       fontSize={12}
                       sx={{ marginTop: "18px" }}
                     >
-                      {player.attributes[0].value}
+                      {athlete.attributes[0].value}
                     </Typography>
                     <Typography color={"white"} fontSize={18}>
-                      {player.name}
+                      {athlete.name}
                     </Typography>
                   </Box>
                 ))}
@@ -215,7 +217,7 @@ export default function PlayerSelectModal({
                     OPPONENT
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {selectedPlayer ? "c69" : "none"}
+                    {selectedPlayer ? "*pull from backend" : "none"}
                   </Typography>
                 </Box>
               </Box>
@@ -245,7 +247,7 @@ export default function PlayerSelectModal({
                     PREVIOUS POINTS
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {selectedPlayer ? "69" : "none"}
+                    {selectedPlayer ? selectedPlayer.prevPoints : "none"}
                   </Typography>
                 </Box>
               </Box>
