@@ -345,7 +345,7 @@ export default function BurnPack({ setDisplay }) {
                         }}
                       >
                         Please switch to Polygon, then refresh the page, to
-                        proceed with minting.
+                        proceed with opening.
                       </Typography>
                     )}
                   </Box>
