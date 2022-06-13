@@ -178,14 +178,14 @@ export default function BurnPack({ setDisplay }) {
         const isRevealPhase = await GameItemsContract.packsReadyToOpen();
 
         setIsPreRevealPhase(!isRevealPhase);
-        // console.log("isPreveal: " + isRevealPhase);
+        console.log("isPreveal: " + isRevealPhase);
         setIsLoading(false);
       };
       fetchData();
       // console.log("isPreveal out: " + isPreRevealPhase);
 
       // Listen to event for when pack burn function is called
-      GameItemsContract.once("starterPackBurned", packBurnedCallback);
+      GameItemsContract.on("starterPackBurned", packBurnedCallback);
     } else {
       // console.log("no account data found!");
       setIsLoading(false);

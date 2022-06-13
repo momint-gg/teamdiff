@@ -27,14 +27,15 @@ const main = async () => {
   // await txn.wait();
   
   //Set Public Sale Open ready for testing
-  console.log("Opening public sale");
-  txn = await contract.openPublicSale();
+  // console.log("Opening public sale");
+  // txn = await contract.openPublicSale();
+  // await txn.wait();
+
+  // Set Private Sale Open ready for testing
+  console.log("Opening burning reveal");
+  txn = await contract.allowStarterPacks();
   await txn.wait();
 
-  //Set Private Sale Open ready for testing
-  // console.log("Opening burning reveal");
-  // txn = await gameContract.setPacksReady();
-  // await txn.wait();
   // Reading WL in from excel
   /*
   let whitelist = []; // Users we're going to WL
