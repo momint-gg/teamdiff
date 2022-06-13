@@ -1,9 +1,7 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { makeStyles } from "@material-ui/core";
 import {
-  Box,
   Button,
-  CircularProgress,
   Container,
   Paper,
   Table,
@@ -28,6 +26,7 @@ import Sample from "../../backend/sample.json";
 import Card2 from "../assets/cards/Abbedagge.png";
 import Card1 from "../assets/cards/Fudge.png";
 import logo from "../assets/images/example.png";
+import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerSelectModal from "../components/PlayerSelectModal";
 import PlayerStateModal from "../components/PlayerStateModal";
 import constants from "../constants";
@@ -105,7 +104,10 @@ export default function MyTeam() {
   const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
   const [ownedAthletesMetadata, setOwnedAthletesMetadata] = useState([]);
-  const [currentPositionIndex, setCurrentPositionIndex] = useState([]);
+  const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
+  const [selectedPlayer, setSelectedPlayer] = useState();
+
+  const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
   // DAte
   const d = new Date();
@@ -214,12 +216,6 @@ export default function MyTeam() {
       );
       setAthleteContract(AthleteContract);
 
-      const getStarterAthleteData = async (starterIds) => {
-        starterIds.forEach((id, index) => {
-          // let prevPoints = AthleteContract.athleteToScores(id, currentWeekNum - 1)
-        });
-      };
-
       async function fetchData() {
         setIsLoading(true);
 
@@ -238,18 +234,18 @@ export default function MyTeam() {
           starterIds[i] = id;
         }
         setStarterAthleteIds(starterIds);
+        // This ussually takes the longest, so set isLoading to false here
+        setIsLoading(false);
 
         // TODO if is not league member, refresh the page
         if (!isInLeague) {
           router.reload(window.location.pathname);
         }
-
-        // TODO this is slightly buggy when someone tries to switch accounts
-        // setIsLoading(false);
       }
 
       // declare the async data fetching function
       const getNFTData = async () => {
+        setIsLoading(true);
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
@@ -271,22 +267,24 @@ export default function MyTeam() {
             athleteMetadata[parseInt(token)] = response.metadata;
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
           }
+          // setIsLoading(false);
         }
         setOwnedAthletesMetadata(athleteMetadata);
-        setIsLoading(false);
 
-        athleteMetadata.forEach((athlete, index) => {
-          if (index == 0)
-            console.log(
-              "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
-            );
-        });
+        // athleteMetadata.forEach((athlete, index) => {
+        //   if (index == 0)
+        //     console.log(
+        //       "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
+        //     );
+        // });
       };
 
       getNFTData().catch((error) => {
         console.log("fetch NFT DATA error: " + error);
       });
+
       fetchData();
+      // getStarterAthleteData(starterAthleteIds);
     } else {
       // alert("no account data or league Address found, please refresh.");
       console.log("no account data or league Address found");
@@ -295,16 +293,84 @@ export default function MyTeam() {
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
-  const submitStarterHandler = (athleteID, positionID) => {
+  useEffect(() => {
+    // console.log("isLoading: " + isLoading);
+    if (starterAthleteIds) {
+      getStarterAthleteData();
+      // setCurrentPositionIndex(1);
+      console.log(
+        "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
+      );
+    }
+  }, [starterAthleteIds]);
+
+  const getStarterAthleteData = async () => {
+    console.log("starterID: " + starterAthleteIds);
+    starterAthleteIds.forEach(async (id, index) => {
+      if (id != 0 && currentWeekNum > 0) {
+        const prevPoints = await athleteContract
+          .athleteToScores(id, currentWeekNum - 1)
+          .catch((error) => {
+            console.log(JSON.stringify(error, null, 2));
+            // prevPoints = null;
+          });
+        console.log("prevpoints: " + prevPoints);
+        ownedAthletesMetadata[id].prevPoints = prevPoints;
+      } else if (id != 0) {
+        ownedAthletesMetadata[id].prevPoints = "n/a";
+      }
+    });
+    ownedAthletesMetadata.forEach((athlete, index) => {
+      if (index == 0)
+        console.log(
+          "after getting prevPointsathlete id #" +
+            index +
+            ": " +
+            JSON.stringify(athlete, null, 2)
+        );
+    });
+  };
+
+  const getFilteredOwnedAthletes = () => {
+    const result = [];
+    ownedAthletesMetadata.map((athlete, index) => {
+      // check if athlete has the currently selected positions
+      if (athlete.attributes[1].value == positions[currentPositionIndex]) {
+        result[index] = athlete;
+      }
+    });
+    return result;
+  };
+
+  const submitStarterHandler = async (athleteID, positionID) => {
     // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
     // // const positionIndex = positionID;
     console.log(
       "setting athlete id#" + athleteID + " at postion #" + positionID
     );
+
+    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
+
+    await leagueProxyContractWithSigner
+      .setAthleteInLineup(athleteID, positionID)
+      .then(
+        console.log(
+          "setting athlete id#" + athleteID + " at postion #" + positionID
+        )
+        // update state to listen to callback for when position is set
+      )
+      .catch((error) => {
+        if (error.data) {
+          alert("Set Lineup error: " + error.data.message);
+        } else {
+          alert("error: " + error.message);
+        }
+      });
   };
 
   const handleStateModal = (player, positionIndex) => {
     setCurrentPlayer(player);
+    setSelectedPlayer(player);
     console.log("setting current player: " + JSON.stringify(player, null, 2));
     setCurrentPositionIndex(positionIndex);
     setStateModalOpen(true);
@@ -313,7 +379,10 @@ export default function MyTeam() {
   const handleSubModal = (player, positionIndex) => {
     setCurrentPlayer(player);
     setCurrentPositionIndex(positionIndex);
+    setSelectedPlayer(player);
+
     // console.log("setting pos: " + position);
+    console.log("setting current player: " + JSON.stringify(player, null, 2));
 
     setSubModalOpen(true);
   };
@@ -323,40 +392,10 @@ export default function MyTeam() {
     setSubModalOpen(false);
   };
 
-  const generateStarterAthleteRows = () => {
-    starterAthleteIds.map((id, index) => {});
-  };
-
-  useEffect(() => {
-    ownedAthletesMetadata.forEach((athlete, index) => {
-      console.log(
-        "athlete  in Useeffectid #" +
-          index +
-          ": " +
-          JSON.stringify(athlete, null, 2)
-      );
-    });
-  }, [isLoading]);
-
   return (
     <>
       {isLoading ? (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
-            justifyContent="center"
-            alignItems="center"
-            flexDirection="column"
-            sx={{
-              display: "flex",
-            }}
-          >
-            <Typography variant="h5" color="white" component="div">
-              Loading
-            </Typography>
-            <br></br>
-            <CircularProgress />
-          </Box>
-        </Container>
+        <LoadingPrompt loading={"Your Team"} />
       ) : (
         <Container
           sx={{
@@ -412,21 +451,15 @@ export default function MyTeam() {
               <TableBody>
                 {starterAthleteIds.map((id, index) => {
                   // const athelete = atheleteData[key];
-                  const athlete = ownedAthletesMetadata[17];
+                  const athlete = ownedAthletesMetadata[id];
                   // if(id != 0)
-                  console.log(
-                    "athlete index: " +
-                      index +
-                      " = " +
-                      JSON.stringify(ownedAthletesMetadata[id], null, 2)
-                  );
-                  const positions = [
-                    "Top",
-                    "Jungle",
-                    "Mid",
-                    "Laner",
-                    "Support",
-                  ];
+                  // console.log(
+                  //   "athlete index: " +
+                  //     index +
+                  //     " = " +
+                  //     JSON.stringify(ownedAthletesMetadata[id], null, 2)
+                  // );
+
                   return (
                     <TableRow
                       key={index.toString()}
@@ -444,8 +477,9 @@ export default function MyTeam() {
                       >
                         <Image
                           src={id != 0 ? athlete.image : logo}
-                          width={"10"}
-                          height={"10"}
+                          width={"40"}
+                          // layout="fill"
+                          height={"40"}
                         />
                         <div>
                           <Typography
@@ -463,20 +497,28 @@ export default function MyTeam() {
                         <div>
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
-                            {id != 0 ? 69 : "none"}
+                            {id != 0 && currentWeekNum != 0
+                              ? athlete.prevPoints
+                              : "none"}
                           </Typography>
                           <Typography>
-                            {id != 0 ? "69/69/69" : "no date"}
+                            {id != 0 && currentWeekNum != 0
+                              ? "69/69/69"
+                              : "no date"}
                           </Typography>
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
-                            {id != 0 ? "c69" : "none"}
+                            {id != 0 && currentWeekNum != 0
+                              ? "*pull from backend"
+                              : "none"}
                           </Typography>
                           <Typography>
-                            {id != 0 ? "69/69/69" : "no date"}
+                            {id != 0 && currentWeekNum != 0
+                              ? "*pull from backend"
+                              : "no date"}
                           </Typography>
                         </div>
                       </TableCell>
@@ -518,9 +560,12 @@ export default function MyTeam() {
                 // players={players}
                 // TODO, set players = to a functoin getOwnedPositionAthletes(positionIndex)
                 // which returns a filtered list of athlets by position
-                players={ownedAthletesMetadata}
-                selectedID={starterAthleteIds[currentPositionIndex]}
+                // players={ownedAthletesMetadata}
+                players={getFilteredOwnedAthletes()}
+                currentStarterID={starterAthleteIds[currentPositionIndex]}
                 handleModalClose={handleStateModalClose}
+                setSelectedPlayer={setSelectedPlayer}
+                selectedPlayer={selectedPlayer}
               />
             </>
           )}

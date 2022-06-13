@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import CloseIcon from "../assets/images/close.png";
 import mystery_card from "../assets/images/mystery_card.png";
 
@@ -39,13 +39,15 @@ export default function PlayerSelectModal({
   stateData,
   submitStarterHandler,
   players,
-  selectedID,
+  currentStarterID,
   handleModalClose,
+  selectedPlayer,
+  setSelectedPlayer,
 }) {
   const classes = useStyles();
-  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
-  const [selectedPlayerID, setSelectedPlayerId] = useState(selectedID);
-  const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
+  // const [selectedPlayer, setSelectedPlayer] = useState(players[currentStarterID]);
+  // const [selectedPlayerID, setSelectedPlayerId] = useState(currentStarterID);
+  const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
   // console.log("selectedPlaer :" + JSON.stringify(selectedPlayer, null, 2));
 
@@ -142,10 +144,10 @@ export default function PlayerSelectModal({
                       fontSize={12}
                       sx={{ marginTop: "18px" }}
                     >
-                      {player.name}
+                      {player.attributes[0].value}
                     </Typography>
                     <Typography color={"white"} fontSize={18}>
-                      {player.attributes[0].value}
+                      {player.name}
                     </Typography>
                   </Box>
                 ))}
@@ -176,6 +178,7 @@ export default function PlayerSelectModal({
                 marginTop: "20px",
                 fontSize: "20px",
               }}
+              disabled={!selectedPlayer}
             >
               START ATHLETE
             </Button>
