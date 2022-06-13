@@ -91,7 +91,7 @@ export default function MyTeam() {
   //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
   const [isLeagueMember, setIsLeagueMember] = useState(false);
 
-  const [currentPlayer, setCurrentPlayer] = useState({});
+  const [currentPlayer, setCurrentPlayer] = useState();
   const [stateModalOpen, setStateModalOpen] = useState(false);
   const [subModalOpen, setSubModalOpen] = useState(false);
   const [signer, setSigner] = useState(null);
@@ -105,7 +105,7 @@ export default function MyTeam() {
   const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
   const [ownedAthletesMetadata, setOwnedAthletesMetadata] = useState([]);
-  const [currentPosition, setCurrentPosition] = useState([]);
+  const [currentPositionIndex, setCurrentPositionIndex] = useState([]);
 
   // DAte
   const d = new Date();
@@ -295,16 +295,24 @@ export default function MyTeam() {
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
-  const handleStateModal = (player, position) => {
+  const submitStarterHandler = (athleteID, positionID) => {
+    // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
+    // // const positionIndex = positionID;
+    console.log(
+      "setting athlete id#" + athleteID + " at postion #" + positionID
+    );
+  };
+
+  const handleStateModal = (player, positionIndex) => {
     setCurrentPlayer(player);
-    // console.log("setting pos: " + position);
-    setCurrentPosition(position);
+    console.log("setting current player: " + JSON.stringify(player, null, 2));
+    setCurrentPositionIndex(positionIndex);
     setStateModalOpen(true);
   };
 
-  const handleSubModal = (player, position) => {
+  const handleSubModal = (player, positionIndex) => {
     setCurrentPlayer(player);
-    setCurrentPosition(position);
+    setCurrentPositionIndex(positionIndex);
     // console.log("setting pos: " + position);
 
     setSubModalOpen(true);
@@ -442,9 +450,7 @@ export default function MyTeam() {
                         <div>
                           <Typography
                             fontSize={30}
-                            onClick={() =>
-                              handleStateModal(athlete, positions[index])
-                            }
+                            onClick={() => handleStateModal(athlete, index)}
                           >
                             {id != 0 ? athlete.name : "none set"}
                           </Typography>
@@ -476,9 +482,7 @@ export default function MyTeam() {
                       </TableCell>
                       <TableCell align="center">
                         <Button
-                          onClick={() =>
-                            handleSubModal(athlete, positions[index])
-                          }
+                          onClick={() => handleSubModal(athlete, index)}
                           style={{
                             background:
                               "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
@@ -500,19 +504,22 @@ export default function MyTeam() {
           {!isLoading && (
             <>
               <PlayerStateModal
-                position={currentPosition}
+                position={currentPositionIndex}
                 modalOpen={stateModalOpen}
                 stateData={Sample.statsData}
                 handleModalClose={handleStateModalClose}
               />
               <PlayerSelectModal
-                position={currentPosition}
+                positionIndex={currentPositionIndex}
                 modalOpen={subModalOpen}
                 stateData={currentPlayer}
+                // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
+                submitStarterHandler={submitStarterHandler}
                 // players={players}
                 // TODO, set players = to a functoin getOwnedPositionAthletes(positionIndex)
                 // which returns a filtered list of athlets by position
                 players={ownedAthletesMetadata}
+                selectedID={starterAthleteIds[currentPositionIndex]}
                 handleModalClose={handleStateModalClose}
               />
             </>
