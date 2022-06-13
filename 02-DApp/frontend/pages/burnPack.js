@@ -314,6 +314,29 @@ export default function BurnPack({ setDisplay }) {
                       Open
                     </Fab>
                   </Box>
+<<<<<<< HEAD
+=======
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      display: "flex",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    {!isPolygon && (
+                      <Typography
+                        style={{
+                          color: "red",
+                          fontSize: 16,
+                        }}
+                      >
+                        Please switch to Polygon, then refresh the page, to
+                        proceed with opening.
+                      </Typography>
+                    )}
+                  </Box>
+>>>>>>> e362120f... typo
                 </>
               )}
               {!canMint && (
