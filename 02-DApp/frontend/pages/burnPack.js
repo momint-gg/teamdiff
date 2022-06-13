@@ -56,7 +56,7 @@ export default function BurnPack({ setDisplay }) {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState();
   const [isPreRevealPhase, setIsPreRevealPhase] = useState();
-  const [isPolygon, setIsPolygon] = useState();
+  // const [isPolygon, setIsPolygon] = useState();
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
   const [isNoMetaMask, setIsNoMetaMask] = useState();
@@ -78,6 +78,11 @@ export default function BurnPack({ setDisplay }) {
       // console.log("Please install MetaMask!");
     }
   }
+  const [nftResp, setNFTResp] = useState(null);
+  // const [packNFTs, setPackNFTs] = useState([]);
+  const [athleteNFTs, setAthleteNFTs] = useState([]);
+  const [currentChain, setCurrentChain] = useState();
+  const [isPolygon, setIsPolygon] = useState();
 
   /**
    * Checks if browsers has injected web3 provider
@@ -99,6 +104,9 @@ export default function BurnPack({ setDisplay }) {
           setSigner(signer);
           setConnectedAccount(accountAddress);
           setIsConnected(true);
+          const { chainId } = await provider.getNetwork();
+          setCurrentChain(chainId);
+          setIsPolygon(chainId === 137);
         } else {
           setIsConnected(false);
           setIsLoading(false);
@@ -303,7 +311,8 @@ export default function BurnPack({ setDisplay }) {
                       disabled={
                         !ownsStarterPack ||
                         hasAlreadyBurnedPack ||
-                        isPreRevealPhase
+                        isPreRevealPhase ||
+                        !isPolygon
                       }
                       // onClick={() => setDisplayMint(true)}
                       sx={{
@@ -319,6 +328,26 @@ export default function BurnPack({ setDisplay }) {
                     >
                       Open
                     </Fab>
+                  </Box>
+                  <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      display: "flex",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    {!isPolygon && (
+                      <Typography
+                        style={{
+                          color: "red",
+                          fontSize: 16,
+                        }}
+                      >
+                        Please switch to Polygon, then refresh the page, to
+                        proceed with minting.
+                      </Typography>
+                    )}
                   </Box>
                 </>
               )}
