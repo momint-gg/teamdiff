@@ -8,24 +8,27 @@
 
 require("dotenv").config({ path: "../.env" });
 const { ethers } = require("ethers");
-const abi = require("../contract_info/abis/Athletes.json");
-const { Athletes } = require("../contract_info/contractAddresses");
+
 const athleteToId = require("../prodScripts/athleteToId"); // Mapping athlete to their ID
 const XLSX = require("xlsx");
 const fs = require("fs");
 const axios = require("axios");
 
-// How to run: node addAthletesStats week_num (e.g. node addAthletesStats 1)
-async function main() {
-  week_num = parseInt(process.argv[2]);
+// TODO: comment out which contracts/ABIs you're not using
+const abi = require("../contract_info/rinkebyAbis/Athletes.json");
+const { Athletes } = require("../contract_info/contractAddressesRinkeby");
+// const abi = require("../contract_info/maticAbis/Athletes.json");
+// const { Athletes } = require("../contract_info/contractAddressesMatic");
 
-  // Constructing our contract
-  const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+async function main() {
+  // Need to hardcode this for now.. to do: pull from contract (LeagueMaker)
+  const week_num = 0;
+
+  // Getting our contract
+  const AthletesContract = await ethers.getContractAt(
+    "Athletes",
+    CONTRACTS.Athletes
   );
-  const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  contract = new ethers.Contract(Athletes, abi.abi, rinkebySigner);
 
   // Parsing excel
   finalStatsToPush = [];
@@ -132,7 +135,7 @@ async function main() {
   // Finally, pushing stats to the contract
   console.log("Now pushing stats to contract");
   for (let i = 0; i < finalStatsToPush.length; i++) {
-    const addAthletesStatsTxn = await contract.appendStats(
+    const addAthletesStatsTxn = await AthletesContract.appendStats(
       finalStatsToPush[i].id, // index of athlete
       finalStatsToPush[i].points, // their points for the week,
       week_num // Week number passed in
@@ -152,7 +155,7 @@ async function main() {
 // Quick check to make sure contract updates
 const testContract = async () => {
   // Making sure 50 athletes
-  let txn = await contract.getAthletes();
+  let txn = await AthletesContract.getAthletes();
   console.log("Number of athletes is ", txn);
 
   // Making sure new stats that were pushed match finalStatsToPush(just checking 5 athletess)
