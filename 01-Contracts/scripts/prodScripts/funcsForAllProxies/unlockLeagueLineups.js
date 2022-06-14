@@ -1,24 +1,18 @@
-require('dotenv').config({ path: '../.env' });
-const { ethers } = require('ethers');
-const abi = require('../contract_info/abis/LeagueMaker.json');
-const { LeagueMaker } = require('../contract_info/contractAddresses');
-const LeagueOfLegendsLogicJSON = require('../contract_info/abis/LeagueOfLegendsLogic.json');
+require("dotenv").config({ path: "../.env" });
+const { ethers } = require("hardhat");
+const LeagueOfLegendsLogicABI = require("../../../../02-DApp/backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json");
+const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
 
 async function main() {
-  // Constructing our contract
-  const provider = new ethers.providers.AlchemyProvider(
-    'rinkeby',
-    process.env.RINKEBY_ALCHEMY_KEY
+  // Getting our LeagueMaker contract
+  const LeagueMakerContract = await ethers.getContractAt(
+    "LeagueMaker",
+    CONTRACTS.LeagueMaker
   );
-  const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  const LeagueMakerCntract = new ethers.Contract(
-    LeagueMaker,
-    abi.abi,
-    rinkebySigner
-  );
+  console.log("Got league maker contract");
 
   // Getting our list of proxies
-  const leagueAddresses = await LeagueMakerCntract.connect(
+  const leagueAddresses = await LeagueMakerContract.connect(
     rinkebySigner
   ).getLeagueAddresses();
 
@@ -28,7 +22,7 @@ async function main() {
   for (let i = 0; i < leagueAddresses.length; i++) {
     currProxy = new ethers.Contract(
       leagueAddresses[i],
-      LeagueOfLegendsLogicJSON.abi,
+      LeagueOfLegendsLogicABI.abi,
       provider
     );
     AllLeagueInstances.push(currProxy);
@@ -43,10 +37,13 @@ async function main() {
     await txn.wait();
 
     txn = await currLeague.lineupIsLocked();
-    txn === false
-      ? console.log('Lineup successfully unlocked!')
-      : console.log('Failed');
-    console.log('Lineup is locked: ', txn);
+    txn === true
+      ? console.log("Failed")
+      : console.log(
+          "Lineup successfully unlocked for proxy ",
+          currLeague.address
+        );
+    console.log("Lineup is locked: ", txn);
   }
 }
 

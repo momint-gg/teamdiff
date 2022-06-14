@@ -1,3 +1,5 @@
+const { task } = require("hardhat/config");
+
 require("dotenv").config();
 require("hardhat-gas-reporter");
 require("@nomiclabs/hardhat-waffle");
@@ -5,7 +7,10 @@ require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-truffle5");
 require("@openzeppelin/hardhat-upgrades");
 require("hardhat-contract-sizer");
+require("@nomiclabs/hardhat-ethers");
 // require("solidity-coverage");
+
+const prodFunctions = require("./scripts/prodFunctions");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -16,6 +21,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     console.log(account.address);
   }
 });
+
+// Passing in task args: --named <name of function> --network <network to run on> (network is default)
+task(
+  "runproxyfunc",
+  "Running functions that will be run on all proxies",
+  async (taskArgs, hre) => {
+    const name = taskArgs.name;
+  }
+);
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more

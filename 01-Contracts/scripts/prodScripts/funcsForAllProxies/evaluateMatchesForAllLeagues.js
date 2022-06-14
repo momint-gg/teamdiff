@@ -1,8 +1,7 @@
 require("dotenv").config({ path: "../.env" });
-const { ethers } = require("ethers");
-const abi = require("../contract_info/abis/LeagueMaker.json");
-const LeagueOfLegendsLogicJSON = require("../contract_info/abis/LeagueOfLegendsLogic.json");
-const CONTRACTS = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
+const { ethers } = require("hardhat");
+const LeagueOfLegendsLogicABI = require("../../../../02-DApp/backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json");
+const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
 
 // Evaluating matches for all of our proxies
 
@@ -20,11 +19,11 @@ async function main() {
   // Creating interactable contract list of proxies
   AllLeagueInstances = []; // all of our leagues (as CONTRACTS) so we can interact with them
   let currProxy;
-  // TODO: Test to see if there will be erros with this
+  // TODO: Test to see if there will be errors with this on matic mainnet
   for (let i = 0; i < leagueAddresses.length; i++) {
     currProxy = new ethers.Contract(
       leagueAddresses[i],
-      LeagueOfLegendsLogicJSON.abi,
+      LeagueOfLegendsLogicABI.abi,
       provider
     );
     AllLeagueInstances.push(currProxy);
