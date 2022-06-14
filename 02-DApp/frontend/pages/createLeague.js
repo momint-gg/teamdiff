@@ -1,59 +1,35 @@
-import { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.css";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import theme from "../styles/theme.js";
 import {
-  Box,
-  Link,
-  FormLabel,
-  FormGroup,
-  Switch,
-  Typography,
-  Button,
-  Chip,
-  Container,
-  Paper,
-  Fab,
-  OutlinedInput,
-  styled,
-  outlinedInputClasses,
-  Checkbox,
-  FormControlLabel,
+    Box, Button, Fab, FormControlLabel, FormGroup, Link, OutlinedInput, outlinedInputClasses, Paper, styled, Switch,
+    Typography
 } from "@mui/material";
-// import 'bootstrap/dist/css/bootstrap.css'
-import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Input from "@mui/material/Input";
 // import Link from '@mui/material/Link'
 import InputAdornment from "@mui/material/InputAdornment";
-import Grid from "@material-ui/core/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+// import 'bootstrap/dist/css/bootstrap.css'
+import TextField from "@mui/material/TextField";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+// Router
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
-
-import { ethers } from "ethers";
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import * as utils from "@ethersproject/hash";
-import { hexZeroPad } from "@ethersproject/bytes";
-// import { Link } from "react-router-dom"
-
-//Wagmi imports
-import { useAccount } from "wagmi";
-
-//Router
-import { useRouter } from "next/router";
-
-//Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
 import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
+// Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import AddToWhitelist from "../components/AddToWhitelist.js";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt.js";
+
+
+
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
 // https://codesandbox.io/s/textfield-outlined-forked-0o0bdi?file=/src/index.js
@@ -102,9 +78,9 @@ export default function CreateLeague({ setDisplay }) {
     inviteListStatus: "open",
   };
 
-  //WAGMI Hooks
+  // WAGMI Hooks
 
-  //TODO change to matic network for prod
+  // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -113,7 +89,7 @@ export default function CreateLeague({ setDisplay }) {
   // Router
   const router = useRouter();
 
-  //Contract State Hooks
+  // Contract State Hooks
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
   const [isCreatingLeague, setIsCreatingLeague] = useState(false);
   const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
@@ -125,7 +101,7 @@ export default function CreateLeague({ setDisplay }) {
   const [isJoiningLeague, setIsJoiningLeague] = useState(false);
   const [hasJoinedLeague, setHasJoinedLeague] = useState(false);
   // const [inviteListIsEnabled, setInviteListIsEnabled] = useState(false)
-  //Rendering stat hooks
+  // Rendering stat hooks
   const [inviteListValues, setInviteListValues] = useState([]);
   // const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true)
   const [validAddressesStatus, setValidAddressesStatus] = useState(true);
@@ -188,7 +164,7 @@ export default function CreateLeague({ setDisplay }) {
       provider
     );
     setLeagueMakerContract(LeagueMakerContract);
-    //TODO filter
+    // TODO filter
     // const filter = {
     //   address: LeagueMakerContract.address,
     //   topics: [
@@ -204,11 +180,11 @@ export default function CreateLeague({ setDisplay }) {
     // const filter = LeagueMakerContract.filters.LeagueCreated(null, null, accountData?.address, null)
 
     // LeagueMakerContract.on(filter, leagueCreatedCallback);
-    //TODO this still triggers more than once sometimes idk whyyyyy
+    // TODO this still triggers more than once sometimes idk whyyyyy
     LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
   }, []);
 
-  //Callback for when a STaked event is fired from leagueProxy contract (occurs when user stakes USDC to joinLeague)
+  // Callback for when a STaked event is fired from leagueProxy contract (occurs when user stakes USDC to joinLeague)
   const stakedEventCallback = async (
     stakerAddress,
     stakeAmount,
@@ -216,8 +192,8 @@ export default function CreateLeague({ setDisplay }) {
   ) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    //Check is admin of the newly created league is the currently logged in account
-    //If true, proceed with league creation callback behavior
+    // Check is admin of the newly created league is the currently logged in account
+    // If true, proceed with league creation callback behavior
     const currentAddress = await signer.getAddress();
     if (stakerAddress === currentAddress) {
       setIsJoiningLeague(false);
@@ -238,14 +214,14 @@ export default function CreateLeague({ setDisplay }) {
     newLeagueAdminAddress,
     initialWhitelistAddresses
   ) => {
-    //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
+    // Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    //Check is admin of the newly created league is the currently logged in account
-    //If true, proceed with league creation callback behavior
+    // Check is admin of the newly created league is the currently logged in account
+    // If true, proceed with league creation callback behavior
     const currentAddress = await signer.getAddress();
     if (currentAddress == newLeagueAdminAddress) {
-      //Update state hooks
+      // Update state hooks
       setIsCreatingLeague(false);
       setIsTransactionDelayed(false);
       setHasCreatedLeague(true);
@@ -253,7 +229,7 @@ export default function CreateLeague({ setDisplay }) {
       setNewLeagueAddress(newLeagueProxyAddress);
       setIsJoiningLeague(true);
 
-      //Construct LeagueProxyContract with signer
+      // Construct LeagueProxyContract with signer
       const LeagueProxyContractWithSigner = new ethers.Contract(
         newLeagueProxyAddress,
         LeagueOfLegendsLogicJSON.abi,
@@ -267,10 +243,10 @@ export default function CreateLeague({ setDisplay }) {
         signer
       );
 
-      //Request that user approves their new league to withdraw USDC on behalf of their wallet
-      //Required for staking
+      // Request that user approves their new league to withdraw USDC on behalf of their wallet
+      // Required for staking
       const stakeAmount = await LeagueProxyContractWithSigner.stakeAmount();
-      //TODO: set correct stakeamount
+      // TODO: set correct stakeamount
       const approvalTxn = await RinkebyUSDCContract.approve(
         newLeagueProxyAddress,
         stakeAmount * 1000000
@@ -280,7 +256,7 @@ export default function CreateLeague({ setDisplay }) {
         setIsJoiningLeague(false);
       });
 
-      //Send request to user to join the league
+      // Send request to user to join the league
       const joinNewlyCreatedLeagueTxn =
         await LeagueProxyContractWithSigner.joinLeague({
           gasLimit: 1000000,
@@ -297,7 +273,7 @@ export default function CreateLeague({ setDisplay }) {
             setIsJoiningLeague(false);
           });
 
-      //For each address on the initial whitelist, send transaction to add address to whitelist of new league
+      // For each address on the initial whitelist, send transaction to add address to whitelist of new league
       initialWhitelistAddresses.forEach(async (whitelistAddress) => {
         const addUsersToWhitelistTxn =
           await LeagueProxyContractWithSigner.addUserToWhitelist(
@@ -310,7 +286,7 @@ export default function CreateLeague({ setDisplay }) {
             // console.log("Added userr to whitelist success")
             ()
             .catch((error) => {
-              //console.log("")
+              // console.log("")
               alert("Add User To WhiteList error: " + error.message);
               // setIsCreatingLeague(false);
             });
@@ -324,9 +300,9 @@ export default function CreateLeague({ setDisplay }) {
     }
   };
 
-  //Hanlder for form submit
+  // Hanlder for form submit
   const createLeagueSubmitHandler = async () => {
-    //Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
+    // Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
     console.log("league name" + formValues.leagueName);
@@ -337,10 +313,10 @@ export default function CreateLeague({ setDisplay }) {
     } else if (formValues.buyInCost > 100) {
       alert("Please enter a buy-in cost below 100 USDC.");
     } else {
-      //Connect to leagueMaker with connect wallet
+      // Connect to leagueMaker with connect wallet
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
       // console.log("submission values: " + (formValues.inviteListStatus === "open"));
-      //Send createLeague transaction to LeagueMaker
+      // Send createLeague transaction to LeagueMaker
       const createLeagueTxn = await leagueMakerContractWithSigner
         .createLeague(
           formValues.leagueName,
@@ -359,16 +335,16 @@ export default function CreateLeague({ setDisplay }) {
           }
         )
         .then((res) => {
-          //console.log("txn result: " + JSON.stringify(res, null, 2));
+          // console.log("txn result: " + JSON.stringify(res, null, 2));
           setIsCreatingLeague(true);
           window.setTimeout(() => {
             setIsTransactionDelayed(true);
           }, 60 * 5 * 1000);
 
           console.log("League Creation in progress...");
-          //console.log("With invite values: " + inviteListValues);
-          //how to tell if transaction failed?
-          //TODO print message to alert if it takes mroe than 60 seconds
+          // console.log("With invite values: " + inviteListValues);
+          // how to tell if transaction failed?
+          // TODO print message to alert if it takes mroe than 60 seconds
         })
         .catch((error) => {
           alert("Create League error: " + error.message);
@@ -504,8 +480,8 @@ export default function CreateLeague({ setDisplay }) {
                 // '& > :not(style)': { m: 1, width: '50ch' },
                 flex: 1,
               }}
-            // noValidate
-            // autoComplete="off"
+              // noValidate
+              // autoComplete="off"
             >
               <Typography variant="h4" color="white" component="div">
                 Form
@@ -639,10 +615,12 @@ export default function CreateLeague({ setDisplay }) {
                 flex: 1,
               }}
 
-            // noValidate
-            // autoComplete="off"
+              // noValidate
+              // autoComplete="off"
             >
-              <Typography variant="h4" color="primary">Invite List (Whitelist)</Typography>
+              <Typography variant="h4" color="primary">
+                Invite List (Whitelist)
+              </Typography>
               <Box>
                 <FormControl component="fieldset">
                   <FormGroup aria-label="position" row>
