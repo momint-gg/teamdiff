@@ -295,6 +295,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         // }
 
         userToLineup[msg.sender][position] = athleteId;
+        //TODO add event
     }
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/

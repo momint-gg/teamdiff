@@ -1,74 +1,40 @@
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { Box, Container, Typography } from "@mui/material";
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import { makeStyles } from "@material-ui/core";
 import {
   Button,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  Container,
   Paper,
-  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from "@mui/material";
-import { makeStyles } from "@material-ui/core";
-import { useMediaQuery } from "react-responsive";
-import logo from "../assets/images/example.png";
-import PlayerStateModal from "../components/PlayerStateModal";
-import PlayerSelectModal from "../components/PlayerSelectModal";
-import Card1 from "../assets/cards/Fudge.png";
-import Card2 from "../assets/cards/Abbedagge.png";
-import Sample from "../../backend/sample.json";
-import { useRouter } from "next/router";
-//Web3 Imports
+// Web3 Imports
 import { ethers } from "ethers";
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-const atheleteData = Sample.athleteData;
-//Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import AthletesJSON from "../../backend/contractscripts/contract_info/abis/Athletes.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+// Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import Sample from "../../backend/sample.json";
+import logo from "../assets/images/example.png";
+import LoadingPrompt from "../components/LoadingPrompt.js";
+import PlayerSelectModal from "../components/PlayerSelectModal";
+import PlayerStateModal from "../components/PlayerStateModal";
 import constants from "../constants";
 
 // TODO get data from backend
-const players = [
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card2,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card2,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-];
 
 export default function MyTeam() {
-  //Router params
+  // Router params
   const router = useRouter();
-  //TODO change to matic network for prod
+  // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
@@ -87,8 +53,6 @@ export default function MyTeam() {
   const [currentWeekNum, setCurrentWeekNum] = useState();
   //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
   const [isLeagueMember, setIsLeagueMember] = useState(false);
-
-  const [currentPlayer, setCurrentPlayer] = useState({});
   const [stateModalOpen, setStateModalOpen] = useState(false);
   const [subModalOpen, setSubModalOpen] = useState(false);
   const [signer, setSigner] = useState(null);
@@ -99,67 +63,33 @@ export default function MyTeam() {
   const [starterAthleteIds, setStarterAthleteIds] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
-  const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
+  // const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
   const [ownedAthletesMetadata, setOwnedAthletesMetadata] = useState([]);
+  const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
+  const [selectedPlayer, setSelectedPlayer] = useState();
+  const [isLineupLocked, setIsLineupLocked] = useState();
 
-  //DAte
+  const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
+
+  // DAte
   const d = new Date();
-  let today = d.getDay() + 1;
-  //Set to corresponding lock day Sun = 1, Sat = 7
-  let leagueLockDay = 1;
-  let daysTillLock = leagueLockDay % today;
+  const today = d.getDay() + 1;
+  // Set to corresponding lock day Sun = 1, Sat = 7
+  const leagueLockDay = 1;
+  let daysTillLock;
+  let daysTillUnlock;
+  today > leagueLockDay
+    ? // If today greater than lock day
+      (daysTillLock = 7 - today + leagueLockDay)
+    : // if today < lock day
+      (daysTillLock = leagueLockDay - today);
+  if (daysTillLock > 5) {
+    daysTillUnlock = 7 - daysTillLock;
+  }
 
-  let starterAthleteData = {
-    top: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    jungle: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    mid: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    laner: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    support: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-  };
   useEffect(() => {
-    // console.log("today" + daysTillLock)
-    // setIsCreatingLeague(false);
-    // setHasCreatedLeague(true);
-    // setHasJoinedLeague(true)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
     const setAccountData = async () => {
       // setIsLoading(true);
       const signer = provider.getSigner();
@@ -170,11 +100,9 @@ export default function MyTeam() {
         setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
-        //TODO this doesn't update screen when switching accounts :/
       } else {
         setIsConnected(false);
       }
-      // setIsLoading(false);
     };
     setAccountData();
     provider.provider.on("accountsChanged", (accounts) => {
@@ -189,13 +117,19 @@ export default function MyTeam() {
   useEffect(() => {
     setAthleteNFTs([]);
     if (isConnected && router.isReady) {
+      console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
-        router.query.leagueAddress,
+        router.query.leagueRoute[0],
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
+      // const LeagueProxyContract = new ethers.Contract(
+      //   router.query.leagueAddress,
+      //   LeagueOfLegendsLogicJSON.abi,
+      //   provider
+      // );
       setLeagueProxyContract(LeagueProxyContract);
 
       // Initialize connections to Athlete datastore contract
@@ -206,14 +140,11 @@ export default function MyTeam() {
       );
       setAthleteContract(AthleteContract);
 
-      const getStarterAthleteData = async (starterIds) => {
-        starterIds.forEach((id, index) => {
-          // let prevPoints = AthleteContract.athleteToScores(id, currentWeekNum - 1)
-        });
-      };
-
       async function fetchData() {
         setIsLoading(true);
+
+        const lineupIsLocked = await LeagueProxyContract.lineupIsLocked();
+        setIsLineupLocked(lineupIsLocked);
 
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
@@ -221,27 +152,27 @@ export default function MyTeam() {
         setIsLeagueMember(isInLeague);
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
-        let starterIds = [null, null, null, null, null];
+        const starterIds = [null, null, null, null, null];
         for (let i = 0; i <= 4; i++) {
-          let id = await LeagueProxyContract.userToLineup(
+          const id = await LeagueProxyContract.userToLineup(
             connectedAccount,
             i
           ).catch((e) => console.log("error: " + e));
           starterIds[i] = id;
         }
         setStarterAthleteIds(starterIds);
+        // This ussually takes the longest, so set isLoading to false here
+        setIsLoading(false);
 
-        //TODO if is not league member, refresh the page
+        // TODO if is not league member, refresh the page
         if (!isInLeague) {
           router.reload(window.location.pathname);
         }
-
-        //TODO this is slightly buggy when someone tries to switch accounts
-        // setIsLoading(false);
       }
 
       // declare the async data fetching function
       const getNFTData = async () => {
+        setIsLoading(true);
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
@@ -250,7 +181,7 @@ export default function MyTeam() {
         });
 
         setNFTResp(nfts);
-        let athleteMetadata = [];
+        const athleteMetadata = [];
 
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
@@ -263,37 +194,122 @@ export default function MyTeam() {
             athleteMetadata[parseInt(token)] = response.metadata;
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
           }
+          // setIsLoading(false);
         }
         setOwnedAthletesMetadata(athleteMetadata);
-        setIsLoading(false);
 
-        athleteMetadata.forEach((athlete, index) => {
-          if (index == 0)
-            console.log(
-              "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
-            );
-        });
+        // athleteMetadata.forEach((athlete, index) => {
+        //   if (index == 0)
+        //     console.log(
+        //       "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
+        //     );
+        // });
       };
 
       getNFTData().catch((error) => {
         console.log("fetch NFT DATA error: " + error);
       });
+
       fetchData();
+      // getStarterAthleteData(starterAthleteIds);
     } else {
-      //alert("no account data or league Address found, please refresh.");
+      // alert("no account data or league Address found, please refresh.");
       console.log("no account data or league Address found");
       // console.log("router: " + JSON.stringify(router.query, null, 2));
       //   console.log("leagueAddress: " + leagueAddress);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
-  const handleStateModal = (player) => {
-    setCurrentPlayer(player);
+  useEffect(() => {
+    // console.log("isLoading: " + isLoading);
+    if (starterAthleteIds) {
+      getStarterAthleteData();
+      // setCurrentPositionIndex(1);
+      console.log(
+        "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
+      );
+    }
+  }, [starterAthleteIds]);
+
+  const getStarterAthleteData = async () => {
+    console.log("starterID: " + starterAthleteIds);
+    starterAthleteIds.forEach(async (id, index) => {
+      if (id != 0 && currentWeekNum > 0) {
+        const prevPoints = await athleteContract
+          .athleteToScores(id, currentWeekNum - 1)
+          .catch((error) => {
+            console.log(JSON.stringify(error, null, 2));
+            // prevPoints = null;
+          });
+        console.log("prevpoints: " + prevPoints);
+        ownedAthletesMetadata[id].prevPoints = prevPoints;
+      } else if (id != 0) {
+        ownedAthletesMetadata[id].prevPoints = "n/a";
+      }
+    });
+    ownedAthletesMetadata.forEach((athlete, index) => {
+      if (index == 0)
+        console.log(
+          "after getting prevPointsathlete id #" +
+            index +
+            ": " +
+            JSON.stringify(athlete, null, 2)
+        );
+    });
+  };
+
+  const getFilteredOwnedAthletes = () => {
+    const result = [];
+    ownedAthletesMetadata.map((athlete, index) => {
+      // check if athlete has the currently selected positions
+      if (athlete.attributes[1].value == positions[currentPositionIndex]) {
+        result[index] = athlete;
+      }
+    });
+    return result;
+  };
+
+  // TODO create a callback function for when athlete has been set in lineup
+  const submitStarterHandler = async (athleteID, positionID) => {
+    // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
+    // // const positionIndex = positionID;
+    console.log(
+      "setting athlete id#" + athleteID + " at postion #" + positionID
+    );
+
+    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
+
+    await leagueProxyContractWithSigner
+      .setAthleteInLineup(athleteID, positionID)
+      .then(
+        console.log(
+          "setting athlete id#" + athleteID + " at postion #" + positionID
+        )
+        // update state to listen to callback for when position is set
+      )
+      .catch((error) => {
+        if (error.data) {
+          alert("Set Lineup error: " + error.data.message);
+        } else {
+          alert("error: " + error.message);
+        }
+      });
+  };
+
+  const handleStateModal = (player, positionIndex) => {
+    setSelectedPlayer(player);
+    console.log("setting current player: " + JSON.stringify(player, null, 2));
+    setCurrentPositionIndex(positionIndex);
     setStateModalOpen(true);
   };
 
-  const handleSubModal = (player) => {
-    setCurrentPlayer(player);
+  const handleSubModal = (player, positionIndex) => {
+    setCurrentPositionIndex(positionIndex);
+    setSelectedPlayer(player);
+
+    // console.log("setting pos: " + position);
+    console.log("setting current player: " + JSON.stringify(player, null, 2));
+
     setSubModalOpen(true);
   };
 
@@ -302,40 +318,10 @@ export default function MyTeam() {
     setSubModalOpen(false);
   };
 
-  const generateStarterAthleteRows = () => {
-    starterAthleteIds.map((id, index) => {});
-  };
-
-  useEffect(() => {
-    ownedAthletesMetadata.forEach((athlete, index) => {
-      console.log(
-        "athlete  in Useeffectid #" +
-          index +
-          ": " +
-          JSON.stringify(athlete, null, 2)
-      );
-    });
-  }, [isLoading]);
-
   return (
     <>
       {isLoading ? (
-        <Container maxWidth="lg" justifyContent="center" alignItems="center">
-          <Box
-            justifyContent="center"
-            alignItems="center"
-            flexDirection="column"
-            sx={{
-              display: "flex",
-            }}
-          >
-            <Typography variant="h5" color="white" component="div">
-              Loading
-            </Typography>
-            <br></br>
-            <CircularProgress />
-          </Box>
-        </Container>
+        <LoadingPrompt loading={"Your Team"} />
       ) : (
         <Container
           sx={{
@@ -363,9 +349,9 @@ export default function MyTeam() {
           >
             {"Week #" +
               currentWeekNum +
-              ": Roster Locks in " +
-              daysTillLock +
-              " Days"}
+              (isLineupLocked
+                ? ": Rosters unlock in " + daysTillUnlock + " Days"
+                : ": Rosters Locks in " + daysTillLock + " Days")}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -391,21 +377,10 @@ export default function MyTeam() {
               <TableBody>
                 {starterAthleteIds.map((id, index) => {
                   // const athelete = atheleteData[key];
-                  const athlete = ownedAthletesMetadata[43];
-                  // if(id != 0)
-                  console.log(
-                    "athlete index: " +
-                      index +
-                      " = " +
-                      JSON.stringify(ownedAthletesMetadata[index], null, 2)
-                  );
-                  const positions = [
-                    "Top",
-                    "Jungle",
-                    "Mid",
-                    "Laner",
-                    "Support",
-                  ];
+                  // NOTE: if id == 0, that means the connectedAccount has not
+                  // set an athlete in that position for this week in their proxy
+                  const athlete = ownedAthletesMetadata[id];
+
                   return (
                     <TableRow
                       key={index.toString()}
@@ -423,42 +398,54 @@ export default function MyTeam() {
                       >
                         <Image
                           src={id != 0 ? athlete.image : logo}
-                          width={"10"}
-                          height={"10"}
+                          width={"40"}
+                          // layout="fill"
+                          height={"40"}
                         />
                         <div>
                           <Typography
                             fontSize={30}
-                            onClick={() => handleStateModal(athelete)}
+                            onClick={() => handleStateModal(athlete, index)}
                           >
                             {id != 0 ? athlete.name : "none set"}
                           </Typography>
                           <Typography component="div">
-                            {athlete.score}
+                            {id != 0 ? athlete.score : "n/a"}
                           </Typography>
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30}>
-                            {id != 0 ? 32 : "none"}
+                            {/* todo get score from datafetch */}
+                            {id != 0 && currentWeekNum != 0
+                              ? athlete.prevPoints
+                              : "none"}
                           </Typography>
-                          <Typography>{id != 0 ? 32 : "no date"}</Typography>
+                          <Typography>
+                            {id != 0 && currentWeekNum != 0
+                              ? "69/69/69"
+                              : "no date"}
+                          </Typography>
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
-                            {id != 0 ? "c9" : "none"}
+                            {id != 0 && currentWeekNum != 0
+                              ? "*pull from backend"
+                              : "none"}
                           </Typography>
                           <Typography>
-                            {id != 0 ? "7/12/12" : "no date"}
+                            {id != 0 && currentWeekNum != 0
+                              ? "*pull from backend"
+                              : "no date"}
                           </Typography>
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <Button
-                          onClick={() => handleSubModal(athelete)}
+                          onClick={() => handleSubModal(athlete, index)}
                           style={{
                             background:
                               "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
@@ -467,8 +454,9 @@ export default function MyTeam() {
                             fontWeight: "600",
                             fontSize: "20px",
                           }}
+                          disabled={isLineupLocked}
                         >
-                          SUB
+                          {id != 0 ? "SUB" : "SET"}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -477,17 +465,27 @@ export default function MyTeam() {
               </TableBody>
             </Table>
           </TableContainer>
-          <PlayerStateModal
-            modalOpen={stateModalOpen}
-            stateData={Sample.statsData}
-            handleModalClose={handleStateModalClose}
-          />
-          <PlayerSelectModal
-            modalOpen={subModalOpen}
-            stateData={currentPlayer}
-            players={players}
-            handleModalClose={handleStateModalClose}
-          />
+          {!isLoading && (
+            <>
+              <PlayerStateModal
+                position={currentPositionIndex}
+                modalOpen={stateModalOpen}
+                stateData={Sample.statsData}
+                handleModalClose={handleStateModalClose}
+              />
+              <PlayerSelectModal
+                positionIndex={currentPositionIndex}
+                modalOpen={subModalOpen}
+                // stateData={currentPlayer}
+                submitStarterHandler={submitStarterHandler}
+                ownedAthletesInPosition={getFilteredOwnedAthletes()}
+                currentStarterID={starterAthleteIds[currentPositionIndex]}
+                handleModalClose={handleStateModalClose}
+                setSelectedPlayer={setSelectedPlayer}
+                selectedPlayer={selectedPlayer}
+              />
+            </>
+          )}
         </Container>
       )}
     </>

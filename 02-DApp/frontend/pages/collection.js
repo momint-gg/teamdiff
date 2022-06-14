@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { FormControl, MenuItem, TextField } from "@mui/material";
-import InputLabel from "@mui/material/InputLabel";
-import AthleteCard from "../components/AthleteCard";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Typography, Grid, Select, styled, Card, Link, Fab } from "@mui/material";
-import constants from "../constants";
+import {
+  Box, Card, Fab, FormControl, Grid, Link, MenuItem, Select, TextField, Typography
+} from "@mui/material";
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
+import InputLabel from "@mui/material/InputLabel";
+import { ethers } from "ethers";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import ImageListItem from '@mui/material/ImageListItem';
-import ImageList from '@mui/material/ImageList';
-
-import ConnectWallet from "./connectWallet";
+import OpenSea from "../assets/images/opensea.png";
+import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
-import AthleteCardModal from "../components/AthleteCardModal";
-import { useMediaQuery } from "react-responsive";
-import OpenSea from "../assets/images/opensea.png"
-import Image from "next/image";
+import constants from "../constants";
+
+
 // import styles from "../styles/collection.module.css"
 
 // const StyledImageListItem = styled(ImageListItem)`
@@ -36,17 +36,16 @@ export default function Collection() {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [searchQuery, setSeachQuery] = useState("")
-  const [isPreparingAthletes, setIsPreparingAthletes] = useState(true)
-  const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([])
-  const [teamFilterSelection, setTeamFilterSelection] = useState('')
-  const [teamPositionSelection, setTeamPositionSelection] = useState('')
-  const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([])
-
+  const [searchQuery, setSeachQuery] = useState("");
+  const [isPreparingAthletes, setIsPreparingAthletes] = useState(true);
+  const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([]);
+  const [teamFilterSelection, setTeamFilterSelection] = useState("");
+  const [teamPositionSelection, setTeamPositionSelection] = useState("");
+  const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([]);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner()
+    const signer = provider.getSigner();
 
     // const fetchData = async () => {
     //   const currentAddress = await signer.getAddress()
@@ -54,26 +53,26 @@ export default function Collection() {
     // }
     // fetchData()
     const setAccountData = async () => {
-      const signer = provider.getSigner()
+      const signer = provider.getSigner();
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress()
-        setSigner(signer)
-        setConnectedAccount(accountAddress)
-        setIsConnected(true)
-
-      }
-      else {
+        const accountAddress = await signer.getAddress();
+        setSigner(signer);
+        setConnectedAccount(accountAddress);
+        setIsConnected(true);
+      } else {
         setIsConnected(false);
       }
-    }
-    setAccountData()
-    provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
-    provider.provider.on('disconnect', () => {
+    };
+    setAccountData();
+    provider.provider.on("accountsChanged", (accounts) => {
+      setAccountData();
+    });
+    provider.provider.on("disconnect", () => {
       console.log("disconnected");
-      setIsConnected(false)
-    })
+      setIsConnected(false);
+    });
   }, []);
 
   const handleModalOpen = () => {
@@ -117,7 +116,10 @@ export default function Collection() {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
-            setAthleteNFTsWrapper((athleteNFTsWrapper) => [...athleteNFTsWrapper, response]);
+            setAthleteNFTsWrapper((athleteNFTsWrapper) => [
+              ...athleteNFTsWrapper,
+              response,
+            ]);
           }
         }
       };
@@ -125,10 +127,10 @@ export default function Collection() {
       await getNFTData().catch((error) => {
         console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
       });
-      console.log('done with preparing atheletes')
+      console.log("done with preparing atheletes");
       // console.log(athleteNFTs, 'hmm')
       // setAthleteNFTsWrapper(athleteNFTs)
-      setIsPreparingAthletes(false)
+      setIsPreparingAthletes(false);
     }
   }, [isConnected, connectedAccount]);
 
@@ -136,63 +138,73 @@ export default function Collection() {
   //   return athleteNFTs.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
   // }
 
-
   const filterResults = (inputs) => {
-    let athleteNFTsCopy = [...athleteNFTs]
+    let athleteNFTsCopy = [...athleteNFTs];
     if (inputs.team) {
       athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
-        const attributesRaw = athlete.metadata.attributes
+        const attributesRaw = athlete.metadata.attributes;
         for (const a of attributesRaw) {
-          if (a["trait_type"].toLowerCase() === "team" && a["value"] === inputs.team) {
-            return true
+          if (
+            a.trait_type.toLowerCase() === "team" &&
+            a.value === inputs.team
+          ) {
+            return true;
           }
         }
-        return false
-      })
+        return false;
+      });
     }
     if (inputs.position) {
       athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => {
-        const attributesRaw = athlete.metadata.attributes
+        const attributesRaw = athlete.metadata.attributes;
         for (const a of attributesRaw) {
-          if (a["trait_type"].toLowerCase() === "position" && a["value"] === inputs.position) {
-            return true
+          if (
+            a.trait_type.toLowerCase() === "position" &&
+            a.value === inputs.position
+          ) {
+            return true;
           }
         }
-        return false
-      })
+        return false;
+      });
     }
     if (inputs.query) {
-      athleteNFTsCopy = athleteNFTsCopy.filter((athlete) => athlete.metadata.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1)
+      athleteNFTsCopy = athleteNFTsCopy.filter(
+        (athlete) =>
+          athlete.metadata.name
+            .toLowerCase()
+            .indexOf(searchQuery.toLowerCase()) !== -1
+      );
     }
 
-    return athleteNFTsCopy
-  }
+    return athleteNFTsCopy;
+  };
 
   const getTeamFilterOptions = () => {
-    const arr = []
+    const arr = [];
     for (const athlete of athleteNFTs) {
-      const attributesRaw = athlete.metadata.attributes
-      console.log(attributesRaw, "***")
+      const attributesRaw = athlete.metadata.attributes;
+      console.log(attributesRaw, "***");
       for (const a of attributesRaw) {
-        if (a["trait_type"].toLowerCase() === "team") {
-          arr.push(a["value"])
+        if (a.trait_type.toLowerCase() === "team") {
+          arr.push(a.value);
         }
       }
     }
-    // const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team) 
-    console.log(arr, 'lll')
-    return [... new Set(arr)]
-  }
+    // const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team)
+    console.log(arr, "lll");
+    return [...new Set(arr)];
+  };
 
   useEffect(() => {
     if (!isPreparingAthletes) {
-      setAllTeamFilterOptions(getTeamFilterOptions())
-      console.log('useeffect')
+      setAllTeamFilterOptions(getTeamFilterOptions());
+      console.log("useeffect");
       setTimeout(() => {
-        console.log(allTeamFilterOptions)
-      }, 1000)
+        console.log(allTeamFilterOptions);
+      }, 1000);
     }
-  }, [isPreparingAthletes])
+  }, [isPreparingAthletes]);
   // const allTeamFilterOptions = getTeamFilterOptions()
 
   // const ALL_POSITION_FILTER_OPTIONS = {
@@ -204,42 +216,45 @@ export default function Collection() {
   // }
 
   const ALL_POSITION_FILTER_OPTIONS = [
-    'Top',
-    'ADC',
-    'Mid',
-    'Jungle',
-    'Support'
-  ]
+    "Top",
+    "ADC",
+    "Mid",
+    "Jungle",
+    "Support",
+  ];
 
   // handles any change in filter/query
   useEffect(() => {
     const filteredResults = filterResults({
       team: teamFilterSelection,
       query: searchQuery,
-      position: teamPositionSelection
-    })
-    console.log(filteredResults, 'filtered')
-    setAthleteNFTsWrapper(filteredResults)
-  }, [teamFilterSelection, searchQuery, teamPositionSelection])
+      position: teamPositionSelection,
+    });
+    console.log(filteredResults, "filtered");
+    setAthleteNFTsWrapper(filteredResults);
+  }, [teamFilterSelection, searchQuery, teamPositionSelection]);
 
   const handleTeamFilterChange = (e) => {
-    const { name, value } = e.target
-    setTeamFilterSelection(value)
-  }
+    const { name, value } = e.target;
+    setTeamFilterSelection(value);
+  };
 
   const handlePositionFilterChange = (e) => {
-    setTeamPositionSelection(e.target.value)
-  }
+    setTeamPositionSelection(e.target.value);
+  };
 
   const handleQueryChange = (e) => {
-    setSeachQuery(e.target.value)
-  }
+    setSeachQuery(e.target.value);
+  };
 
-  if (isConnected && nftResp && (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)) {
+  if (
+    isConnected &&
+    nftResp &&
+    (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)
+  ) {
     return (
       // https://mui.com/material-ui/react-select/
       <Box>
-
         <Typography
           variant={isMobile ? "h4" : "h2"}
           color="secondary"
@@ -253,16 +268,20 @@ export default function Collection() {
             color: "white",
             backgroundColor: "white",
             height: 5,
-          }} />
+          }}
+        />
 
-        <Grid container spacing={isMobile ? 1 : 3} sx={{ marginBottom: "50px" }}>
-          <Grid item xs={12} sm={6} md={4} lg={3} >
+        <Grid
+          container
+          spacing={isMobile ? 1 : 3}
+          sx={{ marginBottom: "50px" }}
+        >
+          <Grid item xs={12} sm={6} md={4} lg={3}>
             <Typography
               variant={isMobile ? "h6" : "h4"}
               color="secondary.light"
               component="div"
-            // fontSize={"50px"}
-
+              // fontSize={"50px"}
             >
               Filter Athletes:
             </Typography>
@@ -275,7 +294,7 @@ export default function Collection() {
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={3}>
-            <FormControl sx={{ minWidth: 250 }} >
+            <FormControl sx={{ minWidth: 250 }}>
               <InputLabel id="position-filter">Position</InputLabel>
               <Select
                 labelId="position-filter"
@@ -289,13 +308,11 @@ export default function Collection() {
                 {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
                   <MenuItem value={positionOption}>{positionOption}</MenuItem>
                 ))}
-
               </Select>
-
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={3}>
-            <FormControl sx={{ minWidth: 250 }} >
+            <FormControl sx={{ minWidth: 250 }}>
               <InputLabel id="team-filter">Team</InputLabel>
               <Select
                 labelId="team-filter"
@@ -306,12 +323,10 @@ export default function Collection() {
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>
-                {allTeamFilterOptions.map((teamOption => (
+                {allTeamFilterOptions.map((teamOption) => (
                   <MenuItem value={teamOption}>{teamOption}</MenuItem>
-                )))}
-
+                ))}
               </Select>
-
             </FormControl>
           </Grid>
         </Grid>
@@ -381,10 +396,11 @@ export default function Collection() {
           color="secondary.light"
           component="div"
           sx={{
-            marginBottom: "20px"
+            marginBottom: "20px",
           }}
         >
-          Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total athletes.
+          Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total
+          athletes.
         </Typography>
 
         <ImageList
@@ -400,17 +416,23 @@ export default function Collection() {
           {athleteNFTsWrapper?.map((athleteData) => (
             <ImageListItem sx={{ margin: "5%" }} className="athlete-image">
               <img
-                src={"/cards/" + athleteData?.title + ".png?w=164&h=164&fit=crop&auto=format"}
+                src={
+                  "/cards/" +
+                  athleteData?.title +
+                  ".png?w=164&h=164&fit=crop&auto=format"
+                }
                 alt={"Athlete card"}
                 loading="lazy"
                 onClick={() => {
                   setCurrAthlete({
-                    image: "/cards/" + athleteData?.title + ".png?w=164&h=164&fit=crop&auto=format",
-                    athleteData: athleteData
-                  })
-                  setModalOpen(true)
+                    image:
+                      "/cards/" +
+                      athleteData?.title +
+                      ".png?w=164&h=164&fit=crop&auto=format",
+                    athleteData: athleteData,
+                  });
+                  setModalOpen(true);
                 }}
-
               />
             </ImageListItem>
           ))}
@@ -430,7 +452,8 @@ export default function Collection() {
           modalOpen={modalOpen}
           image={currAthlete?.image}
           athleteData={currAthlete?.athleteData}
-          handleModalClose={handleModalClose} />
+          handleModalClose={handleModalClose}
+        />
         <Typography
           variant={isMobile ? "h4" : "h2"}
           color="secondary"
@@ -443,7 +466,8 @@ export default function Collection() {
             color: "white",
             backgroundColor: "white",
             height: 5,
-          }} />
+          }}
+        />
         <ImageList
           sx={{
             width: "100%",
@@ -476,12 +500,16 @@ export default function Collection() {
           </Grid> */}
       </Box>
     );
-  }
-  else if (isConnected && nftResp) {
+  } else if (isConnected && nftResp) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Card
-          sx={{ textAlign: "center", padding: 3, color: "white", width: "30rem" }}
+          sx={{
+            textAlign: "center",
+            padding: 3,
+            color: "white",
+            width: "30rem",
+          }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
             Empty Collection
@@ -495,7 +523,8 @@ export default function Collection() {
               overflowWrap: "break-word",
             }}
           >
-            You don't currently own any TeamDiff NFT's! Mint a starter pack, or purchase one on OpenSea.
+            You don't currently own any TeamDiff NFT's! Mint a starter pack, or
+            purchase one on OpenSea.
           </Typography>
           <Box sx={{ marginTop: 2 }}>
             <Link
@@ -508,7 +537,8 @@ export default function Collection() {
                 size="large"
                 aria-label="add"
                 sx={{
-                  fontSize: 20, background:
+                  fontSize: 20,
+                  background:
                     "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                   color: "white",
                 }}
@@ -539,23 +569,16 @@ export default function Collection() {
                   width="30rem"
                   height="30rem"
                 />
-                <Box sx={{ marginLeft: 1 }}>
-                  Buy on OpenSea
-                </Box>
+                <Box sx={{ marginLeft: 1 }}>Buy on OpenSea</Box>
               </Fab>
             </Link>
           </Box>
-        </Card >
-      </Box >
-    )
-  }
-  else if (isConnected) {
-    return (
-      <LoadingPrompt loading={"Your Collection"} />
+        </Card>
+      </Box>
     );
+  } else if (isConnected) {
+    return <LoadingPrompt loading={"Your Collection"} />;
   }
 
-  return (
-    <ConnectWalletPrompt accessing={"your collection"} />
-  );
+  return <ConnectWalletPrompt accessing={"your collection"} />;
 }
