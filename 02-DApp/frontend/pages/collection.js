@@ -73,7 +73,7 @@ export default function Collection() {
   const [teamFilterSelection, setTeamFilterSelection] = useState("");
   const [teamPositionSelection, setTeamPositionSelection] = useState("");
   const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([]);
-  const [loadingError, setLoadingError] = useState(false)
+  const [loadingError, setLoadingError] = useState(false);
 
   /**
    * Checks if browsers has injected web3 provider
@@ -131,8 +131,8 @@ export default function Collection() {
     if (isConnected) {
       // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
-//         console.log("entering getNftData function")
-        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK)
+        //         console.log("entering getNftData function")
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
         // const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK).catch(
         //   (error) => {
         //     // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
@@ -144,7 +144,7 @@ export default function Collection() {
         //     );
         //   }
         // );
-//         console.log("finished createAlchemyweb")
+        //         console.log("finished createAlchemyweb")
 
         const nfts = await web3.alchemy
           .getNfts({
@@ -154,7 +154,7 @@ export default function Collection() {
           .catch((error) => {
             // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
             // setNFTData([]);
-            setLoadingError(true)
+            setLoadingError(true);
             setIsPreparingAthletes(false);
             console.log("get nfts error: ");
           });
@@ -191,7 +191,7 @@ export default function Collection() {
         // alert("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
         // setNFTData([]);
         // setIsPreparingAthletes(false);
-        setLoadingError(true)
+        setLoadingError(true);
         console.log("fetch NFT DATA error");
       });
       console.log("done with preparing atheletes");
@@ -352,7 +352,7 @@ export default function Collection() {
               variant={isMobile ? "h6" : "h4"}
               color="secondary.light"
               component="div"
-            // fontSize={"50px"}
+              // fontSize={"50px"}
             >
               Filter Athletes:
             </Typography>
@@ -667,12 +667,14 @@ export default function Collection() {
               overflowWrap: "break-word",
             }}
           >
-            We encountered an unexpected error while loading your collection. Please check back again later. Don't worry, 
-            your collection is still safe and sound on the blockchain. We're working hard to let you get back into the arena!
+            We encountered an unexpected error while loading your collection.
+            Please check back again later. Don't worry, your collection is still
+            safe and sound on the blockchain. We're working hard to let you get
+            back into the arena!
           </Typography>
         </Card>
       </Box>
-    )
+    );
   }
 
   return <ConnectWalletPrompt accessing={"your collection"} />;

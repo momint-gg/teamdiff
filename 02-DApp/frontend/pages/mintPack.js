@@ -9,7 +9,6 @@ import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import OpenSea from "../assets/images/opensea.png";
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
@@ -247,8 +246,8 @@ export default function MintPack() {
 
   return (
     <Box>
-      {isLoading ? (
-        <LoadingPrompt loading={"Mint Page"} />
+      {!isConnected && !hasMinted && !isMinting ? (
+        <ConnectWalletPrompt accessing={"minting a pack"} />
       ) : (
         <>
           {isNoMetaMask && <MetaMaskRedirectInstructions />}
@@ -425,8 +424,9 @@ export default function MintPack() {
                   <Typography
                     variant="h5"
                     style={{
-                      color: "red",
-                      fontSize: 16,
+                      background:
+                        "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                      filter: "blur(35px)",
                     }}
                   >
                     {`Please switch to Polygon and refresh the page to proceed 
@@ -478,6 +478,9 @@ export default function MintPack() {
                   }}
                 >
                   <Box
+                    justifyContent="center"
+                    alignItems="center"
+                    flexDirection="column"
                     sx={{
                       display: "flex",
                       flexDirection: "row",
@@ -535,10 +538,7 @@ export default function MintPack() {
                   <Box>
                     <Box
                       sx={{
-                        display: "flex",
-                        flexDirection: isMobile ? "column" : "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        flex: 3,
                       }}
                     >
                       <Box
@@ -578,54 +578,95 @@ export default function MintPack() {
                           sx={{ textDecoration: "none" }}
                           target={"_blank"}
                         >
-                          <Fab
-                            variant="extended"
-                            size="large"
-                            aria-label="add"
-                            color={"info"}
-                            sx={{ fontSize: 20, color: "white" }}
-                          >
+                          <Paper
+                            elevation={0}
+                            style={{
+                              background:
+                                "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                              filter: "blur(35px)",
+                            }}
+                          />
+                          <Container sx={{ position: "absolute" }}>
                             <Image
-                              src={OpenSea}
-                              alt={"opensea"}
-                              width="30rem"
-                              height="30rem"
+                              src={profilePic}
+                              alt="TeamDiff Pack"
+                              position="absolute"
                             />
                             <Box sx={{ marginLeft: 1 }}>View on OpenSea</Box>
                           </Fab>
                         </Link>
                       </Box>
-                    </Box>
-                  </Box>
 
-                  <Box sx={{ textAlign: "center" }}>
-                    <Fab
-                      variant="extended"
-                      size="large"
-                      aria-label="add"
-                      onClick={() => router.push("./burnPack")}
-                      sx={{
-                        marginTop: isMobile ? 3 : 5,
-                        marginRight: isMobile ? 0 : 2,
-                        background:
-                          "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                        color: "white",
-                        fontSize: 20,
-                      }}
-                    >
-                      Open Pack
-                    </Fab>
-                    <Fab
-                      variant="extended"
-                      size="large"
-                      color="white"
-                      aria-label="add"
-                      onClick={() => router.push("./collection")}
-                      sx={{ marginTop: isMobile ? 3 : 5, fontSize: 20 }}
-                    >
-                      Go To My Collection
-                    </Fab>
+                      <Box sx={{ textAlign: "center" }}>
+                        <Fab
+                          variant="extended"
+                          size="large"
+                          aria-label="add"
+                          onClick={() => router.push("./burnPack")}
+                          sx={{
+                            marginTop: isMobile ? 3 : 5,
+                            marginRight: isMobile ? 0 : 2,
+                            background:
+                              "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                            color: "white",
+                            fontSize: 20,
+                          }}
+                        >
+                          Open Pack
+                        </Fab>
+                        <Fab
+                          variant="extended"
+                          size="large"
+                          color="white"
+                          aria-label="add"
+                          onClick={() => router.push("./collection")}
+                          sx={{ marginTop: isMobile ? 3 : 5, fontSize: 20 }}
+                        >
+                          Go To My Collection
+                        </Fab>
+                      </Box>
+                    </Box>
+                    {!isMobile && (
+                      <Box
+                        justifyContent="center"
+                        alignItems="center"
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          marginLeft: 5,
+                          marginTop: 2,
+                          "& > :not(style)": {
+                            m: 1,
+                            width: 260,
+                            height: 320,
+                          },
+                        }}
+                      >
+                        <Paper
+                          elevation={0}
+                          style={{
+                            background:
+                              "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
+                            filter: "blur(35px)",
+                          }}
+                        />
+                        <Container sx={{ position: "absolute" }}>
+                          <Image
+                            src={profilePic}
+                            alt="TeamDiff Pack"
+                            position="absolute"
+                          />
+                        </Container>
+                      </Box>
+                    )}
                   </Box>
+                </Container>
+              )}
+              {packsAvailable == 0 && (
+                <Box>
+                  <Typography color="primary">
+                    Sorry, all packs have already been minted :(
+                  </Typography>
                 </Box>
                 {!isMobile && (
                   <Box

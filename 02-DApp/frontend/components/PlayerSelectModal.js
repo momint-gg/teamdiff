@@ -3,6 +3,7 @@ import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import React, { useState } from "react";
 import CloseIcon from "../assets/images/close.png";
+import mystery_card from "../assets/images/mystery_card.png";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -33,13 +34,22 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function PlayerSelectModal({
+  positionIndex,
   modalOpen,
-  stateData,
-  players,
+
+  submitStarterHandler,
+  ownedAthletesInPosition,
+  currentStarterID,
   handleModalClose,
+  selectedPlayer,
+  setSelectedPlayer,
 }) {
   const classes = useStyles();
-  const [selectedPlayer, setSelectedPlayer] = useState(players[0]);
+  // const [selectedPlayer, setSelectedPlayer] = useState(ownedAthletesInPosition[currentStarterID]);
+  const [selectedPlayerID, setSelectedPlayerId] = useState(currentStarterID);
+  const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
+
+  // console.log("selectedPlaer :" + JSON.stringify(selectedPlayer, null, 2));
 
   return (
     <Modal
@@ -55,7 +65,7 @@ export default function PlayerSelectModal({
     >
       <Box className="modal-container" sx={{ padding: "26px 40px !important" }}>
         <Typography variant="h4" color="white">
-          Select {stateData.position}
+          Select {positions[positionIndex]}
         </Typography>
         <Button
           style={{ position: "absolute", top: "10px", right: "10px" }}
@@ -111,30 +121,35 @@ export default function PlayerSelectModal({
                   marginLeft: "40px",
                 }}
               >
-                {players?.map((player) => (
+                {ownedAthletesInPosition?.map((athlete, index) => (
                   <Box sx={{ direction: "ltr" }}>
                     <Box
                       sx={{
                         border: "2px solid",
                         borderColor:
-                          player === selectedPlayer ? "#FF00FF" : "#FFFFFF",
+                          athlete === selectedPlayer ? "#FF00FF" : "#FFFFFF",
                         borderRadius: "10px",
                         padding: "20px 40px",
                         cursor: "pointer",
                       }}
-                      onClick={() => setSelectedPlayer(player)}
+                      onClick={() => {
+                        setSelectedPlayer(athlete);
+                        setSelectedPlayerId(
+                          ownedAthletesInPosition.indexOf(athlete)
+                        );
+                      }}
                     >
-                      <Image src={player.image} width={118} height={158} />
+                      <Image src={athlete.image} width={118} height={158} />
                     </Box>
                     <Typography
                       color={"white"}
                       fontSize={12}
                       sx={{ marginTop: "18px" }}
                     >
-                      {player.name}
+                      {athlete.attributes[0].value}
                     </Typography>
                     <Typography color={"white"} fontSize={18}>
-                      {player.title}
+                      {athlete.name}
                     </Typography>
                   </Box>
                 ))}
@@ -147,9 +162,15 @@ export default function PlayerSelectModal({
               marginTop: "30px",
             }}
           >
-            <Image src={selectedPlayer.image} width={255} height={342} />
+            <Image
+              src={selectedPlayer ? selectedPlayer.image : mystery_card}
+              width={255}
+              height={342}
+            />
             <Button
-              onClick={() => handleSubModal(row)}
+              onClick={() =>
+                submitStarterHandler(selectedPlayerID, positionIndex)
+              }
               style={{
                 background:
                   "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
@@ -159,6 +180,7 @@ export default function PlayerSelectModal({
                 marginTop: "20px",
                 fontSize: "20px",
               }}
+              disabled={!selectedPlayer}
             >
               START ATHLETE
             </Button>
@@ -180,7 +202,9 @@ export default function PlayerSelectModal({
                     TEAM
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.opponent}
+                    {selectedPlayer
+                      ? selectedPlayer.attributes[0].value
+                      : "none"}
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: "20px" }}>
@@ -193,7 +217,7 @@ export default function PlayerSelectModal({
                     OPPONENT
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.score}
+                    {selectedPlayer ? "*pull from backend" : "none"}
                   </Typography>
                 </Box>
               </Box>
@@ -208,7 +232,9 @@ export default function PlayerSelectModal({
                     POSITION
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.position}
+                    {selectedPlayer
+                      ? selectedPlayer.attributes[1].value
+                      : "none"}
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: "20px" }}>
@@ -221,7 +247,7 @@ export default function PlayerSelectModal({
                     PREVIOUS POINTS
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
-                    {stateData.prevPoints}
+                    {selectedPlayer ? selectedPlayer.prevPoints : "none"}
                   </Typography>
                 </Box>
               </Box>
