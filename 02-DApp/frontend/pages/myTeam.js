@@ -23,49 +23,13 @@ import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_inf
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import Sample from "../../backend/sample.json";
-import Card2 from "../assets/cards/Abbedagge.png";
-import Card1 from "../assets/cards/Fudge.png";
 import logo from "../assets/images/example.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerSelectModal from "../components/PlayerSelectModal";
 import PlayerStateModal from "../components/PlayerStateModal";
 import constants from "../constants";
 
-const atheleteData = Sample.athleteData;
-
 // TODO get data from backend
-const players = [
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card2,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card2,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-  {
-    name: "TRADING CARD",
-    title: "Darshan 2022",
-    image: Card1,
-  },
-];
 
 export default function MyTeam() {
   // Router params
@@ -99,11 +63,12 @@ export default function MyTeam() {
   const [starterAthleteIds, setStarterAthleteIds] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
-  const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
+  // const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
   const [ownedAthletesMetadata, setOwnedAthletesMetadata] = useState([]);
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState();
+  const [isLineupLocked, setIsLineupLocked] = useState();
 
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
@@ -113,61 +78,18 @@ export default function MyTeam() {
   // Set to corresponding lock day Sun = 1, Sat = 7
   const leagueLockDay = 1;
   let daysTillLock;
+  let daysTillUnlock;
   today > leagueLockDay
     ? // If today greater than lock day
       (daysTillLock = 7 - today + leagueLockDay)
     : // if today < lock day
       (daysTillLock = leagueLockDay - today);
-  const starterAthleteData = {
-    top: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    jungle: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    mid: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    laner: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-    support: {
-      img: null,
-      name: null,
-      prevPoints: null,
-      opponent: null,
-      date: null,
-    },
-  };
-  useEffect(() => {
-    // console.log("today" + daysTillLock)
-    // setIsCreatingLeague(false);
-    // setHasCreatedLeague(true);
-    // setHasJoinedLeague(true)
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+  if (daysTillLock > 5) {
+    daysTillUnlock = 7 - daysTillLock;
+  }
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     const setAccountData = async () => {
       // setIsLoading(true);
       const signer = provider.getSigner();
@@ -178,11 +100,9 @@ export default function MyTeam() {
         setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
-        // TODO this doesn't update screen when switching accounts :/
       } else {
         setIsConnected(false);
       }
-      // setIsLoading(false);
     };
     setAccountData();
     provider.provider.on("accountsChanged", (accounts) => {
@@ -197,13 +117,19 @@ export default function MyTeam() {
   useEffect(() => {
     setAthleteNFTs([]);
     if (isConnected && router.isReady) {
+      console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
-        router.query.leagueAddress,
+        router.query.leagueRoute[0],
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
+      // const LeagueProxyContract = new ethers.Contract(
+      //   router.query.leagueAddress,
+      //   LeagueOfLegendsLogicJSON.abi,
+      //   provider
+      // );
       setLeagueProxyContract(LeagueProxyContract);
 
       // Initialize connections to Athlete datastore contract
@@ -216,6 +142,9 @@ export default function MyTeam() {
 
       async function fetchData() {
         setIsLoading(true);
+
+        const lineupIsLocked = await LeagueProxyContract.lineupIsLocked();
+        setIsLineupLocked(lineupIsLocked);
 
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
@@ -420,9 +349,9 @@ export default function MyTeam() {
           >
             {"Week #" +
               currentWeekNum +
-              ": Roster Locks in " +
-              daysTillLock +
-              " Days"}
+              (isLineupLocked
+                ? ": Rosters unlock in " + daysTillUnlock + " Days"
+                : ": Rosters Locks in " + daysTillLock + " Days")}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -525,6 +454,7 @@ export default function MyTeam() {
                             fontWeight: "600",
                             fontSize: "20px",
                           }}
+                          disabled={isLineupLocked}
                         >
                           {id != 0 ? "SUB" : "SET"}
                         </Button>

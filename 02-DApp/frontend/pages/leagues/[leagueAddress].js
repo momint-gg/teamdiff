@@ -14,9 +14,6 @@ import WhitelistJSON from "../../../backend/contractscripts/contract_info/abis/W
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddresses.js";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import constants from "../../Constants";
-// Component imports
-import MyTeam from "../myTeam.js";
-
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
 export default function LeagueDetails() {
   // Router params
@@ -160,6 +157,9 @@ export default function LeagueDetails() {
         setLeagueName(leagueName);
         const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
+        if (isInLeague) {
+          router.push("./" + router.query.leagueAddress + "/myTeam");
+        }
         // // console.log("isInLeague: " + isInLeague)
         // Get whitelist of Proxy, to confirm connected user is on whitelist
         const whitelistAddress = await LeagueProxyContract.whitelistContract();
@@ -343,7 +343,8 @@ export default function LeagueDetails() {
         <>
           {isLeagueMember ? (
             <>
-              <MyTeam></MyTeam>
+              {/* <MyTeam></MyTeam> */}
+              {"in dere"}
             </>
           ) : (
             <>
