@@ -55,6 +55,8 @@ export default function BurnPack({ setDisplay }) {
   const [nftResp, setNFTResp] = useState(null);
   // const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
+  const [currentChain, setCurrentChain] = useState();
+  const [isPolygon, setIsPolygon] = useState();
 
   useEffect(() => {
     // setHasMinted(true);
@@ -71,6 +73,9 @@ export default function BurnPack({ setDisplay }) {
         setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
+        const { chainId } = await provider.getNetwork();
+        setCurrentChain(chainId);
+        setIsPolygon(chainId === 137);
       } else {
         setIsConnected(false);
       }

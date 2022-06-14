@@ -1,15 +1,12 @@
-import {
-  useAccount,
-  useConnect,
-  useEnsAvatar,
-  useEnsName,
-  useDisconnect,
-} from "wagmi";
-import { Box, Button, Avatar, Chip, ClickAwayListener } from "@mui/material";
-import { useEffect, useState } from "react";
-
+import { Avatar, Box, Button, Chip, ClickAwayListener } from "@mui/material";
 import { ethers } from "ethers";
+import { useEffect, useState } from "react";
+import {
+  useEnsAvatar,
+  useEnsName
+} from "wagmi";
 import ConnectWalletModal from "./ConnectWalletModal";
+
 
 export default function WalletLogin({ isMobile }) {
   // const { isConnected, connector, connectors, connectAsync } = useConnect()
@@ -54,7 +51,7 @@ export default function WalletLogin({ isMobile }) {
         setIsConnected(true);
       } else {
         setIsConnected(false);
-        console.log("no connected accounts");
+        // console.log("no connected accounts");
       }
     };
     fetchData();
@@ -62,14 +59,14 @@ export default function WalletLogin({ isMobile }) {
       fetchData();
     });
     provider.provider.on("disconnect", () => {
-      console.log("disconnected");
+      // console.log("disconnected");
       setIsConnected(false);
     });
   }, []);
 
   const setAddressPreview = (address) => {
-    console.log("address: " + address);
-    var shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+    // console.log("address: " + address);
+    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
       address.length - 4,
       address.length
     )}`;
