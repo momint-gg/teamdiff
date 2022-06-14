@@ -1,38 +1,23 @@
-import { useState, useEffect } from "react";
-import { useAccount, useDisconnect } from "wagmi";
-import { ethers } from "ethers";
-import AthleteCard from "../components/AthleteCard";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  CardActions,
-  Button,
-} from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-
-import constants from "../Constants";
-import MyLeagues from "./myLeagues";
-import JoinLeague from "./joinLeague";
-import CreateLeague from "./createLeague";
-import { Fragment } from "react";
-import { GiPodium } from "react-icons/gi";
-import { MdGroupAdd } from "react-icons/md";
-import { FaCrown } from "react-icons/fa";
-//Router
+import {
+    Box, Card, CardActions, CardContent, Grid, Typography
+} from "@mui/material";
+import { ethers } from "ethers";
+// Router
 import { useRouter } from "next/router";
+import React, { Fragment, useEffect, useState } from "react";
+import { FaCrown } from "react-icons/fa";
 import { useMediaQuery } from "react-responsive";
+import { useAccount, useDisconnect } from "wagmi";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
+
+
 
 export default function Play() {
-  //Router
+  // Router
   const router = useRouter();
-  //WAGMI Hooks
+  // WAGMI Hooks
   const { data: accountData, isLoading, error } = useAccount({ ens: true });
   // const { data: ensName } = useEnsName()
   // const { data: ensAvatar } = useEnsAvatar()
@@ -107,8 +92,7 @@ export default function Play() {
           <Grid item xs={4}>
             <Card
               sx={{
-                background:
-                  "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
+                background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
               variant="outlined"
@@ -138,14 +122,15 @@ export default function Play() {
                 paddingRight: 2,
               }}
             >
-              View the leagues that you have joined or created. Set your lineups, view your matchups, scout out other players' teams, and the overall standings within a league!
+              View the leagues that you have joined or created. Set your
+              lineups, view your matchups, scout out other players' teams, and
+              the overall standings within a league!
             </Typography>
           </Grid>
           <Grid item xs={4}>
             <Card
               sx={{
-                background:
-                  "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
+                background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
               variant="outlined"
@@ -175,15 +160,16 @@ export default function Play() {
                 paddingRight: 2,
               }}
             >
-              Join a public or private league (invite-only) to compete against others for bragging rights and tokens! Show off your athletes and join as many leagues as you want.
+              Join a public or private league (invite-only) to compete against
+              others for bragging rights and tokens! Show off your athletes and
+              join as many leagues as you want.
             </Typography>
           </Grid>
           <Grid item xs={4}>
             <Card
               variant="outlined"
               sx={{
-                background:
-                  "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
+                background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
               onClick={() => router.push("/createLeagueLanding")}
@@ -213,7 +199,8 @@ export default function Play() {
                 paddingRightt: 2,
               }}
             >
-              Create either a public or private league to compete against your friends and prove that you've assembled the better roster!
+              Create either a public or private league to compete against your
+              friends and prove that you've assembled the better roster!
             </Typography>
           </Grid>
         </Grid>
