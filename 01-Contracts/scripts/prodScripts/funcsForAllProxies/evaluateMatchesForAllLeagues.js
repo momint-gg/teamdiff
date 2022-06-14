@@ -1,24 +1,15 @@
-require('dotenv').config({ path: '../.env' });
-const { ethers } = require('ethers');
-const abi = require('../contract_info/abis/LeagueMaker.json');
-const { LeagueMaker } = require('../contract_info/contractAddresses');
-const LeagueOfLegendsLogicJSON = require('../contract_info/abis/LeagueOfLegendsLogic.json');
+require("dotenv").config({ path: "../.env" });
+const { ethers } = require("ethers");
+const abi = require("../contract_info/abis/LeagueMaker.json");
+const { LeagueMaker } = require("../contract_info/contractAddresses");
+const LeagueOfLegendsLogicJSON = require("../contract_info/abis/LeagueOfLegendsLogic.json");
+const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
 
 async function main() {
-  // Constructing our contract
-  const provider = new ethers.providers.AlchemyProvider(
-    'rinkeby',
-    process.env.RINKEBY_ALCHEMY_KEY
-  );
-  const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  const LeagueMakerCntract = new ethers.Contract(
-    LeagueMaker,
-    abi.abi,
-    rinkebySigner
-  );
+  // Getting our contract
 
   // Getting our list of proxies
-  const leagueAddresses = await LeagueMakerCntract.connect(
+  const leagueAddresses = await LeagueMakerContract.connect(
     rinkebySigner
   ).getLeagueAddresses();
 
