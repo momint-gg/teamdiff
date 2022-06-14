@@ -1,59 +1,46 @@
-import {
-  useAccount,
-  useConnect,
-  useSigner,
-  useProvider,
-  useContract,
-  useEnsLookup,
-} from "wagmi";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-
-import { ethers } from "ethers";
-import "bootstrap/dist/css/bootstrap.css";
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import Image from "next/image";
-import LoadingPrompt from "../components/LoadingPrompt";
-
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import OpenSea from "../assets/images/opensea.png"
-
 import {
-  Link,
   Box,
-  Typography,
-  Button,
-  Chip,
   Container,
-  Paper,
   Fab,
   Grid,
+  Link,
+  Paper,
+  Typography
 } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import cardImage from "../assets/images/mystery_card.png";
+import OpenSea from "../assets/images/opensea.png";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
+import LoadingPrompt from "../components/LoadingPrompt";
 import constants from "../Constants";
-import { useMediaQuery } from "react-responsive";
-import AthletesToIndex from "../constants/AlthletesToIndex.json"
+import AthletesToIndex from "../constants/AlthletesToIndex.json";
 
 function getAthleteImage(id) {
   const athleteName = AthletesToIndex[id];
-  return `/cards/${athleteName}.png`
+  return `/cards/${athleteName}.png`;
 }
 
 export default function BurnPack({ setDisplay }) {
-  //TODO change to matic network for prod
+  // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.ALCHEMY_KEY
   );
-  //Router
+  // Router
   const router = useRouter();
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
-  //State Hooks
+  // State Hooks
   const [mintedPackId, setMintedPackId] = useState(null);
   const [gameItemsContract, setGameItemsContract] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
@@ -111,7 +98,7 @@ export default function BurnPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
-      //Fetcher to retireve newly minted NFT data
+      // Fetcher to retireve newly minted NFT data
       const getNFTData = async (athleteIndices) => {
         console.log("athletic Indices in getNFTData: " + athleteIndices);
         const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
@@ -208,7 +195,7 @@ export default function BurnPack({ setDisplay }) {
 
     // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
-    //Calling burn on game items contract
+    // Calling burn on game items contract
     const burnTxn = await gameItemsContractWithSigner
       .burnStarterPack({
         gasLimit: 10000000,
@@ -277,7 +264,7 @@ export default function BurnPack({ setDisplay }) {
                     sx={{
                       display: "flex",
                       textAlign: "center",
-                      marginTop: 4
+                      marginTop: 4,
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
@@ -308,14 +295,12 @@ export default function BurnPack({ setDisplay }) {
                         color: "white",
                         fontSize: 20,
                         paddingRight: 6,
-                        paddingLeft: 6
+                        paddingLeft: 6,
                       }}
                     >
                       Open
                     </Fab>
                   </Box>
-<<<<<<< HEAD
-=======
                   <Box
                     justifyContent="center"
                     alignItems="center"
@@ -336,7 +321,6 @@ export default function BurnPack({ setDisplay }) {
                       </Typography>
                     )}
                   </Box>
->>>>>>> e362120f... typo
                 </>
               )}
               {!canMint && (
@@ -346,10 +330,7 @@ export default function BurnPack({ setDisplay }) {
                     justifyContent: "center",
                   }}
                 >
-                  <Typography
-                    variant="h6"
-                    color="white"
-                  >
+                  <Typography variant="h6" color="white">
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
                       <a
@@ -357,7 +338,7 @@ export default function BurnPack({ setDisplay }) {
                         //   textDecoration: "none",
                         //   textDecorationColor: "transparent"
                         // }}
-                        class="primary-link"
+                        className="primary-link"
                         href="/mintPack"
                       >
                         here
@@ -397,7 +378,6 @@ export default function BurnPack({ setDisplay }) {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-evenly",
-
                   }}
                 >
                   <Box
@@ -421,7 +401,12 @@ export default function BurnPack({ setDisplay }) {
                       >
                         Acquired 5 TeamDiff Athletes!
                       </Typography>
-                      {!isMobile && <CheckCircleIcon fontSize="large" sx={{ color: "#13db13" }} />}
+                      {!isMobile && (
+                        <CheckCircleIcon
+                          fontSize="large"
+                          sx={{ color: "#13db13" }}
+                        />
+                      )}
                     </Box>
                     <Box
                       sx={{
@@ -433,15 +418,20 @@ export default function BurnPack({ setDisplay }) {
                         marginBottom: 5,
                       }}
                     >
-                      <Typography variant="h4" sx={{ color: "#cdcdcd", marginRight: 1 }}>
+                      <Typography
+                        variant="h4"
+                        sx={{ color: "#cdcdcd", marginRight: 1 }}
+                      >
                         Click any card to view on OpenSea
                       </Typography>
-                      {!isMobile && <Image
-                        src={OpenSea}
-                        alt={"opensea"}
-                        width="30rem"
-                        height="30rem"
-                      />}
+                      {!isMobile && (
+                        <Image
+                          src={OpenSea}
+                          alt={"opensea"}
+                          width="30rem"
+                          height="30rem"
+                        />
+                      )}
                     </Box>
                     <Box>
                       <Grid container spacing={6}>
@@ -461,7 +451,9 @@ export default function BurnPack({ setDisplay }) {
                                 alt={"image"}
                                 loading="lazy"
                                 width="300px"
-                                style={{ filter: "drop-shadow(0 0 0.75rem crimson)" }}
+                                style={{
+                                  filter: "drop-shadow(0 0 0.75rem crimson)",
+                                }}
                               />
                             </Link>
                           </Grid>
@@ -475,7 +467,12 @@ export default function BurnPack({ setDisplay }) {
                       aria-label="add"
                       //  target={"_blank"}
                       onClick={() => router.push("./collection")}
-                      sx={{ marginTop: 5, fontSize: 20, paddingRight: 5, paddingLeft: 5 }}
+                      sx={{
+                        marginTop: 5,
+                        fontSize: 20,
+                        paddingRight: 5,
+                        paddingLeft: 5,
+                      }}
                     >
                       Go To My Collection
                     </Fab>
@@ -513,8 +510,7 @@ export default function BurnPack({ setDisplay }) {
             <ConnectWalletPrompt accessing={"opening a pack"} />
           )}
         </>
-      )
-      }
-    </Box >
+      )}
+    </Box>
   );
 }
