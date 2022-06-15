@@ -63,6 +63,7 @@ contract LeagueMaker is Ownable {
         address[] calldata _whitelistUsers
         
     ) external returns (address) {
+        require(_stakeAmount <= 100, "Stake amount must be below 100");
         // constructorContractAddresses[2] = _testUSDCAddress;
         // constructorContractAddresses[3] = _athletesContractAddress;
         // constructorContractAddress[4] = address(this);

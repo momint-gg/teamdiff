@@ -4,7 +4,7 @@
 // require('dotenv').config({ path: '../.env' });
 // const { ethers } = require('ethers');
 // const { GameItems } = require('../contract_info/contractAddresses');
-// const GameItemsJSON = require('../contract_info/abis/GameItems.json');
+// const GameItemsJSON = require('../contract_info/rinkebyAbis/GameItems.json');
 // const XLSX = require('xlsx');
 // const web3 = require('web3');
 

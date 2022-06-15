@@ -1,4 +1,4 @@
-import { Typography, Box, Card } from "@mui/material";
+import { Box, Card, Typography } from "@mui/material";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 export default function LoadingPrompt({ loading, bottomText, completeTitle }) {
@@ -8,7 +8,7 @@ export default function LoadingPrompt({ loading, bottomText, completeTitle }) {
         sx={{ textAlign: "center", padding: 3, color: "white", width: "30rem" }}
       >
         <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-          {completeTitle ? completeTitle : `Loading ${loading}`}
+          {completeTitle || `Loading ${loading}`}
         </Typography>
         <Box
           sx={{ padding: 3, paddingBottom: 8, marginTop: 0, marginRight: 10 }}

@@ -13,7 +13,7 @@ async function main() {
   //Creating a new contract instance wiht the abi and address (must test on rinkeby)
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
   const wallet = process.env.PRIVATE_KEY;
   console.log("Making wallet");

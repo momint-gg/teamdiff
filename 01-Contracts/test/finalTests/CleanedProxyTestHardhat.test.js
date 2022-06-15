@@ -270,6 +270,10 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
+    // Addr1 joining the league and staking the 10 USDC
+    let join = await proxyContract.connect(owner).joinLeague();
+    await join.wait();
+
     // The admin (owner) adding addr1 to whitelist
     const addToWhitelist = await proxyContract
       .connect(owner)
@@ -279,6 +283,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     // Prompting approval for addr1
     let approval = await testUsdcContract
       .connect(addr1)
+      .approve(proxyContract.address, 10);
+    await approval.wait();
+
+    approval = await testUsdcContract
+      .connect(owner)
       .approve(proxyContract.address, 10);
     await approval.wait();
 
@@ -302,6 +311,10 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       // 20-10
       10
     );
+  });
+
+  it("Has two league members in the league", async () => {
+    expect(proxyContract.leagueMembers().length).to.equal(2);
   });
 
   // NOTE: Now the league has owner and addr1 in it, with a total staked amount of 20

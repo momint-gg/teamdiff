@@ -1,14 +1,5 @@
+import { Box, ImageList, ImageListItem, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
-import {
-  Container,
-  Box,
-  Grid,
-  Fab,
-  Typography,
-  ImageList,
-  ImageListItem,
-  Button,
-} from "@mui/material";
 import LoadingPrompt from "../components/LoadingPrompt";
 
 export default function StarterPackContents() {

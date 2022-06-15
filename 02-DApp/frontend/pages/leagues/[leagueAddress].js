@@ -7,11 +7,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // NPM import
 import WAValidator from "wallet-address-validator";
-import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
-import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
-import WhitelistJSON from "../../../backend/contractscripts/contract_info/abis/Whitelist.json";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
+import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import constants from "../../Constants";
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
@@ -22,7 +22,7 @@ export default function LeagueDetails() {
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
   // const { data: signerData1, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
 
@@ -190,7 +190,7 @@ export default function LeagueDetails() {
 
       // declare the async data fetching function
       const getNFTData = async () => {
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
           owner: connectedAccount,
@@ -341,12 +341,7 @@ export default function LeagueDetails() {
         <LoadingPrompt loading={"Your League"} />
       ) : (
         <>
-          {isLeagueMember ? (
-            <>
-              {/* <MyTeam></MyTeam> */}
-              {"in dere"}
-            </>
-          ) : (
+          {!isLeagueMember && (
             <>
               {isOnWhitelist && !isJoiningLeague && !hasJoinedLeague ? (
                 <Box

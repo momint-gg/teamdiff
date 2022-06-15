@@ -1,14 +1,5 @@
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import { Fragment } from "react";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  CardActions,
-  Button,
-  Avatar,
-  Box,
-} from "@mui/material";
 
 export default function JoinCard({ joinData }) {
   const card = (

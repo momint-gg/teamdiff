@@ -25,18 +25,23 @@ contract GameItems is ERC1155, Ownable {
     uint256 private MAX_STARTER_PACK_BALANCE;
     uint256 private MAX_BOOSTER_PACK_BALANCE;
     uint256 private MAX_PACKS;
+    uint256 private MAX_BOOSTER_PACKS;
     uint256 private NUM_ATHLETES;
     uint256 private NFT_PER_ATHLETE;
-    uint256 chainlinkSubId;
-    uint256 public REVEAL_TIMESTAMP = 10000;
+    // uint256 chainlinkSubId;
+    // uint256 public REVEAL_TIMESTAMP = 10000;
+    // string public name = "TeamDiff";    //do we need this?
+
+    // uint256 public REVEAL_TIMESTAMP = 10000;
     string public name = "TeamDiff";
 
     // When we flip the switch and let everyone open packs
-    bool public packsReadyToOpen = true;
+    bool public packsReadyToOpen;
+    bool public boosterPacksReadyToOpen;
 
     // Total amount of packs minted so far
-    uint256 private starterPacksMinted;
-    uint256 private boosterPacksMinted;
+    uint256 public starterPacksMinted;
+    uint256 public boosterPacksMinted;
     // The total amount of athletes so far we've minted
     uint256 private numAthletes;
 
@@ -52,8 +57,10 @@ contract GameItems is ERC1155, Ownable {
     uint256[3] private boosterPackIndices;
 
     // Events
-    event packMinted(address signer, uint256 id);
-    event packBurned(uint256[5], address signer);
+    event starterPackMinted(address signer, uint256 id);
+    event starterPackBurned(uint256[5], address signer);
+    event boosterPackMinted(address signer, uint256 id);
+    event boosterPackBurned(uint256[3], address signer);
 
     struct Parameters {
         uint256 _numAthletes;
@@ -63,8 +70,7 @@ contract GameItems is ERC1155, Ownable {
         uint256 _maxStarterPackBalance;
         uint256 _maxBoosterPackBalance;
         uint256 _maxPacks;
-        uint256 _revealTimestamp;
-        // uint64 chainlinkSubId;
+        uint256 _maxBoosterPacks;
     }
 
     // TODO show how many packs are still available
@@ -74,11 +80,16 @@ contract GameItems is ERC1155, Ownable {
     // Our whitelist
     mapping(address => bool) public whitelist;
     uint256 public numWhitelisted;
+    bool public isPresalePhase;
+    bool public isPublicSalePhase;
+    bool public isBoosterPackSalePhase;
 
     // Mappings
     mapping(uint256 => string) private _uris; // token URIs
     mapping(uint256 => uint256) private supplyOfToken; // supply of the given token
-    mapping(address => bool) private userToHasBurnedPack;
+    mapping(address => bool) public userToHasBurnedStarterPack;
+    mapping(address => bool) public userToHasMintedStarterPack;
+    mapping(address => uint256) public usersBoosterPacksMinted;
 
     //NOTE we ran into an error if we have more than 16 params passed in constructor
     constructor(
@@ -94,16 +105,36 @@ contract GameItems is ERC1155, Ownable {
         MAX_STARTER_PACK_BALANCE = params._maxStarterPackBalance;
         MAX_BOOSTER_PACK_BALANCE = params._maxBoosterPackBalance;
         MAX_PACKS = params._maxPacks;
+        MAX_BOOSTER_PACKS = params._maxBoosterPacks;
         athleteURI = _athleteURI;
         starterPackURI = _starterPackURI;
         boosterPackURI = _boosterPackURI;
-        REVEAL_TIMESTAMP = params._revealTimestamp;
+        // REVEAL_TIMESTAMP = params._revealTimestamp;
         packsAvailable = MAX_PACKS;
     }
 
-    // Athletes can only be minted once our "switch" has been flipped
-    function setPacksReady() public onlyOwner {
-        packsReadyToOpen = !packsReadyToOpen;
+    // Opening the private sale
+    function openPrivateSale() public onlyOwner {
+        isPresalePhase = true;
+    }
+
+    // Opening the public sale
+    function openPublicSale() public onlyOwner {
+        isPublicSalePhase = true;
+    }
+
+    function openBoosterPackSale() public onlyOwner {
+        isBoosterPackSalePhase = true;
+    }
+
+    // Allowing starter packs to be opened
+    function allowStarterPacks() public onlyOwner {
+        packsReadyToOpen = true;
+    }
+
+    // Allowing booster packs to be opened
+    function allowBoosterPacks() public onlyOwner {
+        boosterPacksReadyToOpen = true;
     }
 
     /*****************************************************/
@@ -133,29 +164,30 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
-    function removeUserFromWhitelist(address _userToRemove)
-        public
-        onlyOwner
-        returns (bool success)
-    {
-        if (whitelist[_userToRemove]) {
-            whitelist[_userToRemove] = false;
-            numWhitelisted -= 1;
-            success = true;
-        }
-    }
+    //Do we need this?
+    // function removeUserFromWhitelist(address _userToRemove)
+    //     public
+    //     onlyOwner
+    //     returns (bool success)
+    // {
+    //     if (whitelist[_userToRemove]) {
+    //         whitelist[_userToRemove] = false;
+    //         numWhitelisted -= 1;
+    //         success = true;
+    //     }
+    // }
 
-    function removeUsersFromWhitelist(address[] memory addrs)
-        public
-        onlyOwner
-        returns (bool success)
-    {
-        for (uint256 i = 0; i < addrs.length; i++) {
-            if (removeUserFromWhitelist(addrs[i])) {
-                success = true;
-            }
-        }
-    }
+    // function removeUsersFromWhitelist(address[] memory addrs)
+    //     public
+    //     onlyOwner
+    //     returns (bool success)
+    // {
+    //     for (uint256 i = 0; i < addrs.length; i++) {
+    //         if (removeUserFromWhitelist(addrs[i])) {
+    //             success = true;
+    //         }
+    //     }
+    // }
 
     function getNumWhitelisted() public view returns (uint256) {
         return numWhitelisted;
@@ -170,39 +202,49 @@ contract GameItems is ERC1155, Ownable {
     /*****************************************************/
     /************ STARTER PACK MINTING/BURNING ***********/
     /*****************************************************/
-
     // Minting a pack to the current user -- later going to be burned and given 3 random NFTs
-    function mintStarterPack() public onlyWhitelisted {
-        uint256 starterPackId = NUM_ATHLETES;
+    function mintStarterPack() public {
+        require(
+            isPresalePhase || isPublicSalePhase,
+            "Private sale hasn't opened yet."
+        );
+        if (isPresalePhase && !isPublicSalePhase) {
+            require(whitelist[msg.sender], "User is not whitelisted.");
+        }
         require(
             starterPacksMinted < MAX_PACKS,
             "All packs have already been minted!"
         );
-        // require(
-        //     balanceOf(msg.sender, starterPackId) < 1,
-        //     "Can only mint one starter pack per account"
-        // );
+        require(
+            !userToHasMintedStarterPack[msg.sender],
+            "Can only mint one starter pack per account"
+        );
+        userToHasMintedStarterPack[msg.sender] = true;
 
-        // Making the index 1 after the athletes end
+        // Making the index 1 after the athlet  es end
+        uint256 starterPackId = NUM_ATHLETES;
         _mint(msg.sender, starterPackId, 1, "0x00");
 
         starterPacksMinted += 1;
         packsAvailable -= 1;
-        emit packMinted(msg.sender, starterPacksMinted);
+        emit starterPackMinted(msg.sender, starterPacksMinted);
     }
 
     // Burning a starter pack and giving random athlete NFTs to sender (one of each position)
     // Passing in random indices here!
-    function burnStarterPack() public onlyWhitelisted {
+    function burnStarterPack() public {
         uint256 starterPackId = NUM_ATHLETES;
-        // require(!userToHasBurnedPack[msg.sender], "You cannot burn more than 1 pack");
+        require(
+            !userToHasBurnedStarterPack[msg.sender],
+            "You cannot burn more than 1 pack"
+        );
         require(packsReadyToOpen, "Packs aren't ready to open yet!");
         require(
             balanceOf(address(msg.sender), starterPackId) > 0,
             "Starter pack does not exist in users wallet"
         );
 
-        userToHasBurnedPack[msg.sender] = true;
+        userToHasBurnedStarterPack[msg.sender] = true;
 
         // Indices for players in the pack, 1 of each position
         uint256[5] memory indices = generateStarterPackIndices();
@@ -214,12 +256,11 @@ contract GameItems is ERC1155, Ownable {
 
         _burn(msg.sender, starterPackId, 1);
 
-        emit packBurned(indices, msg.sender);
+        emit starterPackBurned(indices, msg.sender);
     }
 
     // Mints an athlete -- called when someone "burns" a pack
-    // TODO switch back to private for rpod
-    function mintAthlete(uint256 index) public {
+    function mintAthlete(uint256 index) private {
         if (numAthletes < NUM_ATHLETES * NFT_PER_ATHLETE) {
             require(
                 supplyOfToken[index] < NFT_PER_ATHLETE,
@@ -233,10 +274,53 @@ contract GameItems is ERC1155, Ownable {
         }
     }
 
+    /*****************************************************/
+    /************ BOOSTER PACK MINTING/BURNING ***********/
+    /*****************************************************/
+    function mintBoosterPack() public {
+        require(isBoosterPackSalePhase, "Booster pack sale hasn't opened yet.");
+        require(
+            boosterPacksMinted < MAX_BOOSTER_PACKS,
+            "All booster packs have already been minted!"
+        );
+        require(
+            usersBoosterPacksMinted[msg.sender] < 2,
+            "Can only mint two booster packs per account"
+        );
+        usersBoosterPacksMinted[msg.sender]++;
+        uint256 boosterPackId = NUM_ATHLETES + 1;
+
+        _mint(msg.sender, boosterPackId, 1, "");
+
+        boosterPacksMinted += 1;
+        emit boosterPackMinted(msg.sender, boosterPacksMinted);
+    }
+
+    function burnBoosterPack() public {
+        uint256 boosterPackId = NUM_ATHLETES + 1;
+        require(
+            boosterPacksReadyToOpen,
+            "Booster packs aren't ready to open yet!"
+        );
+        require(
+            balanceOf(address(msg.sender), boosterPackId) > 0,
+            "No remaining booster packs!"
+        );
+
+        uint256[3] memory indices = generateBoosterPackIndices();
+
+        for (uint8 i = 0; i < indices.length; i++) {
+            mintAthlete(indices[i]);
+        }
+
+        _burn(address(msg.sender), boosterPackId, 1);
+
+        emit boosterPackBurned(indices, msg.sender);
+    }
+
     /**********************************************/
     /************ SETTING URIS, INDICES ***********/
     /**********************************************/
-
     // Setting starting Index -- will do every time?
     function setStartingIndex() public onlyOwner {
         // Setting the starting index
@@ -280,6 +364,7 @@ contract GameItems is ERC1155, Ownable {
 
         //Setting pack URIs after the athletes (i.e. 49.json = last athlete, 50.json = starter pack)
         setTokenUri(NUM_ATHLETES, string(abi.encodePacked(starterPackURI)));
+        setTokenUri(NUM_ATHLETES + 1, string(abi.encodePacked(boosterPackURI)));
     }
 
     // Generate pseudo random starter pack indices (randomness not super important here)
@@ -307,76 +392,35 @@ contract GameItems is ERC1155, Ownable {
         return indices;
     }
 
-    function getNFTPerAthlete() public view returns (uint256) {
-        return NFT_PER_ATHLETE;
+
+    //Generate pseudo random booster pack indices
+    function generateBoosterPackIndices()
+        private
+        view
+        returns (uint256[3] memory)
+    {
+        uint256[3] memory indices;
+        uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
+
+        for (uint256 i = 0; i < 3; i++) {
+            startI = startI % 5;
+            uint256 start = startI * 10;
+            uint256 end = startI * 10 + 9;
+
+            indices[i] = ((uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp,
+                        msg.sender,
+                        block.difficulty,
+                        i,
+                        boosterPacksMinted
+                    )
+                )
+            ) % (end - start + 1)) + start);
+
+            startI += 1;
+        }
+        return indices;
     }
-
-    /***********************************************/
-    /************ BOOSTER PACK FUNCTIONS ***********/
-    /***********************************************/
-    //  function mintBoosterPack() public {
-    //         uint256 boosterPackId = NUM_ATHLETES + 1;
-    //         require(
-    //             boosterPacksMinted < MAX_PACKS,
-    //             "All packs have already been minted!"
-    //         );
-    //         require(
-    //             balanceOf(msg.sender, boosterPackId) < 2,
-    //             "Can only mint two booster packs per account"
-    //         );
-
-    //         _mint(msg.sender, boosterPackId, 1, "");
-
-    //         boosterPacksMinted += 1;
-    //         emit packMinted(msg.sender, boosterPacksMinted);
-    //     }
-
-    // function burnBoosterPack() public {
-    //     uint256 boosterPackId = NUM_ATHLETES + 1;
-
-    //     require(packsReadyToOpen, "Packs aren't ready to open yet!");
-    //     require(
-    //         balanceOf(address(msg.sender), boosterPackId) > 0,
-    //         "No remaining booster packs!"
-    //     );
-
-    //     uint256[3] memory indices = generateBoosterPackIndices();
-
-    //     for (uint8 i = 0; i < indices.length; i++) {
-    //         mintAthlete(indices[i]);
-    //     }
-
-    //     _burn(address(msg.sender), boosterPackId, 1);
-    // }
-
-    // //Generate pseudo random booster pack indices
-    // function generateBoosterPackIndices()
-    //     private
-    //     view
-    //     returns (uint256[3] memory)
-    // {
-    //     uint256[3] memory indices;
-    //     uint256 startI = block.number % 5; //Find the start index for booster pack athlete type (somewhere 1->5)
-
-    //     for (uint256 i = 0; i < 3; i++) {
-    //         startI = startI % 5;
-    //         uint256 start = startI * 10;
-    //         uint256 end = startI * 10 + 9;
-
-    //         indices[i] = ((uint256(
-    //             keccak256(
-    //                 abi.encodePacked(
-    //                     block.timestamp,
-    //                     msg.sender,
-    //                     block.difficulty,
-    //                     i,
-    //                     boosterPacksMinted
-    //                 )
-    //             )
-    //         ) % (end - start + 1)) + start);
-
-    //         startI += 1;
-    //     }
-    //     return indices;
-    // }
 }

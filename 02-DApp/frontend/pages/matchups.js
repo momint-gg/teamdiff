@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { Box, Container, Grid, Typography } from "@mui/material";
 import Image from "next/image";
-import { Container, Typography, Box, Grid } from "@mui/material";
-import PlayerStateModal from "../components/PlayerStateModal";
-import LogoIcon from "../assets/images/logoIcon.png";
+import React, { useState } from "react";
 import Sample from "../../backend/sample.json";
-
+import LogoIcon from "../assets/images/logoIcon.png";
+import PlayerStateModal from "../components/PlayerStateModal";
+// todo
 const statsData = Sample.statsData;
 
 const data = {

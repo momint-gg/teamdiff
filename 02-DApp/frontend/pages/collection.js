@@ -1,22 +1,31 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
-  Box, Card, Fab, FormControl, Grid, Link, MenuItem, Select, TextField, Typography
+  Box,
+  Card,
+  Fab,
+  FormControl,
+  Grid,
+  Link,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
 } from "@mui/material";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import InputLabel from "@mui/material/InputLabel";
 import { ethers } from "ethers";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import OpenSea from "../assets/images/opensea.png";
 import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
-import constants from "../constants";
-
-
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
+import constants from "../constants/index";
 // import styles from "../styles/collection.module.css"
 
 // const StyledImageListItem = styled(ImageListItem)`
@@ -27,68 +36,92 @@ import constants from "../constants";
 // `
 
 export default function Collection() {
+  const router = useRouter();
+  // State Hooks
   const [nftResp, setNFTResp] = useState(null);
   const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [currAthlete, setCurrAthlete] = useState(null);
-  const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+
+  /**
+   * Handles a change in injected etheruem provider from MetaMask
+   */
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      console.log("Please install MetaMask!");
+    }
+  }
   const [searchQuery, setSeachQuery] = useState("");
   const [isPreparingAthletes, setIsPreparingAthletes] = useState(true);
   const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([]);
   const [teamFilterSelection, setTeamFilterSelection] = useState("");
   const [teamPositionSelection, setTeamPositionSelection] = useState("");
   const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([]);
+  const [loadingError, setLoadingError] = useState(false);
 
+  /**
+   * Checks if browsers has injected web3 provider
+   * and if so, gets connected account data, or sets to null if no connected account
+   */
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    if (window.ethereum) {
+      handleEthereum();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
-        setSigner(signer);
-        setConnectedAccount(accountAddress);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setConnectedAccount(accountAddress);
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+        setIsLoading(false);
+      };
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", () => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, []);
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
+  // const handleModalOpen = () => {
+  //   setModalOpen(true);
+  // };
   const handleModalClose = () => {
     setModalOpen(false);
   };
-  const handleClick = () => {
-    setMenu((menu) => !menu);
-  };
-  const handleClickAway = () => {
-    setMenu(false);
-  };
-
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   useEffect(async () => {
     setPackNFTs([]);
@@ -96,22 +129,52 @@ export default function Collection() {
     setAthleteNFTsWrapper([]);
     // declare the async data fetching function
     if (isConnected) {
+      // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+        //         console.log("entering getNftData function")
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
+        // const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK).catch(
+        //   (error) => {
+        //     // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
+        //     // setNFTData([]);
+        //     setIsPreparingAthletes(false);
 
-        const nfts = await web3.alchemy.getNfts({
-          owner: connectedAccount,
-          contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-        });
+        //     console.log(
+        //       "create alchemy web3 error: " + JSON.stringify(error, null, 2)
+        //     );
+        //   }
+        // );
+        //         console.log("finished createAlchemyweb")
+
+        const nfts = await web3.alchemy
+          .getNfts({
+            owner: connectedAccount,
+            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+          })
+          .catch((error) => {
+            // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
+            // setNFTData([]);
+            setLoadingError(true);
+            setIsPreparingAthletes(false);
+            console.log("get nfts error: ");
+          });
 
         setNFTResp(nfts);
+        console.log("nftresp", nfts);
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
           const response = await web3.alchemy.getNftMetadata({
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          // console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
+          // console.log(
+          //   "Token #" +
+          //     token +
+          //     " metadata: " +
+          //     JSON.stringify(response, null, 2)
+          // );
+
+          // Check metadata of ERC-1155, and assing to create State list
           if (response.title?.includes("Pack")) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
@@ -124,8 +187,12 @@ export default function Collection() {
         }
       };
 
-      await getNFTData().catch((error) => {
-        console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
+      await getNFTData().catch(() => {
+        // alert("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
+        // setNFTData([]);
+        // setIsPreparingAthletes(false);
+        setLoadingError(true);
+        console.log("fetch NFT DATA error");
       });
       console.log("done with preparing atheletes");
       // console.log(athleteNFTs, 'hmm')
@@ -247,22 +314,26 @@ export default function Collection() {
     setSeachQuery(e.target.value);
   };
 
-  if (
+  if (isNoMetaMask) {
+    return <MetaMaskRedirectInstructions />;
+  } else if (
     isConnected &&
     nftResp &&
-    (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0)
+    (allTeamFilterOptions.length !== 0 || packNFTs.length !== 0) &&
+    !loadingError
   ) {
     return (
       // https://mui.com/material-ui/react-select/
       <Box>
         <Typography
-          variant={isMobile ? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
           style={{ marginTop: 10 }}
         >
-          Owned Athletes
+          My TeamDiff Athlete Cards
         </Typography>
+
         <hr
           style={{
             color: "white",
@@ -455,11 +526,11 @@ export default function Collection() {
           handleModalClose={handleModalClose}
         />
         <Typography
-          variant={isMobile ? "h4" : "h2"}
+          variant={isMobile ? "h4" : "h3"}
           color="secondary"
           component="div"
         >
-          Owned Starter Packs
+          My TeamDiff Starter Packs
         </Typography>
         <hr
           style={{
@@ -500,7 +571,7 @@ export default function Collection() {
           </Grid> */}
       </Box>
     );
-  } else if (isConnected && nftResp) {
+  } else if (isConnected && nftResp && !loadingError) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Card
@@ -527,29 +598,24 @@ export default function Collection() {
             purchase one on OpenSea.
           </Typography>
           <Box sx={{ marginTop: 2 }}>
-            <Link
-              href={"/mintHome"}
-              sx={{ textDecoration: "none" }}
-              target={"_blank"}
+            <Fab
+              variant="extended"
+              size="large"
+              aria-label="add"
+              onClick={() => router.push("./mintPack")}
+              sx={{
+                fontSize: 20,
+                background:
+                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                color: "white",
+              }}
             >
-              <Fab
-                variant="extended"
-                size="large"
-                aria-label="add"
-                sx={{
-                  fontSize: 20,
-                  background:
-                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                  color: "white",
-                }}
-              >
-                Mint Starter Pack
-              </Fab>
-            </Link>
+              Mint Starter Pack
+            </Fab>
           </Box>
           <Box sx={{ marginTop: 2 }}>
             <Link
-              href={"/mintHome"}
+              href={"https://opensea.io/collection/teamdiff"}
               sx={{ textDecoration: "none" }}
               target={"_blank"}
             >
@@ -576,8 +642,39 @@ export default function Collection() {
         </Card>
       </Box>
     );
-  } else if (isConnected) {
+  } else if (isConnected && !loadingError) {
     return <LoadingPrompt loading={"Your Collection"} />;
+  } else if (loadingError) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Card
+          sx={{
+            textAlign: "center",
+            padding: 3,
+            color: "white",
+            width: "30rem",
+          }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            Uh oh, there's been an error...
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: "1.1rem",
+              marginTop: ".4rem",
+              marginBottom: ".4rem",
+              overflowWrap: "break-word",
+            }}
+          >
+            We encountered an unexpected error while loading your collection.
+            Please check back again later. Don't worry, your collection is still
+            safe and sound on the blockchain. We're working hard to let you get
+            back into the arena!
+          </Typography>
+        </Card>
+      </Box>
+    );
   }
 
   return <ConnectWalletPrompt accessing={"your collection"} />;

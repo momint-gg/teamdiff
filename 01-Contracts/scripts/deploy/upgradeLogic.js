@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const LeagueOfLegendsLogicJSON = require("../../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
 const fs = require('fs');
 const constructorArgs = require("../../constructorArgs");
-const contractAddresses = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js")
+const contractAddresses = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js")
 
 const main = async () => {
   let textData = "";
@@ -109,7 +109,7 @@ const main = async () => {
   
   
   // Write data in 'Output.txt' .
-  // fs.writeFileSync('../02-DApp/backend/contractscripts/contract_info/contractAddresses.js', textData, (err) => {
+  // fs.writeFileSync('../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js', textData, (err) => {
   //   // In case of a error throw err.
   //   if (err) {
   //     console.log("bad");
@@ -123,14 +123,14 @@ const main = async () => {
   let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic']
   contractNames.forEach(async (contractName) => {
     srcPath = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
-    backendPath = "../02-DApp/backend/contractscripts/contract_info/abis/" + contractName + ".json";
+    backendPath = "../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/" + contractName + ".json";
     const abiData = fs.readFileSync(srcPath)
     fs.writeFileSync(backendPath, abiData, (err) => {
       // In case of a error throw err.
       if (err) {
         console.log("bad");
         throw err;
-      };
+      }
       console.log("done writing to file");
   
     })
