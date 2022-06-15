@@ -1,7 +1,10 @@
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config({ path: "../../.env" });
 const { ethers } = require("hardhat");
-const LeagueOfLegendsLogicABI = require("../../../../02-DApp/backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json");
-const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
+// TODO: Comment out which one you're not using
+const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
+const LeagueOfLegendsLogicJSON = require("../../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json");
+// const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic.js");
+// const LeagueOfLegendsLogicJSON = require('../../../../02-DApp/backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json')
 
 async function main() {
   // Getting our LeagueMaker contract
@@ -20,7 +23,7 @@ async function main() {
   for (let i = 0; i < leagueAddresses.length; i++) {
     currProxy = new ethers.Contract(
       leagueAddresses[i],
-      LeagueOfLegendsLogicABI.abi,
+      LeagueOfLegendsLogicJSON.abi,
       provider
     );
     AllLeagueInstances.push(currProxy);

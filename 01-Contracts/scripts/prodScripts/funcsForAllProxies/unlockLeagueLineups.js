@@ -1,7 +1,10 @@
 require("dotenv").config({ path: "../.env" });
 const { ethers } = require("hardhat");
-const LeagueOfLegendsLogicABI = require("../../../../02-DApp/backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json");
-const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
+// TODO: Comment out which one you're not using
+const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
+const LeagueOfLegendsLogicJSON = require("../../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json");
+// const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic.js");
+// const LeagueOfLegendsLogicJSON = require('../../../../02-DApp/backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json')
 
 async function main() {
   // Getting our LeagueMaker contract
@@ -12,9 +15,7 @@ async function main() {
   console.log("Got league maker contract");
 
   // Getting our list of proxies
-  const leagueAddresses = await LeagueMakerContract.connect(
-    rinkebySigner
-  ).getLeagueAddresses();
+  const leagueAddresses = await LeagueMakerContract.getLeagueAddresses();
 
   // Creating interactable contract list of proxies
   AllLeagueInstances = []; // all of our leagues (as CONTRACTS) so we can interact with them
@@ -22,7 +23,7 @@ async function main() {
   for (let i = 0; i < leagueAddresses.length; i++) {
     currProxy = new ethers.Contract(
       leagueAddresses[i],
-      LeagueOfLegendsLogicABI.abi,
+      LeagueOfLegendsLogicJSON.abi,
       provider
     );
     AllLeagueInstances.push(currProxy);
@@ -32,7 +33,7 @@ async function main() {
   let currLeague;
   let txn;
   for (let i = 0; i < AllLeagueInstances.length; i++) {
-    currLeague = AllLeagueInstances[i].connect(rinkebySigner);
+    currLeague = AllLeagueInstances[i];
     txn = await currLeague.unlockLineup();
     await txn.wait();
 

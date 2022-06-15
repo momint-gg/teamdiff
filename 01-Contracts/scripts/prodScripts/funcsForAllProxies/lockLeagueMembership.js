@@ -1,26 +1,20 @@
-require('dotenv').config({ path: '../.env' });
-const { ethers } = require('ethers');
-const abi = require('../contract_info/abis/LeagueMaker.json');
-const { LeagueMaker } = require('../contract_info/contractAddresses');
-const LeagueOfLegendsLogicJSON = require('../contract_info/abis/LeagueOfLegendsLogic.json');
+require("dotenv").config({ path: "../../.env" });
+const { ethers } = require("ethers");
+// TODO: Comment out which one you're not using
+const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
+const LeagueOfLegendsLogicJSON = require("../../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json");
+// const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic.js");
+// const LeagueOfLegendsLogicJSON = require('../../../../02-DApp/backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json')
 
 async function main() {
-  // Constructing our contract
-  const provider = new ethers.providers.AlchemyProvider(
-    'rinkeby',
-    process.env.RINKEBY_ALCHEMY_KEY
-  );
-  const rinkebySigner = new ethers.Wallet(process.env.OWNER_KEY, provider);
-  const LeagueMakerCntract = new ethers.Contract(
-    LeagueMaker,
-    abi.abi,
-    rinkebySigner
+  // Getting our LeagueMaker contract
+  const LeagueMakerContract = await ethers.getContractAt(
+    "LeagueMaker",
+    CONTRACTS.LeagueMaker
   );
 
   // Getting our list of proxies
-  const leagueAddresses = await LeagueMakerCntract.connect(
-    rinkebySigner
-  ).getLeagueAddresses();
+  const leagueAddresses = await LeagueMakerContract.getLeagueAddresses();
 
   // Creating interactable contract list of proxies
   AllLeagueInstances = []; // all of our leagues (as CONTRACTS) so we can interact with them
@@ -38,15 +32,15 @@ async function main() {
   let currLeague;
   let txn;
   for (let i = 0; i < AllLeagueInstances.length; i++) {
-    currLeague = AllLeagueInstances[i].connect(rinkebySigner);
+    currLeague = AllLeagueInstances[i];
     txn = await currLeague.setLeagueEntryIsClosed();
     await txn.wait();
 
     txn = await currLeague.leagueEntryIsClosed();
     txn === false
-      ? console.log('League membership successfully locked!')
-      : console.log('Failed');
-    console.log('League membership is locked: ', txn);
+      ? console.log("League membership successfully locked!")
+      : console.log("Failed");
+    console.log("League membership is locked: ", txn);
   }
 }
 

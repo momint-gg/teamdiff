@@ -1,3 +1,4 @@
+// Already did this
 // // Opening up the private sale for everyone (to be run on 6/10)
 
 // require('dotenv').config({ path: '../.env' });

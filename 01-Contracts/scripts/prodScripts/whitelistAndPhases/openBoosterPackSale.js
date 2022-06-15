@@ -1,6 +1,6 @@
 // Opening up the private sale for everyone (to be run on 6/10)
 
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config({ path: "../../.env" });
 const { ethers } = require("ethers");
 // TODO: Comment out which one you're not using
 const CONTRACTS = require("../../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
