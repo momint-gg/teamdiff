@@ -89,7 +89,7 @@ export default function CreateLeague({ setDisplay }) {
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
 
   // Router

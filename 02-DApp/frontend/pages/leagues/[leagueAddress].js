@@ -22,7 +22,7 @@ export default function LeagueDetails() {
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
   // const { data: signerData1, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
 
@@ -190,7 +190,7 @@ export default function LeagueDetails() {
 
       // declare the async data fetching function
       const getNFTData = async () => {
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
           owner: connectedAccount,

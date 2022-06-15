@@ -14,7 +14,7 @@ export default function LeagueCard({ leagueAddress }) {
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);

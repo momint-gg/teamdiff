@@ -37,7 +37,7 @@ export default function MyTeam() {
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
-    process.env.ALCHEMY_KEY
+    process.env.RINKEBY_ALCHEMY_KEY
   );
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
@@ -117,7 +117,7 @@ export default function MyTeam() {
   useEffect(() => {
     setAthleteNFTs([]);
     if (isConnected && router.isReady) {
-      console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
+      // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -173,7 +173,7 @@ export default function MyTeam() {
       // declare the async data fetching function
       const getNFTData = async () => {
         setIsLoading(true);
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
           owner: connectedAccount,
@@ -189,7 +189,12 @@ export default function MyTeam() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          // console.log("Token #" + token + " metadata: " + JSON.stringify(response, null, 2));
+          console.log(
+            "Token #" +
+              token +
+              " metadata: " +
+              JSON.stringify(response, null, 2)
+          );
           if (!response.title?.includes("Pack")) {
             athleteMetadata[parseInt(token)] = response.metadata;
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
@@ -225,9 +230,9 @@ export default function MyTeam() {
     if (starterAthleteIds) {
       getStarterAthleteData();
       // setCurrentPositionIndex(1);
-      console.log(
-        "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
-      );
+      // console.log(
+      //   "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
+      // );
     }
   }, [starterAthleteIds]);
 
@@ -241,21 +246,21 @@ export default function MyTeam() {
             console.log(JSON.stringify(error, null, 2));
             // prevPoints = null;
           });
-        console.log("prevpoints: " + prevPoints);
+        // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
       } else if (id != 0) {
         ownedAthletesMetadata[id].prevPoints = "n/a";
       }
     });
-    ownedAthletesMetadata.forEach((athlete, index) => {
-      if (index == 0)
-        console.log(
-          "after getting prevPointsathlete id #" +
-            index +
-            ": " +
-            JSON.stringify(athlete, null, 2)
-        );
-    });
+    // ownedAthletesMetadata.forEach((athlete, index) => {
+    //   if (index == 0)
+    //     console.log(
+    //       "after getting prevPointsathlete id #" +
+    //         index +
+    //         ": " +
+    //         JSON.stringify(athlete, null, 2)
+    //     );
+    // });
   };
 
   const getFilteredOwnedAthletes = () => {
