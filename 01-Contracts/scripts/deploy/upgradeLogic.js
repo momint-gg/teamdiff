@@ -123,7 +123,7 @@ const main = async () => {
   let contractNames = ['LeagueMaker', 'LeagueOfLegendsLogic']
   contractNames.forEach(async (contractName) => {
     srcPath = "./build/contracts/contracts/" + contractName + ".sol/" + contractName + ".json";
-    backendPath = "../02-DApp/backend/contractscripts/contract_info/abis/" + contractName + ".json";
+    backendPath = "../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/" + contractName + ".json";
     const abiData = fs.readFileSync(srcPath)
     fs.writeFileSync(backendPath, abiData, (err) => {
       // In case of a error throw err.

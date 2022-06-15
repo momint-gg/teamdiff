@@ -8,13 +8,12 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/abis/GameItems.json";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/GameItems.json";
 import OpenSea from "../assets/images/opensea.png";
 import profilePic from "../assets/images/starter-pack.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 import LoadingPrompt from "../components/LoadingPrompt";
-
 
 export default function MintPack() {
   // Router

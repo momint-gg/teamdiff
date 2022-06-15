@@ -7,11 +7,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // NPM import
 import WAValidator from "wallet-address-validator";
-import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
-import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
-import WhitelistJSON from "../../../backend/contractscripts/contract_info/abis/Whitelist.json";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddresses.js";
+import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
+import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import constants from "../../Constants";
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
