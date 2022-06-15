@@ -47,17 +47,18 @@ export default function AthleteCardModal({
           style={{ position: "absolute", top: "10px", right: "10px" }}
           onClick={handleModalClose}
         >
-          <IoCloseOutline 
-          size={"3rem"} 
-          onClick={() => {
-            handleModalClose()
-            }} 
-          style={{ cursor: "pointer",
-                   position: "absolute",
-                   right: "5px",
-                   top: "5px",
-                   color: "black"
-                }}
+          <IoCloseOutline
+            size={"3rem"}
+            onClick={() => {
+              handleModalClose()
+            }}
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              right: "5px",
+              top: "5px",
+              color: "black"
+            }}
           />
         </Button>
         <Typography fontSize={30}>{athleteData?.title}</Typography>

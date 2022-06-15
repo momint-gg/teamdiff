@@ -1,19 +1,19 @@
-import React from "react";
-import { Box, Container, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import WalletLogin from "../components/WalletLogin";
+import React from "react";
 import logo from "../assets/images/logo-horizontal.png";
+import WalletLogin from "../components/WalletLogin";
 import Footer from "./Footer";
 import NavLink from "./NavLink";
 
 const Layout = ({ children, isMobile }) => {
   const pages = [
-    { name: "PLAY", href: "/play" },
-    { name: "COLLECTION", href: "/collection" },
+    { name: "MY COLLECTION", href: "/collection" },
     { name: "MINT", href: "/mintHome" },
     { name: "OPEN", href: "/burnPack" },
   ];
+  // const pages = [];
 
   return (
     // <>

@@ -1,8 +1,8 @@
-import bootstrap from "../styles/sass/custom_bootstrap.module.scss";
-import styles from "../styles/sass/home_styles.module.scss";
-import cardAndPack from "../assets/images/card_and_pack.png";
 import Image from "next/image";
 import Link from "next/link";
+import cardAndPack from "../assets/images/card_and_pack.png";
+import bootstrap from "../styles/sass/custom_bootstrap.module.scss";
+import styles from "../styles/sass/home_styles.module.scss";
 
 export default function Homepage() {
   return (
@@ -67,7 +67,7 @@ export default function Homepage() {
                 <Link href="/mintHome">
                   <button
                     className={[
-                      bootstrap["btn"],
+                      bootstrap.btn,
                       bootstrap["btn-primary"],
                       bootstrap["fs-5"],
                       bootstrap["pe-5"],
@@ -104,7 +104,7 @@ export default function Homepage() {
               <Link href="/mintHome">
                 <button
                   className={[
-                    bootstrap["btn"],
+                    bootstrap.btn,
                     bootstrap["btn-primary"],
                     bootstrap["fs-5"],
                     bootstrap["pe-5"],
@@ -121,12 +121,12 @@ export default function Homepage() {
         <div className={styles["bg-how-it-works"]}>
           <div
             className={[
-              bootstrap["container"],
+              bootstrap.container,
               bootstrap["pt-5"],
               bootstrap["pb-4"],
             ].join(" ")}
           >
-            <div className={[bootstrap["row"], bootstrap["mb-4"]].join(" ")}>
+            <div className={[bootstrap.row, bootstrap["mb-4"]].join(" ")}>
               <div
                 className={[
                   bootstrap["col-lg"],
@@ -159,7 +159,7 @@ export default function Homepage() {
                   height="64"
                   fill="currentColor"
                   className={[
-                    bootstrap["bi"],
+                    bootstrap.bi,
                     bootstrap["bi-collection-fill"],
                     styles["hiw-icon"],
                   ].join(" ")}
@@ -188,7 +188,7 @@ export default function Homepage() {
                   height="64"
                   fill="currentColor"
                   className={[
-                    bootstrap["bi"],
+                    bootstrap.bi,
                     bootstrap["bi-joystick"],
                     styles["hiw-icon"],
                   ].join(" ")}
@@ -218,7 +218,7 @@ export default function Homepage() {
                   height="64"
                   fill="currentColor"
                   className={[
-                    bootstrap["bi"],
+                    bootstrap.bi,
                     bootstrap["bi-coin"],
                     styles["hiw-icon"],
                   ].join(" ")}
@@ -276,12 +276,15 @@ export default function Homepage() {
                 Open your Pack
               </h2>
               <p className={[bootstrap["fs-5"], bootstrap["mt-3"]].join(" ")}>
-                Minting a starterpack is only the first step of your TeamDiff journey. Inside the pack is five trading cards of LCS atheletes! Open the pack (which will burn it in the process) to unlock five athletes and begin to build your collection!
+                Minting a TeamDiff Starter Pack is only the first step of your
+                TeamDiff journey. Each Starter Pack contains five trading cards
+                of LCS atheletes! Open the Starter Pack to unlock five athletes
+                and begin to build your collection!
               </p>
-              <Link href="/burnPack">
+              <Link href="/#">
                 <button
                   className={[
-                    bootstrap["btn"],
+                    bootstrap.btn,
                     bootstrap["btn-outline-secondary"],
                     bootstrap["fs-5"],
                     bootstrap["pe-5"],
@@ -290,7 +293,7 @@ export default function Homepage() {
                     bootstrap["fw-bold"],
                   ].join(" ")}
                 >
-                  Open Pack
+                  Coming Very Soon
                 </button>
               </Link>
             </div>

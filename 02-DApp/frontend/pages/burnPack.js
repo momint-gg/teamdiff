@@ -1,4 +1,3 @@
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
@@ -13,7 +12,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
@@ -22,7 +21,7 @@ import cardImage from "../assets/images/mystery_card.png";
 import OpenSea from "../assets/images/opensea.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt";
-import constants from "../Constants";
+import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
 import AthletesToIndex from "../constants/AlthletesToIndex.json";
 
 function getAthleteImage(id) {
@@ -32,9 +31,13 @@ function getAthleteImage(id) {
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   // Router
   const router = useRouter();
@@ -46,55 +49,99 @@ export default function BurnPack({ setDisplay }) {
   const [isMinting, setIsMinting] = useState(false);
   const [hasMinted, setHasMinted] = useState(false);
   const [mintedIndices, setMintedIndices] = useState(null);
-  const [canMint, setCanMint] = useState(false);
+  const [ownsStarterPack, setOwnsStarterPack] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState();
+  const [isPreRevealPhase, setIsPreRevealPhase] = useState();
+  // const [isPolygon, setIsPolygon] = useState();
+  const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
+
+  const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  /**
+   * Handles a change in injected etheruem provider from MetaMask
+   */
+  function handleEthereum() {
+    const { ethereum } = window;
+    if (ethereum && ethereum.isMetaMask) {
+      // console.log("Ethereum successfully detected!");
+      // Access the decentralized web!
+    } else {
+      setIsNoMetaMask(true);
+      setIsLoading(false);
+
+      // alert("Close this alert to redirect to MetaMask Mobile Browser");
+      // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
+      // console.log("Please install MetaMask!");
+    }
+  }
   const [nftResp, setNFTResp] = useState(null);
   // const [packNFTs, setPackNFTs] = useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [currentChain, setCurrentChain] = useState();
   const [isPolygon, setIsPolygon] = useState();
 
+  /**
+   * Checks if browsers has injected web3 provider
+   * and if so, gets connected account data, or sets to null if no connected account
+   */
   useEffect(() => {
-    // setHasMinted(true);
-    // setMintedIndices([6, 33, 12, 26, 45]);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const sig ner = provider.getSigner()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+    if (window.ethereum) {
+      setIsLoading(true);
+      handleEthereum();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-        setSigner(signer);
-        setConnectedAccount(accountAddress);
-        setIsConnected(true);
-        const { chainId } = await provider.getNetwork();
-        setCurrentChain(chainId);
-        setIsPolygon(chainId === 137);
-      } else {
-        setIsConnected(false);
-      }
-      setIsLoading(false);
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+      const setAccountData = async () => {
+        const signer = provider.getSigner();
+        const accounts = await provider.listAccounts();
+
+        if (accounts.length > 0) {
+          const accountAddress = await signer.getAddress();
+          setSigner(signer);
+          setConnectedAccount(accountAddress);
+          setIsConnected(true);
+          const { chainId } = await provider.getNetwork();
+          setCurrentChain(chainId);
+          setIsPolygon(chainId === 137);
+        } else {
+          setIsConnected(false);
+          setIsLoading(false);
+        }
+        // setIsLoading(false);
+      };
       setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
+      provider.provider.on("accountsChanged", (accounts) => {
+        setAccountData();
+      });
+      provider.provider.on("disconnect", () => {
+        // console.log("disconnected");
+        setIsConnected(false);
+      });
+    } else {
+      window.addEventListener("ethereum#initialized", handleEthereum, {
+        once: true,
+      });
+
+      // If the event is not dispatched by the end of the timeout,
+      // the user probably doesn't have MetaMask installed.
+      setTimeout(handleEthereum, 3000); // 3 seconds
+    }
   }, [connectedAccount]);
 
-  // Use Effect for change in if user isConnected
+  /**
+   * Runs when connectedAccount changes
+   * Sets a GameITems instance to state var
+   * Grabs the connectedAccount data from GameItems
+   */
   useEffect(() => {
     // setAthleteNFTs([]);
     if (isConnected) {
+      setIsLoading(true);
+
       // Initialize connections to GameItems contract
       const GameItemsContract = new ethers.Contract(
         CONTRACT_ADDRESSES.GameItems,
@@ -103,70 +150,19 @@ export default function BurnPack({ setDisplay }) {
       );
       setGameItemsContract(GameItemsContract);
 
-      // Fetcher to retireve newly minted NFT data
-      const getNFTData = async (athleteIndices) => {
-        console.log("athletic Indices in getNFTData: " + athleteIndices);
-        const web3 = createAlchemyWeb3(constants.ALCHEMY_LINK);
-        const nfts = await web3.alchemy
-          .getNfts({
-            owner: connectedAccount,
-            contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-          })
-          .catch((error) => {
-            console.log(
-              "get NFT DATA error: " + JSON.stringify(error, null, 2)
-            );
-          });
-
-        setNFTResp(nfts);
-        for (const nft of nfts?.ownedNfts) {
-          const token = nft?.id?.tokenId;
-          const response = await web3.alchemy.getNftMetadata({
-            contractAddress: CONTRACT_ADDRESSES.GameItems,
-            tokenId: token,
-          });
-          console.log("Token #" + parseInt(token));
-          if (
-            !response.title?.includes("Pack") &&
-            athleteIndices.includes(parseInt(token))
-          ) {
-            // console.log("Token #" + parseInt(token) + " metadata: " + JSON.stringify(response, null, 2));
-
-            setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
-          }
-        }
-      };
-      // getNFTData()
-      // getNFTData([6, 33, 12, 26, 45]).catch((error) => {
-      //   console.log("fetch NFT DATA error: " + JSON.stringify(error, null, 2));
-      // });
-      // athleteNFTs.forEach((athlete, index) => {
-      //   console.log("Token #" + parseInt(index) + " metadata: " + JSON.stringify(athlete, null, 2));
-      // })
-
       // Callback for when pack bur;ned function is called from GameItems contracts
       const packBurnedCallback = async (athleteIndices, signer) => {
         if (signer == connectedAccount) {
           setIsMinting(false);
           setIsTransactionDelayed(false);
           const test = [6, 33, 12, 26, 45];
-          console.log("athleteIndices: " + test);
+          // console.log("athleteIndices: " + test);
 
           setHasMinted(true);
           setMintedIndices(athleteIndices);
-
-          await getNFTData(athleteIndices).catch((error) => {
-            console.log(
-              "fetch NFT DATA error: " + JSON.stringify(error, null, 2)
-            );
-          });
-          // console.log("Finsihed minting indexes: " + athleteIndices[0] + ", " + athleteIndices[1] + ", " + athleteIndices[2] + ", " + athleteIndices[3] + ", " + athleteIndices[4]);
         }
       };
 
-      // packBurnedCallback([6, 33, 12, 26, 45], "0xD926A3ddFBE399386A26B4255533A865AD98f7E3")
-      // const test = [6, 33, 12, 26, 45];
-      // console.log("athleteIndices: " + test)
       const fetchData = async () => {
         // console.log("connected Accotun :" + connectedAccount)
         const balanceOfPacks = await GameItemsContract.balanceOf(
@@ -174,47 +170,67 @@ export default function BurnPack({ setDisplay }) {
           50
         );
         // console.log("balance of packs" + balanceOfPacks);
-        setCanMint(balanceOfPacks > 0);
+        setOwnsStarterPack(balanceOfPacks > 0);
+
+        // Grab if user has already minted starter pack
+        const hasAlreadyBurnedPack1 =
+          await GameItemsContract.userToHasBurnedStarterPack(connectedAccount);
+        setHasAlreadyBurnedPack(hasAlreadyBurnedPack1);
+
+        // Set if is past presale date
+        // open sale start date in UTC
+        // const revealStartDate = new Date("June 13, 2022 21:00:00");
+        // // const revealStartDate = new Date("June 6, 2022 21:00:00");
+        // const today = new Date();
+        // const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
+        const isRevealPhase = await GameItemsContract.packsReadyToOpen();
+
+        setIsPreRevealPhase(!isRevealPhase);
+        console.log("isPreveal: " + isRevealPhase);
+        setIsLoading(false);
       };
       fetchData();
+      // console.log("isPreveal out: " + isPreRevealPhase);
 
       // Listen to event for when pack burn function is called
-      GameItemsContract.once("packBurned", packBurnedCallback);
+      GameItemsContract.on("starterPackBurned", packBurnedCallback);
     } else {
-      console.log("no account data found!");
+      // console.log("no account data found!");
+      setIsLoading(false);
     }
-  }, [isConnected]);
+  }, [isConnected, connectedAccount]);
 
-  // TODO hide burn pack if they don't
+  /**
+   * Creates GameITmes instance with connected Account as signer
+   * Calls burnStarterPack from GameItems Contract
+   */
   const burnStarterPack = async () => {
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = provider.getSigner()
     // Create a new instance of the Contract with a Signer, which allows update methods
-
     const gameItemsContractWithSigner = new ethers.Contract(
       CONTRACT_ADDRESSES.GameItems,
       GameItemsJSON.abi,
       signer
     );
-    // setIsMinting(true);
-
-    // window.setTimeout(() => {setIsTransactionDelayed(true)}, 10000)
 
     // Calling burn on game items contract
-    const burnTxn = await gameItemsContractWithSigner
+    await gameItemsContractWithSigner
       .burnStarterPack({
         gasLimit: 10000000,
       })
       .then((res) => {
-        console.log("txn result: " + JSON.stringify(res, null, 2));
+        // console.log("txn result: " + JSON.stringify(res, null, 2));
         setIsMinting(true);
         window.setTimeout(() => {
           setIsTransactionDelayed(true);
-        }, 60 * 5 * 1000);
-        console.log("Minting pack in progress...");
+        }, 10 * 1000);
+        // console.log("Minting pack in progress...");
       })
       .catch((error) => {
-        alert("error: " + error.message);
+        if (error.data?.message) {
+          alert("error: " + error.data.message);
+        } else {
+          alert("error:" + error.message);
+        }
       });
   };
 
@@ -224,6 +240,8 @@ export default function BurnPack({ setDisplay }) {
         <LoadingPrompt loading={"Open Page"} />
       ) : (
         <>
+          {isNoMetaMask && <MetaMaskRedirectInstructions />}
+
           {isConnected && !hasMinted && (
             <Container
               maxWidth="lg"
@@ -273,7 +291,7 @@ export default function BurnPack({ setDisplay }) {
                     }}
                   >
                     <Typography variant="h4" color="white" component="div">
-                      Open Starter Pack
+                      Open TeamDiff Starter Pack
                     </Typography>
                   </Box>
                   <Box
@@ -290,7 +308,12 @@ export default function BurnPack({ setDisplay }) {
                       size="large"
                       aria-label="add"
                       onClick={burnStarterPack}
-                      disabled={!canMint}
+                      disabled={
+                        !ownsStarterPack ||
+                        hasAlreadyBurnedPack ||
+                        isPreRevealPhase ||
+                        !isPolygon
+                      }
                       // onClick={() => setDisplayMint(true)}
                       sx={{
                         marginRight: 1,
@@ -328,31 +351,59 @@ export default function BurnPack({ setDisplay }) {
                   </Box>
                 </>
               )}
-              {!canMint && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Typography variant="h6" color="white">
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  textAlign: "center",
+                }}
+              >
+                {isPreRevealPhase && (
+                  <>
+                    <Typography variant="subtitle1" color="secondary">
+                      Revealing TeamDiff Starter Packs unlocks June 13th, at
+                      5:00 pm EST
+                    </Typography>
+                    <Typography color="primary">
+                      Come back after the reveal date to open your pack!
+                    </Typography>
+                  </>
+                )}
+                <br></br>
+                {!ownsStarterPack && !hasAlreadyBurnedPack && (
+                  <Typography color="primary">
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
-                      <a
-                        // style={{
-                        //   textDecoration: "none",
-                        //   textDecorationColor: "transparent"
-                        // }}
-                        className="primary-link"
-                        href="/mintPack"
-                      >
+                      <a className="primary-link" href="/mintPack">
                         here
                       </a>
                     </Link>
                     {" to mint one now!"}
                   </Typography>
-                </Box>
-              )}
+                )}
+                {hasAlreadyBurnedPack && (
+                  <Typography color="primary" variant="h5">
+                    {
+                      "Oops! Looks like you have already opened 1 TeamDiff Starter Pack. Trade for more cards on "
+                    }
+                    <Link>
+                      <a
+                        className="primary-link"
+                        target="_blank"
+                        href={
+                          "https://opensea.io/assets/matic/" +
+                          gameItemsContract.address
+                        }
+                        rel="noreferrer"
+                      >
+                        OpenSea
+                      </a>
+                    </Link>
+                    {" or wait until our next drop."}
+                  </Typography>
+                )}
+              </Box>
             </Container>
           )}
           {isMinting && (
@@ -420,7 +471,7 @@ export default function BurnPack({ setDisplay }) {
                         alignItems: "center",
                         justifyContent: "center",
                         marginTop: 2,
-                        marginBottom: 5,
+                        marginBottom: 2,
                       }}
                     >
                       <Typography
@@ -438,13 +489,17 @@ export default function BurnPack({ setDisplay }) {
                         />
                       )}
                     </Box>
+                    <Typography color="primary" sx={{ marginBottom: 5 }}>
+                      *Note, it can take a few minutes for the NFT metadata and
+                      image to populate on OpenSea
+                    </Typography>
                     <Box>
                       <Grid container spacing={6}>
                         {mintedIndices?.map((index) => (
                           <Grid item xs={isMobile ? 12 : 4}>
                             <Link
                               href={
-                                "https://testnets.opensea.io/assets/" +
+                                "https://opensea.io/assets/matic/" +
                                 gameItemsContract.address +
                                 "/" +
                                 index
@@ -464,6 +519,7 @@ export default function BurnPack({ setDisplay }) {
                           </Grid>
                         ))}
                       </Grid>
+                      <br></br>
                     </Box>
                     <Fab
                       variant="extended"
@@ -511,8 +567,10 @@ export default function BurnPack({ setDisplay }) {
           {/* TODO: show a collection of their newly minted athlete cards on the screen */}
             </>
           )}
-          {!isConnected && !hasMinted && !isMinting && (
-            <ConnectWalletPrompt accessing={"opening a pack"} />
+          {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
+            <ConnectWalletPrompt
+              accessing={"opening a TeamDiff Starter pack"}
+            />
           )}
         </>
       )}

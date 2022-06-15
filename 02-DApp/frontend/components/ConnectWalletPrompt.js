@@ -1,6 +1,8 @@
-import { Typography, Box, Card } from "@mui/material";
-import WalletLogin from "./WalletLogin";
+/* eslint-disable react/no-unescaped-entities */
+import { Box, Card, Typography } from "@mui/material";
+import React from "react";
 import { useMediaQuery } from "react-responsive";
+import WalletLogin from "./WalletLogin";
 
 export default function ConnectWalletPrompt({ accessing }) {
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });

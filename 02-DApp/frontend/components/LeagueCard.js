@@ -1,16 +1,10 @@
-import {
-    Box, Card,
-    CardContent, Typography
-} from "@mui/material";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
 // Router
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-
-
-
 
 // export default function LeagueCard({ leagueAddress, setMountedLeagueAddress, setLeague, setLeagueOpen }) {
 export default function LeagueCard({ leagueAddress }) {

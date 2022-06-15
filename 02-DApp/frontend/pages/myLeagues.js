@@ -1,23 +1,16 @@
-import {
-    Box,
-    Typography
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 // import LeagueDetails from "./leagueDetails";
 // Web3 Imports
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 // Wagmi imports
-import {
-    useSigner
-} from "wagmi";
+import { useSigner } from "wagmi";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import LeagueCard from "../components/LeagueCard";
-
-
 
 export default function MyLeagues({ setDisplay }) {
   const [leagueOpen, setLeagueOpen] = useState(false);

@@ -1,6 +1,6 @@
-import React from "react";
+import { Box, Link, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
-import { Box, Typography, Link } from "@mui/material";
+import React from "react";
 
 export default function Footer() {
   return (

@@ -1,13 +1,11 @@
-import { useAccount, useConnect, useEnsName, useEnsAvatar } from "wagmi";
-import { useEffect, useState } from "react";
-
 import { Box, Button, Modal, Typography } from "@mui/material";
 import Image from "next/image";
+import React from "react";
+import { IoCloseOutline } from "react-icons/io5";
+import { useConnect } from "wagmi";
+import CoinbaseWallet from "../assets/images/coinbase.png";
 import MetaMask from "../assets/images/metamask.png";
 import WalletConnect from "../assets/images/wallet-connect.png";
-import CoinbaseWallet from "../assets/images/coinbase.png";
-import { IoCloseOutline } from "react-icons/io5";
-import { ethers } from "ethers";
 
 export default function ConnectWalletModal({
   modalOpen,
@@ -15,55 +13,46 @@ export default function ConnectWalletModal({
   setModalOpen,
   isMobile,
 }) {
-  const {
-    activeConnector,
-    connect,
-    connectors,
-    error: connectError,
-    isConnecting,
-    pendingConnector,
-  } = useConnect();
+  const { connect, connectors, error: connectError } = useConnect();
 
-  const [signer, setSigner] = useState(null);
-  const [connectedAccount, setConnectedAccount] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
+  // const [signer, setSigner] = useState(null);
+  // const [connectedAccount, setConnectedAccount] = useState(null);
+  // const [isConnected, setIsConnected] = useState(false);
 
-  useEffect(() => {
-    // setIsCreatingLeague(false);
-    // setHasCreatedLeague(true);
-    // setHasJoinedLeague(true)
-    // setIsConnected(false)
+  // useEffect(() => {
+  //   // setIsCreatingLeague(false);
+  //   // setHasCreatedLeague(true);
+  //   // setHasJoinedLeague(true)
+  //   // setIsConnected(false)
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   const signer = provider.getSigner()
 
-    // const fetchData = async () => {
-    //   const currentAddress = await signer.getAddress()
-    //   setAddressPreview(currentAddress)
-    // }
-    // fetchData()
-    const setAccountData = async () => {
-      const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+  //     // const fetchData = async () => {
+  //     //   const currentAddress = await signer.getAddress()
+  //     //   setAddressPreview(currentAddress)
+  //     // }
+  //     // fetchData()
+  //     const setAccountData = async () => {
+  //       const signer = provider.getSigner()
+  //       const accounts = await provider.listAccounts();
 
-      if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
-        setSigner(signer);
-        setConnectedAccount(accountAddress);
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-    };
-    setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
-      setAccountData();
-    });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    });
-  }, []);
+  //       if(accounts.length > 0) {
+  //         const accountAddress = await signer.getAddress()
+  //         setSigner(signer)
+  //         setConnectedAccount(accountAddress)
+  //         // setIsConnected(true)
+
+  //       }
+  //       else {
+  //         setIsConnected(false);
+  //       }
+  //     }
+  //     setAccountData()
+  //     provider.provider.on('accountsChanged', (accounts) => { setAccountData() })
+  //     provider.provider.on('disconnect', () =>  { console.log("disconnected");
+  //                                                 setIsConnected(false) })
+  //   }, []);
 
   function getConnectorImage(connector) {
     if (connector.name === "MetaMask") {

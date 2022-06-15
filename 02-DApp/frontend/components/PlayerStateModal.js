@@ -1,19 +1,19 @@
-import Image from "next/image";
 import {
   Box,
   Button,
-  Typography,
   Modal,
-  TableContainer,
+  Paper,
   Table,
-  TableHead,
-  TableRow,
   TableBody,
   TableCell,
-  Paper,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from "@mui/material";
-import CloseIcon from "../assets/images/close.png";
+import Image from "next/image";
 import Card from "../assets/cards/Fudge.png";
+import CloseIcon from "../assets/images/close.png";
 
 export default function PlayerStateModal({
   modalOpen,

@@ -1,7 +1,7 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
-    Box, Button, Fab, FormControlLabel, FormGroup, Link, OutlinedInput, outlinedInputClasses, Paper, styled, Switch,
-    Typography
+  Box, Button, Fab, FormControlLabel, FormGroup, Link, OutlinedInput, outlinedInputClasses, Paper, styled, Switch,
+  Typography
 } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 // import Link from '@mui/material/Link'
@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
-// Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
@@ -27,9 +26,20 @@ import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/rinkeby
 import AddToWhitelist from "../components/AddToWhitelist.js";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt.js";
+<<<<<<< HEAD
 
 
 
+=======
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
+import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
+// Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import AddToWhitelist from "../components/AddToWhitelist.js";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
+import LoadingPrompt from "../components/LoadingPrompt.js";
+>>>>>>> prod
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
 // https://codesandbox.io/s/textfield-outlined-forked-0o0bdi?file=/src/index.js

@@ -65,6 +65,7 @@ module.exports = {
     artifacts: "./build/contracts",
   },
   defaultNetwork: "hardhat",
+  
   networks: {
     hardhat: {
       // url: "http://127.0.0.1:8545",
@@ -74,10 +75,21 @@ module.exports = {
     },
     //Config for Rinkeby
     rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
+      url:
+        "https://eth-rinkeby.alchemyapi.io/v2/" +
+        process.env.RINKEBY_ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
       accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key,
       // gas: 2100000, // fixing cannot estimate gas error in League test
       // gasPrice: 8000000000,
+    },
+    //Config for Polygon
+    polygon: {
+      url:
+        "https://polygon-mainnet.g.alchemy.com/v2/" +
+        process.env.POLYGON_ALCHEMY_KEY, //our alchemy key -- message me (Henry) for this
+      accounts: [process.env.PRIVATE_KEY], //Insert your metamask private key,
+      // gas: 2100000, // fixing cannot estimate gas error in League test
+      // gasPrice: 80 * 1000000000,
     },
     // localhost: {
     //   url: "http://127.0.0.1:8545"
@@ -98,6 +110,8 @@ module.exports = {
     disambiguatePaths: false,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      polygon: process.env.POLYGONSCAN_API_KEY,
+    },
   },
 };

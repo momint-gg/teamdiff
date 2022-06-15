@@ -16,6 +16,10 @@ library MOBALogicLibrary {
         uint256 numWeeks,
         string calldata leagueName
     ) public {
+        require(
+            leagueMembers.length > 0,
+            "You don't have enough members in this league to set a schedule."
+        );
         console.log("setting schedule in library");
         uint256 randomShifter = (
             (uint256(
@@ -176,7 +180,6 @@ library MOBALogicLibrary {
             }
         }
     }
-
 
     // State isn't updating in LOL logic...
     // Moved to one eval matches function instead of splitting it up into two
