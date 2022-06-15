@@ -15,20 +15,23 @@ const fs = require("fs");
 const axios = require("axios");
 
 // TODO: comment out which contracts/ABIs you're not using
-const abi = require("../contract_info/rinkebyAbis/Athletes.json");
-const { Athletes } = require("../contract_info/contractAddressesRinkeby");
-// const abi = require("../contract_info/maticAbis/Athletes.json");
-// const { Athletes } = require("../contract_info/contractAddressesMatic");
+const abi = require("../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json");
+const {
+  Athletes,
+} = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
+// const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
+// const {
+//   Athletes,
+// } = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
 
 async function main() {
-  // Need to hardcode this for now.. to do: pull from contract (LeagueMaker)
-  const week_num = 0;
+  // TODO:
+  // Need to hardcode this week num for now since can't pass in.. to do: pull from contract (LeagueMaker) or Athletes (add function for week number in athletes)
+  // Maybe when eval match is called, we can also increment some value in the athletes contract? -- do later...
+  week_num = 0;
 
   // Getting our contract
-  const AthletesContract = await ethers.getContractAt(
-    "Athletes",
-    CONTRACTS.Athletes
-  );
+  const AthletesContract = await ethers.getContractAt("Athletes", Athletes);
 
   // Parsing excel
   finalStatsToPush = [];
@@ -178,7 +181,7 @@ const testContract = async () => {
 
   pointsRetrievedFromContract = [];
   for (let i = 0; i < randomAthletePoints.length; i++) {
-    txn = await contract.getAthleteScores(idsToCheck[i]);
+    txn = await AthletesContract.getAthleteScores(idsToCheck[i]);
     // console.log(Number(txn[week_num]));
     pointsRetrievedFromContract.push(Number(txn[week_num]));
   }
