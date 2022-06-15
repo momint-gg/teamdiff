@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import WhitelistJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";

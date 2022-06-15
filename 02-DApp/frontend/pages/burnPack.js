@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // import CONSTANTS from "../Constants.js";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/GameItems.json";
 import cardImage from "../assets/images/mystery_card.png";
 import OpenSea from "../assets/images/opensea.png";
@@ -31,14 +31,14 @@ function getAthleteImage(id) {
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
-  // const provider = new ethers.providers.AlchemyProvider(
-  //   "rinkeby",
-  //   process.env.RINKEBY_ALCHEMY_KEY
-  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "matic",
-    process.env.POLYGON_ALCHEMY_KEY
+    "rinkeby",
+    process.env.RINKEBY_ALCHEMY_KEY
   );
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "matic",
+  //   process.env.POLYGON_ALCHEMY_KEY
+  // );
   // Router
   const router = useRouter();
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });

@@ -1,12 +1,12 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import {
-    Box,
-    Card,
-    CardActions,
-    CardContent,
-    Grid,
-    Typography
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Grid,
+  Typography
 } from "@mui/material";
 import { ethers } from "ethers";
 // Router
@@ -175,7 +175,7 @@ export default function Play() {
                 background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
-              onClick={() => router.push("/createLeagueLanding")}
+              onClick={() => router.push("/createLeague")}
             >
               <Fragment>
                 <CardContent sx={{ textAlign: "center" }}>

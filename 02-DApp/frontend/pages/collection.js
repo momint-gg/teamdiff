@@ -19,7 +19,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import OpenSea from "../assets/images/opensea.png";
 import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";

@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 // NPM import
 import WAValidator from "wallet-address-validator";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
@@ -341,12 +341,7 @@ export default function LeagueDetails() {
         <LoadingPrompt loading={"Your League"} />
       ) : (
         <>
-          {isLeagueMember ? (
-            <>
-              {/* <MyTeam></MyTeam> */}
-              {"in dere"}
-            </>
-          ) : (
+          {!isLeagueMember && (
             <>
               {isOnWhitelist && !isJoiningLeague && !hasJoinedLeague ? (
                 <Box

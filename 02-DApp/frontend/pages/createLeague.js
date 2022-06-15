@@ -1,6 +1,16 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
-  Box, Button, Fab, FormControlLabel, FormGroup, Link, OutlinedInput, outlinedInputClasses, Paper, styled, Switch,
+  Box,
+  Button,
+  Fab,
+  FormControlLabel,
+  FormGroup,
+  Link,
+  OutlinedInput,
+  outlinedInputClasses,
+  Paper,
+  styled,
+  Switch,
   Typography
 } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
@@ -19,27 +29,13 @@ import { useEffect, useState } from "react";
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
 import AddToWhitelist from "../components/AddToWhitelist.js";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt.js";
-<<<<<<< HEAD
-
-
-
-=======
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/abis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/abis/LeagueOfLegendsLogic.json";
-import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/abis/RinkebyUSDCJSON.json";
-// Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
-import AddToWhitelist from "../components/AddToWhitelist.js";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
-import LoadingPrompt from "../components/LoadingPrompt.js";
->>>>>>> prod
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
 // https://codesandbox.io/s/textfield-outlined-forked-0o0bdi?file=/src/index.js
@@ -275,7 +271,7 @@ export default function CreateLeague({ setDisplay }) {
             console.log("joining newly created league...");
             window.setTimeout(() => {
               setIsTransactionDelayed(true);
-            }, 60 * 5 * 1000);
+            }, 30 * 1000);
           })
           .catch((error) => {
             //  console.log("Join League error: " + error.error.message);
@@ -349,7 +345,7 @@ export default function CreateLeague({ setDisplay }) {
           setIsCreatingLeague(true);
           window.setTimeout(() => {
             setIsTransactionDelayed(true);
-          }, 60 * 5 * 1000);
+          }, 15 * 1000);
 
           console.log("League Creation in progress...");
           // console.log("With invite values: " + inviteListValues);

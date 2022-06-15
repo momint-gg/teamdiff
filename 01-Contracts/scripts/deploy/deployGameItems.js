@@ -69,7 +69,7 @@ const main = async () => {
   /**
    * Note this overwrites the existing file
    */
-  fs.writeFileSync('../02-DApp/backend/contractscripts/contract_info/contractAddresses.js', textData, (err) => {
+  fs.writeFileSync('../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js', textData, (err) => {
     // In case of a error throw err.
     if (err) {
       console.log("bad");

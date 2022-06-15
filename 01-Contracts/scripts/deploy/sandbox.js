@@ -1,6 +1,6 @@
 const { ethers } = require("hardhat");
 // import { providers } from "ethers";
-const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddresses.js");
+const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
 // const { GameItems } = require('../../../02-DApp/backend/contractscripts/contract_info/contractAddresses');
 // const GameItemsJSON = require('./../../02-DApp/backend/contractscripts/contract_info/abis/GameItems.json');
 const XLSX = require('xlsx');

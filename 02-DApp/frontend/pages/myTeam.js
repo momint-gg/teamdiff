@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddresses.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import Sample from "../../backend/sample.json";
