@@ -118,7 +118,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       "best league", // League name
       10, // Stake amount
       true, // Is public
-      // owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
+      owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
       testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
       AthletesContractInstance.address, // Address of our athletes storage contract
       GameItemInstance.address, // GameItems contract address
@@ -186,7 +186,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       addr1.address,
     ]);
 
-    // Whitelist should now have 2 ysers
+    // Whitelist should now have 2 users
     expect(Number(await GameItemInstance.getNumWhitelisted())).to.equal(2);
     expect(await GameItemInstance.whitelist(owner.address)).to.equal(true);
     expect(await GameItemInstance.whitelist(addr1.address)).to.equal(true);
@@ -241,11 +241,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     expect(admin).to.equal(owner.address);
   });
 
-  it("Set the TestUSDC Address correctly", async () => {
-    const addy = await proxyContract.testUSDC();
-    expect(addy).to.equal(testUsdcContract.address);
-  });
-
   // 2. Testing joining the league flow
   // NOTE: THESE TESTS WILL NOT WORK ON RINKEBY, AS ADDR1 WILL BE UNDEFINED. CAN TEST ON HARDHAT
   it("Gives the sender 10, transfer 10 from sender to other wallet (so they will later be able to join)", async () => {
@@ -270,7 +265,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       20
     );
     expect(Number(await testUsdcContract.balanceOf(owner.address))).to.equal(
-      70
+      80
     );
   });
 
@@ -293,7 +288,10 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     );
 
     // Addr1 joining the league and staking the 10 USDC
-    let join = await proxyContract.connect(addr1).joinLeague();
+    // From the new functionality, owner will also have to join the league now
+    let join = await proxyContract.connect(owner).joinLeague();
+    await join.wait();
+    join = await proxyContract.connect(addr1).joinLeague();
     await join.wait();
 
     // Proxy contract balance and user balance should be updated
@@ -541,7 +539,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   it("Correctly delegates the prize pot, with tiebraker logic as well", async () => {
     // Contract allowance
     const prizePoolAmount = Number(
-      await proxyContract.getContractUSDCBalance()
+      await proxyContract.connect(owner).getContractUSDCBalance()
     );
     console.log("Prize pool amount in test is ", prizePoolAmount);
     let approval = await testUsdcContract

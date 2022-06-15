@@ -7,7 +7,7 @@ const LeagueOfLegendsLogicJSON = require("../../../../02-DApp/backend/contractsc
 // const LeagueOfLegendsLogicJSON = require('../../../../02-DApp/backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json')
 
 async function main() {
-  // Getting our LeagueMaker contract
+  // Getting our contract
   const LeagueMakerContract = await ethers.getContractAt(
     "LeagueMaker",
     CONTRACTS.LeagueMaker
