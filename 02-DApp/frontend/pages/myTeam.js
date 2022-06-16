@@ -468,9 +468,9 @@ export default function MyTeam() {
           {!isLoading && (
             <>
               <PlayerStateModal
-                position={currentPositionIndex}
+                // position={currentPositionIndex}
                 modalOpen={stateModalOpen}
-                stateData={Sample.statsData}
+                stateData={selectedPlayer.name}
                 handleModalClose={handleStateModalClose}
               />
               <PlayerSelectModal

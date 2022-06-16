@@ -39,10 +39,7 @@ export default function PlayerStateModal({
   })
 
   useEffect(async () => {
-    console.log('api call oiror')
     const { data: weeklyDataRes } = await playerStatsApi.get(`/athlete/${playerName}`)
-    console.log('api call')
-    console.log(weeklyDataRes, '*')
     setWeeklyData(weeklyDataRes)
   }, [])
 
@@ -58,10 +55,17 @@ export default function PlayerStateModal({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        // minHeight: 400
+        paddingTop: 5,
+        paddingRight: 5,
+        paddingLeft: 5,
+        paddingBottom: 5
       }}
     >
       <Box className="modal-container">
-        <Image src={Card} width={255} height={342} />
+        <Image src={Card} width={255*2/3} height={342*2/3} />
+
+
         <Button
           style={{ position: "absolute", top: "10px", right: "10px" }}
           onClick={handleModalClose}
@@ -75,7 +79,7 @@ export default function PlayerStateModal({
         </Button>
         <TableContainer
           component={Paper}
-          sx={{ marginTop: "16px", overflow: "auto", maxHeight: 200 }}
+          sx={{ marginTop: "16px", overflow: "auto", maxHeight: 280 }}
         >
           <Table>
             <TableHead sx={{ borderRadius: "16px" }}>
@@ -87,7 +91,7 @@ export default function PlayerStateModal({
                 <TableCell align="center">CSM</TableCell>
                 <TableCell align="center">VSPM</TableCell>
                 <TableCell align="center">FB %</TableCell>
-                <TableCell align="center">pentakills</TableCell>
+                <TableCell align="center">Pentakills</TableCell>
                 <TableCell align="center">Total Points</TableCell>
               </TableRow>
             </TableHead>
@@ -118,7 +122,7 @@ export default function PlayerStateModal({
                       <Typography> {week.vspm || "-"}</Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Typography> {week.fbpercent}</Typography>
+                      <Typography> {week.fbpercent || "-"}</Typography>
                     </TableCell>
                     {/* <TableCell align="center">
                       <Typography> {week.fbpercent ? "Yes" : "No"}</Typography>
@@ -127,7 +131,7 @@ export default function PlayerStateModal({
                       <Typography> {week.pentakills || "-"}</Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Typography> {week.points}</Typography>
+                      <Typography sx={{ fontSize: "150%", fontWeight: 500 }}> {week.points}</Typography>
                     </TableCell>
                   </TableRow>
                 );
