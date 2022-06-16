@@ -89,7 +89,7 @@ const data = {
 
 export default function Matchups() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [currentPlayer, setCurrentPlayer] = useState(false);
+  const [currentPlayer, setCurrentPlayer] = useState();
 
   const handleModalOpen = (athelete) => {
     setCurrentPlayer(athelete);
@@ -249,7 +249,7 @@ export default function Matchups() {
       </Box>
       <PlayerStateModal
         modalOpen={modalOpen}
-        stateData={statsData}
+        playerName={currentPlayer.name}
         handleModalClose={handleStateModalClose}
       />
     </Container>
