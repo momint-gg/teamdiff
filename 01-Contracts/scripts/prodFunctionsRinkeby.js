@@ -4,9 +4,7 @@ const { ethers } = require("hardhat");
 // const RINKEBY_CONTRACTS = require("../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
 
 const main = async () => {
-  for (let i = 0; i < process.argv.length; i++) {
-    console.log(process.argv[i]);
-  }
+  
   const funcName = process.argv[2];
   console.log(funcName);
 

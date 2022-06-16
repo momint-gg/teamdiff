@@ -164,66 +164,66 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     }
   });
 
-  // Pre proxy tests: Testing GameItems.sol flow
-  // GameItems baseline working
-  it("Receives constructor arguments properly", async () => {
-    const starterPackSize = await GameItemInstance.connect(
-      owner
-    ).getNFTPerAthlete();
-    expect(Number(starterPackSize)).to.equal(10);
-  });
+  // // Pre proxy tests: Testing GameItems.sol flow
+  // // GameItems baseline working
+  // it("Receives constructor arguments properly", async () => {
+  //   const starterPackSize = await GameItemInstance.connect(
+  //     owner
+  //   ).getNFTPerAthlete();
+  //   expect(Number(starterPackSize)).to.equal(10);
+  // });
 
-  it("Doesnt let a nonwhitelisted user mint a starter pack", async () => {
-    GameItemInstance.connect(owner);
-    let txn = await GameItemInstance.setStartingIndex();
-    txn = await GameItemInstance.setURIs(); // This takes awhile
-    txn = GameItemInstance.mintStarterPack();
-    // Mint starter pack should fail
-    await expect(txn).to.be.revertedWith("User is not whitelisted.");
+  // it("Doesnt let a nonwhitelisted user mint a starter pack", async () => {
+  //   GameItemInstance.connect(owner);
+  //   let txn = await GameItemInstance.setStartingIndex();
+  //   txn = await GameItemInstance.setURIs(); // This takes awhile
+  //   txn = GameItemInstance.mintStarterPack();
+  //   // Mint starter pack should fail
+  //   await expect(txn).to.be.revertedWith("User is not whitelisted.");
 
-    txn = await GameItemInstance.connect(owner).addUsersToWhitelist([
-      owner.address,
-      addr1.address,
-    ]);
+  //   txn = await GameItemInstance.connect(owner).addUsersToWhitelist([
+  //     owner.address,
+  //     addr1.address,
+  //   ]);
 
-    // Whitelist should now have 2 users
-    expect(Number(await GameItemInstance.getNumWhitelisted())).to.equal(2);
-    expect(await GameItemInstance.whitelist(owner.address)).to.equal(true);
-    expect(await GameItemInstance.whitelist(addr1.address)).to.equal(true);
-  });
+  //   // Whitelist should now have 2 users
+  //   expect(Number(await GameItemInstance.getNumWhitelisted())).to.equal(2);
+  //   expect(await GameItemInstance.whitelist(owner.address)).to.equal(true);
+  //   expect(await GameItemInstance.whitelist(addr1.address)).to.equal(true);
+  // });
 
   // Testing to see if 5 athletes are minted to owner with correct metadata
-  it("Burns a pack successfully for owner and mints 5 athletes in a random order", async () => {
-    txn = await GameItemInstance.connect(owner).mintStarterPack();
-    txn = await GameItemInstance.connect(owner).burnStarterPack();
-    txn = await GameItemInstance.connect(addr1).mintStarterPack();
-    txn = await GameItemInstance.connect(addr1).burnStarterPack();
+  // it("Burns a pack successfully for owner and mints 5 athletes in a random order", async () => {
+  //   txn = await GameItemInstance.connect(owner).mintStarterPack();
+  //   txn = await GameItemInstance.connect(owner).burnStarterPack();
+  //   txn = await GameItemInstance.connect(addr1).mintStarterPack();
+  //   txn = await GameItemInstance.connect(addr1).burnStarterPack();
 
-    // Making sure owner and addr1 have 5 athletes each, and adding to athletes ID array
-    // ATHLETE ARRAYS TO BE USED IN EVAL MATCH TESTS
-    ownerAthletes = [];
-    addr1Athletes = [];
-    for (let i = 0; i < 50; i++) {
-      const currNumOwner = Number(
-        await GameItemInstance.connect(owner).balanceOf(owner.address, i)
-      );
-      const currNumAddr1 = Number(
-        await GameItemInstance.connect(addr1).balanceOf(addr1.address, i)
-      );
-      // Adding athlete IDs to arrays for users
-      if (currNumOwner === 1) {
-        ownerAthletes.push(i);
-      }
-      if (currNumAddr1 === 1) {
-        addr1Athletes.push(i);
-      }
-    }
-    // Amount of athletes they have should equal the starter pack size (5)
-    expect(ownerAthletes.length).to.equal(5);
-    expect(addr1Athletes.length).to.equal(5);
-    console.log("Owner's athletes are ", ownerAthletes);
-    console.log("Addr1's athletes are ", addr1Athletes);
-  });
+  //   // Making sure owner and addr1 have 5 athletes each, and adding to athletes ID array
+  //   // ATHLETE ARRAYS TO BE USED IN EVAL MATCH TESTS
+  //   ownerAthletes = [];
+  //   addr1Athletes = [];
+  //   for (let i = 0; i < 50; i++) {
+  //     const currNumOwner = Number(
+  //       await GameItemInstance.connect(owner).balanceOf(owner.address, i)
+  //     );
+  //     const currNumAddr1 = Number(
+  //       await GameItemInstance.connect(addr1).balanceOf(addr1.address, i)
+  //     );
+  //     // Adding athlete IDs to arrays for users
+  //     if (currNumOwner === 1) {
+  //       ownerAthletes.push(i);
+  //     }
+  //     if (currNumAddr1 === 1) {
+  //       addr1Athletes.push(i);
+  //     }
+  //   }
+  //   // Amount of athletes they have should equal the starter pack size (5)
+  //   expect(ownerAthletes.length).to.equal(5);
+  //   expect(addr1Athletes.length).to.equal(5);
+  //   console.log("Owner's athletes are ", ownerAthletes);
+  //   console.log("Addr1's athletes are ", addr1Athletes);
+  // });
 
   // 1. Testing proxy setup
   it("Successfully gets stake amount for the proxy", async () => {
@@ -270,7 +270,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   });
 
   it("Successfully lets a user (addr1) with enough TestUSDC join the league ", async () => {
-    // Addr1 joining the league and staking the 10 USDC
+    // Owner gotta join the league now too
     let join = await proxyContract.connect(owner).joinLeague();
     await join.wait();
 
@@ -297,9 +297,6 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     );
 
     // Addr1 joining the league and staking the 10 USDC
-    // From the new functionality, owner will also have to join the league now
-    let join = await proxyContract.connect(owner).joinLeague();
-    await join.wait();
     join = await proxyContract.connect(addr1).joinLeague();
     await join.wait();
 

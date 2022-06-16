@@ -18,13 +18,17 @@ contract LeagueMaker is Ownable {
     //using Clones for address;
 
     // ======= Events ==========
-    event LeagueCreated(string name, address proxyAddress, address proxyAdminAddress, address[] initialWhitelistAddresses);
+    event LeagueCreated(
+        string name,
+        address proxyAddress,
+        address proxyAdminAddress,
+        address[] initialWhitelistAddresses
+    );
     event Response(bool success, bytes data);
 
     // ======== Immutable storage ========
-    UpgradeableBeacon immutable  upgradeableBeacon;
+    UpgradeableBeacon immutable upgradeableBeacon;
     address immutable teamDiffAddress;
-
 
     // For staking
     TestUSDC testUSDC;
@@ -46,7 +50,6 @@ contract LeagueMaker is Ownable {
     // ======== Constructor ========
     constructor(address _logic) {
         upgradeableBeacon = new UpgradeableBeacon(_logic);
-        // Creating the teamDiffAddress (we can hardcode this later if we want to change it)
         teamDiffAddress = msg.sender;
     }
 
@@ -61,7 +64,6 @@ contract LeagueMaker is Ownable {
         address _athletesContractAddress,
         address _gameItemsContractAddress,
         address[] calldata _whitelistUsers
-        
     ) external returns (address) {
         require(_stakeAmount <= 100, "Stake amount must be below 100");
         // constructorContractAddresses[2] = _testUSDCAddress;
@@ -100,15 +102,15 @@ contract LeagueMaker is Ownable {
         // TODO this kept failing with error code "ERC20: transfer amount exceeds allowance"", ignoring for now
         // TODO we will need to call .approve on all our proxy contracts to transfer usdc out of them i think
         //testUSDC.approve(msg.sender, 100);
-        // TODO before a user can create a league, they must sign a .approve([leagueMakerAddres], spendAmount) transaction to 
-                //allow this contract to send usdc on their behalf
-                    //or we might have to make them sign another transaction to stake and join league after they create the league
-                        //which might be weird 
+        // TODO before a user can create a league, they must sign a .approve([leagueMakerAddres], spendAmount) transaction to
+        //allow this contract to send usdc on their behalf
+        //or we might have to make them sign another transaction to stake and join league after they create the league
+        //which might be weird
         // rinkebyUSDC.transferFrom(msg.sender, address(proxy), _stakeAmount);
         // rinkebyUSDC.transfer(address(proxy), _stakeAmount);
 
         leagueAddresses.push(address(proxy));
-        
+
         userToLeagueMap[msg.sender].push(address(proxy));
         isProxyMap[address(proxy)] = true;
 
@@ -117,10 +119,9 @@ contract LeagueMaker is Ownable {
         return address(proxy);
     }
 
-
     // You need a getter for this because Solidity's default getter (AKA contract.leagueAddresses()) needs to be called with an index
     // ^ And we want the whole list
-    // Do NOT delete this 
+    // Do NOT delete this
     function getLeagueAddresses() public view returns (address[] memory) {
         return leagueAddresses;
     }

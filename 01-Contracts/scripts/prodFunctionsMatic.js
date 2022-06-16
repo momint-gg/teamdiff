@@ -4,7 +4,9 @@ const { ethers } = require("hardhat");
 // const MaticLeagueOfLegendsLogicABI = require("../../02-DApp/backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json");
 // const MATIC_CONTRACTS = require("../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic.js");
 
-const main = async (funcName) => {};
+const main = async (funcName) => {
+  
+};
 
 const runMain = async () => {
   try {

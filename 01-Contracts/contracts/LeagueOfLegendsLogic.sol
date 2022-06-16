@@ -322,14 +322,12 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     // User joining the league
-    //TODO debug why onlyWhiteListed always reverts
     function joinLeague() public nonReentrant {
-        // function joinLeague() external onlyWhitelisted nonReentrant {
-        require(
+        require( // Only those on the WL and the league admin should be able to join
             (whitelistContract.whitelist(msg.sender) ||
                 whitelistContract.isPublic() ||
                 msg.sender == admin),
-            "User is not on whitelist bro"
+            "User is not on whitelist bro."
         );
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
@@ -337,6 +335,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             rinkebyUSDC.balanceOf(msg.sender) > stakeAmount,
             "Insufficent funds for staking"
         );
+        console.log("X");
 
         //must approve for our own token
         //testUSDC.approve(msg.sender, 100);
@@ -348,8 +347,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-        rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-        // rinkebyUSDC.transfer(address(this), stakeAmount);
+        rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount); // Prompt approval prior to this!
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 
