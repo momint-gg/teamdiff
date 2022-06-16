@@ -109,7 +109,7 @@ export default function MyTeam() {
       setAccountData();
     });
     provider.provider.on("disconnect", () => {
-      console.log("disconnected");
+      // console.log("disconnected");
       setIsConnected(false);
     });
   }, [isConnected]);
@@ -117,7 +117,7 @@ export default function MyTeam() {
   useEffect(() => {
     setAthleteNFTs([]);
     if (isConnected && router.isReady) {
-      // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
+      // // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -189,12 +189,12 @@ export default function MyTeam() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          console.log(
-            "Token #" +
-              token +
-              " metadata: " +
-              JSON.stringify(response, null, 2)
-          );
+          // console.log(
+          //   "Token #" +
+          //     token +
+          //     " metadata: " +
+          //     JSON.stringify(response, null, 2)
+          // );
           if (!response.title?.includes("Pack")) {
             athleteMetadata[parseInt(token)] = response.metadata;
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
@@ -205,48 +205,48 @@ export default function MyTeam() {
 
         // athleteMetadata.forEach((athlete, index) => {
         //   if (index == 0)
-        //     console.log(
+        //     // console.log(
         //       "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
         //     );
         // });
       };
 
       getNFTData().catch((error) => {
-        console.log("fetch NFT DATA error: " + error);
+        // console.log("fetch NFT DATA error: " + error);
       });
 
       fetchData();
       // getStarterAthleteData(starterAthleteIds);
     } else {
       // alert("no account data or league Address found, please refresh.");
-      console.log("no account data or league Address found");
-      // console.log("router: " + JSON.stringify(router.query, null, 2));
-      //   console.log("leagueAddress: " + leagueAddress);
+      // console.log("no account data or league Address found");
+      // // console.log("router: " + JSON.stringify(router.query, null, 2));
+      //   // console.log("leagueAddress: " + leagueAddress);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
   useEffect(() => {
-    // console.log("isLoading: " + isLoading);
+    // // console.log("isLoading: " + isLoading);
     if (starterAthleteIds) {
       getStarterAthleteData();
       // setCurrentPositionIndex(1);
-      // console.log(
+      // // console.log(
       //   "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
       // );
     }
   }, [starterAthleteIds]);
 
   const getStarterAthleteData = async () => {
-    console.log("starterID: " + starterAthleteIds);
+    // console.log("starterID: " + starterAthleteIds);
     starterAthleteIds.forEach(async (id, index) => {
       if (id != 0 && currentWeekNum > 0) {
         const prevPoints = await athleteContract
           .athleteToScores(id, currentWeekNum - 1)
           .catch((error) => {
-            console.log(JSON.stringify(error, null, 2));
+            // console.log(JSON.stringify(error, null, 2));
             // prevPoints = null;
           });
-        // console.log("prevpoints: " + prevPoints);
+        // // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
       } else if (id != 0) {
         ownedAthletesMetadata[id].prevPoints = "n/a";
@@ -254,7 +254,7 @@ export default function MyTeam() {
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
     //   if (index == 0)
-    //     console.log(
+    //     // console.log(
     //       "after getting prevPointsathlete id #" +
     //         index +
     //         ": " +
@@ -278,20 +278,20 @@ export default function MyTeam() {
   const submitStarterHandler = async (athleteID, positionID) => {
     // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
     // // const positionIndex = positionID;
-    console.log(
-      "setting athlete id#" + athleteID + " at postion #" + positionID
-    );
+    // console.log(
+    //   "setting athlete id#" + athleteID + " at postion #" + positionID
+    // );
 
     const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
 
     await leagueProxyContractWithSigner
       .setAthleteInLineup(athleteID, positionID)
-      .then(
-        console.log(
-          "setting athlete id#" + athleteID + " at postion #" + positionID
-        )
-        // update state to listen to callback for when position is set
-      )
+      .then
+      // console.log(
+      //   "setting athlete id#" + athleteID + " at postion #" + positionID
+      // )
+      // update state to listen to callback for when position is set
+      ()
       .catch((error) => {
         if (error.data) {
           alert("Set Lineup error: " + error.data.message);
@@ -303,7 +303,7 @@ export default function MyTeam() {
 
   const handleStateModal = (player, positionIndex) => {
     setSelectedPlayer(player);
-    console.log("setting current player: " + JSON.stringify(player, null, 2));
+    // console.log("setting current player: " + JSON.stringify(player, null, 2));
     setCurrentPositionIndex(positionIndex);
     setStateModalOpen(true);
   };
@@ -312,8 +312,8 @@ export default function MyTeam() {
     setCurrentPositionIndex(positionIndex);
     setSelectedPlayer(player);
 
-    // console.log("setting pos: " + position);
-    console.log("setting current player: " + JSON.stringify(player, null, 2));
+    // // console.log("setting pos: " + position);
+    // console.log("setting current player: " + JSON.stringify(player, null, 2));
 
     setSubModalOpen(true);
   };

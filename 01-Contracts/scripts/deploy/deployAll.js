@@ -6,10 +6,10 @@ const constructorArgs = require("../../constructorArgs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  // textData += "exports.GameItems = '0xdFE4F029E7086a1Eb5616240F4AAc7B964A7874b';\n";
+  textData += "exports.GameItems = '0x4c5fA3e55c55f50A12696298aadd794AAb558C7A';\n";
 
   // Create GameItems Instance
-  const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
+  /*const gameContractFactory = await hre.ethers.getContractFactory("GameItems");
   const gameContract = await gameContractFactory.deploy(...constructorArgs);
   // const gameContract = await gameContractFactory.deploy(...constructorArgs, {
   //   //overriding gas bc transaction was stuck
@@ -68,7 +68,7 @@ const main = async () => {
   // });
   await txn.wait();
   console.log("Now setting packsReady to True");
-
+*/
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
     "MOBALogicLibrary"

@@ -158,7 +158,8 @@ export default function LeagueDetails() {
         const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
         if (isInLeague) {
-          router.push("./" + router.query.leagueAddress + "/myTeam");
+          // router.push("./" + router.query.leagueAddress + "/myTeam");
+          router.push("./" + router.query.leagueAddress + "/matchups");
         }
         // // console.log("isInLeague: " + isInLeague)
         // Get whitelist of Proxy, to confirm connected user is on whitelist

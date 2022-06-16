@@ -83,7 +83,7 @@ export default function WalletLogin({ isMobile }) {
   }, []);
 
   const setAddressPreview = (address) => {
-    console.log("address: " + address);
+    // console.log("address: " + address);
     const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
       address.length - 4,
       address.length
