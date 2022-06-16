@@ -48,8 +48,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         uint256 assists;
         uint256 minionScore;
     }
-    // address public polygonUSDCAddress = ; // When we deploy to mainnet
-    address public rinkebyUSDCAddress;
 
     // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
     // Won't want to make whitelist immutable
@@ -195,16 +193,20 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         // Splitting the prize pot in case of a tie
         uint256 prizePerWinner = contractBalance / leagueWinners.length;
-        console.log("League winners len is ", leagueWinners.length);
-        console.log("Prize per winner is : ", prizePerWinner);
 
         // Emitting event so we can see the winners and how much each should get
         emit leagueEnded(leagueWinners, prizePerWinner);
 
         for (uint256 i; i < leagueWinners.length; i++) {
             // Approval first, then transfer with the below
-            rinkebyUSDC.approve(address(this), prizePerWinner);
-            rinkebyUSDC.transferFrom(
+            // rinkebyUSDC.approve(address(this), prizePerWinner); //TODO: Change back to rinkeby/matic USDC later
+            // rinkebyUSDC.transferFrom(
+            //     address(this),
+            //     leagueWinners[i],
+            //     prizePerWinner
+            // );
+            testUSDC.approve(address(this), prizePerWinner);
+            testUSDC.transferFrom(
                 address(this),
                 leagueWinners[i],
                 prizePerWinner
@@ -221,9 +223,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
-    // TODO: Move requires to a library to save space (MOBALogicLibrary)
-    // note: this is inefficient if we want to update one position only :/
-    //TODO: we should require that they cannot set duplicates
     function setLineup(uint256[5] memory athleteIds) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
@@ -238,10 +237,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         // Require ownership of all athleteIds + update mapping
         for (uint256 i; i < athleteIds.length; i++) {
             athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
-        }
-
-        // Requiring the user has ownership of the athletes
-        for (uint256 i; i < athleteIds.length; i++) {
             require(
                 gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
                 "Caller does not own given athleteIds"
@@ -307,9 +302,9 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     // For testing if join league function Works
-    // function getUsersLength() external view returns (uint256) {
-    //     return leagueMembers.length;
-    // }
+    function getLeagueMembersLength() external view returns (uint256) {
+        return leagueMembers.length;
+    }
 
     // Getting lineupIsLocked (TODO: Comment out for prod)
     function getLineupIsLocked() external view returns (bool) {
@@ -331,11 +326,14 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
+        // require(
+        //     rinkebyUSDC.balanceOf(msg.sender) > stakeAmount,
+        //     "Insufficent funds for staking"
+        // );
         require(
-            rinkebyUSDC.balanceOf(msg.sender) > stakeAmount,
+            testUSDC.balanceOf(msg.sender) > stakeAmount, // TODO: Delete TestUSDC and RinkebyUSDC for MATIC USDC
             "Insufficent funds for staking"
         );
-        console.log("X");
 
         //must approve for our own token
         //testUSDC.approve(msg.sender, 100);
@@ -347,7 +345,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-        rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount); // Prompt approval prior to this!
+        testUSDC.transferFrom(msg.sender, address(this), stakeAmount); // Prompt approval prior to this! //TODO:  Delete TestUSDC and RinkebyUSDC for MATIC USDC
+        // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount); // Prompt approval prior to this! //TODO:  Delete TestUSDC and RinkebyUSDC for MATIC USDC
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 

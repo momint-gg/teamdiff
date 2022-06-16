@@ -65,10 +65,8 @@ contract LeagueMaker is Ownable {
         address _gameItemsContractAddress,
         address[] calldata _whitelistUsers
     ) external returns (address) {
-        require(_stakeAmount <= 100, "Stake amount must be below 100");
-        // constructorContractAddresses[2] = _testUSDCAddress;
-        // constructorContractAddresses[3] = _athletesContractAddress;
-        // constructorContractAddress[4] = address(this);
+        require(_stakeAmount <= 100, "League stake amount must be below 100");
+
         bytes memory delegateCallData = abi.encodeWithSignature(
             "initialize(string,uint256,bool,address,address,address,address,address,address,address)",
             _name,
@@ -84,13 +82,13 @@ contract LeagueMaker is Ownable {
             address(this)
         );
 
-        // testUSDC = TestUSDC(_testUSDCAddress);
+        testUSDC = TestUSDC(_testUSDCAddress);
         // rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
-        // // Make sure the creator of the league has enough USDC
-        // require(
-        //     rinkebyUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
-        //     "Creator of league needs enough USDC (equal to specified stake amount)."
-        // );
+        // Make sure the creator of the league has enough USDC
+        require(
+            testUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
+            "Creator of league needs enough USDC (equal to specified stake amount)."
+        );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),
