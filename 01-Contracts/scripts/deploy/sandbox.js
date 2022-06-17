@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 // import { providers } from "ethers";
 const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
 // const { GameItems } = require('../../../02-DApp/backend/contractscripts/contract_info/contractAddresses');
-// const GameItemsJSON = require('./../../02-DApp/backend/contractscripts/contract_info/abis/GameItems.json');
+const LeagueOfLegendsLogicJSON = require('../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json');
 const XLSX = require('xlsx');
 // const web3 = require('web3');
 
@@ -10,10 +10,28 @@ const main = async () => {
   console.log("sandboxing...");
 
     // Create GameItems Instance
-  const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
+  // const contract = await ethers.getContractAt("LeagueBeaconProxy", "0xa8a6e296Ed7db235A430aA00AD2aAc1967A91d7b")
+  // const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
 
+  const provider = new ethers.providers.AlchemyProvider(
+    "rinkeby",
+    process.env.RINKEBY_ALCHEMY_KEY
+  );
+  const signer = new ethers.Wallet(process.env.RINKEBY_PRIVATE_KEY, provider);
 
-  console.log("got game items address")
+  //Create league proxy instance
+  const LeagueProxyContract = new ethers.Contract(
+    "0xa8a6e296Ed7db235A430aA00AD2aAc1967A91d7b",
+    LeagueOfLegendsLogicJSON.abi,
+    signer
+  );
+
+  //Set League SChedule
+  console.log("setting schedule")
+  let txn = await LeagueProxyContract.setLeagueSchedule({
+    gasLimit: 20000000
+  });
+  await txn.wait();
 
 
   // //Set Private Sale Open ready for testing
@@ -32,9 +50,9 @@ const main = async () => {
   // await txn.wait();
 
   // Set Private Sale Open ready for testing
-  console.log("Opening burning reveal");
-  txn = await contract.allowStarterPacks();
-  await txn.wait();
+  // console.log("Opening burning reveal");
+  // txn = await contract.allowStarterPacks();
+  // await txn.wait();
 
   // Reading WL in from excel
   /*

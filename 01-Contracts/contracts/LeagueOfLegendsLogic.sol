@@ -37,7 +37,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    mapping(uint256 => Matchup[]) public schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
     /* IMMUTABLE STORAGE  */

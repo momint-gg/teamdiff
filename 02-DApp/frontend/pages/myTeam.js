@@ -166,7 +166,7 @@ export default function MyTeam() {
 
         // TODO if is not league member, refresh the page
         if (!isInLeague) {
-          router.reload(window.location.pathname);
+          router.push("/leagues/" + router.query.leagueRoute[0]);
         }
       }
 

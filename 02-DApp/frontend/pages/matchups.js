@@ -195,10 +195,46 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
+
         const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
+
+        let i = 0;
+        let error = "none";
+        do {
+          await LeagueProxyContract.leagueMembers(i).catch((_error) => {
+            error = _error;
+            // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+            // console.log("User To League Map Error: " + _error.message);
+          });
+
+          if (error == "none") {
+            i++;
+          }
+          // console.log("error value at end:" + error);
+        } while (error == "none");
+        const leagueSize = i;
+
+        console.log("league size: " + leagueSize);
+        let weekMatchups = [];
+        weekMatchups = await LeagueProxyContract.getScheduleForWeek(
+          currentWeekNum
+        ).catch((_error) => {
+          // error = _error;
+          alert("Error! : " + JSON.stringify(error, null, 2));
+          // console.log("User To League Map Error: " + _error.message);
+        });
+
+        const shifter = 4 - Math.round(leagueSize / 2);
+        console.log("shifter size: " + shifter);
+
+        weekMatchups = weekMatchups.slice(shifter);
+        weekMatchups.map((matchup, index) => {
+          console.log("matchup #" + index + ": " + matchup);
+        });
+
         const starterIds = [null, null, null, null, null];
         for (let i = 0; i <= 4; i++) {
           const id = await LeagueProxyContract.userToLineup(
@@ -213,7 +249,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
         // TODO if is not league member, refresh the page
         if (!isInLeague) {
-          router.reload(window.location.pathname);
+          router.push("/leagues/" + router.query.leagueRoute[0]);
         }
       }
       // declare the async data fetching function
@@ -257,6 +293,35 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         // });
       };
 
+      // function to loop through and get league schedule
+      async function getLeagueSchedule() {
+        // let i = 0;
+        // let error = "none";
+
+        // // Continue to add leagues to activeLEagueList and pendingLeagueList
+        // // until we hit an error (because i is out of range presumably)
+        // do {
+        let matchup = [];
+        matchup = await leagueProxyContract
+          .getScheduleForWeek(currentWeekNum)
+          .catch((_error) => {
+            // error = _error;
+            alert("Error! : " + JSON.stringify(error, null, 2));
+            // console.log("User To League Map Error: " + _error.message);
+          });
+
+        matchup.map((matchup, index) => {
+          console.log("matchup #" + index + ": " + matchup);
+        });
+
+        // if (error == "none") {
+        //   i++;
+
+        // }
+        // console.log("error value at end:" + error);
+        // } while (error == "none");
+      }
+
       getNFTData().catch((error) => {
         // console.log("fetch NFT DATA error: " + error);
       });
@@ -270,6 +335,35 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       //   // console.log("leagueAddress: " + leagueAddress);
     }
   }, [isConnected, router.isReady, connectedAccount]);
+
+  useEffect(() => {
+    // // console.log("isLoading: " + isLoading);
+    if (starterAthleteIds) {
+      getStarterAthleteData();
+      // setCurrentPositionIndex(1);
+      // // console.log(
+      //   "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
+      // );
+    }
+  }, [starterAthleteIds]);
+
+  const getStarterAthleteData = async () => {
+    // console.log("starterID: " + starterAthleteIds);
+    starterAthleteIds.forEach(async (id, index) => {
+      if (id != 0) {
+        const score = await athleteContract
+          .athleteToScores(id, currentWeekNum)
+          .catch((error) => {
+            alert("error: " + JSON.stringify(error, null, 2));
+            // score = null;
+          });
+        // // console.log("prevpoints: " + score);
+        ownedAthletesMetadata[id].score = score;
+      } else if (id != 0) {
+        ownedAthletesMetadata[id].score = "n/a";
+      }
+    });
+  };
 
   const handleModalOpen = (athelete) => {
     setCurrentPlayer(athelete);
@@ -410,7 +504,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     </Grid>
                     <Grid item xs={1} textAlign="center">
                       <Typography fontSize={30} fontWeight={700}>
-                        {id != 0 ? athlete.score : "no score"}
+                        {id != 0 ? athlete.attributes[0].value : "no team"}
                       </Typography>
                     </Grid>
                     <Grid item xs={1} textAlign="center">
@@ -418,9 +512,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     </Grid>
                     <Grid item xs={1} textAlign="center">
                       <Typography color="#D835D8" fontSize={48}>
-                        {id != 0 && currentWeekNum != 0
-                          ? athlete.prevPoints
-                          : "no prev points"}{" "}
+                        {id != 0 && currentWeekNum != 0 ? athlete.score : "n/a"}{" "}
                       </Typography>
                     </Grid>
                     {/* middle column */}
@@ -438,9 +530,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     {/* opponents athlete stats */}
                     <Grid item xs={1} textAlign="center">
                       <Typography color="#D835D8" fontSize={48}>
-                        {id != 0 && currentWeekNum != 0
-                          ? athlete.prevPoints
-                          : "none"}{" "}
+                        {id != 0 && currentWeekNum != 0 ? athlete.score : "n/a"}{" "}
                       </Typography>
                     </Grid>
                     <Grid item xs={1} textAlign="center">
@@ -448,7 +538,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     </Grid>
                     <Grid item xs={1} textAlign="center">
                       <Typography fontSize={30} fontWeight={700}>
-                        {id != 0 ? athlete.score : "n/a"}
+                        {id != 0 ? athlete.attributes[0].value : "no team"}
                       </Typography>
                     </Grid>
                     <Grid
