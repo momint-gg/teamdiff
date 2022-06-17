@@ -164,66 +164,61 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     }
   });
 
-  // // Pre proxy tests: Testing GameItems.sol flow
-  // // GameItems baseline working
-  // it("Receives constructor arguments properly", async () => {
-  //   const starterPackSize = await GameItemInstance.connect(
-  //     owner
-  //   ).getNFTPerAthlete();
-  //   expect(Number(starterPackSize)).to.equal(10);
-  // });
+  // Pre proxy tests: Testing GameItems.sol flow
+  it("Doesnt let a nonwhitelisted user mint a starter pack", async () => {
+    GameItemInstance.connect(owner);
+    let txn = await GameItemInstance.setStartingIndex();
+    txn = await GameItemInstance.setURIs(); // This takes awhile
 
-  // it("Doesnt let a nonwhitelisted user mint a starter pack", async () => {
-  //   GameItemInstance.connect(owner);
-  //   let txn = await GameItemInstance.setStartingIndex();
-  //   txn = await GameItemInstance.setURIs(); // This takes awhile
-  //   txn = GameItemInstance.mintStarterPack();
-  //   // Mint starter pack should fail
-  //   await expect(txn).to.be.revertedWith("User is not whitelisted.");
+    // Opening private sale & set packs ready to open so owner can open
+    txn = await GameItemInstance.openPublicSale();
+    await txn.wait();
+    txn = await GameItemInstance.allowStarterPacks();
+    await txn.wait();
 
-  //   txn = await GameItemInstance.connect(owner).addUsersToWhitelist([
-  //     owner.address,
-  //     addr1.address,
-  //   ]);
+    txn = await GameItemInstance.connect(owner).addUsersToWhitelist([
+      owner.address,
+      addr1.address,
+    ]);
 
-  //   // Whitelist should now have 2 users
-  //   expect(Number(await GameItemInstance.getNumWhitelisted())).to.equal(2);
-  //   expect(await GameItemInstance.whitelist(owner.address)).to.equal(true);
-  //   expect(await GameItemInstance.whitelist(addr1.address)).to.equal(true);
-  // });
+    // Whitelist should now have 2 users
+    expect(Number(await GameItemInstance.getNumWhitelisted())).to.equal(2);
+    expect(await GameItemInstance.whitelist(owner.address)).to.equal(true);
+    expect(await GameItemInstance.whitelist(addr1.address)).to.equal(true);
+  });
 
   // Testing to see if 5 athletes are minted to owner with correct metadata
-  // it("Burns a pack successfully for owner and mints 5 athletes in a random order", async () => {
-  //   txn = await GameItemInstance.connect(owner).mintStarterPack();
-  //   txn = await GameItemInstance.connect(owner).burnStarterPack();
-  //   txn = await GameItemInstance.connect(addr1).mintStarterPack();
-  //   txn = await GameItemInstance.connect(addr1).burnStarterPack();
+  it("Burns a pack successfully for owner and mints 5 athletes in a random order", async () => {
+    txn = await GameItemInstance.connect(owner).mintStarterPack();
+    txn = await GameItemInstance.connect(owner).burnStarterPack();
+    txn = await GameItemInstance.connect(addr1).mintStarterPack();
+    txn = await GameItemInstance.connect(addr1).burnStarterPack();
 
-  //   // Making sure owner and addr1 have 5 athletes each, and adding to athletes ID array
-  //   // ATHLETE ARRAYS TO BE USED IN EVAL MATCH TESTS
-  //   ownerAthletes = [];
-  //   addr1Athletes = [];
-  //   for (let i = 0; i < 50; i++) {
-  //     const currNumOwner = Number(
-  //       await GameItemInstance.connect(owner).balanceOf(owner.address, i)
-  //     );
-  //     const currNumAddr1 = Number(
-  //       await GameItemInstance.connect(addr1).balanceOf(addr1.address, i)
-  //     );
-  //     // Adding athlete IDs to arrays for users
-  //     if (currNumOwner === 1) {
-  //       ownerAthletes.push(i);
-  //     }
-  //     if (currNumAddr1 === 1) {
-  //       addr1Athletes.push(i);
-  //     }
-  //   }
-  //   // Amount of athletes they have should equal the starter pack size (5)
-  //   expect(ownerAthletes.length).to.equal(5);
-  //   expect(addr1Athletes.length).to.equal(5);
-  //   console.log("Owner's athletes are ", ownerAthletes);
-  //   console.log("Addr1's athletes are ", addr1Athletes);
-  // });
+    // Making sure owner and addr1 have 5 athletes each, and adding to athletes ID array
+    // ATHLETE ARRAYS TO BE USED IN EVAL MATCH TESTS
+    ownerAthletes = [];
+    addr1Athletes = [];
+    for (let i = 0; i < 50; i++) {
+      const currNumOwner = Number(
+        await GameItemInstance.connect(owner).balanceOf(owner.address, i)
+      );
+      const currNumAddr1 = Number(
+        await GameItemInstance.connect(addr1).balanceOf(addr1.address, i)
+      );
+      // Adding athlete IDs to arrays for users
+      if (currNumOwner === 1) {
+        ownerAthletes.push(i);
+      }
+      if (currNumAddr1 === 1) {
+        addr1Athletes.push(i);
+      }
+    }
+    // Amount of athletes they have should equal the starter pack size (5)
+    expect(ownerAthletes.length).to.equal(5);
+    expect(addr1Athletes.length).to.equal(5);
+    console.log("Owner's athletes are ", ownerAthletes);
+    console.log("Addr1's athletes are ", addr1Athletes);
+  });
 
   // 1. Testing proxy setup
   it("Successfully gets stake amount for the proxy", async () => {
@@ -384,65 +379,37 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // NOTE: OWNER AND ADDR1 MINTED STARTER PACKS ABOVE: ARRAYS OF THE ATHLETE IDS ARE: "ownerAthletes" and "addr1Athletes"
   // Temporarily putting this test out since I commented out require
   it("User cannot set lineup of athleteIds that they don't own", async () => {
-    const athleteIds = [1, 2, 3, 4]; // Athlete IDs for user 1 (owner)
-    let txn = proxyContract.connect(addr1).setLineup(athleteIds);
-    expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
+    const athleteIds = [1, 2, 3, 4, 5]; // Athlete IDs for user 1 (owner)
+    let txn;
+    for (let i = 0; i < athleteIds.length; i++) {
+      if (!addr1Athletes.includes(athleteIds[i])) {
+        txn = proxyContract.connect(addr1).setAthleteInLineup(athleteIds[i], i);
+        expect(txn).to.be.revertedWith("Caller does not own given athleteIds");
+      }
+    }
   });
-
-  // it("User cannot set duplicate athlete id in lineup", async () => {
-  //   const athleteIds = [1, 1, 2]; // Athlete IDs for user 1 (owner)
-  //   let txn = proxyContract.connect(addr1).setLineup(athleteIds);
-  //   // For some reason these reverted statements aren't working... but all tests are "passing" (correct errors) so we good
-  //   await expect(txn).to.be.revertedWith(
-  //     "Duplicate athleteIDs are not allowed."
-  //   );
-  // });
 
   it("Doesn't let a user that's not in the league set a lineup", async () => {
     const athleteIds = [1, 2, 3, 4, 5];
-    let txn = proxyContract.connect(addr3).setLineup(athleteIds);
-    await expect(txn).to.be.revertedWith("User is not in League.");
+    let txn;
+    for (let i = 0; i < athleteIds.length; i++) {
+      txn = proxyContract.connect(addr3).setLineup(athleteIds);
+      await expect(txn).to.be.revertedWith("User is not in League.");
+    }
   });
 
   it("User cannot set lineup if line up is locked for the week", async () => {
-    const athleteIds = [1, 2, 3, 4, 5]; // Athlete IDs for user 1 (owner)
+    const athleteIds = [1, 11, 21, 31, 49]; // Athlete IDs for user 1 (owner)
     let txn = await proxyContract.connect(owner).lockLineup();
-    txn = proxyContract.connect(addr1).setLineup(athleteIds);
+    txn = proxyContract.connect(addr1).setAthleteInLineup(athleteIds[0], 0);
     await expect(txn).to.be.revertedWith("lineup is locked for the week!");
     await proxyContract.connect(owner).unlockLineup();
   });
 
-  // it("User cannot set IDs in the same 0-9, 9-19 etc. range (position range)", async () => {
-  //   const athleteIds = [addr1Athletes[1], addr1Athletes[0]];
-  //   let txn = proxyContract.connect(addr1).setLineup(athleteIds);
-  //   await expect(txn).to.be.revertedWith(
-  //     "You are setting an athlete in the wrong position!"
-  //   );
-  // });
-
-  // Setting athletes and getting user's lineup -- inputting valid IDs
-  // it("Correctly sets athlete IDs with valid lineup and gets a user's lineup", async () => {
-  //   const athleteIds = ownerAthletes; // Athlete IDs for user 1 (owner)
-  //   const athleteIds2 = addr1Athletes; // Athlete IDs for user 2 (addr1)
-
-  //   // Need to remember to have a check also that IDs must be in range (0-9, 10-19, etc.) so we don't have the bug where people can set wrong positions
-  //   let txn = await proxyContract.connect(owner).setLineup(athleteIds);
-  //   txn = await proxyContract.connect(addr1).setLineup(athleteIds2);
-
-  //   // Making sure state was updated correctly
-  //   lineup = await proxyContract.connect(owner).getLineup(owner.address); // Getting the caller's lineup
-  //   lineup = lineup.map((player) => Number(player));
-  //   lineup2 = await proxyContract.getLineup(addr1.address);
-  //   lineup2 = lineup2.map((player) => Number(player));
-
-  //   expect(lineup).to.eql(athleteIds); // Note: eql is diff from equal as is does a deep comparison
-  //   expect(lineup2).to.eql(athleteIds2);
-  // });
-
   // Delete this test when we comment out evaluateMatch in LeagueProxy
   // Correctly evaluates the matchup between two users
   // Simulates what we'll be doing from our backend after we pull API data
-  it("Correctly appends stats for athletes", async () => {
+  it("Correctly appends stats for athletes for week 0", async () => {
     // Adding random stats for 50 athletes
     for (let i = 0; i < 50; i++) {
       const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
@@ -457,19 +424,23 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     statsArr = [];
     for (let i = 0; i < 50; i++) {
       const athleteStats = await AthletesContractInstance.getAthleteScores(i);
-      statsArr.push(athleteStats);
+      statsArr.push(athleteStats[0]);
     }
 
     expect(statsArr.length).to.equal(50);
     // Comment out below to see stats arr (is being updated correctly right now!)
-    // console.log("Athlete stats ", statsArr);
+    console.log("Athlete stats ", statsArr);
 
     // Creating points arrays to test out evaluateMatch functions
-    const athleteStatsNums = statsArr.map((stat) => Number(stat));
+    const athleteStatsNums = statsArr.map((stat) => Number(stat)); // Stats for WEEK 0!
     // Arrays for owner and addr1 points (lineup & lineup2)
-    const ownerPointsArr = lineup.map((athlete) => athleteStatsNums[athlete]);
+    const ownerPointsArr = ownerAthletes.map(
+      (athlete) => athleteStatsNums[athlete]
+    );
     console.log("owner athlete scores: ", ownerPointsArr);
-    const addr1PointsArr = lineup2.map((athlete) => athleteStatsNums[athlete]);
+    const addr1PointsArr = addr1Athletes.map(
+      (athlete) => athleteStatsNums[athlete]
+    );
     console.log("addr1 athlete scores: ", addr1PointsArr);
 
     // Finally, total points for owner and addr1. Setting this so we can see if evaluateMatches function in MOBALogicLibrary is working correctly

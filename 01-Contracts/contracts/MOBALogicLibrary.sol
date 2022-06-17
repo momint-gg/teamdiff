@@ -121,7 +121,7 @@ library MOBALogicLibrary {
             address addr2 = schedule[currentWeekNum][i].players[1];
 
             // Check to make sure matchup is not a bye week
-            // If it is a bye week, assign 2 as result for this week
+            // If it is a bye week, assign 3 as result for this week
             if (addr1 == address(0)) {
                 userToRecord[addr2][currentWeekNum] = 3;
             } else if (addr2 == address(0)) {
@@ -154,6 +154,7 @@ library MOBALogicLibrary {
                     } else if (latestScore2 > latestScore1) {
                         addr2Score += 1;
                     }
+                    console.log(addr1Score, " ", addr2Score);
                 }
                 // Updating mappings
                 // uint256 addr1Points = userToPoints[addr1];
