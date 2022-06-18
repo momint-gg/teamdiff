@@ -10,6 +10,7 @@ import { useSigner } from "wagmi";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import PendingLeagueCard from "../components/PendingLeagueCard";
 import LeagueCard from "../components/LeagueCard";
 
 export default function MyLeagues({ setDisplay }) {
@@ -71,9 +72,6 @@ export default function MyLeagues({ setDisplay }) {
 
       // Fetch League membership data for connected wallet
       async function fetchData() {
-        // setActiveLeagueList([]);
-        // setPendingLeagueList([]);
-        // const activeLeagues = await LeagueMakerContract.leagueAddresses(1);
         let i = 0;
         let error = "none";
 
@@ -119,7 +117,6 @@ export default function MyLeagues({ setDisplay }) {
                   whitelistedLeague,
                 ]);
           }
-          // console.log("error value at end:" + error);
         } while (error == "none");
       }
       fetchData();
@@ -134,33 +131,19 @@ export default function MyLeagues({ setDisplay }) {
   }, []);
 
   const activeListItems = activeLeagueList.map((leagueAddress, index) => (
-    <Box key={index}>
+    <Box key={index} sx={{marginRight:3, marginBottom:3}}>
       <LeagueCard
-        // leagueData={exampleData}
         leagueAddress={leagueAddress}
-        // isJoined={true}
-        // setMountedLeagueAddress={setMountedLeagueAddress}
-
-        // setLeague={setCurrLeague}
-        // setLeagueOpen={setLeagueOpen}
       />
-      <hr></hr>
     </Box>
   ));
 
   // Create list of league cards for all pending leagues
   const pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
-    <Box key={index}>
-      <LeagueCard
-        // leagueData={exampleData}
+    <Box key={index} sx={{marginRight:3, marginBottom:3}}>
+      <PendingLeagueCard
         leagueAddress={leagueAddress}
-        // isJoined={false}
-        // setMountedLeagueAddress={setMountedLeagueAddress}
-
-        // setLeague={setCurrLeague}
-        // setLeagueOpen={setLeagueOpen}
       />
-      <hr></hr>
     </Box>
   ));
 
@@ -168,15 +151,6 @@ export default function MyLeagues({ setDisplay }) {
     <Box>
       {!leagueOpen && (
         <Box>
-          {/* <Fab
-            variant="extended"
-            size="small"
-            aria-label="add"
-            onClick={() => setDisplay(false)}
-          >
-            &#60; BACK
-          </Fab> */}
-
           <Typography variant="h4" color="secondary" component="div">
             Active Leagues
           </Typography>
@@ -185,22 +159,23 @@ export default function MyLeagues({ setDisplay }) {
               color: "secondary",
               backgroundColor: "secondary",
               height: 5,
+              flexBasis: "100%"
             }}
           />
           {activeLeagueList.length > 0 ? (
-            <ul>{activeListItems}</ul>
+            <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              }}>
+              {activeListItems}
+            </Box>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Active Leagues)
             </Typography>
           )}
-          {/* <LeagueCard
-                leagueData={exampleData}
-                leagueAddress={exampleData.leagueName}
-                setLeague={setCurrLeague}
-                setLeagueOpen={setLeagueOpen}
-              /> */}
-
           <Typography
             variant="h4"
             color="secondary"
@@ -216,13 +191,22 @@ export default function MyLeagues({ setDisplay }) {
               height: 5,
             }}
           />
+          
           {pendingLeagueList.length > 0 ? (
-            <ul>{pendingListItems}</ul>
+            <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              }}>
+              {pendingListItems}
+            </Box>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Pending Leagues)
             </Typography>
           )}
+          
         </Box>
       )}
       {/* {leagueOpen && (
