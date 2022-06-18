@@ -23,7 +23,7 @@ import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info
 import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import Sample from "../../backend/sample.json";
-import logo from "../assets/images/example.png";
+import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerSelectModal from "../components/PlayerSelectModal";
 import PlayerStateModal from "../components/PlayerStateModal";
@@ -369,10 +369,10 @@ export default function MyTeam() {
                     Player
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
-                    Previous Points
+                    Last Week Points
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
-                    Opponent
+                    This Week Opponent
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
                     Action
@@ -398,7 +398,13 @@ export default function MyTeam() {
                         </Typography>
                       </TableCell>
                       <TableCell
-                        sx={{ display: "flex", alignItems: "center" }}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          // justifyContent: "space-around",
+                          // justifyContent: "center",
+                        }}
                         align="center"
                       >
                         <Image
@@ -412,10 +418,10 @@ export default function MyTeam() {
                             fontSize={30}
                             onClick={() => handleStateModal(athlete, index)}
                           >
-                            {id != 0 ? athlete.name : "none set"}
+                            {id != 0 ? athlete.name : "(none)"}
                           </Typography>
                           <Typography component="div">
-                            {id != 0 ? athlete.score : "n/a"}
+                            {id != 0 && athlete.score}
                           </Typography>
                         </div>
                       </TableCell>
@@ -425,26 +431,24 @@ export default function MyTeam() {
                             {/* todo get score from datafetch */}
                             {id != 0 && currentWeekNum != 0
                               ? athlete.prevPoints
-                              : "none"}
+                              : "(0)"}
                           </Typography>
-                          <Typography>
-                            {id != 0 && currentWeekNum != 0
-                              ? "69/69/69"
-                              : "no date"}
-                          </Typography>
+                          {/* <Typography>
+                            {id != 0  && "69/69/69"}
+                          </Typography> */}
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
-                            {id != 0 && currentWeekNum != 0
-                              ? "*pull from backend"
-                              : "none"}
+                            {id != 0 &&
+                              // currentWeekNum != 0 &&
+                              "*pull opp from backend"}
                           </Typography>
                           <Typography>
-                            {id != 0 && currentWeekNum != 0
-                              ? "*pull from backend"
-                              : "no date"}
+                            {id != 0 &&
+                              // currentWeekNum != 0 &&
+                              "*pull date from backend"}
                           </Typography>
                         </div>
                       </TableCell>

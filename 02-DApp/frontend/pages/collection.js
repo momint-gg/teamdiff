@@ -132,8 +132,8 @@ export default function Collection() {
       // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
         //         console.log("entering getNftData function")
-        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
-        // const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK).catch(
+        // const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK); // .catch(
         //   (error) => {
         //     // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
         //     // setNFTData([]);
@@ -167,12 +167,12 @@ export default function Collection() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          // console.log(
-          //   "Token #" +
-          //     token +
-          //     " metadata: " +
-          //     JSON.stringify(response, null, 2)
-          // );
+          console.log(
+            "Token #" +
+              parseInt(token) +
+              " metadata: " +
+              JSON.stringify(response, null, 2)
+          );
 
           // Check metadata of ERC-1155, and assing to create State list
           if (response.title?.includes("Pack")) {
