@@ -3,6 +3,7 @@ const { ethers } = require("hardhat");
 const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
 // const { GameItems } = require('../../../02-DApp/backend/contractscripts/contract_info/contractAddresses');
 const LeagueOfLegendsLogicJSON = require('../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json');
+const AthletesJSON = require('../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json');
 const XLSX = require('xlsx');
 // const web3 = require('web3');
 
@@ -12,7 +13,7 @@ const main = async () => {
     // Create GameItems Instance
   // const contract = await ethers.getContractAt("LeagueBeaconProxy", "0xa8a6e296Ed7db235A430aA00AD2aAc1967A91d7b")
   // const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
-
+  /*
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.RINKEBY_ALCHEMY_KEY
@@ -32,7 +33,16 @@ const main = async () => {
     gasLimit: 20000000
   });
   await txn.wait();
-
+*/
+//  Deploying athletes contract
+  const AthletesContractFactory = await ethers.getContractFactory("Athletes");
+  const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  await AthletesContractInstance.deployed();
+  // AthletesContractInstance.connect(owner);
+  console.log("Athletes Deployed to: " + AthletesContractInstance.address);
+  // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  // textData +=
+  //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
 
   // //Set Private Sale Open ready for testing
   // console.log("Opening private Sale");

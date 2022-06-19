@@ -1,12 +1,16 @@
 import {
   Box,
   Button,
-  Avatar,
   CardMedia,
-  Typography,
-  Modal
+  Fab,
+  Link,
+  Modal,
+  Typography
 } from "@mui/material";
+import Image from "next/image";
 import { IoCloseOutline } from "react-icons/io5";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import OpenSea from "../assets/images/opensea.png";
 
 export default function AthleteCardModal({
   modalOpen,
@@ -14,6 +18,8 @@ export default function AthleteCardModal({
   athleteData,
   handleModalClose,
 }) {
+  const id = Number(athleteData?.id.tokenId);
+
   return (
     <Modal
       open={modalOpen}
@@ -50,14 +56,14 @@ export default function AthleteCardModal({
           <IoCloseOutline
             size={"3rem"}
             onClick={() => {
-              handleModalClose()
+              handleModalClose();
             }}
             style={{
               cursor: "pointer",
               position: "absolute",
               right: "5px",
               top: "5px",
-              color: "black"
+              color: "black",
             }}
           />
         </Button>
@@ -68,19 +74,54 @@ export default function AthleteCardModal({
           image={image}
           alt="NFT Image"
           sx={{
-            objectFit: "contain"
+            objectFit: "contain",
           }}
         />
         {/* <Typography variant="title" color="inherit" noWrap>
           &nbsp;
         </Typography> */}
-        <Typography variant="body1" color="inherit" sx={{
-          pl: 5,
-          pr: 5,
-          textAlign: "center"
-        }}>
+        <Typography
+          variant="body1"
+          color="inherit"
+          sx={{
+            pl: 5,
+            pr: 5,
+            textAlign: "center",
+          }}
+        >
           {athleteData?.description}
         </Typography>
+        <Box sx={{ marginTop: 2 }}>
+          <Link
+            href={
+              "https://testnets.opensea.io/assets/rinkeby/" +
+              CONTRACT_ADDRESSES.GameItems +
+              "/" + // +
+              id
+            }
+            target="_blank"
+            sx={{ textDecoration: "none" }}
+          >
+            <Fab
+              variant="extended"
+              size="large"
+              color={"info"}
+              aria-label="add"
+              sx={{
+                fontSize: 20,
+                color: "white",
+              }}
+            >
+              <Image
+                src={OpenSea}
+                alt={"opensea"}
+                width="30rem"
+                height="30rem"
+              />
+              <Box sx={{ marginLeft: 1 }}>View on OpenSea</Box>
+            </Fab>
+          </Link>
+        </Box>
       </Box>
     </Modal>
   );

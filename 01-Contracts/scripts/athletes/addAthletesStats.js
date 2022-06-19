@@ -7,7 +7,7 @@
 // 4. Pushes the finalized athlete stats to the Athletes.sol contract
 
 require("dotenv").config({ path: "../.env" });
-const { ethers } = require("ethers");
+const { ethers } = require("hardhat");
 
 const athleteToId = require("../prodScripts/athleteToId"); // Mapping athlete to their ID
 const XLSX = require("xlsx");
@@ -16,15 +16,19 @@ const axios = require("axios");
 
 // TODO: comment out which contracts/ABIs you're not using
 const abi = require("../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json");
-const {
-  Athletes,
-} = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
-// const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
 // const {
 //   Athletes,
-// } = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
+// } = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
+// const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
+// const {
+//   CONTRACT_ADDRESSES,
+// } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
+const {
+  Athletes,
+} = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
 
 async function main() {
+  // console.log("Athletes: " + Athletes)
   // TODO:
   // Need to hardcode this week num for now since can't pass in.. to do: pull from contract (LeagueMaker) or Athletes (add function for week number in athletes)
   // Maybe when eval match is called, we can also increment some value in the athletes contract? -- do later...
@@ -49,7 +53,7 @@ async function main() {
     return Object.keys(object).find((key) => object[key] === value);
   }
 
-  parseExcel("./week_dummy_data.xlsx").forEach((element) => {
+  parseExcel("./scripts/athletes/week_dummy_data.xlsx").forEach((element) => {
     data = element.data;
   });
 
@@ -141,7 +145,10 @@ async function main() {
     const addAthletesStatsTxn = await AthletesContract.appendStats(
       finalStatsToPush[i].id, // index of athlete
       finalStatsToPush[i].points, // their points for the week,
-      week_num // Week number passed in
+      week_num, // Week number passed in
+      {
+        gasLimit: 20000000
+      }
     );
     console.log(
       "Adding points: ",

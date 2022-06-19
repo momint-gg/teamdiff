@@ -167,12 +167,12 @@ export default function Collection() {
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          console.log(
-            "Token #" +
-              parseInt(token) +
-              " metadata: " +
-              JSON.stringify(response, null, 2)
-          );
+          // console.log(
+          //   "Token #" +
+          //     parseInt(token) +
+          //     " metadata: " +
+          //     JSON.stringify(response, null, 2)
+          // );
 
           // Check metadata of ERC-1155, and assing to create State list
           if (response.title?.includes("Pack")) {
@@ -502,6 +502,9 @@ export default function Collection() {
                       ".png?w=164&h=164&fit=crop&auto=format",
                     athleteData: athleteData,
                   });
+                  console.log(
+                    "athleteData: " + JSON.stringify(athleteData, null, 2)
+                  );
                   setModalOpen(true);
                 }}
               />

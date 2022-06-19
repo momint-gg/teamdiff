@@ -28,7 +28,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[8]) public userToRecord; // User to their record
     mapping(address => uint256[5]) public userToLineup; // User to their lineup
-    mapping(address => uint256[8]) public userToWeekScore;
+    // mapping(address => uint256[8]) public userToWeekScore;
     mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -38,7 +38,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     struct Matchup {
         address[2] players;
     }
-    mapping(uint256 => Matchup[]) public schedule; // Schedule for the league (generated before), maps week # => [matchups]
+    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
 
     /**********************/
     /* IMMUTABLE STORAGE  */

@@ -17,86 +17,6 @@ import constants from "../constants";
 // todo
 const statsData = Sample.statsData;
 
-// const data = {
-//   first: {
-//     ens: "reg.eth",
-//     wins: 3,
-//     athleteData: [
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//         position: "TOP",
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//         position: "JG",
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//         position: "MID",
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//         position: "SUP",
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//         position: "ADC",
-//       },
-//     ],
-//   },
-//   second: {
-//     ens: "will.eth",
-//     wins: 2,
-//     athleteData: [
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//       },
-//       {
-//         name: "Faker",
-//         cs: 100,
-//         opponent: "C9",
-//         prevPoints: 30,
-//       },
-//     ],
-//   },
-// };
-
 export default function Matchups({ daysTillLock, daysTillUnlock }) {
   // Router params
   const router = useRouter();
@@ -133,6 +53,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
+  const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
   // const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
   const [
@@ -237,7 +158,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
         // Get league size
         const leagueSize = await getLeagueSizeHelper(LeagueProxyContract);
-        console.log("league size: " + leagueSize);
+        // console.log("league size: " + leagueSize);
 
         // Get week matchups from schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
@@ -254,28 +175,35 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         //   console.log("matchup #" + index + ": " + matchup);
         // });
         setSelectedWeekMatchups(weekMatchups);
+        // TODO
 
         // Get final scores for each competitor
         // const competitor1Score = LeagueProxyContract.get;
-        // TODO
 
-        // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
-        for (let j = 0; j <= 1; j++) {
-          const starterIds = [null, null, null, null, null];
-          let competitorAccount;
-          j == 0
-            ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
-            : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
-          for (let i = 0; i <= 4; i++) {
-            const id = await LeagueProxyContract.userToLineup(
-              competitorAccount,
-              i
-            ).catch((e) => console.log("error: " + e));
-            starterIds[i] = id;
+        if (weekMatchups.length > 0) {
+          setLeagueScheduleIsSet(true);
+
+          // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
+          for (let j = 0; j <= 1; j++) {
+            const starterIds = [null, null, null, null, null];
+            let competitorAccount;
+            j == 0
+              ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
+              : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
+            for (let i = 0; i <= 4; i++) {
+              const id = await LeagueProxyContract.userToLineup(
+                competitorAccount,
+                i
+              ).catch((e) => console.log("error: " + e));
+              starterIds[i] = id;
+            }
+            j == 0
+              ? setCompetitor1StarterAthleteIds(starterIds)
+              : setCompetitor2StarterAthleteIds(starterIds);
           }
-          j == 0
-            ? setCompetitor1StarterAthleteIds(starterIds)
-            : setCompetitor2StarterAthleteIds(starterIds);
+        } else {
+          console.log("leagueSchedule not set");
+          setLeagueScheduleIsSet(false);
         }
         // This ussually takes the longest, so set isLoading to false here
         setIsLoading(false);
@@ -333,7 +261,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   }, [isConnected, router.isReady, connectedAccount]);
 
   useEffect(() => {
-    if (selectedWeekMatchups) {
+    if (selectedWeekMatchups && leagueScheduleIsSet) {
       const getNFTData = async () => {
         setIsLoading(true);
         const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
@@ -391,35 +319,51 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       //   alert("fetch NFT DATA error: " + error);
       // });
     }
-  }, [selectedWeekMatchups]);
+  }, [selectedWeekMatchups, leagueScheduleIsSet]);
 
   useEffect(() => {
     if (
-      competitor1StarterAthleteIds &&
-      competitor2StarterAthleteIds &&
+      // competitor1StarterAthleteIds &&
+      // competitor2StarterAthleteIds &&
       !isLoading
     ) {
       getStarterAthleteData();
     }
-  }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds, isLoading]);
+  }, [isLoading]);
 
   const getStarterAthleteData = async () => {
     // append score stats for competitor 1 starter athletes
+    // 1. Make a shallow copy of the items
+    const athletes = [...competitor1OwnedAthletesMetadata];
+    const c1Scores = [];
     competitor1StarterAthleteIds.forEach(async (id, index) => {
+      // 2. Make a shallow copy of the item you want to mutate
+      const athlete = { ...athletes[id] };
       if (id != 0) {
         const score = await athleteContract
-          .athleteToScores(id, 0)
+          .athleteToScores(id, currentWeekNum)
           .catch((error) => {
             console.log(
               "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
             );
             // score = null;
           });
-        // // console.log("prevpoints: " + score);
-        competitor1OwnedAthletesMetadata[id].score = score;
+        console.log("score for id#" + id + ": " + score);
+
+        // 3. Replace the property you're intested in
+        athlete.score = Number(score);
+
+        // competitor1OwnedAthletesMetadata[id].score = parseInt(score.hex);
+        // setCompetitor1Owned
+        // competitor1OwnedAthletesMetadata[id].score = parseInt(score.hex);
       } else if (id != 0) {
-        competitor1OwnedAthletesMetadata[id].score = "n/a";
+        // 3. Replace the property you're intested in
+        athlete.score = "n/a";
       }
+      // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
+      athletes[id] = athlete;
+      // 5. Set the state to our new copy
+      setCompetitor1OwnedAthletesMetadata(athletes);
     });
 
     // append score stats for competitor 2 starter athletes
@@ -434,7 +378,17 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             // score = null;
           });
         // // console.log("prevpoints: " + score);
-        competitor2OwnedAthletesMetadata[id].score = score;
+        // 1. Make a shallow copy of the items
+        const athletes = [...competitor2OwnedAthletesMetadata];
+        // 2. Make a shallow copy of the item you want to mutate
+        const athlete = { ...athletes[id] };
+        // 3. Replace the property you're intested in
+        athlete.score = parseInt(score.hex);
+        // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
+        athletes[id] = athlete;
+        // 5. Set the state to our new copy
+        setCompetitor2OwnedAthletesMetadata(athletes);
+        // competitor2OwnedAthletesMetadata[id].score = parseInt(score.hex);
       } else if (id != 0) {
         competitor2OwnedAthletesMetadata[id].score = "n/a";
       }
@@ -494,207 +448,225 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                 ? ": Rosters unlock in " + daysTillUnlock + " Days"
                 : ": Rosters Locks in " + daysTillLock + " Days")}{" "}
           </Typography>
-          <Box
-            sx={{
-              background: "#473D3D",
-              borderRadius: "16px",
-              width: "100%",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-around",
-              }}
-            >
+          {leagueScheduleIsSet ? (
+            <>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  background: "#473D3D",
+                  borderRadius: "16px",
+                  width: "85vw",
                 }}
               >
-                <Typography color={"white"} fontSize={48}>
-                  {/* idk what the first zero is for, but otherwise it is undefined, second 0 controls which player in matchup */}
-                  {shortenAddress(selectedWeekMatchups[selectedMatchup][0][0])}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography color={"white"} fontSize={64} fontWeight="700">
-                    3
-                  </Typography>
-                  {/* <Image
-                    src={LogoIcon}
-                    alt="logo image"
-                    width={62}
-                    height={62}
-                  /> */}
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Typography color={"white"} fontSize={48}>
-                  {shortenAddress(selectedWeekMatchups[selectedMatchup][0][1])}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography color={"white"} fontSize={64} fontWeight="700">
-                    2
-                  </Typography>
-                  {/* <Image
-                    src={LogoIcon}
-                    alt="logo image"
-                    width={62}
-                    height={62}
-                  /> */}
-                </Box>
-              </Box>
-            </Box>
-            <Grid>
-              {positions.map((position, index) => {
-                // const athelete = atheleteData[key];
-                // NOTE: if id == 0, that means the connectedAccount has not
-                // set an athlete in that position for this week in their proxy
-                // get athlete for competitor 1 at this position
-                const competitor1StarterId =
-                  competitor1StarterAthleteIds[index];
-                console.log("c1 starterID: " + competitor1StarterId);
-                const competitor1Athlete =
-                  competitor1OwnedAthletesMetadata[competitor1StarterId];
-                console.log(
-                  "starterid: " +
-                    competitor1StarterId +
-                    " athlete: " +
-                    JSON.stringify(competitor1Athlete, null, 2)
-                );
-                // get athlete for competitor 1 at this position
-                const competitor2StarterId =
-                  competitor2StarterAthleteIds[index];
-                const competitor2Athlete =
-                  competitor2OwnedAthletesMetadata[competitor2StarterId];
-                // console.log(
-                //   "id: " + id + " athlete: " + JSON.stringify(athlete, null, 2)
-                // );
-                return (
-                  <Grid
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-around",
+                  }}
+                >
+                  <Box
                     sx={{
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
-                      color: "white",
-                      borderTop: "2px solid #FFFFFF",
                     }}
                   >
-                    <Grid item xs={1} textAlign="center">
-                      <Image
-                        src={
-                          competitor1StarterId != 0
-                            ? competitor1Athlete.image
-                            : logo
-                        }
-                        alt="logo"
-                        width={50}
-                        height={50}
-                      />
-                    </Grid>
-                    <Grid
-                      item
-                      textAlign="center"
-                      onClick={() => handleModalOpen(competitor1Athlete)}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      <Typography fontSize={48}>
-                        {competitor1StarterId != 0
-                          ? competitor1Athlete.name
-                          : "(none)"}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={1} textAlign="center">
-                      <Typography fontSize={30} fontWeight={700}>
-                        {competitor1StarterId != 0 &&
-                          competitor1Athlete.attributes[0].value}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={1} textAlign="center">
-                      <Typography>
-                        {competitor1StarterId != 0 && "Loss vs **backend**"}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={1} textAlign="center">
-                      <Typography color="#D835D8" fontSize={48}>
-                        {competitor1StarterId != 0
-                          ? competitor1Athlete.score
-                          : "(0)"}{" "}
-                      </Typography>
-                    </Grid>
-                    {/* middle column */}
-                    <Grid item xs={2} textAlign="center">
+                    <Typography color={"white"} fontSize={48}>
+                      {/* idk what the first zero is for, but otherwise it is undefined, second 0 controls which player in matchup */}
+                      {shortenAddress(
+                        selectedWeekMatchups[selectedMatchup][0][0]
+                      )}
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Typography
-                        fontSize={42}
+                        color={"white"}
+                        fontSize={64}
+                        fontWeight="700"
+                      >
+                        3
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography color={"white"} fontSize={48}>
+                      {shortenAddress(
+                        selectedWeekMatchups[selectedMatchup][0][1]
+                      )}
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography
+                        color={"white"}
+                        fontSize={64}
+                        fontWeight="700"
+                      >
+                        2
+                      </Typography>
+                      {/* <Image
+                    src={LogoIcon}
+                    alt="logo image"
+                    width={62}
+                    height={62}
+                  /> */}
+                    </Box>
+                  </Box>
+                </Box>
+                <Grid>
+                  {positions.map((position, index) => {
+                    // const athelete = atheleteData[key];
+                    // NOTE: if id == 0, that means the connectedAccount has not
+                    // set an athlete in that position for this week in their proxy
+                    // get athlete for competitor 1 at this position
+                    const competitor1StarterId =
+                      competitor1StarterAthleteIds[index];
+                    console.log("c1 starterID: " + competitor1StarterId);
+                    const competitor1Athlete =
+                      competitor1OwnedAthletesMetadata[competitor1StarterId];
+                    console.log("\tscore: " + competitor1Athlete?.score);
+                    // console.log(
+                    //   "starterid: " +
+                    //     competitor1StarterId +
+                    //     " athlete: " +
+                    //     JSON.stringify(competitor1Athlete, null, 2)
+                    // );
+                    // get athlete for competitor 1 at this position
+                    const competitor2StarterId =
+                      competitor2StarterAthleteIds[index];
+                    const competitor2Athlete =
+                      competitor2OwnedAthletesMetadata[competitor2StarterId];
+                    // console.log(
+                    //   "id: " + id + " athlete: " + JSON.stringify(athlete, null, 2)
+                    // );
+                    return (
+                      <Grid
                         sx={{
-                          borderLeft: "1px solid #FFFFFF",
-                          borderRight: "1px solid #FFFFFF",
-                          fontWeight: "bold",
+                          display: "flex",
+                          alignItems: "center",
+                          color: "white",
+                          borderTop: "2px solid #FFFFFF",
                         }}
                       >
-                        {position}
-                      </Typography>
-                    </Grid>
-                    {/* opponents athlete stats */}
-                    <Grid item xs={1} textAlign="center">
-                      <Typography color="#D835D8" fontSize={48}>
-                        {competitor2StarterId != 0
-                          ? competitor2Athlete.score
-                          : "(0)"}{" "}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={1} textAlign="center">
-                      <Typography>
-                        {competitor2StarterId != 0 && "Loss vs **backend**"}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={1} textAlign="center">
-                      <Typography fontSize={30} fontWeight={700}>
-                        {competitor2StarterId != 0 &&
-                          competitor2Athlete.attributes[0].value}
-                      </Typography>
-                    </Grid>
-                    <Grid
-                      item
-                      textAlign="center"
-                      onClick={() => handleModalOpen(competitor2Athlete)}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      <Typography fontSize={48}>
-                        {competitor2StarterId != 0
-                          ? competitor2Athlete.name
-                          : "(none)"}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={1} textAlign="center">
-                      <Image
-                        src={
-                          competitor2StarterId != 0
-                            ? competitor2Athlete.image
-                            : logo
-                        }
-                        alt="logo"
-                        width={50}
-                        height={50}
-                      />
-                    </Grid>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Box>
-          <PlayerStateModal
-            modalOpen={modalOpen}
-            stateData={statsData}
-            handleModalClose={handleStateModalClose}
-          />
+                        <Grid item xs={1} textAlign="center">
+                          <Image
+                            src={
+                              competitor1StarterId != 0
+                                ? competitor1Athlete.image
+                                : logo
+                            }
+                            alt="logo"
+                            width={50}
+                            height={50}
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          xs={2}
+                          textAlign="left"
+                          onClick={() => handleModalOpen(competitor1Athlete)}
+                          sx={{ cursor: "pointer" }}
+                        >
+                          <Typography fontSize={34}>
+                            {competitor1StarterId != 0
+                              ? competitor1Athlete.name
+                              : "(none)"}
+                          </Typography>
+                        </Grid>
+                        {/* <Grid item xs={1} textAlign="center">
+                          <Typography fontSize={30} fontWeight={700}>
+                            {competitor1StarterId != 0 &&
+                              competitor1Athlete.attributes[0].value}
+                          </Typography>
+                        </Grid> */}
+                        <Grid item xs={1} textAlign="center">
+                          <Typography>
+                            {competitor1StarterId != 0 && "Loss vs **backend**"}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={1} textAlign="center">
+                          <Typography color="#D835D8" fontSize={48}>
+                            {competitor1StarterId != 0
+                              ? competitor1Athlete.score
+                              : "(0)"}{" "}
+                          </Typography>
+                        </Grid>
+                        {/* middle column */}
+                        <Grid item xs={2} textAlign="center">
+                          <Typography
+                            fontSize={42}
+                            sx={{
+                              borderLeft: "1px solid #FFFFFF",
+                              borderRight: "1px solid #FFFFFF",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {position}
+                          </Typography>
+                        </Grid>
+                        {/* opponents athlete stats */}
+                        <Grid item xs={1} textAlign="center">
+                          <Typography color="#D835D8" fontSize={48}>
+                            {competitor2StarterId != 0
+                              ? competitor2Athlete.score
+                              : "(0)"}{" "}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={1} textAlign="center">
+                          <Typography>
+                            {competitor2StarterId != 0 && "Loss vs **backend**"}
+                          </Typography>
+                        </Grid>
+                        {/* <Grid item xs={1} textAlign="center">
+                          <Typography fontSize={30} fontWeight={700}>
+                            {competitor2StarterId != 0 &&
+                              competitor2Athlete.attributes[0].value}
+                          </Typography>
+                        </Grid> */}
+                        <Grid
+                          item
+                          xs={2}
+                          textAlign="right"
+                          onClick={() => handleModalOpen(competitor2Athlete)}
+                          sx={{ cursor: "pointer" }}
+                        >
+                          <Typography fontSize={34}>
+                            {competitor2StarterId != 0
+                              ? competitor2Athlete.name
+                              : "(none)"}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={1} textAlign="center">
+                          <Image
+                            src={
+                              competitor2StarterId != 0
+                                ? competitor2Athlete.image
+                                : logo
+                            }
+                            alt="logo"
+                            width={50}
+                            height={50}
+                          />
+                        </Grid>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </Box>
+              <PlayerStateModal
+                modalOpen={modalOpen}
+                stateData={statsData}
+                handleModalClose={handleStateModalClose}
+              />
+            </>
+          ) : (
+            <Typography textAlign={"center"}>
+              Oops! Your league's schedule has not been set yet. Please request
+              help in Discord if this issue persists past the end of the week.
+            </Typography>
+          )}
         </Container>
       )}
     </>

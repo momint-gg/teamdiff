@@ -6,6 +6,7 @@
     "deploy-polygon": "hardhat run scripts/deploy/deployAll.js --network polygon",
     "deploy-GameItems-polygon": "hardhat run scripts/deploy/deployGameItems.js --network polygon",
     "verify-rinkeby": "hardhat verify --network rinkeby",
+    "update-athlete-stats": "hardhat run ./scripts/athletes/addAthletesStats.js --network rinkeby",
     "sandbox": "hardhat run ./scripts/deploy/sandbox.js --network rinkeby"
   },
   "devDependencies": {
