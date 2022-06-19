@@ -51,6 +51,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     useState([]);
   const [competitor2StarterAthleteIds, setCompetitor2StarterAthleteIds] =
     useState([]);
+  const [competitor1StarterAthleteScores, setCompetitor1StarterAthleteScores] =
+    useState([]);
+  const [competitor2StarterAthleteScores, setCompetitor2StarterAthleteScores] =
+    useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
@@ -69,10 +73,11 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [selectedMatchup, setSelectedMatchup] = useState(0);
   const [competitor1WeekScore, setCompetitor1WeekScore] = useState();
   const [competitor2WeekScore, setCompetitor2WeekScore] = useState();
+  const [competitor1TeamScore, setCompetitor1TeamScore] = useState();
+  const [competitor2TeamScore, setCompetitor2TeamScore] = useState();
 
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
   let shifter = 0;
-
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
     let i = 0;
     let error = "none";
@@ -128,11 +133,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
-      // const LeagueProxyContract = new ethers.Contract(
-      //   router.query.leagueAddress,
-      //   LeagueOfLegendsLogicJSON.abi,
-      //   provider
-      // );
+
       setLeagueProxyContract(LeagueProxyContract);
 
       // Initialize connections to Athlete datastore contract
@@ -158,9 +159,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
         // Get league size
         const leagueSize = await getLeagueSizeHelper(LeagueProxyContract);
-        // console.log("league size: " + leagueSize);
 
-        // Get week matchups from schedule
+        // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
         ).catch((_error) => {
@@ -175,8 +175,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         //   console.log("matchup #" + index + ": " + matchup);
         // });
         setSelectedWeekMatchups(weekMatchups);
-        // TODO
 
+        // TODO
         // Get final scores for each competitor
         // const competitor1Score = LeagueProxyContract.get;
 
@@ -213,9 +213,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           router.push("/leagues/" + router.query.leagueRoute[0]);
         }
       }
-      // declare the async data fetching function
 
-      // function to loop through and get league schedule
+      // function to loop through and get league schedule (not used rn)
       async function getLeagueSchedule() {
         let i = 0;
         let error = "none";
@@ -255,8 +254,6 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       }
 
       fetchData();
-    } else {
-      // console.log("no account data or league Address found");
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
@@ -321,24 +318,29 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     }
   }, [selectedWeekMatchups, leagueScheduleIsSet]);
 
+  // UseEffect to fetch the athlete scores on a change in competitorSTarterIds state var
   useEffect(() => {
     if (
-      // competitor1StarterAthleteIds &&
-      // competitor2StarterAthleteIds &&
-      !isLoading
+      competitor1StarterAthleteIds &&
+      competitor2StarterAthleteIds
+      // !isLoading
     ) {
-      getStarterAthleteData();
+      // setIsLoading(true);
+      // let scores;
+      const fetchData = async () => {
+        await getStarterAthleteData();
+        await calculateMatchupScore();
+      };
+      fetchData();
+      // setIsLoading(false);
     }
-  }, [isLoading]);
+  }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
 
   const getStarterAthleteData = async () => {
-    // append score stats for competitor 1 starter athletes
-    // 1. Make a shallow copy of the items
-    const athletes = [...competitor1OwnedAthletesMetadata];
-    const c1Scores = [];
+    // Create scores array for competitor 1 starter athletes
     competitor1StarterAthleteIds.forEach(async (id, index) => {
       // 2. Make a shallow copy of the item you want to mutate
-      const athlete = { ...athletes[id] };
+      // const athlete = { ...athletes[id] };
       if (id != 0) {
         const score = await athleteContract
           .athleteToScores(id, currentWeekNum)
@@ -348,49 +350,37 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             );
             // score = null;
           });
-        console.log("score for id#" + id + ": " + score);
-
-        // 3. Replace the property you're intested in
-        athlete.score = Number(score);
-
-        // competitor1OwnedAthletesMetadata[id].score = parseInt(score.hex);
-        // setCompetitor1Owned
-        // competitor1OwnedAthletesMetadata[id].score = parseInt(score.hex);
-      } else if (id != 0) {
-        // 3. Replace the property you're intested in
-        athlete.score = "n/a";
+        // console.log("score for id#" + id + ": " + score);
+        setCompetitor1StarterAthleteScores(
+          (competitor1StarterAthleteScores) => [
+            ...competitor1StarterAthleteScores,
+            score,
+          ]
+        );
       }
-      // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
-      athletes[id] = athlete;
-      // 5. Set the state to our new copy
-      setCompetitor1OwnedAthletesMetadata(athletes);
     });
+    // return c1Scores;
 
     // append score stats for competitor 2 starter athletes
     competitor2StarterAthleteIds.forEach(async (id, index) => {
+      // 2. Make a shallow copy of the item you want to mutate
+      // const athlete = { ...athletes[id] };
       if (id != 0) {
         const score = await athleteContract
-          .athleteToScores(id, 0)
+          .athleteToScores(id, currentWeekNum)
           .catch((error) => {
             console.log(
-              "Athlete to Scores2 error: " + JSON.stringify(error, null, 2)
+              "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
             );
             // score = null;
           });
-        // // console.log("prevpoints: " + score);
-        // 1. Make a shallow copy of the items
-        const athletes = [...competitor2OwnedAthletesMetadata];
-        // 2. Make a shallow copy of the item you want to mutate
-        const athlete = { ...athletes[id] };
-        // 3. Replace the property you're intested in
-        athlete.score = parseInt(score.hex);
-        // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
-        athletes[id] = athlete;
-        // 5. Set the state to our new copy
-        setCompetitor2OwnedAthletesMetadata(athletes);
-        // competitor2OwnedAthletesMetadata[id].score = parseInt(score.hex);
-      } else if (id != 0) {
-        competitor2OwnedAthletesMetadata[id].score = "n/a";
+        // console.log("score for id#" + id + ": " + score);
+        setCompetitor2StarterAthleteScores(
+          (competitor2StarterAthleteScores) => [
+            ...competitor2StarterAthleteScores,
+            score,
+          ]
+        );
       }
     });
   };
@@ -412,6 +402,19 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     )}`;
     return shortenedAddress1;
     // setIsConnected(true);
+  };
+
+  const calculateMatchupScore = () => {
+    let team1Counter = 0;
+    let team2Counter = 0;
+    for (let i = 0; i < 5; i < 0) {
+      const starter1Score = competitor1StarterAthleteScores[i];
+      const starter2Score = competitor2StarterAthleteScores[i];
+      if (starter1Score > starter2Score) team1Counter++;
+      else if (starter2Score > starter1Score) team2Counter++;
+    }
+    setCompetitor1TeamScore(team1Counter);
+    setCompetitor2TeamScore(team2Counter);
   };
 
   return (
@@ -482,7 +485,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                         fontSize={64}
                         fontWeight="700"
                       >
-                        3
+                        {competitor1TeamScore}
                       </Typography>
                     </Box>
                   </Box>
@@ -504,7 +507,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                         fontSize={64}
                         fontWeight="700"
                       >
-                        2
+                        {competitor2TeamScore}
                       </Typography>
                       {/* <Image
                     src={LogoIcon}
@@ -520,20 +523,16 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     // const athelete = atheleteData[key];
                     // NOTE: if id == 0, that means the connectedAccount has not
                     // set an athlete in that position for this week in their proxy
+
                     // get athlete for competitor 1 at this position
                     const competitor1StarterId =
                       competitor1StarterAthleteIds[index];
-                    console.log("c1 starterID: " + competitor1StarterId);
+                    // if (competitor1StarterId != 0)
+                    //   console.log("c1 starterID: " + competitor1StarterId);
                     const competitor1Athlete =
                       competitor1OwnedAthletesMetadata[competitor1StarterId];
-                    console.log("\tscore: " + competitor1Athlete?.score);
-                    // console.log(
-                    //   "starterid: " +
-                    //     competitor1StarterId +
-                    //     " athlete: " +
-                    //     JSON.stringify(competitor1Athlete, null, 2)
-                    // );
-                    // get athlete for competitor 1 at this position
+
+                    // get athlete for competitor 2 at this position
                     const competitor2StarterId =
                       competitor2StarterAthleteIds[index];
                     const competitor2Athlete =
@@ -589,7 +588,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                         <Grid item xs={1} textAlign="center">
                           <Typography color="#D835D8" fontSize={48}>
                             {competitor1StarterId != 0
-                              ? competitor1Athlete.score
+                              ? String(competitor1StarterAthleteScores[index])
                               : "(0)"}{" "}
                           </Typography>
                         </Grid>
@@ -610,7 +609,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                         <Grid item xs={1} textAlign="center">
                           <Typography color="#D835D8" fontSize={48}>
                             {competitor2StarterId != 0
-                              ? competitor2Athlete.score
+                              ? competitor2StarterAthleteScores[index]
                               : "(0)"}{" "}
                           </Typography>
                         </Grid>
