@@ -4,4 +4,4 @@ const constants = {
   POLYGON_ALCHEMY_LINK:
     "https://polygon-mainnet.g.alchemy.com/v2/oyBI8KPs0CEqpheAG_EtQnm_c6fGB1l4",
 };
-export default constants
+export default constants;

@@ -94,17 +94,28 @@ export default function BurnPack({ setDisplay }) {
       handleEthereum();
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // .catch(
+      //   (e) => {
+      //     console.error(e);
+      //   }
+      // );
 
       const setAccountData = async () => {
         const signer = provider.getSigner();
-        const accounts = await provider.listAccounts();
+        const accounts = await provider.listAccounts().catch((e) => {
+          console.error(e);
+        });
 
         if (accounts.length > 0) {
-          const accountAddress = await signer.getAddress();
+          const accountAddress = await signer.getAddress().catch((e) => {
+            console.error(e);
+          });
           setSigner(signer);
           setConnectedAccount(accountAddress);
           setIsConnected(true);
-          const { chainId } = await provider.getNetwork();
+          const { chainId } = await provider.getNetwork().catch((e) => {
+            console.error(e);
+          });
           setCurrentChain(chainId);
           setIsPolygon(chainId === 137);
         } else {
@@ -168,13 +179,19 @@ export default function BurnPack({ setDisplay }) {
         const balanceOfPacks = await GameItemsContract.balanceOf(
           connectedAccount,
           50
-        );
+        ).catch((e) => {
+          console.error(e);
+        });
         // console.log("balance of packs" + balanceOfPacks);
         setOwnsStarterPack(balanceOfPacks > 0);
 
         // Grab if user has already minted starter pack
         const hasAlreadyBurnedPack1 =
-          await GameItemsContract.userToHasBurnedStarterPack(connectedAccount);
+          await GameItemsContract.userToHasBurnedStarterPack(
+            connectedAccount
+          ).catch((e) => {
+            console.error(e);
+          });
         setHasAlreadyBurnedPack(hasAlreadyBurnedPack1);
 
         // Set if is past presale date

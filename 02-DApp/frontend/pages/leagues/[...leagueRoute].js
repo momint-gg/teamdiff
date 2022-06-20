@@ -89,6 +89,7 @@ export default function LeaguePlayRouter() {
       setIsLoading(false);
     }
   }, [isConnected, router.isReady, connectedAccount]);
+
   // DAte
   const d = new Date();
   const today = d.getDay() + 1;

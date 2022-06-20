@@ -13,7 +13,7 @@ import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_
 import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
-import constants from "../../Constants";
+import constants from "../../constants/index.js";
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
 export default function LeagueDetails() {
   // Router params

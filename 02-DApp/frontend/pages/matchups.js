@@ -12,7 +12,7 @@ import Sample from "../../backend/sample.json";
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerStateModal from "../components/PlayerStateModal";
-import constants from "../constants";
+import constants from "../constants/index.js";
 
 // todo
 const statsData = Sample.statsData;
@@ -52,7 +52,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [competitor2StarterAthleteIds, setCompetitor2StarterAthleteIds] =
     useState([]);
   const [competitor1StarterAthleteScores, setCompetitor1StarterAthleteScores] =
-    useState([]);
+    useState([-1, -1, -1, -1, -1]);
   const [competitor2StarterAthleteScores, setCompetitor2StarterAthleteScores] =
     useState([]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
@@ -75,7 +75,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [competitor2WeekScore, setCompetitor2WeekScore] = useState();
   const [competitor1TeamScore, setCompetitor1TeamScore] = useState();
   const [competitor2TeamScore, setCompetitor2TeamScore] = useState();
-
+  const [isError, setIsError] = useState(false);
+  const [hasFetchedScores, setHasFetchedScores] = useState(false);
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
   let shifter = 0;
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
@@ -101,10 +102,14 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     const setAccountData = async () => {
       // setIsLoading(true);
       const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      const accounts = await provider.listAccounts().catch((e) => {
+        console.error(e);
+      });
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
+        const accountAddress = await signer.getAddress().catch((e) => {
+          console.error(e);
+        });
         setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
@@ -127,6 +132,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     if (isConnected && router.isReady) {
       // // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
+      setHasFetchedScores(false);
+
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
         router.query.leagueRoute[0],
@@ -148,13 +155,29 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       async function fetchData() {
         setIsLoading(true);
 
-        const leagueName = await LeagueProxyContract.leagueName();
+        const leagueName = await LeagueProxyContract.leagueName().catch((e) => {
+          console.error(e);
+          setIsLoading(false);
+          setIsError(true);
+        });
         setLeagueName(leagueName);
 
-        const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
+        const isInLeague = await LeagueProxyContract.inLeague(
+          connectedAccount
+        ).catch((e) => {
+          console.error(e);
+          setIsLoading(false);
+          setIsError(true);
+        });
         setIsLeagueMember(isInLeague);
 
-        const currentWeekNum = await LeagueProxyContract.currentWeekNum();
+        const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
+          (e) => {
+            console.error(e);
+            setIsLoading(false);
+            setIsError(true);
+          }
+        );
         setCurrentWeekNum(currentWeekNum);
 
         // Get league size
@@ -163,47 +186,67 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
-        ).catch((_error) => {
-          alert(
-            "Get schedule for week Error! : " + JSON.stringify(error, null, 2)
-          );
+        ).catch((e) => {
+          console.error("get schedule for week error: " + e);
+          setIsLoading(false);
+          setIsError(true);
         });
         // Slice array, by finding how many slots in return weekMatchups array to skip (due to setLeagueSchedule algorithm)
         shifter = 4 - Math.round(leagueSize / 2);
-        weekMatchups = weekMatchups.slice(shifter);
-        // weekMatchups.map((matchup, index) => {
-        //   console.log("matchup #" + index + ": " + matchup);
-        // });
-        setSelectedWeekMatchups(weekMatchups);
+        if (weekMatchups) {
+          weekMatchups = weekMatchups.slice(shifter);
+          // weekMatchups.map((matchup, index) => {
+          //   console.log("matchup #" + index + ": " + matchup);
+          // });
+          setSelectedWeekMatchups(weekMatchups);
 
-        // TODO
-        // Get final scores for each competitor
-        // const competitor1Score = LeagueProxyContract.get;
+          // TODO
+          // Get final scores for each competitor
+          // const competitor1Score = LeagueProxyContract.get;
 
-        if (weekMatchups.length > 0) {
-          setLeagueScheduleIsSet(true);
+          if (weekMatchups.length > 0) {
+            setLeagueScheduleIsSet(true);
 
-          // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
-          for (let j = 0; j <= 1; j++) {
-            const starterIds = [null, null, null, null, null];
-            let competitorAccount;
-            j == 0
-              ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
-              : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
-            for (let i = 0; i <= 4; i++) {
-              const id = await LeagueProxyContract.userToLineup(
-                competitorAccount,
-                i
-              ).catch((e) => console.log("error: " + e));
-              starterIds[i] = id;
+            // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
+            for (let j = 0; j <= 1; j++) {
+              const starterIds = [];
+              const comp = [-1, -1, -1, -1, -1];
+              let competitorAccount;
+              j == 0
+                ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
+                : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
+              for (let i = 0; i <= 4; i++) {
+                const id = await LeagueProxyContract.userToLineup(
+                  competitorAccount,
+                  i
+                ).catch((e) => {
+                  console.log("error: " + e);
+                  setIsError(true);
+                });
+                starterIds[i] = id;
+              }
+              j == 0
+                ? setCompetitor1StarterAthleteIds(starterIds)
+                : setCompetitor2StarterAthleteIds(starterIds);
+              // let scores;
+              // const fetchData = async () => {
+              //   if (starterIds != comp && AthleteContract) {
+              //     console.log("in if statement: " + starterIds);
+              //     scores = await getStarterAthleteData(
+              //       starterIds,
+              //       AthleteContract
+              //     );
+              //     console.log("setting state scores to " + scores);
+              //     if (scores) setCompetitor1StarterAthleteScores(scores);
+              //     // await calculateMatchupScore();
+              //   }
+              // };
+              // fetchData();
             }
-            j == 0
-              ? setCompetitor1StarterAthleteIds(starterIds)
-              : setCompetitor2StarterAthleteIds(starterIds);
+          } else {
+            console.log("leagueSchedule not set");
+            setLeagueScheduleIsSet(false);
           }
-        } else {
-          console.log("leagueSchedule not set");
-          setLeagueScheduleIsSet(false);
         }
         // This ussually takes the longest, so set isLoading to false here
         setIsLoading(false);
@@ -215,43 +258,43 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       }
 
       // function to loop through and get league schedule (not used rn)
-      async function getLeagueSchedule() {
-        let i = 0;
-        let error = "none";
-        do {
-          await leagueProxyContract.leagueMembers(i).catch((_error) => {
-            error = _error;
-            // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-            // console.log("User To League Map Error: " + _error.message);
-          });
+      // async function getLeagueSchedule() {
+      //   let i = 0;
+      //   let error = "none";
+      //   do {
+      //     await leagueProxyContract.leagueMembers(i).catch((_error) => {
+      //       error = _error;
+      //       // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+      //       // console.log("User To League Map Error: " + _error.message);
+      //     });
 
-          if (error == "none") {
-            i++;
-          }
-          // console.log("error value at end:" + error);
-        } while (error == "none");
-        const leagueSize = i;
+      //     if (error == "none") {
+      //       i++;
+      //     }
+      //     // console.log("error value at end:" + error);
+      //   } while (error == "none");
+      //   const leagueSize = i;
 
-        console.log("league size: " + leagueSize);
-        let weekMatchups = [];
-        weekMatchups = await leagueProxyContract
-          .getScheduleForWeek(currentWeekNum)
-          .catch((_error) => {
-            // error = _error;
-            alert("Error! : " + JSON.stringify(error, null, 2));
-            // console.log("User To League Map Error: " + _error.message);
-          });
+      //   console.log("league size: " + leagueSize);
+      //   let weekMatchups = [];
+      //   weekMatchups = await leagueProxyContract
+      //     .getScheduleForWeek(currentWeekNum)
+      //     .catch((_error) => {
+      //       // error = _error;
+      //       alert("Error! : " + JSON.stringify(error, null, 2));
+      //       // console.log("User To League Map Error: " + _error.message);
+      //     });
 
-        const shifter = 4 - Math.round(leagueSize / 2);
-        // console.log("shifter size: " + shifter);
+      //   const shifter = 4 - Math.round(leagueSize / 2);
+      //   // console.log("shifter size: " + shifter);
 
-        weekMatchups = weekMatchups.slice(shifter);
-        // weekMatchups.map((matchup, index) => {
-        //   console.log("matchup #" + index + ": " + matchup);
-        // });
+      //   weekMatchups = weekMatchups.slice(shifter);
+      //   // weekMatchups.map((matchup, index) => {
+      //   //   console.log("matchup #" + index + ": " + matchup);
+      //   // });
 
-        setSelectedWeekMatchups(weekMatchups);
-      }
+      //   setSelectedWeekMatchups(weekMatchups);
+      // }
 
       fetchData();
     }
@@ -269,24 +312,42 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         for (let i = 0; i <= 1; i++) {
           let nfts;
           i == 0
-            ? (nfts = await web3.alchemy.getNfts({
-                owner: selectedWeekMatchups[selectedMatchup][0][0],
-                contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-              }))
-            : (nfts = await web3.alchemy.getNfts({
-                owner: selectedWeekMatchups[selectedMatchup][0][1],
-                contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-              }));
+            ? (nfts = await web3.alchemy
+                .getNfts({
+                  owner: selectedWeekMatchups[selectedMatchup][0][0],
+                  contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+                })
+                .catch((e) => {
+                  console.error("getNfts error: " + e);
+                  setIsLoading(false);
+                  setIsError(true);
+                }))
+            : (nfts = await web3.alchemy
+                .getNfts({
+                  owner: selectedWeekMatchups[selectedMatchup][0][1],
+                  contractAddresses: [CONTRACT_ADDRESSES.GameItems],
+                })
+                .catch((e) => {
+                  console.error("getNfts error: " + e);
+                  setIsLoading(false);
+                  setIsError(true);
+                }));
 
           setNFTResp(nfts);
           const athleteMetadata = [];
 
           for (const nft of nfts?.ownedNfts) {
             const token = nft?.id?.tokenId;
-            const response = await web3.alchemy.getNftMetadata({
-              contractAddress: CONTRACT_ADDRESSES.GameItems,
-              tokenId: token,
-            });
+            const response = await web3.alchemy
+              .getNftMetadata({
+                contractAddress: CONTRACT_ADDRESSES.GameItems,
+                tokenId: token,
+              })
+              .catch((e) => {
+                console.error("getNftMetadata error: " + e);
+                setIsLoading(false);
+                setIsError(true);
+              });
             // console.log(
             //   "Token #" +
             //     token +
@@ -321,28 +382,61 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   // UseEffect to fetch the athlete scores on a change in competitorSTarterIds state var
   useEffect(() => {
     if (
-      competitor1StarterAthleteIds &&
-      competitor2StarterAthleteIds
-      // !isLoading
+      // competitor1StarterAthleteIds &&
+      // competitor2StarterAthleteIds
+      !isLoading
     ) {
       // setIsLoading(true);
-      // let scores;
+      // console.log("getting the data from use effect");
+      let scores;
       const fetchData = async () => {
-        await getStarterAthleteData();
-        await calculateMatchupScore();
+        scores = await getStarterAthleteData();
+        // console.log("setting state scores to " + scores);
+        // setCompetitor1StarterAthleteScores(scores);
+        // await calculateMatchupScore();
       };
       fetchData();
-      // setIsLoading(false);
+      // setHasFetchedScores(true);
     }
-  }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
+  }, [isLoading]);
+  // }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
+
+  // const getStarterAthleteData = async (starterIds, athleteContract) => {
+  //   // Create scores array for competitor 1 starter athletes
+  //   if (starterIds.length > 0) {
+  //     const scores = [0, 34, 0, 0, 0];
+  //     const done = false;
+  //     // starterIds.forEach(async (id, index) => {
+  //     for (let i = 0; i < starterIds.length; i++) {
+  //       // 2. Make a shallow copy of the item you want to mutate
+  //       // const athlete = { ...athletes[id] };
+  //       console.log("starter id: " + starterIds[i]);
+  //       if (starterIds[i] != 0) {
+  //         const score = await athleteContract
+  //           .athleteToScores(starterIds[i], 0)
+  //           .catch((error) => {
+  //             console.log(
+  //               "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
+  //             );
+  //             // score = null;
+  //           });
+  //         // console.log("score for id#" + id + ": " + score);
+  //         scores[starterIds[i]] = score;
+  //       }
+  //       if (i == starterIds.length - 1) return scores;
+  //     }
+  //   }
+  // };
 
   const getStarterAthleteData = async () => {
     // Create scores array for competitor 1 starter athletes
+    const c1Scores = competitor1StarterAthleteScores;
+    let score;
     competitor1StarterAthleteIds.forEach(async (id, index) => {
       // 2. Make a shallow copy of the item you want to mutate
       // const athlete = { ...athletes[id] };
-      if (id != 0) {
-        const score = await athleteContract
+      if (id != -1) {
+        score = await athleteContract
           .athleteToScores(id, currentWeekNum)
           .catch((error) => {
             console.log(
@@ -350,39 +444,79 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             );
             // score = null;
           });
-        // console.log("score for id#" + id + ": " + score);
-        setCompetitor1StarterAthleteScores(
-          (competitor1StarterAthleteScores) => [
-            ...competitor1StarterAthleteScores,
-            score,
-          ]
-        );
+        if (index == 4) {
+          // if (index == competitor1StarterAthleteIds.length - 1) {
+          console.log(
+            "index: " +
+              index +
+              ", length: " +
+              competitor1StarterAthleteIds.length
+          );
+          console.log("last element in loop, retunring val");
+          setCompetitor1StarterAthleteScores(c1Scores);
+          setHasFetchedScores(true);
+          return c1Scores;
+        }
       }
+      console.log("score for id#" + id + ": " + score);
+      if (score != -1) c1Scores[index] = score;
+      // setCompetitor1StarterAthleteScores(
+      //   (competitor1StarterAthleteScores) => [
+      //     ...competitor1StarterAthleteScores,
+      //     score,
+      //   ]
+      // );
+
+      // }
+      // if athlete is not set for position at index, just set score to 0
+      // else {
+      //   // setCompetitor1StarterAthleteScores(
+      //   //   (competitor1StarterAthleteScores) => [
+      //   //     ...competitor1StarterAthleteScores,
+      //   //     0,
+      //   //   ]
+      //   // );
+      //   // if (index == 4) {
+      //   //   // if (index == competitor1StarterAthleteIds.length - 1) {
+      //   //   console.log(
+      //   //     "index: " +
+      //   //       index +
+      //   //       ", length: " +
+      //   //       competitor1StarterAthleteIds.length
+      //   //   );
+      //   //   console.log("last element in loop, retunring val");
+      //   //   setCompetitor1StarterAthleteScores(c1Scores);
+      //   //   setHasFetchedScores(true);
+      //   //   return c1Scores;
+      //   // }
+      // }
+      // console.log("setting state scoreshere");
     });
+    // console.log("retunring : " + c1Scores);
     // return c1Scores;
 
-    // append score stats for competitor 2 starter athletes
-    competitor2StarterAthleteIds.forEach(async (id, index) => {
-      // 2. Make a shallow copy of the item you want to mutate
-      // const athlete = { ...athletes[id] };
-      if (id != 0) {
-        const score = await athleteContract
-          .athleteToScores(id, currentWeekNum)
-          .catch((error) => {
-            console.log(
-              "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
-            );
-            // score = null;
-          });
-        // console.log("score for id#" + id + ": " + score);
-        setCompetitor2StarterAthleteScores(
-          (competitor2StarterAthleteScores) => [
-            ...competitor2StarterAthleteScores,
-            score,
-          ]
-        );
-      }
-    });
+    //   // append score stats for competitor 2 starter athletes
+    //   // competitor2StarterAthleteIds.forEach(async (id, index) => {
+    //   //   // 2. Make a shallow copy of the item you want to mutate
+    //   //   // const athlete = { ...athletes[id] };
+    //   //   if (id != 0) {
+    //   //     const score = await athleteContract
+    //   //       .athleteToScores(id, currentWeekNum)
+    //   //       .catch((error) => {
+    //   //         console.log(
+    //   //           "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
+    //   //         );
+    //   //         // score = null;
+    //   //       });
+    //   //     // console.log("score for id#" + id + ": " + score);
+    //   //     setCompetitor2StarterAthleteScores(
+    //   //       (competitor2StarterAthleteScores) => [
+    //   //         ...competitor2StarterAthleteScores,
+    //   //         score,
+    //   //       ]
+    //   //     );
+    //   //   }
+    //   // });
   };
 
   const handleModalOpen = (athelete) => {
@@ -404,21 +538,28 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     // setIsConnected(true);
   };
 
-  const calculateMatchupScore = () => {
-    let team1Counter = 0;
-    let team2Counter = 0;
-    for (let i = 0; i < 5; i < 0) {
-      const starter1Score = competitor1StarterAthleteScores[i];
-      const starter2Score = competitor2StarterAthleteScores[i];
-      if (starter1Score > starter2Score) team1Counter++;
-      else if (starter2Score > starter1Score) team2Counter++;
-    }
-    setCompetitor1TeamScore(team1Counter);
-    setCompetitor2TeamScore(team2Counter);
-  };
+  // const calculateMatchupScore = () => {
+  //   let team1Counter = 0;
+  //   let team2Counter = 0;
+  //   for (let i = 0; i < 5; i < 0) {
+  //     const starter1Score = competitor1StarterAthleteScores[i];
+  //     const starter2Score = competitor2StarterAthleteScores[i];
+  //     if (starter1Score > starter2Score) team1Counter++;
+  //     else if (starter2Score > starter1Score) team2Counter++;
+  //   }
+  //   setCompetitor1TeamScore(team1Counter);
+  //   setCompetitor2TeamScore(team2Counter);
+  // };
 
   return (
     <>
+      {isError && (
+        <Typography>
+          {" "}
+          Oops! We encountered an error when loading you league stats. Please
+          cheeck your internet connections and try again.
+        </Typography>
+      )}
       {isLoading ? (
         <LoadingPrompt loading={"Your Matchup"} />
       ) : (
@@ -518,141 +659,149 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     </Box>
                   </Box>
                 </Box>
-                <Grid>
-                  {positions.map((position, index) => {
-                    // const athelete = atheleteData[key];
-                    // NOTE: if id == 0, that means the connectedAccount has not
-                    // set an athlete in that position for this week in their proxy
+                {hasFetchedScores ? (
+                  <Grid>
+                    {positions.map((position, index) => {
+                      // const athelete = atheleteData[key];
+                      // NOTE: if id == 0, that means the connectedAccount has not
+                      // set an athlete in that position for this week in their proxy
 
-                    // get athlete for competitor 1 at this position
-                    const competitor1StarterId =
-                      competitor1StarterAthleteIds[index];
-                    // if (competitor1StarterId != 0)
-                    //   console.log("c1 starterID: " + competitor1StarterId);
-                    const competitor1Athlete =
-                      competitor1OwnedAthletesMetadata[competitor1StarterId];
+                      // get athlete for competitor 1 at this position
+                      const competitor1StarterId =
+                        competitor1StarterAthleteIds[index];
+                      if (competitor1StarterId != 0)
+                        console.log(
+                          "c1 starter score: " + competitor1StarterAthleteScores
+                        );
+                      const competitor1Athlete =
+                        competitor1OwnedAthletesMetadata[competitor1StarterId];
 
-                    // get athlete for competitor 2 at this position
-                    const competitor2StarterId =
-                      competitor2StarterAthleteIds[index];
-                    const competitor2Athlete =
-                      competitor2OwnedAthletesMetadata[competitor2StarterId];
-                    // console.log(
-                    //   "id: " + id + " athlete: " + JSON.stringify(athlete, null, 2)
-                    // );
-                    return (
-                      <Grid
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          color: "white",
-                          borderTop: "2px solid #FFFFFF",
-                        }}
-                      >
-                        <Grid item xs={1} textAlign="center">
-                          <Image
-                            src={
-                              competitor1StarterId != 0
-                                ? competitor1Athlete.image
-                                : logo
-                            }
-                            alt="logo"
-                            width={50}
-                            height={50}
-                          />
-                        </Grid>
+                      // get athlete for competitor 2 at this position
+                      const competitor2StarterId =
+                        competitor2StarterAthleteIds[index];
+                      const competitor2Athlete =
+                        competitor2OwnedAthletesMetadata[competitor2StarterId];
+                      // console.log(
+                      //   "id: " + id + " athlete: " + JSON.stringify(athlete, null, 2)
+                      // );
+                      return (
                         <Grid
-                          item
-                          xs={2}
-                          textAlign="left"
-                          onClick={() => handleModalOpen(competitor1Athlete)}
-                          sx={{ cursor: "pointer" }}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            color: "white",
+                            borderTop: "2px solid #FFFFFF",
+                          }}
                         >
-                          <Typography fontSize={34}>
-                            {competitor1StarterId != 0
-                              ? competitor1Athlete.name
-                              : "(none)"}
-                          </Typography>
-                        </Grid>
-                        {/* <Grid item xs={1} textAlign="center">
+                          <Grid item xs={1} textAlign="center">
+                            <Image
+                              src={
+                                competitor1StarterId != 0
+                                  ? competitor1Athlete.image
+                                  : logo
+                              }
+                              alt="logo"
+                              width={50}
+                              height={50}
+                            />
+                          </Grid>
+                          <Grid
+                            item
+                            xs={2}
+                            textAlign="left"
+                            onClick={() => handleModalOpen(competitor1Athlete)}
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <Typography fontSize={34}>
+                              {competitor1StarterId != 0
+                                ? competitor1Athlete.name
+                                : "(none)"}
+                            </Typography>
+                          </Grid>
+                          {/* <Grid item xs={1} textAlign="center">
                           <Typography fontSize={30} fontWeight={700}>
                             {competitor1StarterId != 0 &&
                               competitor1Athlete.attributes[0].value}
                           </Typography>
                         </Grid> */}
-                        <Grid item xs={1} textAlign="center">
-                          <Typography>
-                            {competitor1StarterId != 0 && "Loss vs **backend**"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={1} textAlign="center">
-                          <Typography color="#D835D8" fontSize={48}>
-                            {competitor1StarterId != 0
-                              ? String(competitor1StarterAthleteScores[index])
-                              : "(0)"}{" "}
-                          </Typography>
-                        </Grid>
-                        {/* middle column */}
-                        <Grid item xs={2} textAlign="center">
-                          <Typography
-                            fontSize={42}
-                            sx={{
-                              borderLeft: "1px solid #FFFFFF",
-                              borderRight: "1px solid #FFFFFF",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {position}
-                          </Typography>
-                        </Grid>
-                        {/* opponents athlete stats */}
-                        <Grid item xs={1} textAlign="center">
-                          <Typography color="#D835D8" fontSize={48}>
-                            {competitor2StarterId != 0
-                              ? competitor2StarterAthleteScores[index]
-                              : "(0)"}{" "}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={1} textAlign="center">
-                          <Typography>
-                            {competitor2StarterId != 0 && "Loss vs **backend**"}
-                          </Typography>
-                        </Grid>
-                        {/* <Grid item xs={1} textAlign="center">
+                          <Grid item xs={1} textAlign="center">
+                            <Typography>
+                              {competitor1StarterId != 0 &&
+                                "Loss vs **backend**"}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={1} textAlign="center">
+                            <Typography color="#D835D8" fontSize={48}>
+                              {competitor1StarterId != 0
+                                ? String(competitor1StarterAthleteScores[index])
+                                : "(0)"}{" "}
+                            </Typography>
+                          </Grid>
+                          {/* middle column */}
+                          <Grid item xs={2} textAlign="center">
+                            <Typography
+                              fontSize={42}
+                              sx={{
+                                borderLeft: "1px solid #FFFFFF",
+                                borderRight: "1px solid #FFFFFF",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {position}
+                            </Typography>
+                          </Grid>
+                          {/* opponents athlete stats */}
+                          <Grid item xs={1} textAlign="center">
+                            <Typography color="#D835D8" fontSize={48}>
+                              {competitor2StarterId != 0
+                                ? competitor2StarterAthleteScores[index]
+                                : "(0)"}{" "}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={1} textAlign="center">
+                            <Typography>
+                              {competitor2StarterId != 0 &&
+                                "Loss vs **backend**"}
+                            </Typography>
+                          </Grid>
+                          {/* <Grid item xs={1} textAlign="center">
                           <Typography fontSize={30} fontWeight={700}>
                             {competitor2StarterId != 0 &&
                               competitor2Athlete.attributes[0].value}
                           </Typography>
                         </Grid> */}
-                        <Grid
-                          item
-                          xs={2}
-                          textAlign="right"
-                          onClick={() => handleModalOpen(competitor2Athlete)}
-                          sx={{ cursor: "pointer" }}
-                        >
-                          <Typography fontSize={34}>
-                            {competitor2StarterId != 0
-                              ? competitor2Athlete.name
-                              : "(none)"}
-                          </Typography>
+                          <Grid
+                            item
+                            xs={2}
+                            textAlign="right"
+                            onClick={() => handleModalOpen(competitor2Athlete)}
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <Typography fontSize={34}>
+                              {competitor2StarterId != 0
+                                ? competitor2Athlete.name
+                                : "(none)"}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={1} textAlign="center">
+                            <Image
+                              src={
+                                competitor2StarterId != 0
+                                  ? competitor2Athlete.image
+                                  : logo
+                              }
+                              alt="logo"
+                              width={50}
+                              height={50}
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item xs={1} textAlign="center">
-                          <Image
-                            src={
-                              competitor2StarterId != 0
-                                ? competitor2Athlete.image
-                                : logo
-                            }
-                            alt="logo"
-                            width={50}
-                            height={50}
-                          />
-                        </Grid>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
+                      );
+                    })}
+                  </Grid>
+                ) : (
+                  <Typography> fetching scores</Typography>
+                )}
               </Box>
               <PlayerStateModal
                 modalOpen={modalOpen}
