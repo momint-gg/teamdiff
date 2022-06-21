@@ -107,12 +107,15 @@ library MOBALogicLibrary {
         }
     }
 
+    // TODO: Delete all of the console logs
+    // NOTE: Current week num must start with 0
     function evaluateMatches(
         uint256 currentWeekNum,
         Athletes athletesContract,
         mapping(address => uint256[8]) storage userToRecord,
         mapping(address => uint256[5]) storage userLineup,
         mapping(address => uint256) storage userToPoints,
+        mapping(address => uint256[8]) storage userToWeekScore,
         mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
     ) public {
         for (uint256 i; i < schedule[currentWeekNum].length; i++) {
@@ -129,37 +132,29 @@ library MOBALogicLibrary {
             }
             // If not a bye week
             else {
-                console.log("evaluateMatches() called in MOBALogicLibrary");
                 uint256 addr1Score;
                 uint256 addr2Score;
                 uint256[5] memory lineup1 = userLineup[addr1];
                 uint256[5] memory lineup2 = userLineup[addr2];
-                // Calculating users' total scores
+
+                // Calculating users' total scores for their lineups
                 for (uint256 j; j < lineup1.length; j++) {
-                    // Calling the Athletes.sol contract to get the scores of ith athlete
-                    uint256[8] memory currAthleteScores1 = athletesContract
-                        .getAthleteScores(lineup1[j]);
-                    uint256[8] memory currAthleteScores2 = athletesContract
-                        .getAthleteScores(lineup2[j]);
-                    // Getting the last score in the array
-                    uint256 latestScore1 = currAthleteScores1[
-                        currAthleteScores1.length - 1
-                    ];
-                    uint256 latestScore2 = currAthleteScores2[
-                        currAthleteScores2.length - 1
-                    ];
+                    // Calling the Athletes.sol contract to get the scores of ith athlete and current week
+                    uint256 latestScore1 = athletesContract
+                        .getSpecificAthleteScore(lineup1[j], currentWeekNum);
+                    uint256 latestScore2 = athletesContract
+                        .getSpecificAthleteScore(lineup2[j], currentWeekNum);
+
                     // Calculating scores for users
                     if (latestScore1 > latestScore2) {
                         addr1Score += 1;
                     } else if (latestScore2 > latestScore1) {
                         addr2Score += 1;
                     }
-                    console.log(addr1Score, " ", addr2Score);
                 }
-                // Updating mappings
-                // uint256 addr1Points = userToPoints[addr1];
-                // uint256 addr2Points = userToPoints[addr2];
 
+                // Updating mappings
+                // TODO: Add updating state for user to week score mapping?
                 if (addr1Score > addr2Score) {
                     userToRecord[addr1][currentWeekNum] = 1;
                     userToRecord[addr2][currentWeekNum] = 0;
@@ -180,6 +175,17 @@ library MOBALogicLibrary {
                 }
             }
         }
+    }
+
+    // Moved to outside evaluate match function bc stack too deep
+    // First uint returned is lineup1, second uint returned is lineup2
+    function getSpecificAthleteScore(
+        uint256 index1,
+        uint256 index2,
+        Athletes athletesContract,
+        uint256 weekNum
+    ) internal returns (uint256, uint256) {
+        return (0, 0);
     }
 
     // State isn't updating in LOL logic...

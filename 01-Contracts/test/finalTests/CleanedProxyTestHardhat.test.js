@@ -414,9 +414,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     for (let i = 0; i < 50; i++) {
       const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
       let txn = await AthletesContractInstance.connect(owner).appendStats(
-        i,
-        randomNum,
-        0
+        i, // Index of athlete
+        randomNum, // Random score
+        0 // Week num 0
       );
       await txn.wait();
     }
@@ -456,8 +456,28 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     console.log("[Owner: ", ownerPoints, "], [Addr1: ", addr1Points, "]");
   });
 
+  // Making sure the new function works, also necessary so we can have a series of matches
+  it("Sets athletes lineups successfully with the new function (it's setAthleteInLineup() now)", async () => {
+    console.log("Setting lineups...");
+    for (let i = 0; i < ownerAthletes.length; i++) {
+      let txn = await proxyContract.connect(owner).setAthleteInLineup(
+        ownerAthletes[i], // Athlete ID
+        Math.floor(ownerAthletes[i] / 10) // Athlete position
+      );
+      await txn.wait();
+      txn = await proxyContract
+        .connect(addr1)
+        .setAthleteInLineup(
+          addr1Athletes[i],
+          Math.floor(addr1Athletes[i] / 10)
+        );
+      await txn.wait();
+    }
+  });
+
   // The big kahuna
   // Function in MOBALogic isn't working...
+  // TOOD: Current state -- stats are getting pushed to the athletes contract, but they are not getting retrieved in MOBALogicLibrary
   it("Evaluates matches with evaluateMatches() (new function)", async () => {
     console.log("Evaluating matches now...");
     // All possible scenarios for a match
@@ -473,6 +493,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       txn = await currLeague.evaluateMatches();
     }
 
+    // Checking record after matches are evaluated
     const ownerRecord = await proxyContract.connect(owner).getUserRecord();
     const addr1Record = await proxyContract.connect(addr1).getUserRecord();
     const ownerPoints = await proxyContract
