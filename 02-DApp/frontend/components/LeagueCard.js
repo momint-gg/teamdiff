@@ -174,14 +174,8 @@ export default function LeagueCard({ leagueAddress }) {
     </Fragment>
   );
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    const href = "/leagues/" + leagueAddress;
-    router.push(href);
-  };
-
   return (
-    <Card variant="outlined" onClick={() => console.log('clicked')}
+    <Card variant="outlined" 
     sx={{
       background: "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
       borderRadius: "10%",
