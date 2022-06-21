@@ -12,15 +12,6 @@ import logo from "../assets/images/logoIcon.png";
 
 export default function LeagueCard({ leagueAddress }) {
 
-  const getMatchupsUpToWeek = async (number, leagueProxyContractInput) => {
-    const res = []
-    for (let i = 0; i <= number; i++) {
-      const schedule = await leagueProxyContractInput.getScheduleForWeek(i) // week number 0-index
-      res.push(schedule)
-    }
-    return res
-  }
-
   // Router
   const router = useRouter();
 
@@ -47,7 +38,7 @@ export default function LeagueCard({ leagueAddress }) {
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         const weekNum = await LeagueProxyContract.currentWeekNum();
-        const matchupsRes = await getMatchupsUpToWeek(weekNum)
+        const matchupsRes = await LeagueProxyContract.getScheduleForWeek(weekNum)
         setWeekNum(parseInt(weekNum)+1);
         setLeagueName(leagueName);
         setMatchups(matchupsRes)
