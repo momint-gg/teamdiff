@@ -151,14 +151,21 @@ export default function LeagueCard({ leagueAddress }) {
               justifyContent:"space-evenly",
               marginBottom:"-6%",
               }}>
-                  
-            <Typography fontSize={18} fontWeight={"bold"} color="secondary">
-            MY TEAM
-          </Typography>
+            <Link 
+              href={"/myTeam?leagueRoute="+leagueAddress}
+            >
+              <Typography fontSize={18} fontWeight={"bold"} color="secondary">
+                MY TEAM
+              </Typography>
+            </Link>
             {/* <Divider orientation="vertical" variant="middle" flexItem /> */}
-          <Typography fontSize={18} fontWeight={"bold"} variant="body1" color="secondary">
-            VIEW LEAGUE
-          </Typography>          
+            <Link 
+              href={"/leagues/"+leagueAddress}
+            >
+              <Typography fontSize={18} fontWeight={"bold"} variant="body1" color="secondary">
+                VIEW LEAGUE
+              </Typography>      
+            </Link>    
         </Box>
           </Box>
           
