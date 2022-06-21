@@ -9,7 +9,18 @@ import { Fragment, useEffect, useState } from "react";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import logo from "../assets/images/logoIcon.png";
 
+
 export default function LeagueCard({ leagueAddress }) {
+
+  const getMatchupsUpToWeek = async (number, leagueProxyContractInput) => {
+    const res = []
+    for (let i = 0; i <= number; i++) {
+      const schedule = await leagueProxyContractInput.getScheduleForWeek(i) // week number 0-index
+      res.push(schedule)
+    }
+    return res
+  }
+
   // Router
   const router = useRouter();
 
@@ -22,6 +33,7 @@ export default function LeagueCard({ leagueAddress }) {
   const [leagueName, setLeagueName] = useState(null);
   const [weekNum, setWeekNum] = useState(null);
   const [leagueSize, setLeagueSize] = useState(1);
+  const [matchups, setMatchups] = useState([])
 
   useEffect(() => {
     if (leagueAddress) {
@@ -34,9 +46,11 @@ export default function LeagueCard({ leagueAddress }) {
       setLeagueProxyContract(LeagueProxyContract);
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
-        setLeagueName(leagueName);
         const weekNum = await LeagueProxyContract.currentWeekNum();
+        const matchupsRes = await getMatchupsUpToWeek(weekNum)
         setWeekNum(parseInt(weekNum)+1);
+        setLeagueName(leagueName);
+        setMatchups(matchupsRes)
         let i = 0;
         let error = "none";
 
