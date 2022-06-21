@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, Paper, Typography, Divider } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Paper, Typography, Divider, Link } from "@mui/material";
 import { border } from "@mui/system";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -181,7 +181,7 @@ export default function LeagueCard({ leagueAddress }) {
   };
 
   return (
-    <Card variant="outlined" onClick={handleClick}
+    <Card variant="outlined" onClick={() => console.log('clicked')}
     sx={{
       background: "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
       borderRadius: "10%",
