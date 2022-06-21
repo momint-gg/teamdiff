@@ -1,8 +1,11 @@
 import { Container, TableContainer, Table, TableHead, TableRow, TableCell, Typography, Paper, TableBody } from '@mui/material'
 import { useState } from 'react'
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from 'react-icons/ai'
 
 const ViewLeagueTeamMatchup = ({ weekNumber, weeklyMatchups }) => {
     const [week, setWeek] = useState(weekNumber)
+
+    const totalNumWeeks = Object.keys(weeklyMatchups).length
 
     return (
         <Container
@@ -28,9 +31,30 @@ const ViewLeagueTeamMatchup = ({ weekNumber, weeklyMatchups }) => {
                 <TableHead>
                     <TableRow sx={{ background: "#473D3D" }}>
                         <TableCell align="center" colSpan={2}>
-                            <Typography fontSize={30}>
-                                Week {week} 
-                            </Typography>
+                            <Container sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "10px"
+                            }} >
+
+                                {week > 1 && (
+                                    <AiOutlineArrowLeft size={"1.5rem"} 
+                                        onClick={() => setWeek((prevWeek) => prevWeek - 1)}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                )}
+                                <Typography fontSize={30}>
+                                    Week {week} 
+                                </Typography>
+                                {week < totalNumWeeks && (
+                                    <AiOutlineArrowRight size={"1.5rem"} 
+                                        onClick={() => setWeek((prevWeek) => prevWeek + 1)}
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                )}
+                            </Container>
                         </TableCell>
                     </TableRow>
                 </TableHead>
