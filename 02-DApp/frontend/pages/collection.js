@@ -156,7 +156,7 @@ export default function Collection() {
             // setNFTData([]);
             setLoadingError(true);
             setIsPreparingAthletes(false);
-            console.log("get nfts error: ");
+            console.log("get nfts error");
           });
 
         setNFTResp(nfts);
@@ -251,7 +251,7 @@ export default function Collection() {
     const arr = [];
     for (const athlete of athleteNFTs) {
       const attributesRaw = athlete.metadata.attributes;
-      console.log(attributesRaw, "***");
+      // console.log(attributesRaw, "***");
       for (const a of attributesRaw) {
         if (a.trait_type.toLowerCase() === "team") {
           arr.push(a.value);
@@ -259,14 +259,13 @@ export default function Collection() {
       }
     }
     // const allTeams = athleteNFTs.map((athlete) => athlete.metadata.team)
-    console.log(arr, "lll");
+    // console.log(arr, "lll");
     return [...new Set(arr)];
   };
 
   useEffect(() => {
     if (!isPreparingAthletes) {
       setAllTeamFilterOptions(getTeamFilterOptions());
-      console.log("useeffect");
       setTimeout(() => {
         console.log(allTeamFilterOptions);
       }, 1000);
@@ -297,7 +296,7 @@ export default function Collection() {
       query: searchQuery,
       position: teamPositionSelection,
     });
-    console.log(filteredResults, "filtered");
+    // console.log(filteredResults, "filtered");
     setAthleteNFTsWrapper(filteredResults);
   }, [teamFilterSelection, searchQuery, teamPositionSelection]);
 

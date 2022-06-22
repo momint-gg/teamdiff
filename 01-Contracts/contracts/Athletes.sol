@@ -23,10 +23,11 @@ contract Athletes is Ownable {
         uint256 kills;
     }
 
-    function appendStats(uint256 athleteId, uint256 weeklyScore, uint256 weekNum)
-        public
-        onlyOwner
-    {
+    function appendStats(
+        uint256 athleteId,
+        uint256 weeklyScore,
+        uint256 weekNum
+    ) public onlyOwner {
         if (athleteToScores[athleteId].length == 0) {
             numAthletes++;
         }
@@ -50,7 +51,15 @@ contract Athletes is Ownable {
         return athletes;
     }
 
-    // Function for the other contract to call, getting a specific athlete's scores
+    // Function for the other contract to call, getting a specific athlete's scores (changed to single score returned)
+    function getSpecificAthleteScore(uint256 index, uint256 week)
+        public
+        view
+        returns (uint256)
+    {
+        return athleteToScores[index][week];
+    }
+
     function getAthleteScores(uint256 index)
         public
         view

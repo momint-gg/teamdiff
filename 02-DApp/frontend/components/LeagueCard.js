@@ -1,12 +1,14 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Paper, Typography, Divider } from "@mui/material";
+import { border } from "@mui/system";
 // Web3 Imports
 import { ethers } from "ethers";
+import Image from "next/image";
 // Router
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import logo from "../assets/images/logoIcon.png";
 
-// export default function LeagueCard({ leagueAddress, setMountedLeagueAddress, setLeague, setLeagueOpen }) {
 export default function LeagueCard({ leagueAddress }) {
   // Router
   const router = useRouter();
@@ -18,10 +20,10 @@ export default function LeagueCard({ leagueAddress }) {
   );
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
+  const [weekNum, setWeekNum] = useState(null);
   const [leagueSize, setLeagueSize] = useState(1);
 
   useEffect(() => {
-    // console.log("leagueADdy: " + leagueAddress)
     if (leagueAddress) {
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -29,11 +31,12 @@ export default function LeagueCard({ leagueAddress }) {
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
-      // console.log("in useEFfect");
       setLeagueProxyContract(LeagueProxyContract);
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
+        const weekNum = await LeagueProxyContract.currentWeekNum();
+        setWeekNum(parseInt(weekNum)+1);
         let i = 0;
         let error = "none";
 
@@ -44,8 +47,6 @@ export default function LeagueCard({ leagueAddress }) {
             i
           ).catch((_error) => {
             error = _error;
-            // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-            // console.log("User To League Map Error: " + _error.message);
           });
 
           if (error == "none") {
@@ -62,26 +63,100 @@ export default function LeagueCard({ leagueAddress }) {
 
   const card = (
     <Fragment>
-      <CardContent>
-        {/* <Avatar
-          alt="League Image"
-          src={leagueData?.image?.examplePic.src}
-          sx={{ bgcolor: "white", position: "absolute" }}
-        /> */}
-        <Box sx={{ marginLeft: 2 }}>
-          <Typography variant="h5" color="secondary" component="div">
-            {leagueName || "(Untitled)"}
-          </Typography>
+      <CardHeader sx={{
+        background:"#343434 !important",
+        paddingLeft:"10%",
+        height:"3rem",
+        borderBottom:"solid white 0.01rem",
+        minWidth:"20rem"
+        }}
+        title={leagueName? leagueName + " // WEEK " + weekNum : "(Untitled)" + " // WEEK " + weekNum}
+        >
 
-          <Typography variant="body1" color="inherit">
-            {leagueAddress}
+      </CardHeader>
+      <CardContent>
+        <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}>
+          <Box component="div" sx={{
+            wordWrap: 'break-word',
+          }}>
+          <Box 
+          sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between"
+          }}>
+          <Typography fontSize={20} fontWeight={"bold"} variant="body1" color="inherit">
+            Willhunter.eth
           </Typography>
-          <Typography variant="body1" color="inherit">
-            {leagueSize + " /8"}
+          <Box sx={{display:"flex"}}>
+          <Typography fontSize={20} fontWeight={"bold"} variant="body1" color="inherit">
+            3
           </Typography>
-          {/* <Typography variant="body1" color="inherit">
-            Your current standing: {leagueData?.standing}
-          </Typography> */}
+          <Image
+            src={logo}
+            alt="logo"
+            width="30px"
+            height="30px"
+        />
+        </Box>
+          </Box>
+          <Typography fontSize={14} 
+            fontStyle={"italic"} 
+            variant="body1" 
+            color="inherit">
+            {"Record: 0 - 1 - 1"}
+          </Typography>
+          <Box 
+          sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+          }}>
+          <Typography noWrap maxWidth="10rem" fontSize={20} fontWeight={"bold"} variant="body1" color="inherit">
+            reggiecailonglong.eth
+          </Typography>
+          <Box sx={{display:"flex"}}>
+          <Typography fontSize={20} fontWeight={"bold"} variant="body1" color="inherit">
+            2
+          </Typography>
+          <Image
+            src={logo}
+            alt="logo"
+            width="30px"
+            height="30px"
+        />
+        </Box>
+          </Box>
+          <Typography fontSize={14} 
+            fontStyle={"italic"} 
+            variant="body1" 
+            color="inherit">
+            {"Record: 1 - 0 - 1"}
+          </Typography>
+          <Divider sx={{marginTop:5, marginBottom:"-6%"}} variant="middle" color="white" />
+          <Box 
+          sx={{
+              display:"flex",
+              marginTop:3,
+              width:"100%",
+              justifyContent:"space-evenly",
+              marginBottom:"-6%",
+              }}>
+                  
+            <Typography fontSize={18} fontWeight={"bold"} color="secondary">
+            MY TEAM
+          </Typography>
+            {/* <Divider orientation="vertical" variant="middle" flexItem /> */}
+          <Typography fontSize={18} fontWeight={"bold"} variant="body1" color="secondary">
+            VIEW LEAGUE
+          </Typography>          
+        </Box>
+          </Box>
+          
         </Box>
       </CardContent>
     </Fragment>
@@ -94,7 +169,11 @@ export default function LeagueCard({ leagueAddress }) {
   };
 
   return (
-    <Card variant="outlined" onClick={handleClick}>
+    <Card variant="outlined" onClick={handleClick}
+    sx={{
+      background: "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
+      borderRadius: "10%",
+      }}>
       {/* <Link href= {"/leagues/" + leagueAddress}> */}
       {card}
       {/* </Link> */}

@@ -22,7 +22,6 @@ import { useMediaQuery } from "react-responsive";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import Sample from "../../backend/sample.json";
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerSelectModal from "../components/PlayerSelectModal";
@@ -385,7 +384,9 @@ export default function MyTeam() {
                   // NOTE: if id == 0, that means the connectedAccount has not
                   // set an athlete in that position for this week in their proxy
                   const athlete = ownedAthletesMetadata[id];
-
+                  console.log(
+                    "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
+                  );
                   return (
                     <TableRow
                       key={index.toString()}
@@ -418,10 +419,10 @@ export default function MyTeam() {
                             fontSize={30}
                             onClick={() => handleStateModal(athlete, index)}
                           >
-                            {id != 0 ? athlete.name : "(none)"}
+                            {id != 0 ? athlete?.name : "(none)"}
                           </Typography>
                           <Typography component="div">
-                            {id != 0 && athlete.score}
+                            {id != 0 && athlete?.score}
                           </Typography>
                         </div>
                       </TableCell>
@@ -430,7 +431,7 @@ export default function MyTeam() {
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
                             {id != 0 && currentWeekNum != 0
-                              ? athlete.prevPoints
+                              ? athlete?.prevPoints
                               : "(0)"}
                           </Typography>
                           {/* <Typography>
@@ -477,9 +478,14 @@ export default function MyTeam() {
           {!isLoading && (
             <>
               <PlayerStateModal
-                position={currentPositionIndex}
+                // position={currentPositionIndex}
                 modalOpen={stateModalOpen}
-                stateData={Sample.statsData}
+                // playerName={selectedPlayer.name}
+                playerName={
+                  starterAthleteIds[currentPositionIndex] != 0
+                    ? selectedPlayer?.name
+                    : "(none)"
+                }
                 handleModalClose={handleStateModalClose}
               />
               <PlayerSelectModal
