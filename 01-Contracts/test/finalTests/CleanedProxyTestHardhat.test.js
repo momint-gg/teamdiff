@@ -317,7 +317,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       0, // Stake amount
       true, // Is public
       owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
-      testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
+      testUsdcContract.address, // USDC address -- when deploying to mainnet we will pass in MATIC instead
       AthletesContractInstance.address, // Address of our athletes storage contract
       GameItemInstance.address, // GameItems contract address
       [] //Whitelisted users

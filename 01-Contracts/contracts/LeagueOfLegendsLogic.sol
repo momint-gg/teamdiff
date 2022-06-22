@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Athletes.sol";
 import "./Whitelist.sol";
@@ -13,6 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./TestUSDC.sol";
 
+// TODO: Change all TestUSDC to maticUSDC when deploying to mainnet
 contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     using SafeMath for uint256;
 
@@ -24,8 +24,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
     bool public lineupIsLocked;
+    bool public isPublic;
 
-    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[8]) public userToRecord; // User to their record
     mapping(address => uint256[5]) public userToLineup; // User to their lineup
     mapping(address => uint256[8]) public userToWeekScore; // User to their team's score each week
@@ -53,8 +53,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 public testUSDC;
-    IERC20 public rinkebyUSDC;
+    IERC20 public testUSDC; //TODO Delete this
+    IERC20 public erc20;
     GameItems gameItemsContract;
 
     //**************/
@@ -67,7 +67,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //*****************/
     //*** Modifiers ***/
     /******************/
-
     // Only the admin (whoever created the league) can call
     modifier onlyAdmin() {
         require(msg.sender == admin, "Caller is not the admin");
@@ -87,9 +86,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         bool _isPublic,
         address athletesDataStorageAddress,
         address _admin,
-        // address _polygonUSDCAddress, // This doesn't need to be a parameter passed in
-        address _rinkebyUSDCAddress,
-        address _testUSDCAddress,
+        address _ierc20Address,
         address _gameItemsContractAddress,
         address _teamDiffAddress,
         address _leagueMakerContractAddress
@@ -98,14 +95,13 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         numWeeks = 8;
         admin = _admin;
         stakeAmount = _stakeAmount;
-        // isPublic = _isPublic;
+        isPublic = _isPublic;
         leagueEntryIsClosed = false;
         lineupIsLocked = false;
         athletesContract = Athletes(athletesDataStorageAddress);
         leagueMakerContract = LeagueMaker(_leagueMakerContractAddress);
         whitelistContract = new Whitelist(_isPublic); // Initializing our whitelist
-        rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
-        testUSDC = IERC20(_testUSDCAddress);
+        erc20 = IERC20(_ierc20Address);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
         // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
@@ -113,7 +109,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     /*************************************************/
-    /************ TEAM DIFF ONLY FUNCTIONS ******userToLeagueuserToLeague*****/
+    /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
     function setLeagueSchedule() external onlyTeamDiff {
@@ -150,7 +146,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             schedule
         );
 
-        // League is over (8 weeks)
+        // League is over
         if (currentWeekNum == numWeeks - 1) {
             onLeagueEnd();
             return;
@@ -163,12 +159,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /******************************************************/
     // Returning the contracts USDC balance
     function getContractUSDCBalance() external view returns (uint256) {
-        return testUSDC.balanceOf(address(this));
+        return erc20.balanceOf(address(this));
     }
 
     function onLeagueEnd() public onlyTeamDiff {
-        console.log("IN ON LEAGUE END");
-        uint256 contractBalance = testUSDC.balanceOf(address(this)); //TODO: Change to real USDC
+        uint256 contractBalance = erc20.balanceOf(address(this)); //TODO: Change to real USDC
 
         console.log("CALCULATING LEAGUE WINNERS");
         // Calculating the winner(s) of the league
@@ -185,20 +180,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         emit leagueEnded(leagueWinners, prizePerWinner);
 
         for (uint256 i; i < leagueWinners.length; i++) {
-            // Approval first, then transfer with the below
-            // rinkebyUSDC.approve(address(this), prizePerWinner); //TODO: Change back to rinkeby/matic USDC later
-            // rinkebyUSDC.transferFrom(
-            //     address(this),
-            //     leagueWinners[i],
-            //     prizePerWinner
-            // );
-            console.log("Approving spend in LOLLOGIC");
-            testUSDC.approve(address(this), prizePerWinner);
-            testUSDC.transferFrom(
-                address(this),
-                leagueWinners[i],
-                prizePerWinner
-            );
+            erc20.approve(address(this), prizePerWinner);
+            erc20.transferFrom(address(this), leagueWinners[i], prizePerWinner);
         }
     }
 
@@ -225,13 +208,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         // }
 
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
-        // for (uint256 i; i < athleteIds.length; i++) {
-        require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
+        require(
             athleteId >= (position * 10) &&
                 athleteId <= ((position + 1) * 10 - 1),
             "You are setting an athlete in the wrong position!"
         );
-        // }
 
         userToLineup[msg.sender][position] = athleteId;
         //TODO add event
@@ -249,18 +230,16 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         require(!inLeague[msg.sender], "You have already joined this league");
         if (!whitelistContract.isPublic()) {
             require(
-                testUSDC.balanceOf(msg.sender) > stakeAmount, // TODO: Delete TestUSDC and RinkebyUSDC for MATIC USDC
+                erc20.balanceOf(msg.sender) > stakeAmount,
                 "Insufficent funds for staking"
             );
         }
 
-        //Update mapping for user to league
         leagueMakerContract.updateUserToLeagueMapping(msg.sender);
-
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-        testUSDC.transferFrom(msg.sender, address(this), stakeAmount); // Prompt approval prior to this! //TODO:  Delete TestUSDC and RinkebyUSDC for MATIC USDC
-        // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount); // Prompt approval prior to this! //TODO:  Delete TestUSDC and RinkebyUSDC for MATIC USDC
+        erc20.transferFrom(msg.sender, address(this), stakeAmount);
+
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 
