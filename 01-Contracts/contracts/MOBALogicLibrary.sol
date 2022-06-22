@@ -20,7 +20,7 @@ library MOBALogicLibrary {
             leagueMembers.length > 0,
             "You don't have enough members in this league to set a schedule."
         );
-        console.log("setting schedule in library");
+
         uint256 randomShifter = (
             (uint256(
                 keccak256(
@@ -33,10 +33,9 @@ library MOBALogicLibrary {
                 )
             ) + leagueMembers.length * leagueMembers.length)
         );
-        //console.log(randomShifter);
-        //mapping(uint256 => uint256[2][]) storage schedule;
-        //create two arrays of indices that represent indices in leagueMembers
-        //essentially splitting the league into two halves, to assign matchups
+
+        // Create two arrays of indices that represent indices in leagueMembers
+        // Essentially splitting the league into two halves, to assign matchups
         uint256[4] memory leftHalf;
         uint256[4] memory rightHalf;
         for (uint256 week = 0; week < numWeeks; week++) {
@@ -107,8 +106,6 @@ library MOBALogicLibrary {
         }
     }
 
-    // TODO: Delete all of the console logs
-    // NOTE: Current week num must start with 0
     function evaluateMatches(
         uint256 currentWeekNum,
         Athletes athletesContract,

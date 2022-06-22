@@ -53,7 +53,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 public testUSDC; //TODO Delete this
     IERC20 public erc20;
     GameItems gameItemsContract;
 
@@ -163,7 +162,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     function onLeagueEnd() public onlyTeamDiff {
-        uint256 contractBalance = erc20.balanceOf(address(this)); //TODO: Change to real USDC
+        uint256 contractBalance = erc20.balanceOf(address(this));
 
         console.log("CALCULATING LEAGUE WINNERS");
         // Calculating the winner(s) of the league
@@ -228,12 +227,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
-        if (!whitelistContract.isPublic()) {
-            require(
-                erc20.balanceOf(msg.sender) > stakeAmount,
-                "Insufficent funds for staking"
-            );
-        }
+        require(
+            erc20.balanceOf(msg.sender) > stakeAmount ||
+                whitelistContract.isPublic(),
+            "Insufficent funds for staking"
+        );
 
         leagueMakerContract.updateUserToLeagueMapping(msg.sender);
         inLeague[msg.sender] = true;
@@ -308,10 +306,10 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // Add user to whitelist
     function addUserToWhitelist(address _userToAdd) public onlyAdmin {
-        // require(
-        //     !leagueEntryIsClosed,
-        //     "Nobody can enter/exit the league anymore. The season has started!"
-        // );
+        require(
+            !leagueEntryIsClosed,
+            "Nobody can enter/exit the league anymore. The season has started!"
+        );
         whitelistContract.addAddressToWhitelist(_userToAdd);
 
         //TODO this mapp contain users to league and whitelisted leagues
