@@ -76,26 +76,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [competitor1TeamScore, setCompetitor1TeamScore] = useState(0);
   const [competitor2TeamScore, setCompetitor2TeamScore] = useState(0);
   const [isError, setIsError] = useState(false);
-  const [hasFetchedScores, setHasFetchedScores] = useState(false);
+  const [hasFetchedComp1Scores, setHasFetchedComp1Scores] = useState(false);
+  const [hasFetchedComp2Scores, setHasFetchedComp2Scores] = useState(false);
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
   let shifter = 0;
-  const getLeagueSizeHelper = async (LeagueProxyContract) => {
-    let i = 0;
-    let error = "none";
-    do {
-      await LeagueProxyContract.leagueMembers(i).catch((_error) => {
-        error = _error;
-        // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-        // console.log("User To League Map Error: " + _error.message);
-      });
-
-      if (error == "none") {
-        i++;
-      }
-      // console.log("error value at end:" + error);
-    } while (error == "none");
-    return i;
-  };
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -132,7 +116,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     if (isConnected && router.isReady) {
       // // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
-      setHasFetchedScores(false);
+      setHasFetchedComp1Scores(false);
+      setHasFetchedComp2Scores(false);
+      // setHasFetchedComp1Scores(false);
 
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -393,15 +379,29 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       // let scores;
       const fetchData = async () => {
         await getStarterAthleteData();
-        // console.log("setting state scores to " + scores);
-        // setCompetitor1StarterAthleteScores(scores);
-        // await calculateMatchupScore();
       };
       fetchData();
-      // setHasFetchedScores(true);
     }
   }, [isLoading]);
   // }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
+
+  const getLeagueSizeHelper = async (LeagueProxyContract) => {
+    let i = 0;
+    let error = "none";
+    do {
+      await LeagueProxyContract.leagueMembers(i).catch((_error) => {
+        error = _error;
+        // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+        // console.log("User To League Map Error: " + _error.message);
+      });
+
+      if (error == "none") {
+        i++;
+      }
+      // console.log("error value at end:" + error);
+    } while (error == "none");
+    return i;
+  };
 
   const getStarterAthleteData = async () => {
     // Create scores array for competitor 1 starter athletes
@@ -426,7 +426,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         // );
         // console.log("last element in loop, retunring val");
         setCompetitor1StarterAthleteScores(c1Scores);
-        // setHasFetchedScores(true);
+        setHasFetchedComp1Scores(true);
         // return c1Scores;
       }
       // }
@@ -457,7 +457,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         // );
         // console.log("last element in loop, retunring val");
         setCompetitor2StarterAthleteScores(c2Scores);
-        setHasFetchedScores(true);
+        // Todo, break this into two state hooks, one for compettiro 1 and one for the other
+        setHasFetchedComp2Scores(true);
         // return c2Scores;
       }
       // }
@@ -607,7 +608,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     </Box>
                   </Box>
                 </Box>
-                {hasFetchedScores ? (
+                {hasFetchedComp1Scores && hasFetchedComp2Scores ? (
                   <Grid>
                     {positions.map((position, index) => {
                       // const athelete = atheleteData[key];
@@ -645,7 +646,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                             <Image
                               src={
                                 competitor1StarterId != 0
-                                  ? competitor1Athlete.image
+                                  ? competitor1Athlete?.image
                                   : logo
                               }
                               alt="logo"
@@ -662,14 +663,14 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           >
                             <Typography fontSize={34}>
                               {competitor1StarterId != 0
-                                ? competitor1Athlete.name
+                                ? competitor1Athlete?.name
                                 : "(none)"}
                             </Typography>
                           </Grid>
                           {/* <Grid item xs={1} textAlign="center">
                           <Typography fontSize={30} fontWeight={700}>
                             {competitor1StarterId != 0 &&
-                              competitor1Athlete.attributes[0].value}
+                              competitor1Athlete?.attributes[0].value}
                           </Typography>
                         </Grid> */}
                           <Grid item xs={1} textAlign="center">
@@ -715,7 +716,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           {/* <Grid item xs={1} textAlign="center">
                           <Typography fontSize={30} fontWeight={700}>
                             {competitor2StarterId != 0 &&
-                              competitor2Athlete.attributes[0].value}
+                              competitor2Athlete?.attributes[0].value}
                           </Typography>
                         </Grid> */}
                           <Grid
@@ -727,7 +728,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           >
                             <Typography fontSize={34}>
                               {competitor2StarterId != 0
-                                ? competitor2Athlete.name
+                                ? competitor2Athlete?.name
                                 : "(none)"}
                             </Typography>
                           </Grid>
@@ -735,7 +736,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                             <Image
                               src={
                                 competitor2StarterId != 0
-                                  ? competitor2Athlete.image
+                                  ? competitor2Athlete?.image
                                   : logo
                               }
                               alt="logo"

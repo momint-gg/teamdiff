@@ -7,6 +7,9 @@ import React, { useEffect, useState } from "react";
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import LoadingPrompt from "../../components/LoadingPrompt.js";
+import ViewLeagueTeamMatchup from "../../components/ViewLeagueTeamMatchups.js";
+import ViewLeagueTeamsTable from "../../components/ViewLeagueTeamsTable.js";
 import Matchups from "../matchups";
 import MyTeam from "../myTeam";
 
@@ -20,6 +23,11 @@ export default function LeaguePlayRouter() {
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [signer, setSigner] = useState(null);
   const [athleteContract, setAthleteContract] = useState();
+  const [selectedWeekMatchups, setSelectedWeekMatchups] = useState();
+  const [currentWeekNum, setCurrentWeekNum] = useState();
+  const [leagueName, setLeagueName] = useState(null);
+  const [isError, setIsError] = useState(false);
+  const [leagueMemberRecords, setLeagueMemberRecords] = useState([]);
 
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
@@ -50,7 +58,7 @@ export default function LeaguePlayRouter() {
       } else {
         setIsConnected(false);
       }
-      setIsLoading(false);
+      // setIsLoading(false);
     };
     setAccountData();
     provider.provider.on("accountsChanged", (accounts) => {
@@ -63,20 +71,19 @@ export default function LeaguePlayRouter() {
   }, [isConnected]);
 
   useEffect(() => {
+    // setAthleteNFTs([]);
     if (isConnected && router.isReady) {
       // // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
+      // setHasFetchedScores(false);
+
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
         router.query.leagueRoute[0],
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
-      // const LeagueProxyContract = new ethers.Contract(
-      //   router.query.leagueAddress,
-      //   LeagueOfLegendsLogicJSON.abi,
-      //   provider
-      // );
+
       setLeagueProxyContract(LeagueProxyContract);
 
       // Initialize connections to Athlete datastore contract
@@ -86,9 +93,137 @@ export default function LeaguePlayRouter() {
         provider
       );
       setAthleteContract(AthleteContract);
-      setIsLoading(false);
+
+      let weekMatchups = [];
+      async function fetchData() {
+        setIsLoading(true);
+
+        const leagueName = await LeagueProxyContract.leagueName().catch((e) => {
+          console.error(e);
+          setIsLoading(false);
+          setIsError(true);
+        });
+        setLeagueName(leagueName);
+
+        // Get a [3] that represents wins, losses, ties, in that order for each league member
+
+        // const isInLeague = await LeagueProxyContract.inLeague(
+        //   connectedAccount
+        // ).catch((e) => {
+        //   console.error(e);
+        //   setIsLoading(false);
+        //   setIsError(true);
+        // });
+        // setIsLeagueMember(isInLeague);
+
+        const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
+          (e) => {
+            console.error(e);
+            setIsLoading(false);
+            setIsError(true);
+          }
+        );
+        setCurrentWeekNum(Number(currentWeekNum));
+
+        // Get league size
+        // const leagueSize = await getRecordsHelper(LeagueProxyContract);
+        const leagueSize = await getLeagueSizeHelper(LeagueProxyContract);
+
+        // Get records
+
+        // Get selected weeks matchups from league proxy schedule
+        weekMatchups = await LeagueProxyContract.getScheduleForWeek(
+          currentWeekNum
+        ).catch((e) => {
+          console.error("get schedule for week error: " + e);
+          setIsLoading(false);
+          setIsError(true);
+        });
+
+        // let shifter
+        // Slice array, by finding how many slots in return weekMatchups array to skip (due to setLeagueSchedule algorithm)
+        const shifter = 4 - Math.round(leagueSize / 2);
+        if (weekMatchups) {
+          weekMatchups = weekMatchups.slice(shifter);
+          // weekMatchups.map((matchup, index) => {
+          //   console.log("matchup #" + index + ": " + matchup);
+          // });
+          setSelectedWeekMatchups(weekMatchups);
+        }
+        setIsLoading(false);
+      }
+      fetchData();
     }
   }, [isConnected, router.isReady, connectedAccount]);
+
+  useEffect(() => {
+    if (!isLoading) getLeagueSchedule();
+  }, [currentWeekNum]);
+
+  const getLeagueSizeHelper = async (LeagueProxyContract) => {
+    let i = 0;
+    let error = "none";
+    do {
+      await LeagueProxyContract.leagueMembers(i).catch((_error) => {
+        error = _error;
+        // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+        // console.log("User To League Map Error: " + _error.message);
+      });
+
+      if (error == "none") {
+        i++;
+      }
+      // console.log("error value at end:" + error);
+    } while (error == "none");
+    return i;
+  };
+
+  const getRecordsHelper = async (LeagueProxyContract) => {
+    let i = 0;
+    let error = "none";
+    do {
+      const leagueMember = await LeagueProxyContract.leagueMembers(i).catch(
+        (_error) => {
+          error = _error;
+          // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
+          // console.log("User To League Map Error: " + _error.message);
+        }
+      );
+
+      if (error == "none") {
+        i++;
+        const record = await LeagueProxyContract.userToRecord(leagueMember);
+        console.log("league member #" + i + ": " + record);
+      }
+      // console.log("error value at end:" + error);
+    } while (error == "none");
+    return i;
+  };
+
+  async function getLeagueSchedule() {
+    // Get league size
+    const leagueSize = await getLeagueSizeHelper(leagueProxyContract);
+
+    console.log("league size: " + leagueSize);
+    let weekMatchups = [];
+    weekMatchups = await leagueProxyContract
+      .getScheduleForWeek(currentWeekNum)
+      .catch((_error) => {
+        // error = _error;
+        alert("Error! : " + JSON.stringify(error, null, 2));
+        // console.log("User To League Map Error: " + _error.message);
+      });
+
+    const shifter = 4 - Math.round(leagueSize / 2);
+    // console.log("shifter size: " + shifter);
+
+    weekMatchups = weekMatchups.slice(shifter);
+    // weekMatchups.map((matchup, index) => {
+    //   console.log("matchup #" + index + ": " + matchup);
+    // });
+
+    setSelectedWeekMatchups(weekMatchups);
+  }
 
   // DAte
   const d = new Date();
@@ -117,6 +252,29 @@ export default function LeaguePlayRouter() {
       break;
     case "myTeam":
       return <MyTeam></MyTeam>;
+      break;
+    case "schedule":
+      return (
+        <>
+          {isLoading ? (
+            <LoadingPrompt loading={"Your Schedule"} />
+          ) : (
+            <>
+              <ViewLeagueTeamsTable
+                leagueName={leagueName}
+                teamNames={["this", "that", "thar"]}
+                teamRecords={[]}
+              ></ViewLeagueTeamsTable>
+              <br></br>
+              <ViewLeagueTeamMatchup
+                week={currentWeekNum}
+                setWeek={setCurrentWeekNum}
+                weeklyMatchups={selectedWeekMatchups}
+              ></ViewLeagueTeamMatchup>
+            </>
+          )}
+        </>
+      );
       break;
     default:
       return <Typography>still loading router</Typography>;
