@@ -117,7 +117,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     var txn = await LeagueMakerInstance.connect(owner).createLeague(
       "best league", // League name
       10, // Stake amount
-      true, // Is public
+      false, // Is public
       owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
       testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
       AthletesContractInstance.address, // Address of our athletes storage contract
@@ -279,6 +279,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       .addUserToWhitelist(addr1.address);
     await addToWhitelist.wait();
 
+    // Expect user not to be able to join the league before approval...
+    expect(proxyContract.connect(addr1).joinLeague()).to.be.revertedWith(
+      "Insufficent funds for staking"
+    );
+
     // Prompting approval for addr1
     approval = await testUsdcContract
       .connect(addr1)
@@ -302,6 +307,44 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       // 20-10
       10
     );
+  });
+
+  // TODO: Write test
+  it("Successfully lets users join league for free with a public league (no whitelist)", async () => {
+    // Making the new proxy league
+    let txn = await LeagueMakerInstance.connect(owner).createLeague(
+      "Public league test", // League name
+      0, // Stake amount
+      true, // Is public
+      owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
+      testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
+      AthletesContractInstance.address, // Address of our athletes storage contract
+      GameItemInstance.address, // GameItems contract address
+      [] //Whitelisted users
+    );
+    let leagueProxyContractAddress2;
+    receipt = await txn.wait();
+    for (const event of receipt.events) {
+      if (event.event != null) {
+        leagueProxyContractAddress2 = event.args[1];
+      }
+    }
+    console.log("League proxy deployed to:", leagueProxyContractAddress2);
+
+    LeagueProxyInstance2 = new ethers.Contract(
+      leagueProxyContractAddress2,
+      LeagueOfLegendsLogicJSON.abi,
+      provider
+    );
+    LeagueProxyInstance2.connect(owner);
+
+    // Let's users join league
+    console.log("Owner and addr1 about to join the league");
+    join = await LeagueProxyInstance2.connect(owner).joinLeague();
+    await join.wait();
+    join = await LeagueProxyInstance2.connect(addr1).joinLeague();
+    await join.wait();
+    console.log("Owner and addr1 joined the public league!");
   });
 
   it("Has two league members in the league", async () => {
@@ -494,14 +537,15 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     }
 
     // Checking record after matches are evaluated
-    const ownerRecord = await proxyContract.connect(owner).getUserRecord();
-    const addr1Record = await proxyContract.connect(addr1).getUserRecord();
-    const ownerPointsFromContract = await proxyContract
-      .connect(owner)
-      .userToPoints(owner.address)[owner.address];
-    const addr1PointsFromContract = await proxyContract.userToPoints(
+    const ownerRecord = await proxyContract.getUserRecord(owner.address);
+    const addr1Record = await proxyContract.getUserRecord(addr1.address);
+    const ownerPointsFromContract = await proxyContract.getUserPoints(
+      owner.address
+    );
+    const addr1PointsFromContract = await proxyContract.getUserPoints(
       addr1.address
-    )[addr1.address];
+    );
+
     console.log("Records: Note -- 0 = loss, 1 = win, 2 = tie, 3 = bye \n");
     console.log(
       "Owner's record (userToRecord) is ",
@@ -547,8 +591,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // NOTE: On the frontend, we will listen for the event "leagueEnded" which will signal when the league ends and have the prize pot amount per winner (in case of a tie)
   it("Correctly delegates the prize pot, with tiebraker logic as well", async () => {
     // Contract allowance
+    console.log("Getting prize pool");
     const prizePoolAmount = Number(
-      await proxyContract.connect(owner).getContractUSDCBalance()
+      await proxyContract.getContractUSDCBalance()
     );
     console.log("Prize pool amount in test is ", prizePoolAmount);
     let approval = await testUsdcContract
