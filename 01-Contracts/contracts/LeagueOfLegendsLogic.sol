@@ -221,57 +221,14 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return leagueMembers[index];
     }
 
-    //***************************************************/
-    //*************** LEAGUE PLAY FUNCTION **************/
-    //***************************************************/
+    //****************************************************/
+    //*************** LEAGUE PLAY FUNCTIONS **************/
+    //****************************************************/
+
     // Setting the lineup for a user
-    function setLineup(uint256[5] memory athleteIds) external {
-        require(!lineupIsLocked, "lineup is locked for the week!");
-        require(inLeague[msg.sender], "User is not in League.");
-
-        //Decrement all athleteToLineup Occurences from previous lineup
-        for (uint256 i; i < userToLineup[msg.sender].length; i++) {
-            athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
-                currentWeekNum
-            ]--;
-        }
-
-        // Require ownership of all athleteIds + update mapping
-        for (uint256 i; i < athleteIds.length; i++) {
-            athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
-            require(
-                gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
-                "Caller does not own given athleteIds"
-            );
-        }
-
-        // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
-        for (uint256 i; i < athleteIds.length; i++) {
-            require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
-                athleteIds[i] >= (i * 10) &&
-                    athleteIds[i] <= ((i + 1) * 10 - 1),
-                "You are setting an athlete in the wrong position!"
-            );
-        }
-
-        userToLineup[msg.sender] = athleteIds;
-    }
-
     function setAthleteInLineup(uint256 athleteId, uint256 position) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
-
-        //Decrement all athleteToLineup Occurences from previous lineup
-        // for (uint256 i; i < userToLineup[msg.sender].length; i++) {
-        //     athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
-        //         currentWeekNum
-        //     ]--;
-        // }
-
-        // // Require ownership of all athleteIds + update mapping
-        // for (uint256 i; i < athleteIds.length; i++) {
-        //     athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
-        // }
 
         // Requiring the user has ownership of the athletes
         // for (uint256 i; i < athleteIds.length; i++) {
@@ -292,30 +249,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         userToLineup[msg.sender][position] = athleteId;
         //TODO add event
-    }
-
-    /*****************************************************/
-    /***************** GETTER FUNCTIONS ******************/
-    /*****************************************************/
-    // Getter for user to weekly pts
-    // When we get the mapping directly, returns incorrectly so we need to keep this!
-    function getUserRecord() external view returns (uint256[8] memory) {
-        return userToRecord[msg.sender];
-    }
-
-    // For testing if join league function Works
-    function getLeagueMembersLength() external view returns (uint256) {
-        return leagueMembers.length;
-    }
-
-    // Getting lineupIsLocked (TODO: Comment out for prod)
-    function getLineupIsLocked() external view returns (bool) {
-        return lineupIsLocked;
-    }
-
-    // You need to call an index when getting a mapping. More convenient to have a getter so we can return whole lineup
-    function getLineup(address _user) public view returns (uint256[5] memory) {
-        return userToLineup[_user];
     }
 
     // User joining the league
@@ -352,26 +285,29 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 
-    // User joining the league
-    //TODO debug why onlyWhiteListed always reverts
-    // It wasn't reverting for me.. you gotta make sure the user is on the whitelist first?
-    // Using the other joinLeague function above ^
-    // function joinLeague() external nonReentrant onlyWhitelisted {
-    //     // function joinLeague() external onlyWhitelisted nonReentrant {
-    //     // require(
-    //     //     whitelistContract.whitelist(msg.sender),
-    //     //     "User is not on whitelist bro"
-    //     // );
-    //     require(!leagueEntryIsClosed, "League Entry is Closed!");
-    //     require(!inLeague[msg.sender], "You have already joined this league");
-    //     require(
-    //         testUSDC.balanceOf(msg.sender) > stakeAmount,
-    //         "Insufficent funds for staking"
-    //     );
+    /*****************************************************/
+    /***************** GETTER FUNCTIONS ******************/
+    /*****************************************************/
+    // Getter for user to weekly pts
+    // When we get the mapping directly, returns incorrectly so we need to keep this!
+    function getUserRecord() external view returns (uint256[8] memory) {
+        return userToRecord[msg.sender];
+    }
 
-    //     inLeague[msg.sender] = true;
-    //     leagueMembers.push(msg.sender);
-    // }
+    // For testing if join league function Works
+    function getLeagueMembersLength() external view returns (uint256) {
+        return leagueMembers.length;
+    }
+
+    // Getting lineupIsLocked (TODO: Comment out for prod)
+    function getLineupIsLocked() external view returns (bool) {
+        return lineupIsLocked;
+    }
+
+    // You need to call an index when getting a mapping. More convenient to have a getter so we can return whole lineup
+    function getLineup(address _user) public view returns (uint256[5] memory) {
+        return userToLineup[_user];
+    }
 
     // Getting a schedule for a week
     function getScheduleForWeek(uint256 _week)

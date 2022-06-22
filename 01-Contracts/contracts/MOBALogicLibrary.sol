@@ -154,7 +154,9 @@ library MOBALogicLibrary {
                 }
 
                 // Updating mappings
-                // TODO: Add updating state for user to week score mapping?
+                userToWeekScore[addr1][currentWeekNum] = addr1Score;
+                userToWeekScore[addr2][currentWeekNum] = addr2Score;
+
                 if (addr1Score > addr2Score) {
                     userToRecord[addr1][currentWeekNum] = 1;
                     userToRecord[addr2][currentWeekNum] = 0;
