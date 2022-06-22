@@ -8,7 +8,9 @@ const LeagueOfLegendsLogicJSON = require("../../build/contracts/contracts/League
 
 async function main() {
   // Deploying
-
+  //Signers
+  const [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
+    await hre.ethers.getSigners();
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
     "MOBALogicLibrary"
@@ -20,11 +22,11 @@ async function main() {
     MOBALogicLibraryInstance.address
   );
 
-  //Create League Maker Library Instance
-  const LeagueMakerLibraryFactory = await ethers.getContractFactory("LeagueMakerLibrary");
-  const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
-  await LeagueMakerLibraryInstance.deployed();
-  console.log("LeagueMakerLibrary deployed to:", LeagueMakerLibraryInstance.address);
+  // //Create League Maker Library Instance
+  // const LeagueMakerLibraryFactory = await ethers.getContractFactory("LeagueMakerLibrary");
+  // const LeagueMakerLibraryInstance = await LeagueMakerLibraryFactory.deploy();
+  // await LeagueMakerLibraryInstance.deployed();
+  // console.log("LeagueMakerLibrary deployed to:", LeagueMakerLibraryInstance.address);
   
   //Create Game Logic Instance
   const LeagueOfLegendsLogicFactory = await ethers.getContractFactory(
@@ -43,12 +45,16 @@ async function main() {
     LeagueOfLegendsLogicInstance.address
   );
 
+    // Deploying athletes contract
+  const AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
+  const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  await AthletesContractInstance.deployed();
+  AthletesContractInstance.connect(owner);
+  console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
+  
+
   //Create League Maker INstance
-  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker", {
-    libraries: {
-      LeagueMakerLibrary: LeagueMakerLibraryInstance.address,
-    }
-  });
+  const LeagueMakerFactory = await ethers.getContractFactory("LeagueMaker");
 
   const LeagueMakerInstance = await LeagueMakerFactory.deploy(
     LeagueOfLegendsLogicInstance.address
@@ -71,9 +77,7 @@ async function main() {
   //   },
   // });
 
-  //Signers
-  [owner, addr1, addr2, addr3, addr4, addr5, addr6] =
-    await hre.ethers.getSigners();
+
 
   /******************/
   /***TESTING *******/
@@ -81,26 +85,44 @@ async function main() {
 
   //Create two league proxy instances
   //TODO must update 
-  var txn = await LeagueMakerInstance.createLeague("best league", 10, true);
+  var txn = await LeagueMakerInstance.createLeague(
+    "best league", 
+    10,
+     true,
+     AthletesContractInstance.address,
+     AthletesContractInstance.address,
+     AthletesContractInstance.address,
+     AthletesContractInstance.address,
+         []
+  );
+
   var leagueProxyContractAddress;
   receipt = await txn.wait();
   for (const event of receipt.events) {
     if (event.event != null) {
-      console.log(`Event ${event.event} with args ${event.args}`);
+      // console.log(`Event ${event.event} with args ${event.args}`);
       leagueProxyContractAddress = event.args[1];
     }
   }
   console.log("LEAGUE PROXY INSTANCE ADDRESS ", leagueProxyContractAddress);
 
-  txn = await LeagueMakerInstance.createLeague("league #2", 10, false);
-  var leagueProxyContractAddress2;
-  receipt = await txn.wait();
-  for (const event of receipt.events) {
-    if (event.event != null) {
-      console.log(`Event ${event.event} with args ${event.args}`);
-      leagueProxyContractAddress2 = event.args[1];
-    }
-  }
+  // txn = await LeagueMakerInstance.createLeague( 
+  //   "best league2", 
+  // 10,
+  //  true,
+  //  AthletesContractInstance.address,
+  //  AthletesContractInstance.address,
+  //  AthletesContractInstance.address,
+  //  AthletesContractInstance.address,
+  //      []);
+  // var leagueProxyContractAddress2;
+  // receipt = await txn.wait();
+  // for (const event of receipt.events) {
+  //   if (event.event != null) {
+  //     console.log(`Event ${event.event} with args ${event.args}`);
+  //     leagueProxyContractAddress2 = event.args[1];
+  //   }
+  // }
 
   //Creating a new contract instance wiht the abi and address (must test on rinkeby)
   const provider = new ethers.providers.getDefaultProvider();
@@ -112,11 +134,11 @@ async function main() {
     provider
   );
   //console.log("LeagueProxyStorage: " + JSON.stringify(LeagueMakerInstance.storage(), null, 2));
-  const LeagueProxyInstance2 = new ethers.Contract(
-    leagueProxyContractAddress2,
-    LeagueOfLegendsLogicJSON.abi,
-    provider
-  );
+  // const LeagueProxyInstance2 = new ethers.Contract(
+  //   leagueProxyContractAddress2,
+  //   LeagueOfLegendsLogicJSON.abi,
+  //   provider
+  // );
 
   //Testing delegate call on leagueProxyInstance
   let LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(owner);
@@ -239,17 +261,21 @@ async function main() {
   // );
 
   //Add users to league
-  var signers = [addr1.address, addr2.address, addr3.address];
-  await signers.forEach(async (signer, index) => {
+  var signers2 = [addr1.address, addr2.address, addr3.address];
+  await signers2.forEach(async (signer, index) => {
     console.log("signer: " + signer + " index: " + index);
     txn = await LeagueProxyInstanceWithSigner.addUserToLeague(signer);
-    receipt = await txn.wait();
+    await txn.wait();
     // console.log(
     //   "\n\tleagueMember #" + index + ": " +
     //   (await LeagueProxyInstanceWithSigner.leagueMembers(index + 1))
     // )
-  });
+  })
   // .then(async () => {
+  //   console.log(
+  //         "\n\tleagueMembers: " +
+  //     (await LeagueProxyInstanceWithSigner.leagueMembers(2))
+  //   )
   //   //Set league schedule
   //   //LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
   //   txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
@@ -259,11 +285,15 @@ async function main() {
   //   "\n\tleagueMember #0: " +
   //   (await LeagueProxyInstanceWithSigner.leagueMembers(0))
   // )
+  const leagueSize = await LeagueProxyInstanceWithSigner.inLeague(addr1.address);
+  console.log(
+    "\n\tleagueMembers: " + leagueSize
+)
 
     //Set league schedule
     //LeagueProxyInstanceWithSigner = LeagueProxyInstance.connect(LeagueMakerInstance.address);
-    // txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
-    txn = await LeagueMakerInstance.setLeagueSchedules();
+    txn = await LeagueProxyInstanceWithSigner.setLeagueSchedule();
+    // txn = await LeagueMakerInstance.setLeagueSchedules();
     receipt = await txn.wait();
     // const msgData = web3.eth.abi.encodeFunctionSignature("setLeagueSchedule()");
 

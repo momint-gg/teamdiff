@@ -85,10 +85,10 @@ contract LeagueMaker is Ownable {
         testUSDC = TestUSDC(_testUSDCAddress);
         // rinkebyUSDC = IERC20(_rinkebyUSDCAddress);
         // Make sure the creator of the league has enough USDC
-        require(
-            testUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
-            "Creator of league needs enough USDC (equal to specified stake amount)."
-        );
+        // require(
+        //     testUSDC.balanceOf(address(msg.sender)) >= _stakeAmount,
+        //     "Creator of league needs enough USDC (equal to specified stake amount)."
+        // );
 
         LeagueBeaconProxy proxy = new LeagueBeaconProxy(
             address(upgradeableBeacon),

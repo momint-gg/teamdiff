@@ -50,7 +50,7 @@ library MOBALogicLibrary {
                 : (matchupSlots = (leagueMembers.length + 1));
 
             //Grab temp value of rightHalf for final swap
-            uint256 rightArrTemp = rightHalf[0];
+            uint256 leftArrTemp = leftHalf[0];
 
             //fill values of array
             for (uint256 i = 0; i < matchupSlots / 2; i++) {
@@ -72,8 +72,13 @@ library MOBALogicLibrary {
                     leftHalf[i] = rightHalf[(i + 1) % ((matchupSlots / 2))];
                 }
             }
-            if (week != 0) {
+            if (week != 0) { 
                 leftHalf[(matchupSlots / 2) - 1] = rightArrTemp;
+                //first sort complete, now swap first indices
+                rightHalf[0] = leftHalf[0];
+                leftHalf[0] = leftArrTemp;
+
+                // leftHalf[(matchupSlots / 2) - 1] = rightArrTemp;
             }
             for (uint256 i = 0; i < matchupSlots / 2; i++) {
                 //temporary array to hold single matchup
@@ -99,8 +104,10 @@ library MOBALogicLibrary {
 
                 //Add matchup to schedule for current week
                 schedule[week].push(matchup);
+                // console.log(leftHalf[i]);
                 console.log(matchup.players[0]);
                 console.log(" vs ");
+                // console.log(rightHalf[i]);
                 console.log(matchup.players[1]);
                 console.log("\n");
             }
@@ -109,73 +116,73 @@ library MOBALogicLibrary {
 
     // TODO: Delete all of the console logs
     // NOTE: Current week num must start with 0
-    function evaluateMatches(
-        uint256 currentWeekNum,
-        Athletes athletesContract,
-        mapping(address => uint256[8]) storage userToRecord,
-        mapping(address => uint256[5]) storage userLineup,
-        mapping(address => uint256) storage userToPoints,
-        mapping(address => uint256[8]) storage userToWeekScore,
-        mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
-    ) public {
-        for (uint256 i; i < schedule[currentWeekNum].length; i++) {
-            // Addresses of the players who's match is being evaluated
-            address addr1 = schedule[currentWeekNum][i].players[0];
-            address addr2 = schedule[currentWeekNum][i].players[1];
+    // function evaluateMatches(
+    //     uint256 currentWeekNum,
+    //     Athletes athletesContract,
+    //     mapping(address => uint256[8]) storage userToRecord,
+    //     mapping(address => uint256[5]) storage userLineup,
+    //     mapping(address => uint256) storage userToPoints,
+    //     mapping(address => uint256[8]) storage userToWeekScore,
+    //     mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
+    // ) public {
+    //     for (uint256 i; i < schedule[currentWeekNum].length; i++) {
+    //         // Addresses of the players who's match is being evaluated
+    //         address addr1 = schedule[currentWeekNum][i].players[0];
+    //         address addr2 = schedule[currentWeekNum][i].players[1];
 
-            // Check to make sure matchup is not a bye week
-            // If it is a bye week, assign 3 as result for this week
-            if (addr1 == address(0)) {
-                userToRecord[addr2][currentWeekNum] = 3;
-            } else if (addr2 == address(0)) {
-                userToRecord[addr1][currentWeekNum] = 3;
-            }
-            // If not a bye week
-            else {
-                uint256 addr1Score;
-                uint256 addr2Score;
-                uint256[5] memory lineup1 = userLineup[addr1];
-                uint256[5] memory lineup2 = userLineup[addr2];
+    //         // Check to make sure matchup is not a bye week
+    //         // If it is a bye week, assign 3 as result for this week
+    //         if (addr1 == address(0)) {
+    //             userToRecord[addr2][currentWeekNum] = 3;
+    //         } else if (addr2 == address(0)) {
+    //             userToRecord[addr1][currentWeekNum] = 3;
+    //         }
+    //         // If not a bye week
+    //         else {
+    //             uint256 addr1Score;
+    //             uint256 addr2Score;
+    //             uint256[5] memory lineup1 = userLineup[addr1];
+    //             uint256[5] memory lineup2 = userLineup[addr2];
 
-                // Calculating users' total scores for their lineups
-                for (uint256 j; j < lineup1.length; j++) {
-                    // Calling the Athletes.sol contract to get the scores of ith athlete and current week
-                    uint256 latestScore1 = athletesContract
-                        .getSpecificAthleteScore(lineup1[j], currentWeekNum);
-                    uint256 latestScore2 = athletesContract
-                        .getSpecificAthleteScore(lineup2[j], currentWeekNum);
+    //             // Calculating users' total scores for their lineups
+    //             for (uint256 j; j < lineup1.length; j++) {
+    //                 // Calling the Athletes.sol contract to get the scores of ith athlete and current week
+    //                 uint256 latestScore1 = athletesContract
+    //                     .getSpecificAthleteScore(lineup1[j], currentWeekNum);
+    //                 uint256 latestScore2 = athletesContract
+    //                     .getSpecificAthleteScore(lineup2[j], currentWeekNum);
 
-                    // Calculating scores for users
-                    if (latestScore1 > latestScore2) {
-                        addr1Score += 1;
-                    } else if (latestScore2 > latestScore1) {
-                        addr2Score += 1;
-                    }
-                }
+    //                 // Calculating scores for users
+    //                 if (latestScore1 > latestScore2) {
+    //                     addr1Score += 1;
+    //                 } else if (latestScore2 > latestScore1) {
+    //                     addr2Score += 1;
+    //                 }
+    //             }
 
-                // Updating mappings
-                // TODO: Add updating state for user to week score mapping?
-                if (addr1Score > addr2Score) {
-                    userToRecord[addr1][currentWeekNum] = 1;
-                    userToRecord[addr2][currentWeekNum] = 0;
-                    userToPoints[addr1] += 2;
-                    emit MatchResult(addr1, addr2);
-                } else if (addr2Score > addr1Score) {
-                    userToRecord[addr2][currentWeekNum] = 1;
-                    userToRecord[addr1][currentWeekNum] = 0;
-                    userToPoints[addr2] += 2;
-                    emit MatchResult(addr2, addr1);
-                } else {
-                    // In the case of a tie
-                    userToRecord[addr2][currentWeekNum] = 2;
-                    userToRecord[addr1][currentWeekNum] = 2;
-                    userToPoints[addr1] += 1;
-                    userToPoints[addr2] += 1;
-                    emit MatchResult(addr2, addr1);
-                }
-            }
-        }
-    }
+    //             // Updating mappings
+    //             // TODO: Add updating state for user to week score mapping?
+    //             if (addr1Score > addr2Score) {
+    //                 userToRecord[addr1][currentWeekNum] = 1;
+    //                 userToRecord[addr2][currentWeekNum] = 0;
+    //                 userToPoints[addr1] += 2;
+    //                 emit MatchResult(addr1, addr2);
+    //             } else if (addr2Score > addr1Score) {
+    //                 userToRecord[addr2][currentWeekNum] = 1;
+    //                 userToRecord[addr1][currentWeekNum] = 0;
+    //                 userToPoints[addr2] += 2;
+    //                 emit MatchResult(addr2, addr1);
+    //             } else {
+    //                 // In the case of a tie
+    //                 userToRecord[addr2][currentWeekNum] = 2;
+    //                 userToRecord[addr1][currentWeekNum] = 2;
+    //                 userToPoints[addr1] += 1;
+    //                 userToPoints[addr2] += 1;
+    //                 emit MatchResult(addr2, addr1);
+    //             }
+    //         }
+    //     }
+    // }
 
     // Moved to outside evaluate match function bc stack too deep
     // First uint returned is lineup1, second uint returned is lineup2

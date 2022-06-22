@@ -146,24 +146,24 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
-    function evaluateMatches() external onlyTeamDiff {
-        MOBALogicLibrary.evaluateMatches(
-            currentWeekNum,
-            athletesContract,
-            userToRecord,
-            userToLineup,
-            userToPoints,
-            userToWeekScore,
-            schedule
-        );
+    // function evaluateMatches() external onlyTeamDiff {
+    //     MOBALogicLibrary.evaluateMatches(
+    //         currentWeekNum,
+    //         athletesContract,
+    //         userToRecord,
+    //         userToLineup,
+    //         userToPoints,
+    //         userToWeekScore,
+    //         schedule
+    //     );
 
-        // League is over (8 weeks)
-        if (currentWeekNum == numWeeks - 1) {
-            onLeagueEnd();
-            return;
-        }
-        currentWeekNum++;
-    }
+    //     // League is over (8 weeks)
+    //     if (currentWeekNum == numWeeks - 1) {
+    //         onLeagueEnd();
+    //         return;
+    //     }
+    //     currentWeekNum++;
+    // }
 
     /******************************************************/
     /*************** STAKING/LEAGUE FUNCTIONS *************/
@@ -413,5 +413,13 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         //TODO this mapp contain users to league and whitelisted leagues
         // leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
         // // whitelist[_userToAdd] = true;
+    }
+
+    /*testing*/
+        // Add user to whitelist
+    function addUserToLeague(address _userToAdd) public {
+        inLeague[_userToAdd] = true;
+        leagueMembers.push(_userToAdd);
+        userToLineup[_userToAdd] = [100,100,100,100,100];
     }
 }
