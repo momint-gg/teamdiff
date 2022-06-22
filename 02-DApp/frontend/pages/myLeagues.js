@@ -10,8 +10,8 @@ import { useSigner } from "wagmi";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import PendingLeagueCard from "../components/PendingLeagueCard";
 import LeagueCard from "../components/LeagueCard";
+import PendingLeagueCard from "../components/PendingLeagueCard";
 
 export default function MyLeagues({ setDisplay }) {
   const [leagueOpen, setLeagueOpen] = useState(false);
@@ -102,9 +102,9 @@ export default function MyLeagues({ setDisplay }) {
             const isInLeague = await LeagueProxyContract.inLeague(
               connectedAccount
             );
-            // console.log("isInleague:" + isInLeague);
+            console.log("isInleague:" + isInLeague);
             const admin = await LeagueProxyContract.admin();
-            // console.log("admin: " + admin);
+            console.log("admin: " + admin);
             // Add League address  to appropriate state list
             // TODO we
             isInLeague
@@ -131,19 +131,15 @@ export default function MyLeagues({ setDisplay }) {
   }, []);
 
   const activeListItems = activeLeagueList.map((leagueAddress, index) => (
-    <Box key={index} sx={{marginRight:3, marginBottom:3}}>
-      <LeagueCard
-        leagueAddress={leagueAddress}
-      />
+    <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
+      <LeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
   // Create list of league cards for all pending leagues
   const pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
-    <Box key={index} sx={{marginRight:3, marginBottom:3}}>
-      <PendingLeagueCard
-        leagueAddress={leagueAddress}
-      />
+    <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
+      <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
@@ -159,16 +155,17 @@ export default function MyLeagues({ setDisplay }) {
               color: "secondary",
               backgroundColor: "secondary",
               height: 5,
-              flexBasis: "100%"
+              flexBasis: "100%",
             }}
           />
           {activeLeagueList.length > 0 ? (
             <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              }}>
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
               {activeListItems}
             </Box>
           ) : (
@@ -191,14 +188,15 @@ export default function MyLeagues({ setDisplay }) {
               height: 5,
             }}
           />
-          
+
           {pendingLeagueList.length > 0 ? (
             <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              }}>
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
               {pendingListItems}
             </Box>
           ) : (
@@ -206,7 +204,6 @@ export default function MyLeagues({ setDisplay }) {
               (No Pending Leagues)
             </Typography>
           )}
-          
         </Box>
       )}
       {/* {leagueOpen && (

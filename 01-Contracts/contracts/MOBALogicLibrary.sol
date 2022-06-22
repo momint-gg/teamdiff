@@ -50,6 +50,7 @@ library MOBALogicLibrary {
                 : (matchupSlots = (leagueMembers.length + 1));
 
             //Grab temp value of rightHalf for final swap
+            uint256 rightArrTemp = rightHalf[0];
             uint256 leftArrTemp = leftHalf[0];
 
             //fill values of array

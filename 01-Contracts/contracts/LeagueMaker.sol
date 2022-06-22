@@ -126,6 +126,7 @@ contract LeagueMaker is Ownable {
 
     function updateUserToLeagueMapping(address user) external {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
+        //Require that user has not already pushed to this array??
         userToLeagueMap[user].push(msg.sender);
     }
 

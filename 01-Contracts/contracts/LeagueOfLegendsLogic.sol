@@ -64,6 +64,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //*** Events ***/
     /***************/
     event Staked(address sender, uint256 amount, address leagueAddress);
+    event athleteSetInLineup(address sender, uint256 index, uint256 position);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
 
@@ -226,37 +227,37 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     //*************** LEAGUE PLAY FUNCTION **************/
     //***************************************************/
     // Setting the lineup for a user
-    function setLineup(uint256[5] memory athleteIds) external {
-        require(!lineupIsLocked, "lineup is locked for the week!");
-        require(inLeague[msg.sender], "User is not in League.");
+    // function setLineup(uint256[5] memory athleteIds) external {
+    //     require(!lineupIsLocked, "lineup is locked for the week!");
+    //     require(inLeague[msg.sender], "User is not in League.");
 
-        //Decrement all athleteToLineup Occurences from previous lineup
-        for (uint256 i; i < userToLineup[msg.sender].length; i++) {
-            athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
-                currentWeekNum
-            ]--;
-        }
+    //     //Decrement all athleteToLineup Occurences from previous lineup
+    //     for (uint256 i; i < userToLineup[msg.sender].length; i++) {
+    //         athleteToLineupOccurencesPerWeek[userToLineup[msg.sender][i]][
+    //             currentWeekNum
+    //         ]--;
+    //     }
 
-        // Require ownership of all athleteIds + update mapping
-        for (uint256 i; i < athleteIds.length; i++) {
-            athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
-            require(
-                gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
-                "Caller does not own given athleteIds"
-            );
-        }
+    //     // Require ownership of all athleteIds + update mapping
+    //     for (uint256 i; i < athleteIds.length; i++) {
+    //         athleteToLineupOccurencesPerWeek[athleteIds[i]][currentWeekNum]++;
+    //         require(
+    //             gameItemsContract.balanceOf(msg.sender, athleteIds[i]) > 0,
+    //             "Caller does not own given athleteIds"
+    //         );
+    //     }
 
-        // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
-        for (uint256 i; i < athleteIds.length; i++) {
-            require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
-                athleteIds[i] >= (i * 10) &&
-                    athleteIds[i] <= ((i + 1) * 10 - 1),
-                "You are setting an athlete in the wrong position!"
-            );
-        }
+    //     // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
+    //     for (uint256 i; i < athleteIds.length; i++) {
+    //         require( // In range 0-9, 10-19, etc. (Unique positions are in these ranges)
+    //             athleteIds[i] >= (i * 10) &&
+    //                 athleteIds[i] <= ((i + 1) * 10 - 1),
+    //             "You are setting an athlete in the wrong position!"
+    //         );
+    //     }
 
-        userToLineup[msg.sender] = athleteIds;
-    }
+    //     userToLineup[msg.sender] = athleteIds;
+    // }
 
     function setAthleteInLineup(uint256 athleteId, uint256 position) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
@@ -293,6 +294,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         userToLineup[msg.sender][position] = athleteId;
         //TODO add event
+        emit athleteSetInLineup(msg.sender, athleteId, position);
     }
 
     /*****************************************************/
@@ -329,14 +331,14 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
-        // require(
-        //     rinkebyUSDC.balanceOf(msg.sender) > stakeAmount,
-        //     "Insufficent funds for staking"
-        // );
         require(
-            testUSDC.balanceOf(msg.sender) > stakeAmount, // TODO: Delete TestUSDC and RinkebyUSDC for MATIC USDC
+            rinkebyUSDC.balanceOf(msg.sender) > stakeAmount,
             "Insufficent funds for staking"
         );
+        // require(
+        //     testUSDC.balanceOf(msg.sender) > stakeAmount, // TODO: Delete TestUSDC and RinkebyUSDC for MATIC USDC
+        //     "Insufficent funds for staking"
+        // );
 
         //must approve for our own token
         //testUSDC.approve(msg.sender, 100);
@@ -411,15 +413,15 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         whitelistContract.addAddressToWhitelist(_userToAdd);
 
         //TODO this mapp contain users to league and whitelisted leagues
-        // leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
+        leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
         // // whitelist[_userToAdd] = true;
     }
 
     /*testing*/
         // Add user to whitelist
-    function addUserToLeague(address _userToAdd) public {
-        inLeague[_userToAdd] = true;
-        leagueMembers.push(_userToAdd);
-        userToLineup[_userToAdd] = [100,100,100,100,100];
-    }
+    // function addUserToLeague(address _userToAdd) public {
+    //     inLeague[_userToAdd] = true;
+    //     leagueMembers.push(_userToAdd);
+    //     userToLineup[_userToAdd] = [100,100,100,100,100];
+    // }
 }

@@ -157,6 +157,7 @@ export default function LeagueDetails() {
         setLeagueName(leagueName);
         const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
+        console.log("isInLeage: " + isInLeague);
         if (isInLeague) {
           // router.push("./" + router.query.leagueAddress + "/myTeam");
           router.push("./" + router.query.leagueAddress + "/matchups");

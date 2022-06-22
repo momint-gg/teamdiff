@@ -263,21 +263,21 @@ export default function CreateLeague({ setDisplay }) {
       });
 
       // Send request to user to join the league
-      const joinNewlyCreatedLeagueTxn =
-        await LeagueProxyContractWithSigner.joinLeague({
-          gasLimit: 1000000,
+      // const joinNewlyCreatedLeagueTxn =
+      await LeagueProxyContractWithSigner.joinLeague({
+        gasLimit: 1000000,
+      })
+        .then((res) => {
+          console.log("joining newly created league...");
+          window.setTimeout(() => {
+            setIsTransactionDelayed(true);
+          }, 30 * 1000);
         })
-          .then((res) => {
-            console.log("joining newly created league...");
-            window.setTimeout(() => {
-              setIsTransactionDelayed(true);
-            }, 30 * 1000);
-          })
-          .catch((error) => {
-            //  console.log("Join League error: " + error.error.message);
-            alert("Join League error: " + error.message);
-            setIsJoiningLeague(false);
-          });
+        .catch((error) => {
+          //  console.log("Join League error: " + error.error.message);
+          alert("Join League error: " + error.message);
+          setIsJoiningLeague(false);
+        });
 
       // For each address on the initial whitelist, send transaction to add address to whitelist of new league
       initialWhitelistAddresses.forEach(async (whitelistAddress) => {
