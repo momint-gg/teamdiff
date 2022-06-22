@@ -116,6 +116,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         testUSDC = IERC20(_testUSDCAddress);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
+        // userToLineup = [100, 100, 100, 100, 100];
         // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
         console.log("Proxy initialized!");
     }
@@ -330,7 +331,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             (whitelistContract.whitelist(msg.sender) ||
                 whitelistContract.isPublic() ||
                 msg.sender == admin),
-            "User is not on whitelist bro"
+            "User is not on whitelist"
         );
         require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
@@ -349,6 +350,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
+        userToLineup[msg.sender] = [100,100,100,100,100];
         rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         // rinkebyUSDC.transfer(address(this), stakeAmount);
         emit Staked(msg.sender, stakeAmount, address(this));

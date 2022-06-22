@@ -12,7 +12,7 @@ const main = async () => {
 
     // Create GameItems Instance
   // const contract = await ethers.getContractAt("LeagueBeaconProxy", "0xa8a6e296Ed7db235A430aA00AD2aAc1967A91d7b")
-  // const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
+  const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
   /*
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -35,11 +35,11 @@ const main = async () => {
   await txn.wait();
 */
 //  Deploying athletes contract
-  const AthletesContractFactory = await ethers.getContractFactory("Athletes");
-  const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
-  await AthletesContractInstance.deployed();
-  // AthletesContractInstance.connect(owner);
-  console.log("Athletes Deployed to: " + AthletesContractInstance.address);
+  // const AthletesContractFactory = await ethers.getContractFactory("Athletes");
+  // const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  // await AthletesContractInstance.deployed();
+  // // AthletesContractInstance.connect(owner);
+  // console.log("Athletes Deployed to: " + AthletesContractInstance.address);
   // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
   // textData +=
   //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
@@ -49,10 +49,10 @@ const main = async () => {
   // txn = await contract.openPrivateSale();
   // await txn.wait();
 
-  //Manually add to address Open ready for testing
-  // console.log("Adding User to whitelsit");
-  // txn = await contract.addUserToWhitelist("0x550B8Cf3e728eb22C40D2a4a6EBE1365e06BA871");
-  // await txn.wait();
+  // Manually add to address Open ready for testing
+  console.log("Adding User to whitelsit");
+  txn = await contract.addUserToWhitelist("0xa3b9818D2B2ED2548C6873c17a4bf8B611A801b4");
+  await txn.wait();
   
   //Set Public Sale Open ready for testing
   // console.log("Opening public sale");

@@ -81,10 +81,14 @@ export default function MintPack() {
         const accounts = await provider.listAccounts();
 
         if (accounts.length > 0) {
-          const accountAddress = await signer.getAddress();
+          const accountAddress = await signer.getAddress().catch((e) => {
+            console.error(e);
+          });
           setSigner(signer);
           setConnectedAccount(accountAddress);
-          const { chainId } = await provider.getNetwork();
+          const { chainId } = await provider.getNetwork().catch((e) => {
+            console.error(e);
+          });
           setCurrentChain(chainId);
           setIsPolygon(chainId === 137);
           setIsConnected(true);
@@ -163,23 +167,41 @@ export default function MintPack() {
         setIsLoading(true);
 
         // Grab packs available
-        const packsAvail = await GameItemsContract.packsAvailable();
+        const packsAvail = await GameItemsContract.packsAvailable().catch(
+          (e) => {
+            console.error(e);
+          }
+        );
         setPacksAvailable(packsAvail.toNumber());
 
         // Grab if user has already minted starter pack
         const hasAlreadyMintedPack1 =
-          await GameItemsContract.userToHasMintedStarterPack(connectedAccount);
+          await GameItemsContract.userToHasMintedStarterPack(
+            connectedAccount
+          ).catch((e) => {
+            console.error(e);
+          });
         setHasAlreadyMintedPack(hasAlreadyMintedPack1);
 
         // Grab if user is on whitelist
         const isOnWhitelist1 = await GameItemsContract.whitelist(
           connectedAccount
-        );
+        ).catch((e) => {
+          console.error(e);
+        });
         setIsOnWhitelist(isOnWhitelist1);
 
         // Set if is past presale date
-        const isPresale = await GameItemsContract.isPresalePhase();
-        const isPublicSale = await GameItemsContract.isPublicSalePhase();
+        const isPresale = await GameItemsContract.isPresalePhase().catch(
+          (e) => {
+            console.error(e);
+          }
+        );
+        const isPublicSale = await GameItemsContract.isPublicSalePhase().catch(
+          (e) => {
+            console.error(e);
+          }
+        );
         setIsPresalePhase(isPresale);
         setIsPublicSalePhase(isPublicSale);
         console.log("ispublic: " + isPublicSale);
@@ -343,12 +365,12 @@ export default function MintPack() {
                     paddingLeft: 8,
                   }}
                   // disabled={!isPolygon}
-                  disabled={
-                    hasAlreadyMintedPack ||
-                    // (!isOnWhitelist && isPresalePhase) ||
-                    !(isPresalePhase || isPublicSalePhase) ||
-                    !isPolygon
-                  }
+                  // disabled={
+                  //   // hasAlreadyMintedPack ||
+                  //   // // (!isOnWhitelist && isPresalePhase) ||
+                  //   // !(isPresalePhase || isPublicSalePhase) ||
+                  //   // !isPolygon
+                  // }
                 >
                   Mint
                 </Fab>

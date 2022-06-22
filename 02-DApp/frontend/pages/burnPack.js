@@ -325,12 +325,12 @@ export default function BurnPack({ setDisplay }) {
                       size="large"
                       aria-label="add"
                       onClick={burnStarterPack}
-                      disabled={
-                        !ownsStarterPack ||
-                        hasAlreadyBurnedPack ||
-                        isPreRevealPhase ||
-                        !isPolygon
-                      }
+                      // disabled={
+                      //   !ownsStarterPack ||
+                      //   hasAlreadyBurnedPack ||
+                      //   isPreRevealPhase ||
+                      //   !isPolygon
+                      // }
                       // onClick={() => setDisplayMint(true)}
                       sx={{
                         marginRight: 1,

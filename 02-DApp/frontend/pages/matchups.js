@@ -54,7 +54,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [competitor1StarterAthleteScores, setCompetitor1StarterAthleteScores] =
     useState([-1, -1, -1, -1, -1]);
   const [competitor2StarterAthleteScores, setCompetitor2StarterAthleteScores] =
-    useState([]);
+    useState([-1, -1, -1, -1, -1]);
   const [athleteNFTs, setAthleteNFTs] = useState([]);
   const [nftResp, setNFTResp] = useState(null);
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
@@ -73,8 +73,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [selectedMatchup, setSelectedMatchup] = useState(0);
   const [competitor1WeekScore, setCompetitor1WeekScore] = useState();
   const [competitor2WeekScore, setCompetitor2WeekScore] = useState();
-  const [competitor1TeamScore, setCompetitor1TeamScore] = useState();
-  const [competitor2TeamScore, setCompetitor2TeamScore] = useState();
+  const [competitor1TeamScore, setCompetitor1TeamScore] = useState(0);
+  const [competitor2TeamScore, setCompetitor2TeamScore] = useState(0);
   const [isError, setIsError] = useState(false);
   const [hasFetchedScores, setHasFetchedScores] = useState(false);
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
@@ -210,7 +210,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
             for (let j = 0; j <= 1; j++) {
               const starterIds = [];
-              const comp = [-1, -1, -1, -1, -1];
+              // const comp = [-1, -1, -1, -1, -1];
               let competitorAccount;
               j == 0
                 ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
@@ -220,9 +220,11 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                   competitorAccount,
                   i
                 ).catch((e) => {
-                  console.log("error: " + e);
+                  console.error("userToLineup error: " + e);
                   setIsError(true);
                 });
+                // TODO this will return 0 if starter is not set for position,
+                // but sometimes we want that if a user sets athlete id #0, init all startEr ids to be -1 in contract
                 starterIds[i] = id;
               }
               j == 0
@@ -388,9 +390,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     ) {
       // setIsLoading(true);
       // console.log("getting the data from use effect");
-      let scores;
+      // let scores;
       const fetchData = async () => {
-        scores = await getStarterAthleteData();
+        await getStarterAthleteData();
         // console.log("setting state scores to " + scores);
         // setCompetitor1StarterAthleteScores(scores);
         // await calculateMatchupScore();
@@ -401,122 +403,68 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   }, [isLoading]);
   // }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
 
-  // const getStarterAthleteData = async (starterIds, athleteContract) => {
-  //   // Create scores array for competitor 1 starter athletes
-  //   if (starterIds.length > 0) {
-  //     const scores = [0, 34, 0, 0, 0];
-  //     const done = false;
-  //     // starterIds.forEach(async (id, index) => {
-  //     for (let i = 0; i < starterIds.length; i++) {
-  //       // 2. Make a shallow copy of the item you want to mutate
-  //       // const athlete = { ...athletes[id] };
-  //       console.log("starter id: " + starterIds[i]);
-  //       if (starterIds[i] != 0) {
-  //         const score = await athleteContract
-  //           .athleteToScores(starterIds[i], 0)
-  //           .catch((error) => {
-  //             console.log(
-  //               "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
-  //             );
-  //             // score = null;
-  //           });
-  //         // console.log("score for id#" + id + ": " + score);
-  //         scores[starterIds[i]] = score;
-  //       }
-  //       if (i == starterIds.length - 1) return scores;
-  //     }
-  //   }
-  // };
-
   const getStarterAthleteData = async () => {
     // Create scores array for competitor 1 starter athletes
     const c1Scores = competitor1StarterAthleteScores;
     let score;
     competitor1StarterAthleteIds.forEach(async (id, index) => {
-      // 2. Make a shallow copy of the item you want to mutate
-      // const athlete = { ...athletes[id] };
-      if (id != -1) {
-        score = await athleteContract
-          .athleteToScores(id, currentWeekNum)
-          .catch((error) => {
-            console.log(
-              "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
-            );
-            // score = null;
-          });
-        if (index == 4) {
-          // if (index == competitor1StarterAthleteIds.length - 1) {
+      // if (id != -1) {
+      // TODO if id #-1 is passed in, return -1
+      score = await athleteContract
+        .athleteToScores(id, currentWeekNum)
+        .catch((error) => {
           console.log(
-            "index: " +
-              index +
-              ", length: " +
-              competitor1StarterAthleteIds.length
+            "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
           );
-          console.log("last element in loop, retunring val");
-          setCompetitor1StarterAthleteScores(c1Scores);
-          setHasFetchedScores(true);
-          return c1Scores;
-        }
+          // score = null;
+        });
+      // this if statement should always evaulate eventually
+      if (index == 4) {
+        // if (index == competitor1StarterAthleteIds.length - 1) {
+        // console.log(
+        //   "index: " + index + ", length: " + competitor1StarterAthleteIds.length
+        // );
+        // console.log("last element in loop, retunring val");
+        setCompetitor1StarterAthleteScores(c1Scores);
+        // setHasFetchedScores(true);
+        // return c1Scores;
       }
-      console.log("score for id#" + id + ": " + score);
+      // }
+      // console.log("score for id#" + id + ": " + score);
+      // only update array if score is not defualt value
       if (score != -1) c1Scores[index] = score;
-      // setCompetitor1StarterAthleteScores(
-      //   (competitor1StarterAthleteScores) => [
-      //     ...competitor1StarterAthleteScores,
-      //     score,
-      //   ]
-      // );
-
-      // }
-      // if athlete is not set for position at index, just set score to 0
-      // else {
-      //   // setCompetitor1StarterAthleteScores(
-      //   //   (competitor1StarterAthleteScores) => [
-      //   //     ...competitor1StarterAthleteScores,
-      //   //     0,
-      //   //   ]
-      //   // );
-      //   // if (index == 4) {
-      //   //   // if (index == competitor1StarterAthleteIds.length - 1) {
-      //   //   console.log(
-      //   //     "index: " +
-      //   //       index +
-      //   //       ", length: " +
-      //   //       competitor1StarterAthleteIds.length
-      //   //   );
-      //   //   console.log("last element in loop, retunring val");
-      //   //   setCompetitor1StarterAthleteScores(c1Scores);
-      //   //   setHasFetchedScores(true);
-      //   //   return c1Scores;
-      //   // }
-      // }
-      // console.log("setting state scoreshere");
     });
-    // console.log("retunring : " + c1Scores);
-    // return c1Scores;
 
-    //   // append score stats for competitor 2 starter athletes
-    //   // competitor2StarterAthleteIds.forEach(async (id, index) => {
-    //   //   // 2. Make a shallow copy of the item you want to mutate
-    //   //   // const athlete = { ...athletes[id] };
-    //   //   if (id != 0) {
-    //   //     const score = await athleteContract
-    //   //       .athleteToScores(id, currentWeekNum)
-    //   //       .catch((error) => {
-    //   //         console.log(
-    //   //           "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
-    //   //         );
-    //   //         // score = null;
-    //   //       });
-    //   //     // console.log("score for id#" + id + ": " + score);
-    //   //     setCompetitor2StarterAthleteScores(
-    //   //       (competitor2StarterAthleteScores) => [
-    //   //         ...competitor2StarterAthleteScores,
-    //   //         score,
-    //   //       ]
-    //   //     );
-    //   //   }
-    //   // });
+    // Create scores array for competitor 1 starter athletes
+    const c2Scores = competitor2StarterAthleteScores;
+    // let score;
+    competitor2StarterAthleteIds.forEach(async (id, index) => {
+      // if (id != -1) {
+      // TODO if id #-1 is passed in, return -1
+      score = await athleteContract
+        .athleteToScores(id, currentWeekNum)
+        .catch((error) => {
+          console.log(
+            "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
+          );
+          // score = null;
+        });
+      // this if statement should always evaulate eventually
+      if (index == 4) {
+        // if (index == competitor1StarterAthleteIds.length - 1) {
+        // console.log(
+        //   "index: " + index + ", length: " + competitor1StarterAthleteIds.length
+        // );
+        // console.log("last element in loop, retunring val");
+        setCompetitor2StarterAthleteScores(c2Scores);
+        setHasFetchedScores(true);
+        // return c2Scores;
+      }
+      // }
+      // console.log("score for id#" + id + ": " + score);
+      // only update array if score is not defualt value
+      if (score != -1) c2Scores[index] = score;
+    });
   };
 
   const handleModalOpen = (athelete) => {
@@ -554,7 +502,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   return (
     <>
       {isError && (
-        <Typography>
+        <Typography textAlign="center">
           {" "}
           Oops! We encountered an error when loading you league stats. Please
           cheeck your internet connections and try again.
@@ -754,7 +702,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           <Grid item xs={1} textAlign="center">
                             <Typography color="#D835D8" fontSize={48}>
                               {competitor2StarterId != 0
-                                ? competitor2StarterAthleteScores[index]
+                                ? String(competitor2StarterAthleteScores[index])
                                 : "(0)"}{" "}
                             </Typography>
                           </Grid>
