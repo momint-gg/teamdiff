@@ -393,7 +393,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     const athleteIds = [1, 2, 3, 4, 5];
     let txn;
     for (let i = 0; i < athleteIds.length; i++) {
-      txn = proxyContract.connect(addr3).setLineup(athleteIds);
+      txn = proxyContract.connect(addr3).setAthleteInLineup(athleteIds[i], i);
       await expect(txn).to.be.revertedWith("User is not in League.");
     }
   });
@@ -496,40 +496,47 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     // Checking record after matches are evaluated
     const ownerRecord = await proxyContract.connect(owner).getUserRecord();
     const addr1Record = await proxyContract.connect(addr1).getUserRecord();
-    const ownerPoints = await proxyContract
+    const ownerPointsFromContract = await proxyContract
       .connect(owner)
-      .userToPoints(owner.address);
-    const addr1Points = await proxyContract.userToPoints(addr1.address);
-    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+      .userToPoints(owner.address)[owner.address];
+    const addr1PointsFromContract = await proxyContract.userToPoints(
+      addr1.address
+    )[addr1.address];
+    console.log("Records: Note -- 0 = loss, 1 = win, 2 = tie, 3 = bye \n");
     console.log(
-      "Owner's points are ",
-      ownerPoints,
+      "Owner's record (userToRecord) is ",
+      ownerRecord,
+      ", addr1's record is ",
+      addr1Record
+    );
+    console.log(
+      "Owner's points *from the contract* are ",
+      ownerPointsFromContract,
       "addr1 points are ",
-      addr1Points
+      addr1PointsFromContract
     );
 
     // Making sure mappings are correctly updated
     if (Number(ownerRecord[0]) === 1) {
       ownerWins = true;
       expect(Number(addr1Record[0])).to.equal(0);
-      expect(Number(ownerPoints)).to.equal(2);
-      expect(Number(addr1Points)).to.equal(0);
-    }
-    if (Number(addr1Record[0]) === 1) {
+      expect(Number(ownerPointsFromContract)).to.equal(2);
+      expect(Number(addr1PointsFromContract)).to.equal(0);
+    } else if (Number(addr1Record[0]) === 1) {
       addr1Wins = true;
       expect(Number(ownerRecord[0])).to.equal(0);
-      expect(Number(ownerPoints)).to.equal(0);
-      expect(Number(addr1Points)).to.equal(2);
+      expect(Number(ownerPointsFromContract)).to.equal(0);
+      expect(Number(addr1PointsFromContract)).to.equal(2);
     }
     // Both should have a tie (2)
-    if (Number(addr1Record[0]) === 2) {
+    else if (Number(addr1Record[0]) === 2) {
       tie = true;
       expect(Number(ownerRecord[0])).to.equal(2);
-      expect(Number(ownerPoints)).to.equal(1);
-      expect(Number(addr1Points)).to.equal(1);
+      expect(Number(ownerPointsFromContract)).to.equal(1);
+      expect(Number(addr1PointsFromContract)).to.equal(1);
     }
     // Both should have a bye (3)
-    if (Number(addr1Record[0]) === 3) {
+    else if (Number(addr1Record[0]) === 3) {
       byeWeek = true;
       expect(Number(ownerRecord[0])).to.equal(3);
     }

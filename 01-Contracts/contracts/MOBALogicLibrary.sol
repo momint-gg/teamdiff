@@ -124,34 +124,18 @@ library MOBALogicLibrary {
             address addr2 = schedule[currentWeekNum][i].players[1];
 
             // Check to make sure matchup is not a bye week
-            // If it is a bye week, assign 3 as result for this week
             if (addr1 == address(0)) {
                 userToRecord[addr2][currentWeekNum] = 3;
             } else if (addr2 == address(0)) {
                 userToRecord[addr1][currentWeekNum] = 3;
-            }
-            // If not a bye week
-            else {
-                uint256 addr1Score;
-                uint256 addr2Score;
-                uint256[5] memory lineup1 = userLineup[addr1];
-                uint256[5] memory lineup2 = userLineup[addr2];
-
-                // Calculating users' total scores for their lineups
-                for (uint256 j; j < lineup1.length; j++) {
-                    // Calling the Athletes.sol contract to get the scores of ith athlete and current week
-                    uint256 latestScore1 = athletesContract
-                        .getSpecificAthleteScore(lineup1[j], currentWeekNum);
-                    uint256 latestScore2 = athletesContract
-                        .getSpecificAthleteScore(lineup2[j], currentWeekNum);
-
-                    // Calculating scores for users
-                    if (latestScore1 > latestScore2) {
-                        addr1Score += 1;
-                    } else if (latestScore2 > latestScore1) {
-                        addr2Score += 1;
-                    }
-                }
+            } else {
+                (uint256 addr1Score, uint256 addr2Score) = calculateScores(
+                    addr1,
+                    addr2,
+                    currentWeekNum,
+                    userLineup,
+                    athletesContract
+                );
 
                 // Updating mappings
                 userToWeekScore[addr1][currentWeekNum] = addr1Score;
@@ -167,7 +151,7 @@ library MOBALogicLibrary {
                     userToRecord[addr1][currentWeekNum] = 0;
                     userToPoints[addr2] += 2;
                     emit MatchResult(addr2, addr1);
-                } else {
+                } else if (addr1Score == addr2Score) {
                     // In the case of a tie
                     userToRecord[addr2][currentWeekNum] = 2;
                     userToRecord[addr1][currentWeekNum] = 2;
@@ -179,93 +163,40 @@ library MOBALogicLibrary {
         }
     }
 
-    // Moved to outside evaluate match function bc stack too deep
-    // First uint returned is lineup1, second uint returned is lineup2
-    function getSpecificAthleteScore(
-        uint256 index1,
-        uint256 index2,
-        Athletes athletesContract,
-        uint256 weekNum
-    ) internal returns (uint256, uint256) {
-        return (0, 0);
+    // Moved score calculation to outside evaluate match function because stack was too deep
+    function calculateScores(
+        address addr1,
+        address addr2,
+        uint256 currentWeekNum,
+        mapping(address => uint256[5]) storage userLineup,
+        Athletes athletesContract
+    ) private view returns (uint256, uint256) {
+        uint256 addr1Score;
+        uint256 addr2Score;
+        uint256[5] memory lineup1 = userLineup[addr1];
+        uint256[5] memory lineup2 = userLineup[addr2];
+
+        // Calculating users' total scores for their lineups
+        for (uint256 j; j < lineup1.length; j++) {
+            // Calling the Athletes.sol contract to get the scores of ith athlete and current week
+            uint256 latestScore1 = athletesContract.getSpecificAthleteScore(
+                lineup1[j],
+                currentWeekNum
+            );
+            uint256 latestScore2 = athletesContract.getSpecificAthleteScore(
+                lineup2[j],
+                currentWeekNum
+            );
+
+            // Calculating scores for users
+            if (latestScore1 > latestScore2) {
+                addr1Score += 1;
+            } else if (latestScore2 > latestScore1) {
+                addr2Score += 1;
+            }
+        }
+        return (addr1Score, addr2Score);
     }
-
-    // State isn't updating in LOL logic...
-    // Moved to one eval matches function instead of splitting it up into two
-    // Important Note: 0 = loss, 1 = win, 2 = tie, 3 = bye
-    // function evaluateMatches(
-    //     uint256 currentWeekNum,
-    //     Athletes athletesContract,
-    //     mapping(address => uint256[]) storage userToRecord,
-    //     mapping(address => uint256[]) storage userLineup,
-    //     mapping(address => uint256) storage userToPoints,
-    //     mapping(uint256 => LeagueOfLegendsLogic.Matchup[]) storage schedule
-    // ) public {
-    //     for (uint256 i; i < schedule[currentWeekNum].length; i++) {
-    //         // Addresses of the players who's match is being evaluated
-    //         address addr1 = schedule[currentWeekNum][i].players[0];
-    //         address addr2 = schedule[currentWeekNum][i].players[1];
-
-    //         // Check to make sure matchup is not a bye week
-    //         // If it is a bye week, assign 2 as result for this week
-    //         if (addr1 == address(0)) {
-    //             userToRecord[addr2].push(3);
-    //         } else if (addr2 == address(0)) {
-    //             userToRecord[addr1].push(3);
-    //         }
-    //         // If not a bye week
-    //         else {
-    //             console.log("evaluateMatches() called in MOBALogicLibrary");
-    //             uint256 addr1Score;
-    //             uint256 addr2Score;
-    //             uint256[] memory lineup1 = userLineup[addr1];
-    //             uint256[] memory lineup2 = userLineup[addr2];
-    //             // Calculating users' total scores
-    //             for (uint256 j; j < lineup1.length; j++) {
-    //                 // Calling the Athletes.sol contract to get the scores of ith athlete
-    //                 uint256[] memory currAthleteScores1 = athletesContract
-    //                     .getAthleteScores(lineup1[j]);
-    //                 uint256[] memory currAthleteScores2 = athletesContract
-    //                     .getAthleteScores(lineup2[j]);
-    //                 // Getting the last score in the array
-    //                 uint256 latestScore1 = currAthleteScores1[
-    //                     currAthleteScores1.length - 1
-    //                 ];
-    //                 uint256 latestScore2 = currAthleteScores2[
-    //                     currAthleteScores2.length - 1
-    //                 ];
-    //                 // Calculating scores for users
-    //                 if (latestScore1 > latestScore2) {
-    //                     addr1Score += 1;
-    //                 } else if (latestScore2 > latestScore1) {
-    //                     addr2Score += 1;
-    //                 }
-    //             }
-    //             // Updating mappings
-    //             // uint256 addr1Points = userToPoints[addr1];
-    //             // uint256 addr2Points = userToPoints[addr2];
-
-    //             if (addr1Score > addr2Score) {
-    //                 userToRecord[addr1].push(1);
-    //                 userToRecord[addr2].push(0);
-    //                 userToPoints[addr1] += 2;
-    //                 emit MatchResult(addr1, addr2);
-    //             } else if (addr2Score > addr1Score) {
-    //                 userToRecord[addr2].push(1);
-    //                 userToRecord[addr1].push(0);
-    //                 userToPoints[addr2] += 2;
-    //                 emit MatchResult(addr2, addr1);
-    //             } else {
-    //                 // In the case of a tie
-    //                 userToRecord[addr2].push(2);
-    //                 userToRecord[addr1].push(2);
-    //                 userToPoints[addr1] += 1;
-    //                 userToPoints[addr2] += 1;
-    //                 emit MatchResult(addr2, addr1);
-    //             }
-    //         }
-    //     }
-    // }
 
     // Calculating league winner(s)
     function calculateLeagueWinners(
@@ -306,9 +237,7 @@ library MOBALogicLibrary {
         }
     }
 
-    // Making sure a lineup is valid -- moving setLineup requires to external function (TODO)
-    function checkValidLineup() external returns (bool) {}
-
+    // Read-only function for users to verify scores were calculated correctly
     function calculateScoreOnChain(
         LeagueOfLegendsLogic.Stats calldata athleteStats
     ) public pure returns (uint256) {
