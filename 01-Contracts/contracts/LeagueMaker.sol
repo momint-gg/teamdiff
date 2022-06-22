@@ -8,15 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./LeagueBeaconProxy.sol";
 import "./Athletes.sol";
 import "./GameItems.sol";
-import "./TestUSDC.sol";
-
-// import "@openzeppelin/contracts/access/Ownable.sol";
-// import "./LeagueMakerLibrary.sol";
 
 contract LeagueMaker is Ownable {
-    //To use Clone library
-    //using Clones for address;
-
     // ======= Events ==========
     event LeagueCreated(
         string name,
@@ -31,14 +24,12 @@ contract LeagueMaker is Ownable {
     address immutable teamDiffAddress;
 
     // For staking
-    TestUSDC testUSDC;
     IERC20 erc20;
 
     // ======== Mutable storage ========
     address beaconAddress;
     address[] public leagueAddresses; //list of all deployed leagueAddresses
-    //Maps Users to all the leagues they are a member of or on the whitelist for
-    mapping(address => address[]) public userToLeagueMap;
+    mapping(address => address[]) public userToLeagueMap; //Maps Users to all the leagues they are a member of or on the whitelist for
     mapping(address => bool) public isProxyMap;
     uint256 numWeeks;
 
@@ -54,13 +45,12 @@ contract LeagueMaker is Ownable {
     }
 
     // ======== Deploy New League Proxy ========
-    // First need to prompt approval before calling this function for the stakeAmount to be spend by league creator
     function createLeague(
         string calldata _name,
         uint256 _stakeAmount,
         bool _isPublic,
         address _admin,
-        address _erc20Address, // Note: We will take this out once we deploy to mainnet (b/c will be using public ABI), but we need for now
+        address _erc20Address,
         address _athletesContractAddress,
         address _gameItemsContractAddress,
         address[] calldata _whitelistUsers
@@ -101,9 +91,6 @@ contract LeagueMaker is Ownable {
         return address(proxy);
     }
 
-    // You need a getter for this because Solidity's default getter (AKA contract.leagueAddresses()) needs to be called with an index
-    // ^ And we want the whole list
-    // Do NOT delete this
     function getLeagueAddresses() public view returns (address[] memory) {
         return leagueAddresses;
     }
@@ -119,5 +106,16 @@ contract LeagueMaker is Ownable {
         //delete parameters;
         beaconAddress = address(newBeacon);
         return address(newBeacon);
+    }
+
+    // Only our wallet can call, need this because the "owner" of the proxy contract isn't us
+    modifier onlyTeamDiff() {
+        require(msg.sender == teamDiffAddress, "Caller is not TeamDiff");
+        _;
+    }
+
+    // Season starting late
+    function incrementCurrentWeek() external onlyTeamDiff {
+        currentWeek++;
     }
 }
