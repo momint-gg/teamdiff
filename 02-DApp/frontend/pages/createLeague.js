@@ -381,7 +381,7 @@ export default function CreateLeague({ setDisplay }) {
       setIsValidBuyInCost(true);
     } else if (
       isNaN(formValues.buyInCost) ||
-      Number(formValues.buyInCost) <= 0 ||
+      Number(formValues.buyInCost) < 0 ||
       Number(formValues.buyInCost) > 100
     ) {
       // console.log("uhoh")
