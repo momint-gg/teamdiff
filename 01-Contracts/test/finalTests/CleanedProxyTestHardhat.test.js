@@ -117,7 +117,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     var txn = await LeagueMakerInstance.connect(owner).createLeague(
       "best league", // League name
       10, // Stake amount
-      true, // Is public
+      false, // Is public
       owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
       testUsdcContract.address, // Test USDC address -- when deploying to mainnet won't need this
       AthletesContractInstance.address, // Address of our athletes storage contract
@@ -279,6 +279,11 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       .addUserToWhitelist(addr1.address);
     await addToWhitelist.wait();
 
+    // Expect user not to be able to join the league before approval...
+    expect(proxyContract.connect(addr1).joinLeague()).to.be.revertedWith(
+      "Insufficent funds for staking"
+    );
+
     // Prompting approval for addr1
     approval = await testUsdcContract
       .connect(addr1)
@@ -302,6 +307,44 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       // 20-10
       10
     );
+  });
+
+  // TODO: Write test
+  it("Successfully lets users join league for free with a public league (no whitelist)", async () => {
+    // Making the new proxy league
+    let txn = await LeagueMakerInstance.connect(owner).createLeague(
+      "Public league test", // League name
+      0, // Stake amount
+      true, // Is public
+      owner.address, // Admin for league proxy - actually don't need to pass this in bc is msg.sender...
+      testUsdcContract.address, // USDC address -- when deploying to mainnet we will pass in MATIC instead
+      AthletesContractInstance.address, // Address of our athletes storage contract
+      GameItemInstance.address, // GameItems contract address
+      [] //Whitelisted users
+    );
+    let leagueProxyContractAddress2;
+    receipt = await txn.wait();
+    for (const event of receipt.events) {
+      if (event.event != null) {
+        leagueProxyContractAddress2 = event.args[1];
+      }
+    }
+    console.log("League proxy deployed to:", leagueProxyContractAddress2);
+
+    LeagueProxyInstance2 = new ethers.Contract(
+      leagueProxyContractAddress2,
+      LeagueOfLegendsLogicJSON.abi,
+      provider
+    );
+    LeagueProxyInstance2.connect(owner);
+
+    // Let's users join league
+    console.log("Owner and addr1 about to join the league");
+    join = await LeagueProxyInstance2.connect(owner).joinLeague();
+    await join.wait();
+    join = await LeagueProxyInstance2.connect(addr1).joinLeague();
+    await join.wait();
+    console.log("Owner and addr1 joined the public league!");
   });
 
   it("Has two league members in the league", async () => {
@@ -393,7 +436,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     const athleteIds = [1, 2, 3, 4, 5];
     let txn;
     for (let i = 0; i < athleteIds.length; i++) {
-      txn = proxyContract.connect(addr3).setLineup(athleteIds);
+      txn = proxyContract.connect(addr3).setAthleteInLineup(athleteIds[i], i);
       await expect(txn).to.be.revertedWith("User is not in League.");
     }
   });
@@ -414,9 +457,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     for (let i = 0; i < 50; i++) {
       const randomNum = Math.floor(Math.random() * 5 + 1); // In range (1,5)
       let txn = await AthletesContractInstance.connect(owner).appendStats(
-        i,
-        randomNum,
-        0
+        i, // Index of athlete
+        randomNum, // Random score
+        0 // Week num 0
       );
       await txn.wait();
     }
@@ -456,8 +499,28 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     console.log("[Owner: ", ownerPoints, "], [Addr1: ", addr1Points, "]");
   });
 
+  // Making sure the new function works, also necessary so we can have a series of matches
+  it("Sets athletes lineups successfully with the new function (it's setAthleteInLineup() now)", async () => {
+    console.log("Setting lineups...");
+    for (let i = 0; i < ownerAthletes.length; i++) {
+      let txn = await proxyContract.connect(owner).setAthleteInLineup(
+        ownerAthletes[i], // Athlete ID
+        Math.floor(ownerAthletes[i] / 10) // Athlete position
+      );
+      await txn.wait();
+      txn = await proxyContract
+        .connect(addr1)
+        .setAthleteInLineup(
+          addr1Athletes[i],
+          Math.floor(addr1Athletes[i] / 10)
+        );
+      await txn.wait();
+    }
+  });
+
   // The big kahuna
   // Function in MOBALogic isn't working...
+  // TOOD: Current state -- stats are getting pushed to the athletes contract, but they are not getting retrieved in MOBALogicLibrary
   it("Evaluates matches with evaluateMatches() (new function)", async () => {
     console.log("Evaluating matches now...");
     // All possible scenarios for a match
@@ -473,42 +536,51 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       txn = await currLeague.evaluateMatches();
     }
 
-    const ownerRecord = await proxyContract.connect(owner).getUserRecord();
-    const addr1Record = await proxyContract.connect(addr1).getUserRecord();
-    const ownerPoints = await proxyContract
-      .connect(owner)
-      .userToPoints(owner.address);
-    const addr1Points = await proxyContract.userToPoints(addr1.address);
-    console.log("Owner is ", ownerRecord, "addr1 is ", addr1Record);
+    // Checking record after matches are evaluated
+    const ownerRecord = await proxyContract.getUserRecord(owner.address);
+    const addr1Record = await proxyContract.getUserRecord(addr1.address);
+    const ownerPointsFromContract = await proxyContract.getUserPoints(
+      owner.address
+    );
+    const addr1PointsFromContract = await proxyContract.getUserPoints(
+      addr1.address
+    );
+
+    console.log("Records: Note -- 0 = loss, 1 = win, 2 = tie, 3 = bye \n");
     console.log(
-      "Owner's points are ",
-      ownerPoints,
+      "Owner's record (userToRecord) is ",
+      ownerRecord,
+      ", addr1's record is ",
+      addr1Record
+    );
+    console.log(
+      "Owner's points *from the contract* are ",
+      ownerPointsFromContract,
       "addr1 points are ",
-      addr1Points
+      addr1PointsFromContract
     );
 
     // Making sure mappings are correctly updated
     if (Number(ownerRecord[0]) === 1) {
       ownerWins = true;
       expect(Number(addr1Record[0])).to.equal(0);
-      expect(Number(ownerPoints)).to.equal(2);
-      expect(Number(addr1Points)).to.equal(0);
-    }
-    if (Number(addr1Record[0]) === 1) {
+      expect(Number(ownerPointsFromContract)).to.equal(2);
+      expect(Number(addr1PointsFromContract)).to.equal(0);
+    } else if (Number(addr1Record[0]) === 1) {
       addr1Wins = true;
       expect(Number(ownerRecord[0])).to.equal(0);
-      expect(Number(ownerPoints)).to.equal(0);
-      expect(Number(addr1Points)).to.equal(2);
+      expect(Number(ownerPointsFromContract)).to.equal(0);
+      expect(Number(addr1PointsFromContract)).to.equal(2);
     }
     // Both should have a tie (2)
-    if (Number(addr1Record[0]) === 2) {
+    else if (Number(addr1Record[0]) === 2) {
       tie = true;
       expect(Number(ownerRecord[0])).to.equal(2);
-      expect(Number(ownerPoints)).to.equal(1);
-      expect(Number(addr1Points)).to.equal(1);
+      expect(Number(ownerPointsFromContract)).to.equal(1);
+      expect(Number(addr1PointsFromContract)).to.equal(1);
     }
     // Both should have a bye (3)
-    if (Number(addr1Record[0]) === 3) {
+    else if (Number(addr1Record[0]) === 3) {
       byeWeek = true;
       expect(Number(ownerRecord[0])).to.equal(3);
     }
@@ -519,8 +591,9 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
   // NOTE: On the frontend, we will listen for the event "leagueEnded" which will signal when the league ends and have the prize pot amount per winner (in case of a tie)
   it("Correctly delegates the prize pot, with tiebraker logic as well", async () => {
     // Contract allowance
+    console.log("Getting prize pool");
     const prizePoolAmount = Number(
-      await proxyContract.connect(owner).getContractUSDCBalance()
+      await proxyContract.getContractUSDCBalance()
     );
     console.log("Prize pool amount in test is ", prizePoolAmount);
     let approval = await testUsdcContract

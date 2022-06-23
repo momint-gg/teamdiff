@@ -24,66 +24,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *
  * _Available since v3.4._
  */
-contract LeagueBeaconProxy is
-    Proxy,
-    ERC1967Upgrade,
-    Ownable,
-    AccessControl
-{
-        using SafeMath for uint256;
+contract LeagueBeaconProxy is Proxy, ERC1967Upgrade, Ownable, AccessControl {
+    using SafeMath for uint256;
 
-    string public leagueName;
-    uint256 public numWeeks; // Current week of the split
-    uint256 public stakeAmount;
-    uint256 public currentWeekNum;
-    address public admin;
-    address public teamDiffAddress;
-    bool public leagueEntryIsClosed;
-    bool public lineupIsLocked;
-
-    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
-    mapping(address => uint256[8]) public userToRecord; // User to their record
-    mapping(address => uint256[5]) public userToLineup; // User to their lineup
-    mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
-    mapping(address => bool) public inLeague; // Checking if a user is in the league
-    address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
-    address[] private leagueWinners;
-
-    // League schedule
-    struct Matchup {
-        address[2] players;
-    }
-    mapping(uint256 => Matchup[]) schedule; // Schedule for the league (generated before), maps week # => [matchups]
-
-    /**********************/
-    /* IMMUTABLE STORAGE  */
-    /**********************/
-    struct Stats {
-        uint256 kills;
-        uint256 deaths;
-        uint256 assists;
-        uint256 minionScore;
-    }
-    // address public polygonUSDCAddress = ; // When we deploy to mainnet
-    address public rinkebyUSDCAddress;
-
-    // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
-    // Won't want to make whitelist immutable
-    // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
-    Athletes athletesContract;
-    Whitelist public whitelistContract;
-    LeagueMaker leagueMakerContract;
-    // IERC20 public testUSDC;
-    IERC20 public rinkebyUSDC;
-    GameItems gameItemsContract;
-
-    //**************/
-    //*** Events ***/
-    /***************/
-    event Staked(address sender, uint256 amount, address leagueAddress);
-    event testUSDCDeployed(address sender, address contractAddress);
-    event leagueEnded(address[] winner, uint256 prizePotPerWinner);
-    
     /**
      * @dev Initializes the proxy with `beacon`.
      *
