@@ -300,7 +300,7 @@ export default function LeagueDetails() {
           setIsJoiningLeague(true);
           window.setTimeout(() => {
             setIsTransactionDelayed(true);
-          }, 60 * 5 * 1000);
+          }, 20 * 1000);
         })
         .catch((error) => {
           setIsJoiningLeague(false);

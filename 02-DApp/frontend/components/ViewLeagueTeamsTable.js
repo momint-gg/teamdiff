@@ -1,6 +1,13 @@
 import {
-    Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
-    TableRow, Typography
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from "@mui/material";
 
 // fake data - data structure is a best guess at what contract data is formatted as
@@ -98,7 +105,9 @@ const ViewLeagueTeamsTable = ({ leagueName, teamNames, teamRecords }) => {
                     <Typography fontSize={30}>{team}</Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography fontSize={30}>{record}</Typography>
+                    <Typography fontSize={30}>
+                      {record[0] + "-" + record[1] + "-" + record[2]}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               );

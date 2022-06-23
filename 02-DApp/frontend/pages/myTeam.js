@@ -2,6 +2,7 @@ import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { makeStyles } from "@material-ui/core";
 import {
   Button,
+  CircularProgress,
   Container,
   Paper,
   Table,
@@ -68,6 +69,7 @@ export default function MyTeam() {
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState();
   const [isLineupLocked, setIsLineupLocked] = useState();
+  const [isSettingAthlete, setIsSettingAthlete] = useState();
 
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
@@ -130,6 +132,7 @@ export default function MyTeam() {
       //   provider
       // );
       setLeagueProxyContract(LeagueProxyContract);
+      LeagueProxyContract.on("AthleteSetInLineup", athleteSetCallback);
 
       // Initialize connections to Athlete datastore contract
       const AthleteContract = new ethers.Contract(
@@ -238,7 +241,7 @@ export default function MyTeam() {
   const getStarterAthleteData = async () => {
     // console.log("starterID: " + starterAthleteIds);
     starterAthleteIds.forEach(async (id, index) => {
-      if (id != 0 && currentWeekNum > 0) {
+      if (id != 100 && currentWeekNum > 0) {
         const prevPoints = await athleteContract
           .athleteToScores(id, currentWeekNum - 1)
           .catch((error) => {
@@ -247,7 +250,7 @@ export default function MyTeam() {
           });
         // // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
-      } else if (id != 0) {
+      } else if (id != 100) {
         ownedAthletesMetadata[id].prevPoints = "n/a";
       }
     });
@@ -266,11 +269,28 @@ export default function MyTeam() {
     const result = [];
     ownedAthletesMetadata.map((athlete, index) => {
       // check if athlete has the currently selected positions
-      if (athlete.attributes[1].value == positions[currentPositionIndex]) {
+      if (athlete?.attributes[1].value == positions[currentPositionIndex]) {
         result[index] = athlete;
       }
     });
     return result;
+  };
+
+  const athleteSetCallback = async (sender, id, position) => {
+    if (sender == connectedAccount && isSettingAthlete) {
+      setIsSettingAthlete(false);
+      alert(
+        "Successfully set Athlete id #" +
+          id +
+          " in posiiton: " +
+          positions[position] +
+          ". " +
+          "\nPlease refresh to see changes."
+      );
+      // router.push()
+    } else {
+      console.log("event triggered but filtered");
+    }
   };
 
   // TODO create a callback function for when athlete has been set in lineup
@@ -285,12 +305,14 @@ export default function MyTeam() {
 
     await leagueProxyContractWithSigner
       .setAthleteInLineup(athleteID, positionID)
-      .then
-      // console.log(
-      //   "setting athlete id#" + athleteID + " at postion #" + positionID
-      // )
-      // update state to listen to callback for when position is set
-      ()
+      .then(() => {
+        // console.log(
+        //   "setting athlete id#" + athleteID + " at postion #" + positionID
+        // )
+        // update state to listen to callback for when position is set
+        setIsSettingAthlete(true);
+        setSubModalOpen(false);
+      })
       .catch((error) => {
         if (error.data) {
           alert("Set Lineup error: " + error.data.message);
@@ -334,6 +356,12 @@ export default function MyTeam() {
             alignItems: "center",
           }}
         >
+          {isSettingAthlete && (
+            <>
+              <Typography>Updating line-up on-chain...</Typography>
+              <CircularProgress></CircularProgress>
+            </>
+          )}
           <Typography
             variant="h4"
             color="white"
@@ -409,7 +437,7 @@ export default function MyTeam() {
                         align="center"
                       >
                         <Image
-                          src={id != 0 ? athlete.image : logo}
+                          src={id != 100 ? athlete?.image : logo}
                           width={"40"}
                           // layout="fill"
                           height={"40"}
@@ -419,10 +447,10 @@ export default function MyTeam() {
                             fontSize={30}
                             onClick={() => handleStateModal(athlete, index)}
                           >
-                            {id != 0 ? athlete?.name : "(none)"}
+                            {id != 100 ? athlete?.name : "(none)"}
                           </Typography>
                           <Typography component="div">
-                            {id != 0 && athlete?.score}
+                            {id != 100 && athlete?.score}
                           </Typography>
                         </div>
                       </TableCell>
@@ -430,24 +458,24 @@ export default function MyTeam() {
                         <div>
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
-                            {id != 0 && currentWeekNum != 0
+                            {id != 100 && currentWeekNum != 0
                               ? athlete?.prevPoints
                               : "(0)"}
                           </Typography>
                           {/* <Typography>
-                            {id != 0  && "69/69/69"}
+                            {id != 100  && "69/69/69"}
                           </Typography> */}
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
-                            {id != 0 &&
+                            {id != 100 &&
                               // currentWeekNum != 0 &&
                               "*pull opp from backend"}
                           </Typography>
                           <Typography>
-                            {id != 0 &&
+                            {id != 100 &&
                               // currentWeekNum != 0 &&
                               "*pull date from backend"}
                           </Typography>
@@ -466,7 +494,7 @@ export default function MyTeam() {
                           }}
                           disabled={isLineupLocked}
                         >
-                          {id != 0 ? "SUB" : "SET"}
+                          {id != 100 ? "SUB" : "SET"}
                         </Button>
                       </TableCell>
                     </TableRow>

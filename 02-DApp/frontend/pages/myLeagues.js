@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 // import LeagueDetails from "./leagueDetails";
 // Web3 Imports
@@ -23,6 +23,7 @@ export default function MyLeagues({ setDisplay }) {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -72,6 +73,7 @@ export default function MyLeagues({ setDisplay }) {
 
       // Fetch League membership data for connected wallet
       async function fetchData() {
+        setIsLoading(true);
         let i = 0;
         let error = "none";
 
@@ -118,6 +120,7 @@ export default function MyLeagues({ setDisplay }) {
         } while (error == "none");
         setActiveLeagueList(activeLeaguesTemp);
         setPendingLeagueList(pendingLeaguesTemp);
+        setIsLoading(false);
       }
       fetchData();
     } else {
@@ -158,20 +161,29 @@ export default function MyLeagues({ setDisplay }) {
               flexBasis: "100%",
             }}
           />
-          {activeLeagueList.length > 0 ? (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
-              }}
-            >
-              {activeListItems}
-            </Box>
+          {isLoading ? (
+            <>
+              <Typography>Loading Active Leagues</Typography>
+              <CircularProgress></CircularProgress>
+            </>
           ) : (
-            <Typography variant="h6" color="primary" component="div">
-              (No Active Leagues)
-            </Typography>
+            {
+              ...(activeLeagueList.length > 0 ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {activeListItems}
+                </Box>
+              ) : (
+                <Typography variant="h6" color="primary" component="div">
+                  (No Active Leagues)
+                </Typography>
+              )),
+            }
           )}
           <Typography
             variant="h4"
@@ -188,21 +200,29 @@ export default function MyLeagues({ setDisplay }) {
               height: 5,
             }}
           />
-
-          {pendingLeagueList.length > 0 ? (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
-              }}
-            >
-              {pendingListItems}
-            </Box>
+          {isLoading ? (
+            <>
+              <Typography>Loading Pending Leagues</Typography>
+              <CircularProgress></CircularProgress>
+            </>
           ) : (
-            <Typography variant="h6" color="primary" component="div">
-              (No Pending Leagues)
-            </Typography>
+            {
+              ...(pendingLeagueList.length > 0 ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {pendingListItems}
+                </Box>
+              ) : (
+                <Typography variant="h6" color="primary" component="div">
+                  (No Pending Leagues)
+                </Typography>
+              )),
+            }
           )}
         </Box>
       )}

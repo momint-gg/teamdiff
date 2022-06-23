@@ -30,7 +30,7 @@ contract LeagueBeaconProxy is
     Ownable,
     AccessControl
 {
- string public leagueName;
+    string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
     uint256 public currentWeekNum;
@@ -38,8 +38,8 @@ contract LeagueBeaconProxy is
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
     bool public lineupIsLocked;
+    bool public isPublic;
 
-    mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[8]) public userToRecord; // User to their record
     mapping(address => uint256[5]) public userToLineup; // User to their lineup
     mapping(address => uint256[8]) public userToWeekScore; // User to their team's score each week
@@ -64,14 +64,10 @@ contract LeagueBeaconProxy is
         uint256 minionScore;
     }
 
-    // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
-    // Won't want to make whitelist immutable
-    // @Trey I don't think we really need to save more gas so not making these immutable (for now) for testing simplicity. Can always do this later...
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    IERC20 public testUSDC;
-    IERC20 public rinkebyUSDC;
+    IERC20 public erc20;
     GameItems gameItemsContract;
 
     //**************/
@@ -81,6 +77,7 @@ contract LeagueBeaconProxy is
     event athleteSetInLineup(address sender, uint256 index, uint256 position);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
+
     /**
      * @dev Initializes the proxy with `beacon`.
      *

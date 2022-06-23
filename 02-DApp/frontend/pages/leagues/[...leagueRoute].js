@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import AddToWhitelist from "../../components/AddToWhitelist.js";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import ViewLeagueTeamMatchup from "../../components/ViewLeagueTeamMatchups.js";
 import ViewLeagueTeamsTable from "../../components/ViewLeagueTeamsTable.js";
@@ -20,7 +21,11 @@ export default function LeaguePlayRouter() {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLeagueAdmin, setIsLeagueAdmin] = useState(false);
+
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
+  const [inviteListValues, setInviteListValues] = useState([]);
+
   const [signer, setSigner] = useState(null);
   const [athleteContract, setAthleteContract] = useState();
   const [selectedWeekMatchups, setSelectedWeekMatchups] = useState();
@@ -28,7 +33,8 @@ export default function LeaguePlayRouter() {
   const [leagueName, setLeagueName] = useState(null);
   const [isError, setIsError] = useState(false);
   const [leagueMemberRecords, setLeagueMemberRecords] = useState([]);
-
+  const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
+  const [leagueMembers, setLeagueMembers] = useState([]);
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -125,11 +131,15 @@ export default function LeaguePlayRouter() {
         );
         setCurrentWeekNum(Number(currentWeekNum));
 
-        // Get league size
-        // const leagueSize = await getRecordsHelper(LeagueProxyContract);
-        const leagueSize = await getLeagueSizeHelper(LeagueProxyContract);
+        // Get league size, and league members, and records for each member
+        const leagueSize = await getRecordsHelper(
+          LeagueProxyContract,
+          currentWeekNum
+        );
 
-        // Get records
+        // Get league Admin
+        const leagueAdmin = await LeagueProxyContract.admin();
+        setIsLeagueAdmin(leagueAdmin == connectedAccount);
 
         // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
@@ -149,6 +159,9 @@ export default function LeaguePlayRouter() {
           //   console.log("matchup #" + index + ": " + matchup);
           // });
           setSelectedWeekMatchups(weekMatchups);
+          if (weekMatchups.length > 0) {
+            setLeagueScheduleIsSet(true);
+          }
         }
         setIsLoading(false);
       }
@@ -178,9 +191,11 @@ export default function LeaguePlayRouter() {
     return i;
   };
 
-  const getRecordsHelper = async (LeagueProxyContract) => {
+  const getRecordsHelper = async (LeagueProxyContract, currentWeekNum) => {
     let i = 0;
     let error = "none";
+    const records = [];
+    const leagueMembersTemp = [];
     do {
       const leagueMember = await LeagueProxyContract.leagueMembers(i).catch(
         (_error) => {
@@ -192,12 +207,53 @@ export default function LeaguePlayRouter() {
 
       if (error == "none") {
         i++;
-        const record = await LeagueProxyContract.userToRecord(leagueMember);
+        const record = await LeagueProxyContract.getUserRecord(leagueMember);
+        // const record = await LeagueProxyContract.userToRecord(leagueMember, week);
+        // const leagueMember =
         console.log("league member #" + i + ": " + record);
+
+        leagueMembersTemp.push(shortenAddress(leagueMember));
+        records.push(formatUserRecordHelper(record, currentWeekNum));
       }
       // console.log("error value at end:" + error);
     } while (error == "none");
+    setLeagueMemberRecords(records);
+    setLeagueMembers(leagueMembersTemp);
     return i;
+  };
+
+  const formatUserRecordHelper = (rawRecord, currentWeekNum) => {
+    let wins = 0;
+    let losses = 0;
+    let ties = 0;
+    rawRecord.map((result, index) => {
+      switch (result) {
+        case 2:
+          ties++;
+          break;
+        case 1:
+          wins++;
+          break;
+        // case 0:
+        //   losses++;
+        //   break;
+        default:
+          break;
+      }
+    });
+    // Losses should equal the total number of games player - the wins and the ties
+    losses = currentWeekNum - wins - ties;
+    return [wins, losses, ties];
+  };
+
+  const shortenAddress = (address) => {
+    // console.log("address to shorten: " + address);
+    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+      address.length - 4,
+      address.length
+    )}`;
+    return shortenedAddress1;
+    // setIsConnected(true);
   };
 
   async function getLeagueSchedule() {
@@ -224,6 +280,10 @@ export default function LeaguePlayRouter() {
 
     setSelectedWeekMatchups(weekMatchups);
   }
+
+  // async function getLeagueMembersHelper() {
+  //   leagueProxyContract.
+  // }
 
   // DAte
   const d = new Date();
@@ -262,22 +322,41 @@ export default function LeaguePlayRouter() {
             <>
               <ViewLeagueTeamsTable
                 leagueName={leagueName}
-                teamNames={["this", "that", "thar"]}
-                teamRecords={[]}
+                teamNames={leagueMembers}
+                teamRecords={leagueMemberRecords}
               ></ViewLeagueTeamsTable>
               <br></br>
               <ViewLeagueTeamMatchup
+                leagueScheduleIsSet={leagueScheduleIsSet}
                 week={currentWeekNum}
                 setWeek={setCurrentWeekNum}
                 weeklyMatchups={selectedWeekMatchups}
               ></ViewLeagueTeamMatchup>
+              {isLeagueAdmin && (
+                <>
+                  <br></br>
+                  <Typography
+                    variant="h4"
+                    color="secondary"
+                    textAlign={"center"}
+                  >
+                    Admin Functions
+                  </Typography>
+                  <AddToWhitelist
+                    setInviteListValues={setInviteListValues}
+                    inviteListValues={inviteListValues}
+                    connectedAccount={connectedAccount}
+                  ></AddToWhitelist>
+                </>
+              )}
+              <br></br>
             </>
           )}
         </>
       );
       break;
     default:
-      return <Typography>still loading router</Typography>;
+      return <LoadingPrompt loading={"Your League"} />;
       break;
   }
   // } else return <LoadingPrompt loading={"League Dashborad"}></LoadingPrompt>;

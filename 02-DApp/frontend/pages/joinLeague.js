@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 // import LeagueDetails from "./leagueDetails";
 // Web3 Imports
@@ -19,7 +19,7 @@ export default function JoinLeague({ setDisplay }) {
   const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -67,6 +67,7 @@ export default function JoinLeague({ setDisplay }) {
 
       // Fetch League membership data for connected wallet
       async function fetchData() {
+        setIsLoading(true);
         let i = 0;
         let error = "none";
         // Continue to add leagues to activeLEagueList and pendingLeagueList
@@ -105,6 +106,7 @@ export default function JoinLeague({ setDisplay }) {
           }
           // console.log("error value at end:" + error);
         } while (error == "none");
+        setIsLoading(false);
       }
       fetchData();
     } else {
@@ -222,12 +224,21 @@ export default function JoinLeague({ setDisplay }) {
           height: 5,
         }}
       />
-      {pendingLeagueList.length > 0 ? (
-        <ul>{pendingListItems}</ul>
+      {isLoading ? (
+        <>
+          <Typography>Loading Whitelisted Leagues</Typography>
+          <CircularProgress></CircularProgress>
+        </>
       ) : (
-        <Typography variant="h6" color="primary" component="div">
-          (No Pending Leagues)
-        </Typography>
+        {
+          ...(pendingLeagueList.length > 0 ? (
+            <ul>{pendingListItems}</ul>
+          ) : (
+            <Typography variant="h6" color="primary" component="div">
+              (No Pending Leagues)
+            </Typography>
+          )),
+        }
       )}
       <Typography variant="h4" color="secondary" component="div">
         Public Leagues
@@ -239,12 +250,21 @@ export default function JoinLeague({ setDisplay }) {
           height: 5,
         }}
       />
-      {publicLeagueList.length > 0 ? (
-        <ul>{publicListItems}</ul>
+      {isLoading ? (
+        <>
+          <Typography>Loading Public Leagues</Typography>
+          <CircularProgress></CircularProgress>
+        </>
       ) : (
-        <Typography variant="h6" color="primary" component="div">
-          (No Active Leagues)
-        </Typography>
+        {
+          ...(publicLeagueList.length > 0 ? (
+            <ul>{publicListItems}</ul>
+          ) : (
+            <Typography variant="h6" color="primary" component="div">
+              (No Active Leagues)
+            </Typography>
+          )),
+        }
       )}
     </Box>
   );

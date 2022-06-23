@@ -116,7 +116,7 @@ const main = async () => {
   textData += "exports.Beacon = '" + BeaconInstance.address + "';\n";
 
   //Signers
-  // [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
+  [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
 
   // // Deploying test USDC contract
   // TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
@@ -125,25 +125,27 @@ const main = async () => {
   // testUsdcContract.connect(owner);
   // console.log("Test USDC Deployed to: " + testUsdcContract.address);
   // textData += "exports.TestUSDC = \'" + testUsdcContract.address + "\';\n";
-  textData +=
-    "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
+  // textData +=
+  //   "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
 
   // Deploying athletes contract
-  // AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
-  // AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
-  // await AthletesContractInstance.deployed();
+  AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
+  AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  await AthletesContractInstance.deployed();
   // AthletesContractInstance.connect(owner);
-  // console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
-  // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  console.log("Athletes USDC Deployed to: " + AthletesContractInstance.address);
   textData +=
-    "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
+    "exports.Athletes = '" + AthletesContractInstance.address + "';\n";
+  // textData +=
+  //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
 
   //Adding polygonUSDC and rinkebyUSDC to contract addresses file
   textData +=
-    "exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';" + // When we deploy to mainnet
+    "exports.chainlinkTokenAddress = '0x01BE23585060835E02B77ef475b0Cc51aA1e0709';" + // When we deploy to mainnet
     "\nexports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';";
 
   // Write data in 'Output.txt' .
+  console.log("Writing contract addresses...");
   fs.writeFileSync(
     "../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js",
     textData,
@@ -157,8 +159,9 @@ const main = async () => {
     }
   );
 
-  //This copies the abi from our build folder to a dedicated folder in the backend folder
-  let contractNames = ["LeagueMaker", "LeagueOfLegendsLogic", "GameItems"];
+  // This copies the abi from our build folder to a dedicated folder in the backend folder
+  // Note: don't really need this anymore since scripts are in contracts folder now
+  let contractNames = ["LeagueMaker", "LeagueOfLegendsLogic", "Athletes"];
   contractNames.forEach(async (contractName) => {
     srcPath =
       "./build/contracts/contracts/" +
@@ -193,5 +196,3 @@ const runMain = async () => {
 };
 
 runMain();
-
-//Latest contract address (rinkeby) --> 0x94b90ca07014F8B67A6bCa8b1b7313d5fD8D2160 (created 2/10 4pm)

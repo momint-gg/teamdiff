@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
-const LeagueOfLegendsLogicJSON = require("../../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
+// const LeagueOfLegendsLogicJSON = require("../../build/contracts/contracts/LeagueOfLegendsLogic.sol/LeagueOfLegendsLogic.json");
 const fs = require("fs");
-const constructorArgs = require("../../constructorArgs");
+// const constructorArgs = require("../../constructorArgs");
 
 const main = async () => {
   console.log("deploying...");
@@ -125,15 +125,6 @@ const main = async () => {
   //Signers
   // [owner, addr1, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
 
-  // // Deploying test USDC contract
-  // TestUSDCContractFactory = await hre.ethers.getContractFactory("TestUSDC");
-  // testUsdcContract = await TestUSDCContractFactory.deploy(); // Setting supply as 100
-  // await testUsdcContract.deployed();
-  // testUsdcContract.connect(owner);
-  // console.log("Test USDC Deployed to: " + testUsdcContract.address);
-  // textData += "exports.TestUSDC = \'" + testUsdcContract.address + "\';\n";
-  textData +=
-    "exports.TestUSDC = '0x7Eec3A6940d29514424AAB501A36327929a10A62';\n";
 
   // Deploying athletes contract
   // AthletesContractFactory = await hre.ethers.getContractFactory("Athletes");
@@ -147,7 +138,7 @@ const main = async () => {
 
   //Adding polygonUSDC and rinkebyUSDC to contract addresses file
   textData +=
-    "exports.polygonUSDCAddress = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';" + // When we deploy to mainnet
+    "exports.chainlinkTokenAddress = '0x01BE23585060835E02B77ef475b0Cc51aA1e0709';" + // When we deploy to mainnet
     "\nexports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';";
 
   // Write data in 'Output.txt' .

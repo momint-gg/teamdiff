@@ -30,9 +30,10 @@ import { useEffect, useState } from "react";
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+// import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
+import ERC20JSON from "../../backend/contractscripts/contract_info/rinkebyAbis/ERC20.json";
 import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
 import AddToWhitelist from "../components/AddToWhitelist.js";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt.js";
@@ -77,7 +78,7 @@ const StyledButton = styled(Button)`
 export default function CreateLeague({ setDisplay }) {
   const defaultValues = {
     leagueName: "",
-    // token: "usdc",
+    token: "usdc",
     buyInCost: "",
     payoutSplit: "default",
     whitelistedAddresses: [],
@@ -218,7 +219,8 @@ export default function CreateLeague({ setDisplay }) {
     newLeagueName,
     newLeagueProxyAddress,
     newLeagueAdminAddress,
-    initialWhitelistAddresses
+    initialWhitelistAddresses,
+    stakeTokenAddress
   ) => {
     // Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -243,9 +245,10 @@ export default function CreateLeague({ setDisplay }) {
       );
       LeagueProxyContractWithSigner.once("Staked", stakedEventCallback);
 
-      const RinkebyUSDCContract = new ethers.Contract(
-        "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
-        RinkebyUSDCJSON,
+      const TokenContract = new ethers.Contract(
+        stakeTokenAddress,
+        // does this need to be a special json, or are all erc20 json the same
+        ERC20JSON,
         signer
       );
 
@@ -253,7 +256,7 @@ export default function CreateLeague({ setDisplay }) {
       // Required for staking
       const stakeAmount = await LeagueProxyContractWithSigner.stakeAmount();
       // TODO: set correct stakeamount
-      const approvalTxn = await RinkebyUSDCContract.approve(
+      const approvalTxn = await TokenContract.approve(
         newLeagueProxyAddress,
         stakeAmount * 1000000
       ).catch((error) => {
@@ -297,12 +300,6 @@ export default function CreateLeague({ setDisplay }) {
               // setIsCreatingLeague(false);
             });
       });
-
-      // console.log("Finsihed creating league: "
-      //             + "\n\tname: " + newLeagueName
-      //             + "\n\tproxy address: " + newLeagueProxyAddress
-      //             + "\n\tadmin address: " + newLeagueAdminAddress);
-      //             // + "\n\tstate of invite list: " + inviteListValues);
     }
   };
 
@@ -311,6 +308,7 @@ export default function CreateLeague({ setDisplay }) {
     // Get Provider of session, and create wallet signer object from provider (to sign transactions as user)
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
+
     console.log("league name" + formValues.leagueName);
     if (formValues.leagueName === "") {
       alert("Please enter valid league name.");
@@ -319,6 +317,24 @@ export default function CreateLeague({ setDisplay }) {
     } else if (formValues.buyInCost > 100) {
       alert("Please enter a buy-in cost below 100 USDC.");
     } else {
+      let stakeTokenAddress;
+      switch (formValues.token) {
+        case "usdc":
+          stakeTokenAddress = CONTRACT_ADDRESSES.rinkebyUSDCAddress;
+          // stakeTokenAddress = CONTRACT_ADDRESSES.polygonUSDCAddress;
+          break;
+        case "ETH":
+          stakeTokenAddress = CONTRACT_ADDRESSES.chainlinkTokenAddress;
+          // stakeTokenAddress = CONTRACT_ADDRESSES.wrappedEthAddress;
+          break;
+        // TODO update for prod
+        // case "MATIC":
+        //   // stakeTokenAddress = CONTRACT_ADDRESSES.maticAddress
+        //   break;
+        default:
+          stakeTokenAddress = CONTRACT_ADDRESSES.rinkebyUSDCAddress;
+          break;
+      }
       // Connect to leagueMaker with connect wallet
       const leagueMakerContractWithSigner = leagueMakerContract.connect(signer);
       // console.log("submission values: " + (formValues.inviteListStatus === "open"));
@@ -331,7 +347,7 @@ export default function CreateLeague({ setDisplay }) {
           !isPrivate,
           // false,
           connectedAccount,
-          CONTRACT_ADDRESSES.TestUSDC,
+          stakeTokenAddress,
           CONTRACT_ADDRESSES.Athletes,
           CONTRACT_ADDRESSES.GameItems,
           inviteListValues,
@@ -381,7 +397,7 @@ export default function CreateLeague({ setDisplay }) {
       setIsValidBuyInCost(true);
     } else if (
       isNaN(formValues.buyInCost) ||
-      Number(formValues.buyInCost) <= 0 ||
+      Number(formValues.buyInCost) < 0 ||
       Number(formValues.buyInCost) > 100
     ) {
       // console.log("uhoh")
@@ -568,8 +584,12 @@ export default function CreateLeague({ setDisplay }) {
                     <MenuItem key="usdc" value="usdc">
                       USDC
                     </MenuItem>
-                    {/* <MenuItem key="eth" value="eth">eth</MenuItem>
-                  <MenuItem key="other" value="other">other</MenuItem> */}
+                    <MenuItem key="ETH" value="ETH">
+                      ETH
+                    </MenuItem>
+                    {/* <MenuItem key="MATIC" value="MATIC">
+                      MATIC
+                    </MenuItem> */}
                   </Select>
                   {/* </FormControl> */}
                 </FormControl>
