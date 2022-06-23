@@ -446,6 +446,8 @@ export default function LeagueDetails() {
               {hasJoinedLeague && (
                 <>
                   <ViewLeagueTeamsTable 
+                    connectedAccount={connectedAccount}
+                    leagueAddress={router.query.leagueAddress}
                     leagueName={leagueName} 
                     teamNames={leagueMembers}
                     teamRecords={playerRecords}
