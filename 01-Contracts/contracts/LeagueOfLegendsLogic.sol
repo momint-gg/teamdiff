@@ -219,13 +219,13 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // User joining the league
     function joinLeague() public nonReentrant {
+        require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(
             (whitelistContract.whitelist(msg.sender) ||
                 whitelistContract.isPublic() ||
                 msg.sender == admin),
             "User is not on whitelist bro."
         );
-        require(!leagueEntryIsClosed, "League Entry is Closed!");
         require(!inLeague[msg.sender], "You have already joined this league");
         require(
             erc20.balanceOf(msg.sender) > stakeAmount ||
@@ -312,7 +312,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
         whitelistContract.addAddressToWhitelist(_userToAdd);
 
-        //TODO this mapp contain users to league and whitelisted leagues
+        //TODO this mapp contain users to league and whitelisted leagues (TODO Delete below)
         // leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
         // // whitelist[_userToAdd] = true;
     }

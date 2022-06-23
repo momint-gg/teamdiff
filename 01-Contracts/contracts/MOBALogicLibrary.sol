@@ -233,24 +233,4 @@ library MOBALogicLibrary {
             }
         }
     }
-
-    // Read-only function for users to verify scores were calculated correctly
-    function calculateScoreOnChain(
-        LeagueOfLegendsLogic.Stats calldata athleteStats
-    ) public pure returns (uint256) {
-        //calculate score with given stats
-        uint256 score = 0;
-        score += 2 * athleteStats.kills * 100;
-        score -= athleteStats.deaths * 100;
-        score += athleteStats.assists * 100;
-        score += (athleteStats.minionScore * 100) / 50;
-        if (athleteStats.kills >= 10) {
-            score += 500;
-        }
-        if (athleteStats.assists >= 10) {
-            score += 500;
-        }
-        //returns the score * 100, can scale down on frontend to enable floats
-        return score;
-    }
 }
