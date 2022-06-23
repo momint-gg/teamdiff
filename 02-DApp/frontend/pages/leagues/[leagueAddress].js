@@ -13,6 +13,8 @@ import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_
 import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
+import ViewLeagueTeamsTable from "../../components/ViewLeagueTeamsTable.js";
+import ViewLeagueTeamMatchups from "../../components/ViewLeagueTeamMatchups.js";
 import constants from "../../Constants";
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
 export default function LeagueDetails() {
@@ -49,6 +51,10 @@ export default function LeagueDetails() {
   const [inviteListValues, setInviteListValues] = useState([]);
   const [addPlayerBtnEnabled, setAddPlayerBtnEnabled] = useState(true);
   const [validAddressesStatus, setValidAddressesStatus] = useState(true);
+  const [leagueMembers, setLeagueMembers] = useState([])
+  const [playerRecords, setPlayerRecords] = useState([])
+
+  const [weekNum, setWeekNum] = useState()
 
   // Menu Import
   const [anchorEl, setAnchorEl] = useState(null);
@@ -160,6 +166,18 @@ export default function LeagueDetails() {
         if (isInLeague) {
           router.push("./" + router.query.leagueAddress + "/myTeam");
         }
+
+        const members = await LeagueProxyContract.leagueMembers()
+        const records = []
+        for (let i = 0; i < members.length; i++) {
+          const r = await LeagueProxyContract.getUserRecord(members[i])
+          records.push(r)
+        }
+        setLeagueMembers(members)
+        setPlayerRecords(records) // ?? what is this format??
+        const week = await LeagueProxyContract.currentWeekNum()
+        setWeekNum(week)
+
         // // console.log("isInLeague: " + isInLeague)
         // Get whitelist of Proxy, to confirm connected user is on whitelist
         const whitelistAddress = await LeagueProxyContract.whitelistContract();
@@ -427,7 +445,18 @@ export default function LeagueDetails() {
               )}
               {hasJoinedLeague && (
                 <>
-                  <Link>
+                  <ViewLeagueTeamsTable 
+                    connectedAccount={connectedAccount}
+                    leagueAddress={router.query.leagueAddress}
+                    leagueName={leagueName} 
+                    teamNames={leagueMembers}
+                    teamRecords={playerRecords}
+                    />
+                  <ViewLeagueTeamMatchups 
+                    weekNumber={weekNum}
+                    weeklyMatchups={undefined} // TODO
+                  />
+                  {/* <Link>
                     <a
                       className="primary-link"
                       href={
@@ -462,7 +491,7 @@ export default function LeagueDetails() {
                         Click to view league on TeamDiff
                       </Typography>
                     </a>
-                  </Link>
+                  </Link> */}
                   <br></br>
                 </>
               )}

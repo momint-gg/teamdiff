@@ -48,7 +48,7 @@ import { Container, TableContainer, Table, TableHead, TableRow, TableCell, Typog
 
 // const leagueName = "WashU Esports"
 
-const ViewLeagueTeamsTable = ({ leagueName, teamNames, teamRecords }) => {
+const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, teamNames, teamRecords }) => {
     return (
         <Container
         sx={{
@@ -87,15 +87,22 @@ const ViewLeagueTeamsTable = ({ leagueName, teamNames, teamRecords }) => {
                 <TableBody>
                     {teamNames.map((team, idx) => {
                         const record = teamRecords[idx]
+                        const teamURL = connectedAccount === team 
+                            ? "/myTeam?leagueRoute="+connectedAccount 
+                            : "/leagues/"+leagueAddress+"/"+team
                         return (
                             <TableRow 
                             key={team}
                             sx={{ background: idx % 2 ? "#473D3D" : "#8E8E8E" }}
                             >
                                 <TableCell align="center">
-                                    <Typography fontSize={30}>
-                                        {team}
-                                    </Typography>
+                                    <Link
+                                        href={teamURL}
+                                    >
+                                        <Typography fontSize={30}>
+                                            {team}
+                                        </Typography>                                  
+                                    </Link>
                                 </TableCell>
                                 <TableCell align="center">
                                     <Typography fontSize={30}>

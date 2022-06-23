@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, Paper, Typography, Divider } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Paper, Typography, Divider, Link } from "@mui/material";
 import { border } from "@mui/system";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -9,7 +9,9 @@ import { Fragment, useEffect, useState } from "react";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import logo from "../assets/images/logoIcon.png";
 
+
 export default function LeagueCard({ leagueAddress }) {
+
   // Router
   const router = useRouter();
 
@@ -22,6 +24,7 @@ export default function LeagueCard({ leagueAddress }) {
   const [leagueName, setLeagueName] = useState(null);
   const [weekNum, setWeekNum] = useState(null);
   const [leagueSize, setLeagueSize] = useState(1);
+  const [matchups, setMatchups] = useState([])
 
   useEffect(() => {
     if (leagueAddress) {
@@ -34,9 +37,11 @@ export default function LeagueCard({ leagueAddress }) {
       setLeagueProxyContract(LeagueProxyContract);
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
-        setLeagueName(leagueName);
         const weekNum = await LeagueProxyContract.currentWeekNum();
+        const matchupsRes = await LeagueProxyContract.getScheduleForWeek(weekNum)
         setWeekNum(parseInt(weekNum)+1);
+        setLeagueName(leagueName);
+        setMatchups(matchupsRes)
         let i = 0;
         let error = "none";
 
@@ -146,14 +151,21 @@ export default function LeagueCard({ leagueAddress }) {
               justifyContent:"space-evenly",
               marginBottom:"-6%",
               }}>
-                  
-            <Typography fontSize={18} fontWeight={"bold"} color="secondary">
-            MY TEAM
-          </Typography>
+            <Link 
+              href={"/myTeam?leagueRoute="+leagueAddress}
+            >
+              <Typography fontSize={18} fontWeight={"bold"} color="secondary">
+                MY TEAM
+              </Typography>
+            </Link>
             {/* <Divider orientation="vertical" variant="middle" flexItem /> */}
-          <Typography fontSize={18} fontWeight={"bold"} variant="body1" color="secondary">
-            VIEW LEAGUE
-          </Typography>          
+            <Link 
+              href={"/leagues/"+leagueAddress}
+            >
+              <Typography fontSize={18} fontWeight={"bold"} variant="body1" color="secondary">
+                VIEW LEAGUE
+              </Typography>      
+            </Link>    
         </Box>
           </Box>
           
@@ -162,14 +174,8 @@ export default function LeagueCard({ leagueAddress }) {
     </Fragment>
   );
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    const href = "/leagues/" + leagueAddress;
-    router.push(href);
-  };
-
   return (
-    <Card variant="outlined" onClick={handleClick}
+    <Card variant="outlined" 
     sx={{
       background: "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
       borderRadius: "10%",
