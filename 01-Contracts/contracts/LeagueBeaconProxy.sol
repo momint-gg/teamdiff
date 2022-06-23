@@ -30,9 +30,7 @@ contract LeagueBeaconProxy is
     Ownable,
     AccessControl
 {
-        using SafeMath for uint256;
-
-    string public leagueName;
+ string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
     uint256 public currentWeekNum;
@@ -44,6 +42,7 @@ contract LeagueBeaconProxy is
     mapping(uint256 => uint256[8]) athleteToLineupOccurencesPerWeek; //checking to make sure athlete IDs only show up once per week, no playing the same NFT multiple times
     mapping(address => uint256[8]) public userToRecord; // User to their record
     mapping(address => uint256[5]) public userToLineup; // User to their lineup
+    mapping(address => uint256[8]) public userToWeekScore; // User to their team's score each week
     mapping(address => uint256) public userToPoints; // User to their total points (win = 2 pts, tie = 1 pt)
     mapping(address => bool) public inLeague; // Checking if a user is in the league
     address[] public leagueMembers; // Contains league members (don't check this in requires though, very slow/gas intensive)
@@ -64,8 +63,6 @@ contract LeagueBeaconProxy is
         uint256 assists;
         uint256 minionScore;
     }
-    // address public polygonUSDCAddress = ; // When we deploy to mainnet
-    address public rinkebyUSDCAddress;
 
     // TODO: Make contracts (Athletes, LeagueMaker, and IERC20) constant/immutable unless changing later
     // Won't want to make whitelist immutable
@@ -73,7 +70,7 @@ contract LeagueBeaconProxy is
     Athletes athletesContract;
     Whitelist public whitelistContract;
     LeagueMaker leagueMakerContract;
-    // IERC20 public testUSDC;
+    IERC20 public testUSDC;
     IERC20 public rinkebyUSDC;
     GameItems gameItemsContract;
 
@@ -81,9 +78,9 @@ contract LeagueBeaconProxy is
     //*** Events ***/
     /***************/
     event Staked(address sender, uint256 amount, address leagueAddress);
+    event athleteSetInLineup(address sender, uint256 index, uint256 position);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
-    
     /**
      * @dev Initializes the proxy with `beacon`.
      *

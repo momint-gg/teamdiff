@@ -212,11 +212,11 @@ export default function LeagueDetails() {
           }
         }
       };
+      fetchData();
 
       getNFTData().catch((error) => {
         console.log("fetch NFT DATA error: " + error);
       });
-      fetchData();
     } else {
       // alert("no account data or league Address found, please refresh.");
       // console.log("no account data or league Address found");

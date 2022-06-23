@@ -77,6 +77,8 @@ export default function MyLeagues({ setDisplay }) {
 
         // Continue to add leagues to activeLEagueList and pendingLeagueList
         // until we hit an error (because i is out of range presumably)
+        const activeLeaguesTemp = [];
+        const pendingLeaguesTemp = [];
         do {
           const whitelistedLeague = await LeagueMakerContract.userToLeagueMap(
             connectedAccount,
@@ -108,16 +110,14 @@ export default function MyLeagues({ setDisplay }) {
             // Add League address  to appropriate state list
             // TODO we
             isInLeague
-              ? setActiveLeagueList((activeLeagueList) => [
-                  ...activeLeagueList,
-                  whitelistedLeague,
-                ])
-              : setPendingLeagueList((pendingLeagueList) => [
-                  ...pendingLeagueList,
-                  whitelistedLeague,
-                ]);
+              ? !activeLeaguesTemp.includes(whitelistedLeague) &&
+                activeLeaguesTemp.push(whitelistedLeague)
+              : !pendingLeaguesTemp.includes(whitelistedLeague) &&
+                pendingLeaguesTemp.push(whitelistedLeague);
           }
         } while (error == "none");
+        setActiveLeagueList(activeLeaguesTemp);
+        setPendingLeagueList(pendingLeaguesTemp);
       }
       fetchData();
     } else {
