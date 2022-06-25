@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract Whitelist is Ownable {
     mapping(address => bool) public whitelist;
+    address[] public whitelistedAddresses;
     //address leagueCreator;
     uint256 numWhitelisted; // Keeping track of the number of users whitelisted (slight modification to code)
     bool public isPublic; // Should be false by default
@@ -53,6 +54,7 @@ contract Whitelist is Ownable {
     {
         if (!whitelist[addr]) {
             whitelist[addr] = true;
+            whitelistedAddresses.push(addr);
             emit WhitelistedAddressAdded(addr);
             numWhitelisted += 1;
             success = true;

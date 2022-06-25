@@ -207,7 +207,7 @@ export default function LeagueCard({ leagueAddress }) {
                 </Link>
                 {/* <Divider orientation="vertical" variant="middle" flexItem /> */}
                 <Link
-                  href={"./leagues/" + leagueAddress + "/schedule"}
+                  href={"./leagues/" + leagueAddress + "/home"}
                   fontSize={18}
                   fontWeight={"bold"}
                   variant="body1"

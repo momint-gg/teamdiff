@@ -160,9 +160,7 @@ export default function JoinLeague({ setDisplay }) {
               WhitelistJSON.abi,
               provider
             );
-            // Determine if connected wallet has joined this whitelisted League Address
-            // const isInLeague = await LeagueProxyContract.inLeague("0xD926A3ddFBE399386A26B4255533A865AD98f7E3");
-            // TODO create an instance of whitelist contract and read isPublic from that;
+
             const isPublic = await WhitelistContract.isPublic();
             // const isPublic = await LeagueProxyContract.isPublic();
             // console.log("\tIs public: " + isPublic);
