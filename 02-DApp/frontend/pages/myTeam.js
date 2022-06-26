@@ -276,7 +276,7 @@ export default function MyTeam() {
   };
 
   const athleteSetCallback = async (sender, id, position) => {
-    if (sender == connectedAccount && isSettingAthlete) {
+    if (sender == connectedAccount) {
       setIsSettingAthlete(false);
       alert(
         "Successfully set Athlete id #" +

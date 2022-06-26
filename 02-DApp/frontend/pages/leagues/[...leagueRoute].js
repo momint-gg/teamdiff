@@ -255,7 +255,7 @@ export default function LeaguePlayRouter() {
         const record = await LeagueProxyContract.getUserRecord(leagueMember);
         // const record = await LeagueProxyContract.userToRecord(leagueMember, week);
         // const leagueMember =
-        console.log("league member #" + i + ": " + record);
+        // console.log("league member #" + i + ": " + record);
 
         leagueMembersTemp.push(shortenAddress(leagueMember));
         records.push(formatUserRecordHelper(record, currentWeekNum));
@@ -374,6 +374,8 @@ export default function LeaguePlayRouter() {
         <Matchups
           daysTillLock={daysTillLock}
           daysTillUnlock={daysTillUnlock}
+          // LeagueProxyContract={leagueProxyContract}
+          // AthleteContract={athleteContract}
         ></Matchups>
       );
       break;

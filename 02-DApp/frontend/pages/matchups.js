@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
@@ -78,8 +79,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [isError, setIsError] = useState(false);
   const [hasFetchedComp1Scores, setHasFetchedComp1Scores] = useState(false);
   const [hasFetchedComp2Scores, setHasFetchedComp2Scores] = useState(false);
+  const [leagueSize, setLeagueSize] = useState();
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
   let shifter = 0;
+  // let leagueSize = 0;
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -168,6 +171,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
         // Get league size
         const leagueSize = await getLeagueSizeHelper(LeagueProxyContract);
+        setLeagueSize(leagueSize);
+        // console.log("size: " + leagueSize);
 
         // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
@@ -192,45 +197,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
           if (weekMatchups.length > 0) {
             setLeagueScheduleIsSet(true);
-
-            // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
-            for (let j = 0; j <= 1; j++) {
-              const starterIds = [];
-              // const comp = [-1, -1, -1, -1, -1];
-              let competitorAccount;
-              j == 0
-                ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
-                : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
-              for (let i = 0; i <= 4; i++) {
-                const id = await LeagueProxyContract.userToLineup(
-                  competitorAccount,
-                  i
-                ).catch((e) => {
-                  console.error("userToLineup error: " + e);
-                  setIsError(true);
-                });
-                // TODO this will return 0 if starter is not set for position,
-                // but sometimes we want that if a user sets athlete id #0, init all startEr ids to be -1 in contract
-                starterIds[i] = id;
-              }
-              j == 0
-                ? setCompetitor1StarterAthleteIds(starterIds)
-                : setCompetitor2StarterAthleteIds(starterIds);
-              // let scores;
-              // const fetchData = async () => {
-              //   if (starterIds != comp && AthleteContract) {
-              //     console.log("in if statement: " + starterIds);
-              //     scores = await getStarterAthleteData(
-              //       starterIds,
-              //       AthleteContract
-              //     );
-              //     console.log("setting state scores to " + scores);
-              //     if (scores) setCompetitor1StarterAthleteScores(scores);
-              //     // await calculateMatchupScore();
-              //   }
-              // };
-              // fetchData();
-            }
+            getSelectedMatchupStarterIds(weekMatchups, LeagueProxyContract);
           } else {
             console.log("leagueSchedule not set");
             setLeagueScheduleIsSet(false);
@@ -245,48 +212,59 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         }
       }
 
-      // function to loop through and get league schedule (not used rn)
-      // async function getLeagueSchedule() {
-      //   let i = 0;
-      //   let error = "none";
-      //   do {
-      //     await leagueProxyContract.leagueMembers(i).catch((_error) => {
-      //       error = _error;
-      //       // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-      //       // console.log("User To League Map Error: " + _error.message);
-      //     });
-
-      //     if (error == "none") {
-      //       i++;
-      //     }
-      //     // console.log("error value at end:" + error);
-      //   } while (error == "none");
-      //   const leagueSize = i;
-
-      //   console.log("league size: " + leagueSize);
-      //   let weekMatchups = [];
-      //   weekMatchups = await leagueProxyContract
-      //     .getScheduleForWeek(currentWeekNum)
-      //     .catch((_error) => {
-      //       // error = _error;
-      //       alert("Error! : " + JSON.stringify(error, null, 2));
-      //       // console.log("User To League Map Error: " + _error.message);
-      //     });
-
-      //   const shifter = 4 - Math.round(leagueSize / 2);
-      //   // console.log("shifter size: " + shifter);
-
-      //   weekMatchups = weekMatchups.slice(shifter);
-      //   // weekMatchups.map((matchup, index) => {
-      //   //   console.log("matchup #" + index + ": " + matchup);
-      //   // });
-
-      //   setSelectedWeekMatchups(weekMatchups);
-      // }
-
       fetchData();
     }
   }, [isConnected, router.isReady, connectedAccount]);
+
+  const getSelectedMatchupStarterIds = async (
+    weekMatchups,
+    LeagueProxyContract
+  ) => {
+    // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
+    for (let j = 0; j <= 1; j++) {
+      // console.l
+      const starterIds = [100, 100, 100, 100, 100];
+      // const comp = [-1, -1, -1, -1, -1];
+      let competitorAccount;
+      j == 0
+        ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
+        : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
+      console.log("competitor addy: " + competitorAccount + "\n\tj: " + j);
+
+      // If playing bye week, set starter ids to  null
+      if (
+        competitorAccount == "0x0000000000000000000000000000000000000000" &&
+        j == 0
+      )
+        setCompetitor1StarterAthleteIds([100, 100, 100, 100, 100]);
+      else if (
+        competitorAccount == "0x0000000000000000000000000000000000000000" &&
+        j == 1
+      ) {
+        setCompetitor2StarterAthleteIds([100, 100, 100, 100, 100]);
+        console.log("setting comp1 to 100");
+        // break;
+        // 0x0000000000000000000000000000000000000000
+      } else {
+        for (let i = 0; i <= 4; i++) {
+          const id = await LeagueProxyContract.userToLineup(
+            competitorAccount,
+            i
+          ).catch((e) => {
+            console.error("userToLineup error: " + e);
+            setIsError(true);
+          });
+          // TODO this will return 0 if starter is not set for position,
+          // but sometimes we want that if a user sets athlete id #0, init all startEr ids to be -1 in contract
+          starterIds[i] = id;
+        }
+        console.log("starter id: " + starterIds + " \n\tj: " + j);
+        j == 0
+          ? setCompetitor1StarterAthleteIds(starterIds)
+          : setCompetitor2StarterAthleteIds(starterIds);
+      }
+    }
+  };
 
   useEffect(() => {
     if (selectedWeekMatchups && leagueScheduleIsSet) {
@@ -352,20 +330,24 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             ? setCompetitor1OwnedAthletesMetadata(athleteMetadata)
             : setCompetitor2OwnedAthletesMetadata(athleteMetadata);
         }
-        competitor1OwnedAthletesMetadata.forEach((athlete, index) => {
-          if (index == 0)
-            console.log(
-              "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
-            );
-        });
-        // setIsLoading(false);
+        await getSelectedMatchupStarterIds(
+          selectedWeekMatchups,
+          leagueProxyContract
+        );
+        // competitor1OwnedAthletesMetadata.forEach((athlete, index) => {
+        //   if (index == 0)
+        //     console.log(
+        //       "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
+        //     );
+        // });
+        setIsLoading(false);
       };
       getNFTData();
       // .catch((error) => {
       //   alert("fetch NFT DATA error: " + error);
       // });
     }
-  }, [selectedWeekMatchups, leagueScheduleIsSet]);
+  }, [selectedWeekMatchups, selectedMatchup, leagueScheduleIsSet]);
 
   // UseEffect to fetch the athlete scores on a change in competitorSTarterIds state var
   useEffect(() => {
@@ -377,12 +359,14 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       // setIsLoading(true);
       // console.log("getting the data from use effect");
       // let scores;
+      setHasFetchedComp1Scores(false);
+      setHasFetchedComp2Scores(false);
       const fetchData = async () => {
         await getStarterAthleteData();
       };
       fetchData();
     }
-  }, [isLoading]);
+  }, [isLoading, competitor1StarterAthleteIds]);
   // }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
 
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
@@ -404,11 +388,14 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   };
 
   const getStarterAthleteData = async () => {
+    // setHasFetchedComp1Scores(false);
+    // setHasFetchedComp2Scores(false);
+
     // Create scores array for competitor 1 starter athletes
     const c1Scores = competitor1StarterAthleteScores;
     let score;
     competitor1StarterAthleteIds.forEach(async (id, index) => {
-      // if (id != -1) {
+      // if (id != 100) {
       // TODO if id #-1 is passed in, return -1
       score = await athleteContract
         .athleteToScores(id, currentWeekNum)
@@ -418,6 +405,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           );
           // score = null;
         });
+      // console.log("score for id#" + id + ": " + score);
+      // only update array if score is not defualt value
+      if (score != -1) c1Scores[index] = score;
       // this if statement should always evaulate eventually
       if (index == 4) {
         // if (index == competitor1StarterAthleteIds.length - 1) {
@@ -430,9 +420,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         // return c1Scores;
       }
       // }
-      // console.log("score for id#" + id + ": " + score);
-      // only update array if score is not defualt value
-      if (score != -1) c1Scores[index] = score;
+      // }
     });
 
     // Create scores array for competitor 1 starter athletes
@@ -550,6 +538,41 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                   width: "85vw",
                 }}
               >
+                <Container
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "10px",
+                  }}
+                >
+                  {selectedMatchup > 0 && (
+                    <AiOutlineArrowLeft
+                      size={"1.5rem"}
+                      onClick={() =>
+                        setSelectedMatchup(
+                          (selectedMatchup) => selectedMatchup - 1
+                        )
+                      }
+                      style={{ cursor: "pointer" }}
+                    />
+                  )}
+                  <Typography fontSize={30}>
+                    Matchups {selectedMatchup}
+                  </Typography>
+                  {selectedMatchup + 2 < leagueSize && (
+                    <AiOutlineArrowRight
+                      size={"1.5rem"}
+                      onClick={() =>
+                        setSelectedMatchup(
+                          (selectedMatchup) => selectedMatchup + 1
+                        )
+                      }
+                      style={{ cursor: "pointer" }}
+                    />
+                  )}
+                </Container>
                 <Box
                   sx={{
                     display: "flex",
@@ -620,7 +643,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                         competitor1StarterAthleteIds[index];
                       if (competitor1StarterId != 100)
                         console.log(
-                          "c1 starter score: " + competitor1StarterAthleteScores
+                          "c2 starter ids: " + competitor2StarterAthleteIds
                         );
                       const competitor1Athlete =
                         competitor1OwnedAthletesMetadata[competitor1StarterId];
