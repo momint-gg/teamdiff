@@ -106,7 +106,6 @@ export default function LeagueCard({ leagueAddress }) {
           >
             <Link
               href={"./leagues/" + leagueAddress + "/myTeam"}
-              target={"_blank"}
               fontSize={18}
               fontWeight={"bold"}
               variant="body1"

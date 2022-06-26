@@ -159,7 +159,7 @@ const ViewLeagueTeamMatchup = ({
           </Table>
         </TableContainer>
       ) : (
-        <Typography textAlign={"center"}>
+        <Typography textAlign={"center"} color="primary">
           Oops! Your league's schedule has not been set yet. Please request help
           in Discord if this issue persists past the end of the week.
         </Typography>
