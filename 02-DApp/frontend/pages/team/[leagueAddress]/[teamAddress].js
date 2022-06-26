@@ -1,10 +1,41 @@
-import { useRouter } from 'next/router'
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import { makeStyles } from "@material-ui/core";
+import {
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from "@mui/material";
+// Web3 Imports
+import { ethers } from "ethers";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
+// Contract imports
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import logo from "../assets/images/mystery_card.png";
+import LoadingPrompt from "../components/LoadingPrompt.js";
+import PlayerSelectModal from "../components/PlayerSelectModal";
+import PlayerStateModal from "../components/PlayerStateModal";
+import constants from "../constants";
 
-export default function OtherTeam() {
-    const router = useRouter()
+// TODO get data from backend
 
-// TODO change to matic network for prod
-const provider = new ethers.providers.AlchemyProvider(
+export default function MyTeam() {
+  // Router params
+  const router = useRouter();
+  // TODO change to matic network for prod
+  const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.RINKEBY_ALCHEMY_KEY
   );
@@ -38,6 +69,7 @@ const provider = new ethers.providers.AlchemyProvider(
   const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState();
   const [isLineupLocked, setIsLineupLocked] = useState();
+  const [isSettingAthlete, setIsSettingAthlete] = useState();
 
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
@@ -78,7 +110,7 @@ const provider = new ethers.providers.AlchemyProvider(
       setAccountData();
     });
     provider.provider.on("disconnect", () => {
-      console.log("disconnected");
+      // console.log("disconnected");
       setIsConnected(false);
     });
   }, [isConnected]);
@@ -86,7 +118,7 @@ const provider = new ethers.providers.AlchemyProvider(
   useEffect(() => {
     setAthleteNFTs([]);
     if (isConnected && router.isReady) {
-      // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
+      // // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
@@ -100,6 +132,7 @@ const provider = new ethers.providers.AlchemyProvider(
       //   provider
       // );
       setLeagueProxyContract(LeagueProxyContract);
+      LeagueProxyContract.on("AthleteSetInLineup", athleteSetCallback);
 
       // Initialize connections to Athlete datastore contract
       const AthleteContract = new ethers.Contract(
@@ -117,8 +150,9 @@ const provider = new ethers.providers.AlchemyProvider(
 
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        // const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
-        // setIsLeagueMember(isInLeague);
+        const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
+        setIsLeagueMember(isInLeague);
+        // TODO if is not league member, refresh the page
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
         const starterIds = [null, null, null, null, null];
@@ -132,11 +166,6 @@ const provider = new ethers.providers.AlchemyProvider(
         setStarterAthleteIds(starterIds);
         // This ussually takes the longest, so set isLoading to false here
         setIsLoading(false);
-
-        // TODO if is not league member, refresh the page
-        // if (!isInLeague) {
-        //   router.reload(window.location.pathname);
-        // }
       }
 
       // declare the async data fetching function
@@ -158,12 +187,12 @@ const provider = new ethers.providers.AlchemyProvider(
             contractAddress: CONTRACT_ADDRESSES.GameItems,
             tokenId: token,
           });
-          console.log(
-            "Token #" +
-              token +
-              " metadata: " +
-              JSON.stringify(response, null, 2)
-          );
+          // console.log(
+          //   "Token #" +
+          //     token +
+          //     " metadata: " +
+          //     JSON.stringify(response, null, 2)
+          // );
           if (!response.title?.includes("Pack")) {
             athleteMetadata[parseInt(token)] = response.metadata;
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
@@ -174,56 +203,56 @@ const provider = new ethers.providers.AlchemyProvider(
 
         // athleteMetadata.forEach((athlete, index) => {
         //   if (index == 0)
-        //     console.log(
+        //     // console.log(
         //       "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
         //     );
         // });
       };
 
       getNFTData().catch((error) => {
-        console.log("fetch NFT DATA error: " + error);
+        // console.log("fetch NFT DATA error: " + error);
       });
 
       fetchData();
       // getStarterAthleteData(starterAthleteIds);
     } else {
       // alert("no account data or league Address found, please refresh.");
-      console.log("no account data or league Address found");
-      // console.log("router: " + JSON.stringify(router.query, null, 2));
-      //   console.log("leagueAddress: " + leagueAddress);
+      // console.log("no account data or league Address found");
+      // // console.log("router: " + JSON.stringify(router.query, null, 2));
+      //   // console.log("leagueAddress: " + leagueAddress);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
   useEffect(() => {
-    // console.log("isLoading: " + isLoading);
+    // // console.log("isLoading: " + isLoading);
     if (starterAthleteIds) {
       getStarterAthleteData();
       // setCurrentPositionIndex(1);
-      // console.log(
+      // // console.log(
       //   "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
       // );
     }
   }, [starterAthleteIds]);
 
   const getStarterAthleteData = async () => {
-    console.log("starterID: " + starterAthleteIds);
+    // console.log("starterID: " + starterAthleteIds);
     starterAthleteIds.forEach(async (id, index) => {
-      if (id != 0 && currentWeekNum > 0) {
+      if (id != 100 && currentWeekNum > 0) {
         const prevPoints = await athleteContract
           .athleteToScores(id, currentWeekNum - 1)
           .catch((error) => {
-            console.log(JSON.stringify(error, null, 2));
+            // console.log(JSON.stringify(error, null, 2));
             // prevPoints = null;
           });
-        // console.log("prevpoints: " + prevPoints);
+        // // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
-      } else if (id != 0) {
+      } else if (id != 100) {
         ownedAthletesMetadata[id].prevPoints = "n/a";
       }
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
     //   if (index == 0)
-    //     console.log(
+    //     // console.log(
     //       "after getting prevPointsathlete id #" +
     //         index +
     //         ": " +
@@ -236,31 +265,50 @@ const provider = new ethers.providers.AlchemyProvider(
     const result = [];
     ownedAthletesMetadata.map((athlete, index) => {
       // check if athlete has the currently selected positions
-      if (athlete.attributes[1].value == positions[currentPositionIndex]) {
+      if (athlete?.attributes[1].value == positions[currentPositionIndex]) {
         result[index] = athlete;
       }
     });
     return result;
   };
 
+  const athleteSetCallback = async (sender, id, position) => {
+    if (sender == connectedAccount) {
+      setIsSettingAthlete(false);
+      alert(
+        "Successfully set Athlete id #" +
+          id +
+          " in posiiton: " +
+          positions[position] +
+          ". " +
+          "\nPlease refresh to see changes."
+      );
+      // router.push()
+    } else {
+      console.log("event triggered but filtered");
+    }
+  };
+
   // TODO create a callback function for when athlete has been set in lineup
   const submitStarterHandler = async (athleteID, positionID) => {
     // const positions = ["Top", "Jungle", "Mid", "Laner", "Support"];
     // // const positionIndex = positionID;
-    console.log(
-      "setting athlete id#" + athleteID + " at postion #" + positionID
-    );
+    // console.log(
+    //   "setting athlete id#" + athleteID + " at postion #" + positionID
+    // );
 
     const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
 
     await leagueProxyContractWithSigner
       .setAthleteInLineup(athleteID, positionID)
-      .then(
-        console.log(
-          "setting athlete id#" + athleteID + " at postion #" + positionID
-        )
+      .then(() => {
+        // console.log(
+        //   "setting athlete id#" + athleteID + " at postion #" + positionID
+        // )
         // update state to listen to callback for when position is set
-      )
+        setIsSettingAthlete(true);
+        setSubModalOpen(false);
+      })
       .catch((error) => {
         if (error.data) {
           alert("Set Lineup error: " + error.data.message);
@@ -272,7 +320,7 @@ const provider = new ethers.providers.AlchemyProvider(
 
   const handleStateModal = (player, positionIndex) => {
     setSelectedPlayer(player);
-    console.log("setting current player: " + JSON.stringify(player, null, 2));
+    // console.log("setting current player: " + JSON.stringify(player, null, 2));
     setCurrentPositionIndex(positionIndex);
     setStateModalOpen(true);
   };
@@ -281,8 +329,8 @@ const provider = new ethers.providers.AlchemyProvider(
     setCurrentPositionIndex(positionIndex);
     setSelectedPlayer(player);
 
-    // console.log("setting pos: " + position);
-    console.log("setting current player: " + JSON.stringify(player, null, 2));
+    // // console.log("setting pos: " + position);
+    // console.log("setting current player: " + JSON.stringify(player, null, 2));
 
     setSubModalOpen(true);
   };
@@ -304,6 +352,12 @@ const provider = new ethers.providers.AlchemyProvider(
             alignItems: "center",
           }}
         >
+          {isSettingAthlete && (
+            <>
+              <Typography>Updating line-up on-chain...</Typography>
+              <CircularProgress></CircularProgress>
+            </>
+          )}
           <Typography
             variant="h4"
             color="white"
@@ -338,10 +392,10 @@ const provider = new ethers.providers.AlchemyProvider(
                     Player
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
-                    Previous Points
+                    Last Week Points
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
-                    Opponent
+                    This Week Opponent
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
                     Action
@@ -354,7 +408,9 @@ const provider = new ethers.providers.AlchemyProvider(
                   // NOTE: if id == 0, that means the connectedAccount has not
                   // set an athlete in that position for this week in their proxy
                   const athlete = ownedAthletesMetadata[id];
-
+                  console.log(
+                    "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
+                  );
                   return (
                     <TableRow
                       key={index.toString()}
@@ -367,11 +423,17 @@ const provider = new ethers.providers.AlchemyProvider(
                         </Typography>
                       </TableCell>
                       <TableCell
-                        sx={{ display: "flex", alignItems: "center" }}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          // justifyContent: "space-around",
+                          // justifyContent: "center",
+                        }}
                         align="center"
                       >
                         <Image
-                          src={id != 0 ? athlete.image : logo}
+                          src={id != 100 ? athlete?.image : logo}
                           width={"40"}
                           // layout="fill"
                           height={"40"}
@@ -381,10 +443,10 @@ const provider = new ethers.providers.AlchemyProvider(
                             fontSize={30}
                             onClick={() => handleStateModal(athlete, index)}
                           >
-                            {id != 0 ? athlete.name : "none set"}
+                            {id != 100 ? athlete?.name : "(none)"}
                           </Typography>
                           <Typography component="div">
-                            {id != 0 ? athlete.score : "n/a"}
+                            {id != 100 && athlete?.score}
                           </Typography>
                         </div>
                       </TableCell>
@@ -392,28 +454,26 @@ const provider = new ethers.providers.AlchemyProvider(
                         <div>
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
-                            {id != 0 && currentWeekNum != 0
-                              ? athlete.prevPoints
-                              : "none"}
+                            {id != 100 && currentWeekNum != 0
+                              ? athlete?.prevPoints
+                              : "(0)"}
                           </Typography>
-                          <Typography>
-                            {id != 0 && currentWeekNum != 0
-                              ? "69/69/69"
-                              : "no date"}
-                          </Typography>
+                          {/* <Typography>
+                            {id != 100  && "69/69/69"}
+                          </Typography> */}
                         </div>
                       </TableCell>
                       <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
-                            {id != 0 && currentWeekNum != 0
-                              ? "*pull from backend"
-                              : "none"}
+                            {id != 100 &&
+                              // currentWeekNum != 0 &&
+                              "*pull opp from backend"}
                           </Typography>
                           <Typography>
-                            {id != 0 && currentWeekNum != 0
-                              ? "*pull from backend"
-                              : "no date"}
+                            {id != 100 &&
+                              // currentWeekNum != 0 &&
+                              "*pull date from backend"}
                           </Typography>
                         </div>
                       </TableCell>
@@ -428,9 +488,9 @@ const provider = new ethers.providers.AlchemyProvider(
                             fontWeight: "600",
                             fontSize: "20px",
                           }}
-                          disabled={isLineupLocked || router.query.teamAddress !== connectedAccount}
+                          disabled={isLineupLocked || !isInLeague}
                         >
-                          {id != 0 ? "SUB" : "SET"}
+                          {id != 100 ? "SUB" : "SET"}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -444,7 +504,12 @@ const provider = new ethers.providers.AlchemyProvider(
               <PlayerStateModal
                 // position={currentPositionIndex}
                 modalOpen={stateModalOpen}
-                playerName={selectedPlayer.name}
+                // playerName={selectedPlayer.name}
+                playerName={
+                  starterAthleteIds[currentPositionIndex] != 0
+                    ? selectedPlayer?.name
+                    : "(none)"
+                }
                 handleModalClose={handleStateModalClose}
               />
               <PlayerSelectModal
