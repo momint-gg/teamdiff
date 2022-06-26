@@ -36,6 +36,7 @@ export default function LeaguePlayRouter() {
   const [leagueMemberRecords, setLeagueMemberRecords] = useState([]);
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
   const [leagueMembers, setLeagueMembers] = useState([]);
+  const [whitelistAddress, setWhitelistAddress] = useState([]);
   let isPublic;
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
@@ -109,10 +110,7 @@ export default function LeaguePlayRouter() {
       let weekMatchups = [];
       async function fetchData() {
         setIsLoading(true);
-        const whitelistContractAddress =
-          await LeagueProxyContract.whitelistContract().catch((e) => {
-            console.error(e);
-          });
+
         // console.log("white: " + whitelistContract);
 
         const leagueName = await LeagueProxyContract.leagueName().catch((e) => {
@@ -154,7 +152,14 @@ export default function LeaguePlayRouter() {
         // Get league Admin
         const leagueAdmin = await LeagueProxyContract.admin();
         setIsLeagueAdmin(leagueAdmin == connectedAccount);
-
+        if (leagueAdmin == connectedAccount) {
+          // If is league admin, then set whitelist contract
+          const whitelistContractAddress =
+            await LeagueProxyContract.whitelistContract().catch((e) => {
+              console.error(e);
+            });
+          setWhitelistAddress(whitelistContractAddress);
+        }
         // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
@@ -178,19 +183,36 @@ export default function LeaguePlayRouter() {
           }
         }
 
-        const WhitelistContract = new ethers.Contract(
-          whitelistContractAddress,
-          WhitelistJSON.abi,
-          provider
-        );
-        isPublic = await WhitelistContract.isPublic().catch((e) => {
-          console.error(e);
-        });
+        // const WhitelistContract = new ethers.Contract(
+        //   whitelistContractAddress,
+        //   WhitelistJSON.abi,
+        //   provider
+        // );
+        // isPublic = await WhitelistContract.isPublic().catch((e) => {
+        //   console.error(e);
+        // });
+
         setIsLoading(false);
       }
       fetchData();
     }
   }, [isConnected, router.isReady, connectedAccount]);
+
+  useEffect(() => {
+    if (whitelistAddress) {
+      const WhitelistContract = new ethers.Contract(
+        whitelistAddress,
+        WhitelistJSON.abi,
+        provider
+      );
+      const fetchData = async () => {
+        isPublic = await WhitelistContract.isPublic().catch((e) => {
+          console.error(e);
+        });
+      };
+      fetchData();
+    }
+  }, [whitelistAddress]);
 
   useEffect(() => {
     if (!isLoading) getLeagueSchedule();
@@ -405,7 +427,18 @@ export default function LeaguePlayRouter() {
                         connectedAccount={connectedAccount}
                       ></AddToWhitelist>
 
-                      <Fab onClick={whitelistSubmitHandler}>Submit</Fab>
+                      <Fab
+                        sx={{
+                          float: "right",
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                        }}
+                        variant="extended"
+                        size="medium"
+                        onClick={whitelistSubmitHandler}
+                      >
+                        Submit
+                      </Fab>
                     </>
                   ) : (
                     <Typography>

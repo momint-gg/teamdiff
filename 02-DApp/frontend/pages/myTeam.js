@@ -17,7 +17,7 @@ import {
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
@@ -152,6 +152,10 @@ export default function MyTeam() {
         setLeagueName(leagueName);
         const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
+        // TODO if is not league member, refresh the page
+        if (!isInLeague) {
+          router.push("/leagues/" + router.query.leagueRoute[0]);
+        }
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
         const starterIds = [null, null, null, null, null];
@@ -165,11 +169,6 @@ export default function MyTeam() {
         setStarterAthleteIds(starterIds);
         // This ussually takes the longest, so set isLoading to false here
         setIsLoading(false);
-
-        // TODO if is not league member, refresh the page
-        if (!isInLeague) {
-          router.push("/leagues/" + router.query.leagueRoute[0]);
-        }
       }
 
       // declare the async data fetching function

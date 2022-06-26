@@ -11,9 +11,9 @@ const main = async () => {
   console.log("sandboxing...");
 
     // Create GameItems Instance
-  // const contract = await ethers.getContractAt("LeagueBeaconProxy", "0xa8a6e296Ed7db235A430aA00AD2aAc1967A91d7b")
-  const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
-  /*
+  // const contract = await ethers.getContractAt("LeagueBeaconProxy", "0x39aa9eFAF4136aaA2E2760D69Afe6732A085f9E5")
+  // const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
+  
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
     process.env.RINKEBY_ALCHEMY_KEY
@@ -22,7 +22,7 @@ const main = async () => {
 
   //Create league proxy instance
   const LeagueProxyContract = new ethers.Contract(
-    "0xa8a6e296Ed7db235A430aA00AD2aAc1967A91d7b",
+    "0x39aa9eFAF4136aaA2E2760D69Afe6732A085f9E5",
     LeagueOfLegendsLogicJSON.abi,
     signer
   );
@@ -33,7 +33,7 @@ const main = async () => {
     gasLimit: 20000000
   });
   await txn.wait();
-*/
+
 //  Deploying athletes contract
   // const AthletesContractFactory = await ethers.getContractFactory("Athletes");
   // const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
@@ -50,9 +50,9 @@ const main = async () => {
   // await txn.wait();
 
   // Manually add to address Open ready for testing
-  console.log("Adding User to whitelsit");
-  txn = await contract.addUserToWhitelist("0xa3b9818D2B2ED2548C6873c17a4bf8B611A801b4");
-  await txn.wait();
+  // console.log("Adding User to whitelsit");
+  // txn = await contract.addUserToWhitelist("0xa3b9818D2B2ED2548C6873c17a4bf8B611A801b4");
+  // await txn.wait();
   
   //Set Public Sale Open ready for testing
   // console.log("Opening public sale");
