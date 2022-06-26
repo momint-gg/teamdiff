@@ -321,6 +321,8 @@ export default function LeaguePlayRouter() {
           ) : (
             <>
               <ViewLeagueTeamsTable
+                connectedAccount={connectedAccount}
+                leagueAddres={router.query.leagueRoute[0]}
                 leagueName={leagueName}
                 teamNames={leagueMembers}
                 teamRecords={leagueMemberRecords}

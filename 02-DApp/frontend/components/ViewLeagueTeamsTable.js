@@ -7,7 +7,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography
+  Typography,
+  Link
 } from "@mui/material";
 
 // fake data - data structure is a best guess at what contract data is formatted as
@@ -58,7 +59,7 @@ import {
 
 // const leagueName = "WashU Esports"
 
-const ViewLeagueTeamsTable = ({ leagueName, teamNames, teamRecords }) => {
+const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, teamNames, teamRecords }) => {
   return (
     <Container
       sx={{
@@ -96,13 +97,20 @@ const ViewLeagueTeamsTable = ({ leagueName, teamNames, teamRecords }) => {
           <TableBody>
             {teamNames?.map((team, idx) => {
               const record = teamRecords[idx];
+              const teamURL = connectedAccount === team 
+                            ? "./leagues/" + leagueAddress + "/myTeam"
+                            : "/team/"+leagueAddress+"/"+team
               return (
                 <TableRow
                   key={team}
                   sx={{ background: idx % 2 ? "#473D3D" : "#8E8E8E" }}
                 >
                   <TableCell align="center">
+                    <Link
+                      href={teamURL}
+                    >
                     <Typography fontSize={30}>{team}</Typography>
+                    </Link>
                   </TableCell>
                   <TableCell align="center">
                     <Typography fontSize={30}>
