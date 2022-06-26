@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Typography, CardActionArea, CardHeader } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
 // Router
@@ -61,6 +61,24 @@ export default function PendingLeagueCard({ leagueAddress }) {
 
   const card = (
     <Fragment>
+      <CardActionArea
+      href={"/leagues/" + leagueAddress}
+    >
+      <CardHeader
+        sx={{
+          background: "#343434 !important",
+          p: "15%",
+          height: "3rem",
+          borderBottom: "solid white 0.01rem",
+          minWidth: "15rem",
+        }}
+        title={
+          leagueName
+            ? leagueName
+            : "(Untitled)"
+        }
+        subheader={"CLICK TO JOIN"}
+      />
       <CardContent  >
         <Box
         sx={{
@@ -71,26 +89,21 @@ export default function PendingLeagueCard({ leagueAddress }) {
         }}>
           <Box component="div" sx={{
             wordWrap: 'break-word',
-            maxWidth: '18rem',
+            maxWidth: '15rem',
             textAlign: 'center',
           }}>
-          <Typography fontSize={24} fontWeight={"bold"} variant="body1" color="inherit">
-            {leagueName || "(Untitled)"}
-          </Typography>
-          <Typography fontSize={18} variant="body1" color="inherit">
-            {leagueAddress}
-          </Typography>
           <Typography fontSize={18} 
             fontStyle={"italic"} 
             variant="body1" 
             color="inherit"
             component="div"
-            paddingTop={2}>
+          >
             {leagueSize + "/8 players"}
           </Typography>
           </Box>
         </Box>
       </CardContent>
+      </CardActionArea>
     </Fragment>
   );
 
@@ -101,7 +114,7 @@ export default function PendingLeagueCard({ leagueAddress }) {
   };
 
   return (
-    <Card variant="outlined" onClick={handleClick}
+    <Card variant="outlined"
     sx={{
       background: "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
       borderRadius: "10%",
