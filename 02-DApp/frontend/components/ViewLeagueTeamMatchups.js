@@ -116,9 +116,9 @@ const ViewLeagueTeamMatchup = ({
                           <Typography fontSize={25}>
                             {Object.keys(matchup)[0]}
                           </Typography>
-                          <Typography fontSize={15}>
+                          {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
-                          </Typography>
+                          </Typography> */}
                         </Container>
                         <Typography fontSize={35} sx={{ paddingRight: 4 }}>
                           {shortenAddress(matchup[0][0])}
@@ -146,9 +146,9 @@ const ViewLeagueTeamMatchup = ({
                           <Typography fontSize={25}>
                             {Object.keys(matchup)[1]}
                           </Typography>
-                          <Typography fontSize={15}>
+                          {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
-                          </Typography>
+                          </Typography> */}
                         </Container>
                       </Container>
                     </TableCell>
