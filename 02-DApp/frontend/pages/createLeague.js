@@ -95,6 +95,9 @@ export default function CreateLeague({ setDisplay }) {
 
   // Router
   const router = useRouter();
+  console.log(router.query)
+  console.log(router.query.leagueRoute)
+  // console.log(router.query.test[0])
 
   // Contract State Hooks
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
