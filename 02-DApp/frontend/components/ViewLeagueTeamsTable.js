@@ -59,6 +59,16 @@ import {
 
 // const leagueName = "WashU Esports"
 
+const shortenAddress = (address) => {
+    // console.log("address to shorten: " + address);
+    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+      address.length - 4,
+      address.length
+    )}`;
+    return shortenedAddress1;
+    // setIsConnected(true);
+  };
+
 const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, teamNames, teamRecords }) => {
   return (
     <Container
@@ -98,7 +108,7 @@ const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, tea
             {teamNames?.map((team, idx) => {
               const record = teamRecords[idx];
               const teamURL = connectedAccount === team 
-                            ? "./leagues/" + leagueAddress + "/myTeam"
+                            ? "/leagues/" + leagueAddress + "/myTeam"
                             : "/team/"+leagueAddress+"/"+team
               return (
                 <TableRow
@@ -109,7 +119,7 @@ const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, tea
                     <Link
                       href={teamURL}
                     >
-                    <Typography fontSize={30}>{team}</Typography>
+                    <Typography fontSize={30}>{shortenAddress(team)}</Typography>
                     </Link>
                   </TableCell>
                   <TableCell align="center">

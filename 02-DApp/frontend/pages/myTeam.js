@@ -362,6 +362,28 @@ export default function MyTeam() {
               <CircularProgress></CircularProgress>
             </>
           )}
+          <Container>
+            <Button
+              variant="contained"
+              onClick={() => router.push("/leagues/"+router.query.leagueRoute[0]+"/schedule")}
+              size="small"
+              // color="secondary"
+              // filled
+              style={{
+                // background:
+                //   "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
+                background: "#480D48",
+                borderRadius: "30px",
+                padding: "10px 40px",
+                fontWeight: "200",
+                fontSize: "15px",
+                position: "absolute",
+                left: "25px"
+              }}
+            >
+              Back to league page
+            </Button>
+          </Container> 
           <Typography
             variant="h4"
             color="white"

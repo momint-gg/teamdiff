@@ -34,7 +34,7 @@ export default function PlayerStateModal({
     retries: 2,
     retryDelay: (count) => {
       console.log('retrying player stat api call: ' + count)
-      return retryDelay * 1000
+      return count * 1000
     }
   })
 

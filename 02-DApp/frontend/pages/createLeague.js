@@ -525,6 +525,7 @@ export default function CreateLeague({ setDisplay }) {
                     minWidth: "15vw",
                     marginRight: "2vw",
                   }}
+                  color="primary"
                 >
                   League Name
                 </Typography>
@@ -567,6 +568,7 @@ export default function CreateLeague({ setDisplay }) {
                     minWidth: "15vw",
                     marginRight: "2vw",
                   }}
+                  color="primary"
                 >
                   Token
                 </Typography>
@@ -610,6 +612,7 @@ export default function CreateLeague({ setDisplay }) {
                     minWidth: "15vw",
                     marginRight: "2vw",
                   }}
+                  color="primary"
                 >
                   Buy-in Cost
                 </Typography>
