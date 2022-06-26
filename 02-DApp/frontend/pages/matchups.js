@@ -4,7 +4,7 @@ import { Box, Container, Grid, Typography } from "@mui/material";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { default as React, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
@@ -618,7 +618,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                       // get athlete for competitor 1 at this position
                       const competitor1StarterId =
                         competitor1StarterAthleteIds[index];
-                      if (competitor1StarterId != 0)
+                      if (competitor1StarterId != 100)
                         console.log(
                           "c1 starter score: " + competitor1StarterAthleteScores
                         );
@@ -645,7 +645,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           <Grid item xs={1} textAlign="center">
                             <Image
                               src={
-                                competitor1StarterId != 0
+                                competitor1StarterId != 100
                                   ? competitor1Athlete?.image
                                   : logo
                               }
@@ -662,26 +662,26 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                             sx={{ cursor: "pointer" }}
                           >
                             <Typography fontSize={34}>
-                              {competitor1StarterId != 0
+                              {competitor1StarterId != 100
                                 ? competitor1Athlete?.name
                                 : "(none)"}
                             </Typography>
                           </Grid>
                           {/* <Grid item xs={1} textAlign="center">
                           <Typography fontSize={30} fontWeight={700}>
-                            {competitor1StarterId != 0 &&
+                            {competitor1StarterId != 100 &&
                               competitor1Athlete?.attributes[0].value}
                           </Typography>
                         </Grid> */}
                           <Grid item xs={1} textAlign="center">
                             <Typography>
-                              {competitor1StarterId != 0 &&
+                              {competitor1StarterId != 100 &&
                                 "Loss vs **backend**"}
                             </Typography>
                           </Grid>
                           <Grid item xs={1} textAlign="center">
                             <Typography color="#D835D8" fontSize={48}>
-                              {competitor1StarterId != 0
+                              {competitor1StarterId != 100
                                 ? String(competitor1StarterAthleteScores[index])
                                 : "(0)"}{" "}
                             </Typography>
@@ -702,20 +702,20 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           {/* opponents athlete stats */}
                           <Grid item xs={1} textAlign="center">
                             <Typography color="#D835D8" fontSize={48}>
-                              {competitor2StarterId != 0
+                              {competitor2StarterId != 100
                                 ? String(competitor2StarterAthleteScores[index])
                                 : "(0)"}{" "}
                             </Typography>
                           </Grid>
                           <Grid item xs={1} textAlign="center">
                             <Typography>
-                              {competitor2StarterId != 0 &&
+                              {competitor2StarterId != 100 &&
                                 "Loss vs **backend**"}
                             </Typography>
                           </Grid>
                           {/* <Grid item xs={1} textAlign="center">
                           <Typography fontSize={30} fontWeight={700}>
-                            {competitor2StarterId != 0 &&
+                            {competitor2StarterId != 100 &&
                               competitor2Athlete?.attributes[0].value}
                           </Typography>
                         </Grid> */}
@@ -727,7 +727,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                             sx={{ cursor: "pointer" }}
                           >
                             <Typography fontSize={34}>
-                              {competitor2StarterId != 0
+                              {competitor2StarterId != 100
                                 ? competitor2Athlete?.name
                                 : "(none)"}
                             </Typography>
@@ -735,7 +735,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           <Grid item xs={1} textAlign="center">
                             <Image
                               src={
-                                competitor2StarterId != 0
+                                competitor2StarterId != 100
                                   ? competitor2Athlete?.image
                                   : logo
                               }

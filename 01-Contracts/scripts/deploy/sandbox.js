@@ -22,7 +22,7 @@ const main = async () => {
 
   //Create league proxy instance
   const LeagueProxyContract = new ethers.Contract(
-    "0x39aa9eFAF4136aaA2E2760D69Afe6732A085f9E5",
+    "0x56783cc09C773FeC7FFA3396e2C8Aec629dfeFF0",
     LeagueOfLegendsLogicJSON.abi,
     signer
   );
@@ -31,7 +31,9 @@ const main = async () => {
   console.log("setting schedule")
   let txn = await LeagueProxyContract.setLeagueSchedule({
     gasLimit: 20000000
-  });
+  }).catch((e) => {
+    console.error("errpor: " + e)
+  })
   await txn.wait();
 
 //  Deploying athletes contract
