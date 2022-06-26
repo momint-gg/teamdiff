@@ -1,5 +1,11 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { Box, Container, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Grid,
+  Typography
+} from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -223,7 +229,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
     for (let j = 0; j <= 1; j++) {
       // console.l
-      const starterIds = [100, 100, 100, 100, 100];
+      const starterIds = [];
       // const comp = [-1, -1, -1, -1, -1];
       let competitorAccount;
       j == 0
@@ -334,12 +340,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           selectedWeekMatchups,
           leagueProxyContract
         );
-        // competitor1OwnedAthletesMetadata.forEach((athlete, index) => {
-        //   if (index == 0)
-        //     console.log(
-        //       "athlete id #" + index + ": " + JSON.stringify(athlete, null, 2)
-        //     );
-        // });
+
         setIsLoading(false);
       };
       getNFTData();
@@ -363,10 +364,11 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       setHasFetchedComp2Scores(false);
       const fetchData = async () => {
         await getStarterAthleteData();
+        await calculateMatchupScore();
       };
       fetchData();
     }
-  }, [isLoading, competitor1StarterAthleteIds]);
+  }, [isLoading]);
   // }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
 
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
@@ -405,7 +407,6 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           );
           // score = null;
         });
-      // console.log("score for id#" + id + ": " + score);
       // only update array if score is not defualt value
       if (score != -1) c1Scores[index] = score;
       // this if statement should always evaulate eventually
@@ -437,6 +438,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           );
           // score = null;
         });
+      // only update array if score is not defualt value
+      if (score != -1) c2Scores[index] = score;
       // this if statement should always evaulate eventually
       if (index == 4) {
         // if (index == competitor1StarterAthleteIds.length - 1) {
@@ -449,10 +452,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         setHasFetchedComp2Scores(true);
         // return c2Scores;
       }
+      console.log("c2 score for id#" + id + ": " + score);
+
       // }
       // console.log("score for id#" + id + ": " + score);
-      // only update array if score is not defualt value
-      if (score != -1) c2Scores[index] = score;
     });
   };
 
@@ -475,18 +478,18 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     // setIsConnected(true);
   };
 
-  // const calculateMatchupScore = () => {
-  //   let team1Counter = 0;
-  //   let team2Counter = 0;
-  //   for (let i = 0; i < 5; i < 0) {
-  //     const starter1Score = competitor1StarterAthleteScores[i];
-  //     const starter2Score = competitor2StarterAthleteScores[i];
-  //     if (starter1Score > starter2Score) team1Counter++;
-  //     else if (starter2Score > starter1Score) team2Counter++;
-  //   }
-  //   setCompetitor1TeamScore(team1Counter);
-  //   setCompetitor2TeamScore(team2Counter);
-  // };
+  const calculateMatchupScore = () => {
+    let team1Counter = 0;
+    let team2Counter = 0;
+    for (let i = 0; i < 5; i++) {
+      const starter1Score = competitor1StarterAthleteScores[i];
+      const starter2Score = competitor2StarterAthleteScores[i];
+      if (starter1Score > starter2Score) team1Counter++;
+      else if (starter2Score > starter1Score) team2Counter++;
+    }
+    setCompetitor1TeamScore(team1Counter);
+    setCompetitor2TeamScore(team2Counter);
+  };
 
   return (
     <>
@@ -641,10 +644,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                       // get athlete for competitor 1 at this position
                       const competitor1StarterId =
                         competitor1StarterAthleteIds[index];
-                      if (competitor1StarterId != 100)
-                        console.log(
-                          "c2 starter ids: " + competitor2StarterAthleteIds
-                        );
+                      // if (competitor1StarterId != 100)
+                      console.log(
+                        "c2 starter ids: " + competitor2StarterAthleteIds
+                      );
                       const competitor1Athlete =
                         competitor1OwnedAthletesMetadata[competitor1StarterId];
 
@@ -772,7 +775,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     })}
                   </Grid>
                 ) : (
-                  <Typography> fetching scores</Typography>
+                  <>
+                    <Typography textAlign="center"> fetching scores</Typography>
+                    <CircularProgress></CircularProgress>
+                  </>
                 )}
               </Box>
               <PlayerStateModal

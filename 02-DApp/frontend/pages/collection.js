@@ -131,6 +131,7 @@ export default function Collection() {
     if (isConnected) {
       // Get the owned GAmeItems ERC-1155s from the connectedAccount
       const getNFTData = async () => {
+        setIsLoading(true);
         //         console.log("entering getNftData function")
         // const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
         const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK); // .catch(
@@ -185,6 +186,7 @@ export default function Collection() {
             ]);
           }
         }
+        setIsLoading(false);
       };
 
       await getNFTData().catch(() => {
@@ -573,7 +575,7 @@ export default function Collection() {
           </Grid> */}
       </Box>
     );
-  } else if (isConnected && nftResp && !loadingError) {
+  } else if (isConnected && nftResp && !loadingError && !isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Card
@@ -644,7 +646,7 @@ export default function Collection() {
         </Card>
       </Box>
     );
-  } else if (isConnected && !loadingError) {
+  } else if (isConnected && !loadingError && isLoading) {
     return <LoadingPrompt loading={"Your Collection"} />;
   } else if (loadingError) {
     return (

@@ -147,7 +147,7 @@ async function main() {
       finalStatsToPush[i].points, // their points for the week,
       week_num, // Week number passed in
       {
-        gasLimit: 20000000
+        gasLimit: 30000000
       }
     );
     console.log(
