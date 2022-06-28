@@ -3,6 +3,6 @@ exports.MOBALogicLibrary = '0x6cd2DfeBd046FBfFAf1c128f85646ECa83A4f8b5';
 exports.LeagueOfLegendsLogic = '0x900Db32d9ce0AA67A3D3595473948cD7ba35c5d5';
 exports.LeagueMaker = '0xFC13E43d4D969636E7375df5A2b7be3CaACdB7A3';
 exports.Beacon = '0xc1251c5C1CC46E2c2a66FEfCB66a4d6fBc2647D2';
-exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';
+exports.Athletes = '0x67476486754E9EE711b0EF307c86E4cC9FFe545F';
 exports.chainlinkTokenAddress = '0x01BE23585060835E02B77ef475b0Cc51aA1e0709';
 exports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';

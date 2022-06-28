@@ -13,36 +13,38 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 // import Card from "../assets/cards/Fudge.png";
-import CloseIcon from "../assets/images/close.png";
-import axios from 'axios'
-import axiosRetry from 'axios-retry'
+import axios from "axios";
+import axiosRetry from "axios-retry";
 import { useEffect, useState } from "react";
-
+import CloseIcon from "../assets/images/close.png";
 
 export default function PlayerStateModal({
   modalOpen,
   playerName,
   handleModalClose,
 }) {
-
-  const [weeklyData, setWeeklyData] = useState([])
+  const [weeklyData, setWeeklyData] = useState([]);
   const playerStatsApi = axios.create({
-    baseURL: 'https://teamdiff-backend-api.vercel.app/api'
-  })
-  playerStatsApi.defaults.baseURL = 'https://teamdiff-backend-api.vercel.app/api'
+    baseURL: "https://teamdiff-backend-api.vercel.app/api",
+  });
+  playerStatsApi.defaults.baseURL =
+    "https://teamdiff-backend-api.vercel.app/api";
   axiosRetry(playerStatsApi, {
     retries: 2,
     retryDelay: (count) => {
-      console.log('retrying player stat api call: ' + count)
-      return retryDelay * 1000
-    }
-  })
+      console.log("retrying player stat api call: " + count);
+      return retryDelay * 1000;
+    },
+  });
 
   useEffect(async () => {
-    const { data: weeklyDataRes } = await playerStatsApi.get(`/athlete/${playerName}`)
-    setWeeklyData(weeklyDataRes)
-  }, [])
-
+    // console.log("platerNaME: + " + playerName);
+    // const { data: weeklyDataRes } = await playerStatsApi.get(`/athlete/danny`);
+    const { data: weeklyDataRes } = await playerStatsApi.get(
+      `/athlete/${playerName}`
+    );
+    setWeeklyData(weeklyDataRes);
+  }, [playerName]);
 
   return (
     // <div>hi</div>
@@ -59,12 +61,15 @@ export default function PlayerStateModal({
         paddingTop: 5,
         paddingRight: 5,
         paddingLeft: 5,
-        paddingBottom: 5
+        paddingBottom: 5,
       }}
     >
       <Box className="modal-container">
-        <Image src={`/cards/${playerName}.png`} width={255*2/3} height={342*2/3} />
-
+        <Image
+          src={`/cards/${playerName}.png`}
+          width={(255 * 2) / 3}
+          height={(342 * 2) / 3}
+        />
 
         <Button
           style={{ position: "absolute", top: "10px", right: "10px" }}
@@ -131,7 +136,10 @@ export default function PlayerStateModal({
                       <Typography> {week.pentakills || "-"}</Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Typography sx={{ fontSize: "150%", fontWeight: 500 }}> {week.points}</Typography>
+                      <Typography sx={{ fontSize: "150%", fontWeight: 500 }}>
+                        {" "}
+                        {week.points}
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 );

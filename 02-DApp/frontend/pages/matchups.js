@@ -1,4 +1,3 @@
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
   Box,
   CircularProgress,
@@ -6,7 +5,10 @@ import {
   Grid,
   Typography
 } from "@mui/material";
+
 // Web3 Imports
+import axios from "axios";
+import axiosRetry from "axios-retry";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -15,14 +17,12 @@ import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import Sample from "../../backend/sample.json";
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerStateModal from "../components/PlayerStateModal";
-import constants from "../constants/index.js";
-
+import AthletesToIndex from "../constants/AlthletesToIndex.json";
 // todo
-const statsData = Sample.statsData;
+// const statsData = Sample.statsData;
 
 export default function Matchups({ daysTillLock, daysTillUnlock }) {
   // Router params
@@ -33,27 +33,35 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     process.env.RINKEBY_ALCHEMY_KEY
   );
 
-  // const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
-  // const useStyles = makeStyles({
-  //   cell: {
-  //     fontSize: 36,
-  //   },
-  // });
-  // const classes = useStyles()
+  // Web2 endpoints
+  const playerStatsApi = axios.create({
+    baseURL: "https://teamdiff-backend-api.vercel.app/api",
+  });
+  playerStatsApi.defaults.baseURL =
+    "https://teamdiff-backend-api.vercel.app/api";
+
+  axiosRetry(playerStatsApi, {
+    retries: 2,
+    retryDelay: (count) => {
+      console.log("retrying player stat api call: " + count);
+      return count * 1000;
+    },
+  });
+
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPlayer, setCurrentPlayer] = useState(false);
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
   const [currentWeekNum, setCurrentWeekNum] = useState();
   //   const [leagueAddress, setLeagueAddress] = useState(router.query.leagueAddress);
-  const [isLeagueMember, setIsLeagueMember] = useState(false);
-  const [stateModalOpen, setStateModalOpen] = useState(false);
-  const [subModalOpen, setSubModalOpen] = useState(false);
-  const [signer, setSigner] = useState(null);
+  // const [isLeagueMember, setIsLeagueMember] = useState(false);
+  // const [stateModalOpen, setStateModalOpen] = useState(false);
+  // const [subModalOpen, setSubModalOpen] = useState(false);
+  // const [signer, setSigner] = useState(null);
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
+  // const [isTransactionDelayed, setIsTransactionDelayed] = useState(false);
   const [competitor1StarterAthleteIds, setCompetitor1StarterAthleteIds] =
     useState([]);
   const [competitor2StarterAthleteIds, setCompetitor2StarterAthleteIds] =
@@ -62,24 +70,24 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     useState([-1, -1, -1, -1, -1]);
   const [competitor2StarterAthleteScores, setCompetitor2StarterAthleteScores] =
     useState([-1, -1, -1, -1, -1]);
-  const [athleteNFTs, setAthleteNFTs] = useState([]);
-  const [nftResp, setNFTResp] = useState(null);
+  // const [athleteNFTs, setAthleteNFTs] = useState([]);
+  // const [nftResp, setNFTResp] = useState(null);
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
   // const [lineup, setLineup] = useState([null, 11, 23, 34, 45]);
   const [athleteContract, setAthleteContract] = useState();
-  const [
-    competitor1OwnedAthletesMetadata,
-    setCompetitor1OwnedAthletesMetadata,
-  ] = useState([]);
-  const [
-    competitor2OwnedAthletesMetadata,
-    setCompetitor2OwnedAthletesMetadata,
-  ] = useState([]);
+  // const [
+  //   competitor1OwnedAthletesMetadata,
+  //   setCompetitor1OwnedAthletesMetadata,
+  // ] = useState([]);
+  // const [
+  //   competitor2OwnedAthletesMetadata,
+  //   setCompetitor2OwnedAthletesMetadata,
+  // ] = useState([]);
   const [isLineupLocked, setIsLineupLocked] = useState();
   const [selectedWeekMatchups, setSelectedWeekMatchups] = useState();
   const [selectedMatchup, setSelectedMatchup] = useState(0);
-  const [competitor1WeekScore, setCompetitor1WeekScore] = useState();
-  const [competitor2WeekScore, setCompetitor2WeekScore] = useState();
+  // const [competitor1WeekScore, setCompetitor1WeekScore] = useState();
+  // const [competitor2WeekScore, setCompetitor2WeekScore] = useState();
   const [competitor1TeamScore, setCompetitor1TeamScore] = useState(0);
   const [competitor2TeamScore, setCompetitor2TeamScore] = useState(0);
   const [isError, setIsError] = useState(false);
@@ -103,7 +111,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         const accountAddress = await signer.getAddress().catch((e) => {
           console.error(e);
         });
-        setSigner(signer);
+        // setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
       } else {
@@ -121,7 +129,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   }, [isConnected]);
 
   useEffect(() => {
-    setAthleteNFTs([]);
+    // setAthleteNFTs([]);
     if (isConnected && router.isReady) {
       // // console.log("route in myteam:" + JSON.stringify(router.query, null, 2));
       setIsLoading(true);
@@ -164,7 +172,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           setIsLoading(false);
           setIsError(true);
         });
-        setIsLeagueMember(isInLeague);
+        // setIsLeagueMember(isInLeague);
 
         const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
           (e) => {
@@ -228,14 +236,12 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   ) => {
     // Get starter athlete ids for both competitors of currently viewed matchup of currenlty selected week
     for (let j = 0; j <= 1; j++) {
-      // console.l
       const starterIds = [];
-      // const comp = [-1, -1, -1, -1, -1];
       let competitorAccount;
       j == 0
         ? (competitorAccount = weekMatchups[selectedMatchup][0][0])
         : (competitorAccount = weekMatchups[selectedMatchup][0][1]);
-      console.log("competitor addy: " + competitorAccount + "\n\tj: " + j);
+      // console.log("competitor addy: " + competitorAccount + "\n\tj: " + j);
 
       // If playing bye week, set starter ids to  null
       if (
@@ -260,11 +266,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             console.error("userToLineup error: " + e);
             setIsError(true);
           });
-          // TODO this will return 0 if starter is not set for position,
-          // but sometimes we want that if a user sets athlete id #0, init all startEr ids to be -1 in contract
+          // TODO this will return 100 if starter is not set for position,
           starterIds[i] = id;
         }
-        console.log("starter id: " + starterIds + " \n\tj: " + j);
+        // console.log("starter id: " + starterIds + " \n\tj: " + j);
         j == 0
           ? setCompetitor1StarterAthleteIds(starterIds)
           : setCompetitor2StarterAthleteIds(starterIds);
@@ -272,70 +277,12 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     }
   };
 
+  // UseEffect that grabs the line up starter ids for the currently viewed matchup
   useEffect(() => {
     if (selectedWeekMatchups && leagueScheduleIsSet) {
+      // Lowkeyy we don't need to pull this from contract, rather just do it from backend
       const getNFTData = async () => {
         setIsLoading(true);
-        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
-        // console.log(
-        //   "slected week matchups: " +
-        //     JSON.stringify(selectedWeekMatchups, null, 2)
-        // );
-        for (let i = 0; i <= 1; i++) {
-          let nfts;
-          i == 0
-            ? (nfts = await web3.alchemy
-                .getNfts({
-                  owner: selectedWeekMatchups[selectedMatchup][0][0],
-                  contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-                })
-                .catch((e) => {
-                  console.error("getNfts error: " + e);
-                  setIsLoading(false);
-                  setIsError(true);
-                }))
-            : (nfts = await web3.alchemy
-                .getNfts({
-                  owner: selectedWeekMatchups[selectedMatchup][0][1],
-                  contractAddresses: [CONTRACT_ADDRESSES.GameItems],
-                })
-                .catch((e) => {
-                  console.error("getNfts error: " + e);
-                  setIsLoading(false);
-                  setIsError(true);
-                }));
-
-          setNFTResp(nfts);
-          const athleteMetadata = [];
-
-          for (const nft of nfts?.ownedNfts) {
-            const token = nft?.id?.tokenId;
-            const response = await web3.alchemy
-              .getNftMetadata({
-                contractAddress: CONTRACT_ADDRESSES.GameItems,
-                tokenId: token,
-              })
-              .catch((e) => {
-                console.error("getNftMetadata error: " + e);
-                setIsLoading(false);
-                setIsError(true);
-              });
-            // console.log(
-            //   "Token #" +
-            //     token +
-            //     " metadata: " +
-            //     JSON.stringify(response, null, 2)
-            // );
-            if (!response.title?.includes("Pack")) {
-              athleteMetadata[parseInt(token)] = response.metadata;
-              setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
-            }
-            // setIsLoading(false);
-          }
-          i == 0
-            ? setCompetitor1OwnedAthletesMetadata(athleteMetadata)
-            : setCompetitor2OwnedAthletesMetadata(athleteMetadata);
-        }
         await getSelectedMatchupStarterIds(
           selectedWeekMatchups,
           leagueProxyContract
@@ -344,32 +291,21 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         setIsLoading(false);
       };
       getNFTData();
-      // .catch((error) => {
-      //   alert("fetch NFT DATA error: " + error);
-      // });
     }
   }, [selectedWeekMatchups, selectedMatchup, leagueScheduleIsSet]);
 
   // UseEffect to fetch the athlete scores on a change in competitorSTarterIds state var
   useEffect(() => {
-    if (
-      // competitor1StarterAthleteIds &&
-      // competitor2StarterAthleteIds
-      !isLoading
-    ) {
-      // setIsLoading(true);
-      // console.log("getting the data from use effect");
-      // let scores;
+    if (!isLoading) {
       setHasFetchedComp1Scores(false);
       setHasFetchedComp2Scores(false);
       const fetchData = async () => {
-        await getStarterAthleteData();
+        await getStarterAthleteScores();
         await calculateMatchupScore();
       };
       fetchData();
     }
   }, [isLoading]);
-  // }, [competitor1StarterAthleteIds, competitor2StarterAthleteIds]);
 
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
     let i = 0;
@@ -389,73 +325,52 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     return i;
   };
 
-  const getStarterAthleteData = async () => {
+  const getStarterAthleteScores = async () => {
     // setHasFetchedComp1Scores(false);
     // setHasFetchedComp2Scores(false);
-
+    const { data } = await playerStatsApi.get(`/allAthletes/${currentWeekNum}`);
     // Create scores array for competitor 1 starter athletes
     const c1Scores = competitor1StarterAthleteScores;
     let score;
+
+    // const c1Scores = competitor1StarterAthleteScores;
     competitor1StarterAthleteIds.forEach(async (id, index) => {
-      // if (id != 100) {
-      // TODO if id #-1 is passed in, return -1
-      score = await athleteContract
-        .athleteToScores(id, currentWeekNum)
-        .catch((error) => {
-          console.log(
-            "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
-          );
-          // score = null;
-        });
-      // only update array if score is not defualt value
-      if (score != -1) c1Scores[index] = score;
+      if (id != 100) {
+        // TODO if id #-1 is passed in, return -1
+        const athleteData = data.find((element) => element.id == id);
+        score = athleteData.points;
+        // console.log("score for id#" + id + ": " + score);
+        c1Scores[index] = score;
+      } else {
+        console.log(
+          "c1 invalid starter id score: id " + id + "score " + c1Scores[index]
+        );
+      }
+      // if(score)
       // this if statement should always evaulate eventually
       if (index == 4) {
-        // if (index == competitor1StarterAthleteIds.length - 1) {
-        // console.log(
-        //   "index: " + index + ", length: " + competitor1StarterAthleteIds.length
-        // );
-        // console.log("last element in loop, retunring val");
         setCompetitor1StarterAthleteScores(c1Scores);
         setHasFetchedComp1Scores(true);
-        // return c1Scores;
       }
-      // }
-      // }
     });
 
-    // Create scores array for competitor 1 starter athletes
+    // const c2Scores = [-1, -1, -1, -1, -1];
     const c2Scores = competitor2StarterAthleteScores;
     // let score;
     competitor2StarterAthleteIds.forEach(async (id, index) => {
-      // if (id != -1) {
-      // TODO if id #-1 is passed in, return -1
-      score = await athleteContract
-        .athleteToScores(id, currentWeekNum)
-        .catch((error) => {
-          console.log(
-            "Athlete to Scores1 Error: " + JSON.stringify(error, null, 2)
-          );
-          // score = null;
-        });
-      // only update array if score is not defualt value
-      if (score != -1) c2Scores[index] = score;
-      // this if statement should always evaulate eventually
-      if (index == 4) {
-        // if (index == competitor1StarterAthleteIds.length - 1) {
-        // console.log(
-        //   "index: " + index + ", length: " + competitor1StarterAthleteIds.length
-        // );
-        // console.log("last element in loop, retunring val");
-        setCompetitor2StarterAthleteScores(c2Scores);
-        // Todo, break this into two state hooks, one for compettiro 1 and one for the other
-        setHasFetchedComp2Scores(true);
-        // return c2Scores;
+      if (id != 100) {
+        // TODO if id #-1 is passed in, return -1
+        const athleteData = data.find((element) => element.id == id);
+        score = athleteData.points;
+        // console.log("score for id#" + id + ": " + score);
+        c2Scores[index] = score;
       }
-      console.log("c2 score for id#" + id + ": " + score);
 
-      // }
-      // console.log("score for id#" + id + ": " + score);
+      // this if statement should always evaulate eventual
+      if (index == 4) {
+        setCompetitor2StarterAthleteScores(c2Scores);
+        setHasFetchedComp2Scores(true);
+      }
     });
   };
 
@@ -484,12 +399,22 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     for (let i = 0; i < 5; i++) {
       const starter1Score = competitor1StarterAthleteScores[i];
       const starter2Score = competitor2StarterAthleteScores[i];
-      if (starter1Score > starter2Score) team1Counter++;
-      else if (starter2Score > starter1Score) team2Counter++;
+      // console.log("c1 starter score: " + starter1Score);
+      // console.log("c2 starter score: " + starter2Score);
+      if (starter1Score > starter2Score) {
+        team1Counter++;
+        // console.log("c1 score " + )
+      } else if (starter2Score > starter1Score) team2Counter++;
     }
+    // console.log("team1 counters" + team1Counter);
     setCompetitor1TeamScore(team1Counter);
     setCompetitor2TeamScore(team2Counter);
   };
+
+  function getAthleteImage(id) {
+    const athleteName = AthletesToIndex[id];
+    return `/cards/${athleteName}.png`;
+  }
 
   return (
     <>
@@ -645,20 +570,29 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                       const competitor1StarterId =
                         competitor1StarterAthleteIds[index];
                       // if (competitor1StarterId != 100)
-                      console.log(
-                        "c2 starter ids: " + competitor2StarterAthleteIds
-                      );
+                      // console.log(
+                      //   "c2 starter ids: " + competitor2StarterAthleteIds
+                      // );
                       const competitor1Athlete =
-                        competitor1OwnedAthletesMetadata[competitor1StarterId];
+                        AthletesToIndex[competitor1StarterId];
+                      // const competitor1Athlete =
+                      //   competitor1OwnedAthletesMetadata[competitor1StarterId];
 
                       // get athlete for competitor 2 at this position
                       const competitor2StarterId =
                         competitor2StarterAthleteIds[index];
                       const competitor2Athlete =
-                        competitor2OwnedAthletesMetadata[competitor2StarterId];
-                      // console.log(
-                      //   "id: " + id + " athlete: " + JSON.stringify(athlete, null, 2)
-                      // );
+                        AthletesToIndex[competitor2StarterId];
+                      // const competitor2Athlete =
+                      //   competitor2OwnedAthletesMetadata[competitor2StarterId];
+                      // if (competitor2StarterId != 100) {
+                      //   console.log(
+                      //     "id: " +
+                      //       competitor2StarterId +
+                      //       " athlete: " +
+                      //       JSON.stringify(competitor2Athlete, null, 2)
+                      //   );
+                      // }
                       return (
                         <Grid
                           sx={{
@@ -672,8 +606,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                             <Image
                               src={
                                 competitor1StarterId != 100
-                                  ? competitor1Athlete?.image
-                                  : logo
+                                  ? getAthleteImage(competitor1StarterId)
+                                  : // ? competitor1Athlete?.image
+                                    logo
                               }
                               alt="logo"
                               width={50}
@@ -689,8 +624,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           >
                             <Typography fontSize={34}>
                               {competitor1StarterId != 100
-                                ? competitor1Athlete?.name
-                                : "(none)"}
+                                ? competitor1Athlete
+                                : // ? competitor1Athlete?.name
+                                  "(none)"}
                             </Typography>
                           </Grid>
                           {/* <Grid item xs={1} textAlign="center">
@@ -754,7 +690,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           >
                             <Typography fontSize={34}>
                               {competitor2StarterId != 100
-                                ? competitor2Athlete?.name
+                                ? competitor2Athlete
                                 : "(none)"}
                             </Typography>
                           </Grid>
@@ -762,8 +698,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                             <Image
                               src={
                                 competitor2StarterId != 100
-                                  ? competitor2Athlete?.image
-                                  : logo
+                                  ? getAthleteImage(competitor2StarterId)
+                                  : // ? competitor2Athlete?.image
+                                    logo
                               }
                               alt="logo"
                               width={50}
@@ -775,15 +712,24 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     })}
                   </Grid>
                 ) : (
-                  <>
-                    <Typography textAlign="center"> fetching scores</Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography textAlign="center">
+                      {" "}
+                      Fetching scores{" "}
+                    </Typography>
                     <CircularProgress></CircularProgress>
-                  </>
+                  </Box>
                 )}
               </Box>
               <PlayerStateModal
                 modalOpen={modalOpen}
-                stateData={statsData}
+                playerName={currentPlayer}
                 handleModalClose={handleStateModalClose}
               />
             </>
