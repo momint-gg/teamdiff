@@ -254,7 +254,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         j == 1
       ) {
         setCompetitor2StarterAthleteIds([100, 100, 100, 100, 100]);
-        console.log("setting comp1 to 100");
+        // console.log("setting comp1 to 100");
         // break;
         // 0x0000000000000000000000000000000000000000
       } else {
@@ -287,7 +287,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           selectedWeekMatchups,
           leagueProxyContract
         );
-
+        console.log("got selected matchupstarterids");
         setIsLoading(false);
       };
       getNFTData();
@@ -297,15 +297,38 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   // UseEffect to fetch the athlete scores on a change in competitorSTarterIds state var
   useEffect(() => {
     if (!isLoading) {
-      setHasFetchedComp1Scores(false);
-      setHasFetchedComp2Scores(false);
+      // setHasFetchedComp1Scores(false);
+      // setHasFetchedComp2Scores(false);
+      // setCompetitor1TeamScore(0);
+      // setCompetitor2TeamScore(0);
       const fetchData = async () => {
         await getStarterAthleteScores();
-        await calculateMatchupScore();
+        // console.log("calculating matchup score");
+        // await calculateMatchupScore();
       };
       fetchData();
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    // setCompetitor1TeamScore(0);
+    // setCompetitor2TeamScore(0);
+    if (hasFetchedComp1Scores && hasFetchedComp2Scores) {
+      //     setCompetitor1TeamScore(0);
+      // setCompetitor2TeamScore(0);
+      const fetchData = async () => {
+        // await getStarterAthleteScores();
+        // console.log("calculating matchup score");
+        await calculateMatchupScore();
+      };
+      fetchData();
+    }
+  }, [
+    hasFetchedComp1Scores,
+    hasFetchedComp2Scores,
+    competitor1StarterAthleteIds,
+    competitor2StarterAthleteIds,
+  ]);
 
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
     let i = 0;
@@ -326,11 +349,11 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   };
 
   const getStarterAthleteScores = async () => {
-    // setHasFetchedComp1Scores(false);
-    // setHasFetchedComp2Scores(false);
+    setHasFetchedComp1Scores(false);
+    setHasFetchedComp2Scores(false);
     const { data } = await playerStatsApi.get(`/allAthletes/${currentWeekNum}`);
     // Create scores array for competitor 1 starter athletes
-    const c1Scores = competitor1StarterAthleteScores;
+    const c1Scores = [-1, -1, -1, -1, -1];
     let score;
 
     // const c1Scores = competitor1StarterAthleteScores;
@@ -341,10 +364,6 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         score = athleteData.points;
         // console.log("score for id#" + id + ": " + score);
         c1Scores[index] = score;
-      } else {
-        console.log(
-          "c1 invalid starter id score: id " + id + "score " + c1Scores[index]
-        );
       }
       // if(score)
       // this if statement should always evaulate eventually
@@ -354,8 +373,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       }
     });
 
-    // const c2Scores = [-1, -1, -1, -1, -1];
-    const c2Scores = competitor2StarterAthleteScores;
+    const c2Scores = [-1, -1, -1, -1, -1];
+    // const c2Scores = competitor2StarterAthleteScores;
     // let score;
     competitor2StarterAthleteIds.forEach(async (id, index) => {
       if (id != 100) {
@@ -370,8 +389,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       if (index == 4) {
         setCompetitor2StarterAthleteScores(c2Scores);
         setHasFetchedComp2Scores(true);
+        // console.log("finsihed getting comp2 scores");
       }
     });
+    // await calculateMatchupScore();
   };
 
   const handleModalOpen = (athelete) => {
@@ -394,6 +415,10 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   };
 
   const calculateMatchupScore = () => {
+    // console.log("calculating matchup score");
+
+    setCompetitor1TeamScore(0);
+    setCompetitor2TeamScore(0);
     let team1Counter = 0;
     let team2Counter = 0;
     for (let i = 0; i < 5; i++) {
@@ -487,7 +512,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                     />
                   )}
                   <Typography fontSize={30}>
-                    Matchups {selectedMatchup}
+                    Matchup #{selectedMatchup + 1}
                   </Typography>
                   {selectedMatchup + 2 < leagueSize && (
                     <AiOutlineArrowRight
