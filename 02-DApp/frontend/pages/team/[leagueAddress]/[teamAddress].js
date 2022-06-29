@@ -122,7 +122,7 @@ export default function MyTeam() {
       setIsLoading(true);
       // Initialize connections to GameItems contract
       const LeagueProxyContract = new ethers.Contract(
-        router.query.leagueRoute[0],
+        router.query.leagueAddress,
         LeagueOfLegendsLogicJSON.abi,
         provider
       );
@@ -153,15 +153,12 @@ export default function MyTeam() {
         const isInLeague = await LeagueProxyContract.inLeague(connectedAccount);
         setIsLeagueMember(isInLeague);
         // TODO if is not league member, refresh the page
-        if (!isInLeague) {
-          router.push("/leagues/" + router.query.leagueRoute[0]);
-        }
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
         const starterIds = [null, null, null, null, null];
         for (let i = 0; i <= 4; i++) {
           const id = await LeagueProxyContract.userToLineup(
-            connectedAccount,
+            router.query.teamAddress,
             i
           ).catch((e) => console.log("error: " + e));
           starterIds[i] = id;
@@ -177,7 +174,7 @@ export default function MyTeam() {
         const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
-          owner: connectedAccount,
+          owner: router.query.teamAddress,
           contractAddresses: [CONTRACT_ADDRESSES.GameItems],
         });
 
@@ -361,30 +358,6 @@ export default function MyTeam() {
               <CircularProgress></CircularProgress>
             </>
           )}
-          <Container>
-            <Button
-              variant="contained"
-              onClick={() =>
-                router.push("/leagues/" + router.query.leagueRoute[0] + "/home")
-              }
-              size="small"
-              // color="secondary"
-              // filled
-              style={{
-                // background:
-                //   "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
-                background: "#480D48",
-                borderRadius: "30px",
-                padding: "10px 40px",
-                fontWeight: "200",
-                fontSize: "15px",
-                position: "absolute",
-                left: "25px",
-              }}
-            >
-              Back to league page
-            </Button>
-          </Container>
           <Typography
             variant="h4"
             color="white"
@@ -515,7 +488,7 @@ export default function MyTeam() {
                             fontWeight: "600",
                             fontSize: "20px",
                           }}
-                          disabled={isLineupLocked}
+                          disabled={isLineupLocked || !isInLeague}
                         >
                           {id != 100 ? "SUB" : "SET"}
                         </Button>

@@ -51,14 +51,14 @@ function MyApp({ Component, pageProps }) {
   });
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
-  // const provider = new ethers.providers.AlchemyProvider(
-  //   "rinkeby",
-  //   process.env.RINKEBY_ALCHEMY_KEY
-  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "matic",
-    process.env.POLYGON_ALCHEMY_KEY
+    "rinkeby",
+    process.env.RINKEBY_ALCHEMY_KEY
   );
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "matic",
+  //   process.env.POLYGON_ALCHEMY_KEY
+  // );
 
   const client = createClient({
     autoConnect: true,

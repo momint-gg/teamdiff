@@ -4,9 +4,7 @@ import {
   CardActionArea,
   CardContent,
   CardHeader,
-  Divider,
-  Link,
-  Typography
+  Link
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -82,17 +80,14 @@ export default function LeagueCard({ leagueAddress }) {
         <CardHeader
           sx={{
             background: "#343434 !important",
-            paddingLeft: "10%",
+            p: "15%",
             height: "3rem",
             borderBottom: "solid white 0.01rem",
-            minWidth: "20rem",
+            minWidth: "15rem",
           }}
           // onClick={handleClick}
-          title={
-            leagueName
-              ? leagueName + " // WEEK " + weekNum
-              : "(Untitled)" + " // WEEK " + weekNum
-          }
+          title={leagueName || "(Untitled)"}
+          subheader={"WEEK " + weekNum}
         ></CardHeader>
         {/* </CardActionArea> */}
         <CardContent>
@@ -100,15 +95,35 @@ export default function LeagueCard({ leagueAddress }) {
             sx={{
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
             }}
           >
-            <Box
+            <Link
+              href={"./leagues/" + leagueAddress + "/myTeam"}
+              fontSize={18}
+              fontWeight={"bold"}
+              variant="body1"
+              color="secondary"
+            >
+              MY TEAM
+              <Image src={logo} alt="logo" width="30px" height="30px" />
+            </Link>
+            <Link
+              href={"./leagues/" + leagueAddress + "/home"}
+              fontSize={18}
+              fontWeight={"bold"}
+              variant="body1"
+              color="secondary"
+            >
+              VIEW LEAGUE
+              <Image src={logo} alt="logo" width="30px" height="30px" />
+            </Link>
+            {/* <Box
               component="div"
               sx={{
                 wordWrap: "break-word",
               }}
             >
-              {/* <CardActionArea href={"/leagues/" + leagueAddress}> */}
               <Box
                 sx={{
                   display: "flex",
@@ -181,42 +196,11 @@ export default function LeagueCard({ leagueAddress }) {
               >
                 {"Record: 1 - 0 - 1"}
               </Typography>
-              {/* </CardActionArea> */}
               <Divider
                 sx={{ marginTop: 5, marginBottom: "-6%" }}
                 variant="middle"
                 color="white"
-              />
-              <Box
-                sx={{
-                  display: "flex",
-                  marginTop: 3,
-                  width: "100%",
-                  justifyContent: "space-evenly",
-                  marginBottom: "-6%",
-                }}
-              >
-                <Link
-                  href={"./leagues/" + leagueAddress + "/myTeam"}
-                  target={"_blank"}
-                  fontSize={18}
-                  fontWeight={"bold"}
-                  color="secondary"
-                >
-                  MY TEAM
-                </Link>
-                {/* <Divider orientation="vertical" variant="middle" flexItem /> */}
-                <Link
-                  href={"./leagues/" + leagueAddress + "/home"}
-                  fontSize={18}
-                  fontWeight={"bold"}
-                  variant="body1"
-                  color="secondary"
-                >
-                  VIEW LEAGUE
-                </Link>
-              </Box>
-            </Box>
+              /> */}
           </Box>
         </CardContent>
       </Fragment>

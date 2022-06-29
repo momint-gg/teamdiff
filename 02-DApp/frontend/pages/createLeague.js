@@ -95,6 +95,9 @@ export default function CreateLeague({ setDisplay }) {
 
   // Router
   const router = useRouter();
+  // console.log(router.query)
+  // console.log(router.query.leagueRoute)
+  // console.log(router.query.test[0])
 
   // Contract State Hooks
   const [leagueMakerContract, setLeagueMakerContract] = useState(null);
@@ -522,6 +525,7 @@ export default function CreateLeague({ setDisplay }) {
                     minWidth: "15vw",
                     marginRight: "2vw",
                   }}
+                  color="primary"
                 >
                   League Name
                 </Typography>
@@ -564,6 +568,7 @@ export default function CreateLeague({ setDisplay }) {
                     minWidth: "15vw",
                     marginRight: "2vw",
                   }}
+                  color="primary"
                 >
                   Token
                 </Typography>
@@ -607,6 +612,7 @@ export default function CreateLeague({ setDisplay }) {
                     minWidth: "15vw",
                     marginRight: "2vw",
                   }}
+                  color="primary"
                 >
                   Buy-in Cost
                 </Typography>

@@ -155,7 +155,7 @@ export default function MyLeagues({ setDisplay }) {
           </Typography>
           <hr
             style={{
-              color: "secondary",
+              color: "white",
               backgroundColor: "secondary",
               height: 5,
               flexBasis: "100%",
@@ -189,13 +189,12 @@ export default function MyLeagues({ setDisplay }) {
             variant="h4"
             color="secondary"
             component="div"
-            sx={{ marginTop: 5 }}
           >
             Pending Leagues
           </Typography>
           <hr
             style={{
-              color: "secondary",
+              color: "white",
               backgroundColor: "secondary",
               height: 5,
             }}

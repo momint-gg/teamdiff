@@ -38,6 +38,7 @@ export default function LeaguePlayRouter() {
   const [leagueMembers, setLeagueMembers] = useState([]);
   const [whitelistAddress, setWhitelistAddress] = useState([]);
   let isPublic;
+  const [leagueMembersLong, setLeagueMembersLong] = useState([]);
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
     "rinkeby",
@@ -241,6 +242,7 @@ export default function LeaguePlayRouter() {
     let error = "none";
     const records = [];
     const leagueMembersTemp = [];
+    const leagueMembersLongTemp = [];
     do {
       const leagueMember = await LeagueProxyContract.leagueMembers(i).catch(
         (_error) => {
@@ -258,11 +260,13 @@ export default function LeaguePlayRouter() {
         // console.log("league member #" + i + ": " + record);
 
         leagueMembersTemp.push(shortenAddress(leagueMember));
+        leagueMembersLongTemp.push(leagueMember);
         records.push(formatUserRecordHelper(record, currentWeekNum));
       }
       // console.log("error value at end:" + error);
     } while (error == "none");
     setLeagueMemberRecords(records);
+    setLeagueMembersLong(leagueMembersLongTemp);
     setLeagueMembers(leagueMembersTemp);
     return i;
   };
@@ -390,8 +394,10 @@ export default function LeaguePlayRouter() {
           ) : (
             <>
               <ViewLeagueTeamsTable
+                connectedAccount={connectedAccount}
+                leagueAddress={router.query.leagueRoute[0]}
                 leagueName={leagueName}
-                teamNames={leagueMembers}
+                teamNames={leagueMembersLong}
                 teamRecords={leagueMemberRecords}
               ></ViewLeagueTeamsTable>
               <br></br>

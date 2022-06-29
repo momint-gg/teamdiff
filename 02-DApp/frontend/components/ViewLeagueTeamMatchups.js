@@ -116,9 +116,9 @@ const ViewLeagueTeamMatchup = ({
                           <Typography fontSize={25}>
                             {Object.keys(matchup)[0]}
                           </Typography>
-                          <Typography fontSize={15}>
+                          {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
-                          </Typography>
+                          </Typography> */}
                         </Container>
                         <Typography fontSize={35} sx={{ paddingRight: 4 }}>
                           {shortenAddress(matchup[0][0])}
@@ -146,9 +146,9 @@ const ViewLeagueTeamMatchup = ({
                           <Typography fontSize={25}>
                             {Object.keys(matchup)[1]}
                           </Typography>
-                          <Typography fontSize={15}>
+                          {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
-                          </Typography>
+                          </Typography> */}
                         </Container>
                       </Container>
                     </TableCell>
@@ -159,7 +159,7 @@ const ViewLeagueTeamMatchup = ({
           </Table>
         </TableContainer>
       ) : (
-        <Typography textAlign={"center"}>
+        <Typography textAlign={"center"} color="primary">
           Oops! Your league's schedule has not been set yet. Please request help
           in Discord if this issue persists past the end of the week.
         </Typography>

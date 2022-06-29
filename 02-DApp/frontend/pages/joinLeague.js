@@ -10,7 +10,7 @@ import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkeby
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
 import WhitelistJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
 // Component Imports
-import LeagueCard from "../components/LeagueCard";
+import PendingLeagueCard from "../components/PendingLeagueCard";
 
 export default function JoinLeague({ setDisplay }) {
   const [publicLeagueList, setPublicLeagueList] = useState([]);
@@ -187,31 +187,22 @@ export default function JoinLeague({ setDisplay }) {
   }, [isConnected, connectedAccount]);
 
   const publicListItems = publicLeagueList.map((leagueAddress, index) => (
-    <Box key={index}>
-      <LeagueCard leagueAddress={leagueAddress} />
-      <hr></hr>
+    <Box key={index} 
+      sx={{ marginRight: 3, marginBottom: 3 }}>
+      <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
   // Create list of league cards for all pending leagues
   const pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
-    <Box key={index}>
-      <LeagueCard leagueAddress={leagueAddress} />
-      <hr></hr>
+    <Box key={index} 
+      sx={{ marginRight: 3, marginBottom: 3 }}>
+      <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
   return (
     <Box>
-      {/* <Fab
-        variant="extended"
-        size="small"
-        aria-label="add"
-        onClick={() => setDisplay(false)}
-      >
-        &#60; BACK
-      </Fab> */}
-
       <Typography variant="h4" color="secondary" component="div" marginTop={2}>
         Your Whitelisted Leagues
       </Typography>
@@ -230,7 +221,15 @@ export default function JoinLeague({ setDisplay }) {
       ) : (
         {
           ...(pendingLeagueList.length > 0 ? (
-            <ul>{pendingListItems}</ul>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
+              {pendingListItems}
+            </Box>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Pending Leagues)
@@ -256,7 +255,15 @@ export default function JoinLeague({ setDisplay }) {
       ) : (
         {
           ...(publicLeagueList.length > 0 ? (
-            <ul>{publicListItems}</ul>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
+              {publicListItems}
+            </Box>
           ) : (
             <Typography variant="h6" color="primary" component="div">
               (No Active Leagues)
