@@ -1,12 +1,13 @@
 // Router
-import { Typography } from "@mui/material";
+import { Box, Fab, Typography } from "@mui/material";
 import { ethers } from "ethers";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
 import AthletesJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
 import AddToWhitelist from "../../components/AddToWhitelist.js";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import ViewLeagueTeamMatchup from "../../components/ViewLeagueTeamMatchups.js";
@@ -35,6 +36,8 @@ export default function LeaguePlayRouter() {
   const [leagueMemberRecords, setLeagueMemberRecords] = useState([]);
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
   const [leagueMembers, setLeagueMembers] = useState([]);
+  const [whitelistAddress, setWhitelistAddress] = useState([]);
+  let isPublic;
   const [leagueMembersLong, setLeagueMembersLong] = useState([]);
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
@@ -55,10 +58,14 @@ export default function LeaguePlayRouter() {
     const setAccountData = async () => {
       setIsLoading(true);
       const signer = provider.getSigner();
-      const accounts = await provider.listAccounts();
+      const accounts = await provider.listAccounts().catch((e) => {
+        console.error(e);
+      });
 
       if (accounts.length > 0) {
-        const accountAddress = await signer.getAddress();
+        const accountAddress = await signer.getAddress().catch((e) => {
+          console.error(e);
+        });
         setSigner(signer);
         setConnectedAccount(accountAddress);
         setIsConnected(true);
@@ -105,6 +112,8 @@ export default function LeaguePlayRouter() {
       async function fetchData() {
         setIsLoading(true);
 
+        // console.log("white: " + whitelistContract);
+
         const leagueName = await LeagueProxyContract.leagueName().catch((e) => {
           console.error(e);
           setIsLoading(false);
@@ -114,13 +123,16 @@ export default function LeaguePlayRouter() {
 
         // Get a [3] that represents wins, losses, ties, in that order for each league member
 
-        // const isInLeague = await LeagueProxyContract.inLeague(
-        //   connectedAccount
-        // ).catch((e) => {
-        //   console.error(e);
-        //   setIsLoading(false);
-        //   setIsError(true);
-        // });
+        const isInLeague = await LeagueProxyContract.inLeague(
+          connectedAccount
+        ).catch((e) => {
+          console.error(e);
+          setIsLoading(false);
+          setIsError(true);
+        });
+        if (!isInLeague) {
+          router.push("/leagues/" + router.query.leagueRoute[0]);
+        }
         // setIsLeagueMember(isInLeague);
 
         const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
@@ -141,7 +153,14 @@ export default function LeaguePlayRouter() {
         // Get league Admin
         const leagueAdmin = await LeagueProxyContract.admin();
         setIsLeagueAdmin(leagueAdmin == connectedAccount);
-
+        if (leagueAdmin == connectedAccount) {
+          // If is league admin, then set whitelist contract
+          const whitelistContractAddress =
+            await LeagueProxyContract.whitelistContract().catch((e) => {
+              console.error(e);
+            });
+          setWhitelistAddress(whitelistContractAddress);
+        }
         // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
@@ -164,11 +183,37 @@ export default function LeaguePlayRouter() {
             setLeagueScheduleIsSet(true);
           }
         }
+
+        // const WhitelistContract = new ethers.Contract(
+        //   whitelistContractAddress,
+        //   WhitelistJSON.abi,
+        //   provider
+        // );
+        // isPublic = await WhitelistContract.isPublic().catch((e) => {
+        //   console.error(e);
+        // });
+
         setIsLoading(false);
       }
       fetchData();
     }
   }, [isConnected, router.isReady, connectedAccount]);
+
+  useEffect(() => {
+    if (whitelistAddress) {
+      const WhitelistContract = new ethers.Contract(
+        whitelistAddress,
+        WhitelistJSON.abi,
+        provider
+      );
+      const fetchData = async () => {
+        isPublic = await WhitelistContract.isPublic().catch((e) => {
+          console.error(e);
+        });
+      };
+      fetchData();
+    }
+  }, [whitelistAddress]);
 
   useEffect(() => {
     if (!isLoading) getLeagueSchedule();
@@ -212,7 +257,7 @@ export default function LeaguePlayRouter() {
         const record = await LeagueProxyContract.getUserRecord(leagueMember);
         // const record = await LeagueProxyContract.userToRecord(leagueMember, week);
         // const leagueMember =
-        console.log("league member #" + i + ": " + record);
+        // console.log("league member #" + i + ": " + record);
 
         leagueMembersTemp.push(shortenAddress(leagueMember));
         leagueMembersLongTemp.push(leagueMember);
@@ -221,7 +266,7 @@ export default function LeaguePlayRouter() {
       // console.log("error value at end:" + error);
     } while (error == "none");
     setLeagueMemberRecords(records);
-    setLeagueMembersLong(leagueMembersLongTemp)
+    setLeagueMembersLong(leagueMembersLongTemp);
     setLeagueMembers(leagueMembersTemp);
     return i;
   };
@@ -285,6 +330,28 @@ export default function LeaguePlayRouter() {
     setSelectedWeekMatchups(weekMatchups);
   }
 
+  // TODO add a function for getting all previosuly whitelisted users, to display to admin
+
+  const whitelistSubmitHandler = async () => {
+    inviteListValues.forEach(async (whitelistAddress) => {
+      console.log("adding " + whitelistAddress + " to whitelies");
+      const LeagueProxyContractWithSigner = leagueProxyContract.connect(signer);
+      // const addUsersToWhitelistTxn =
+      await LeagueProxyContractWithSigner.addUserToWhitelist(whitelistAddress, {
+        gasLimit: 10000000,
+      })
+        .then(
+          // console.log("Added userr to whitelist success")
+          setInviteListValues([])
+        )
+        .catch((error) => {
+          // console.log("")
+          alert("Add User To WhiteList error: " + error.message);
+          // setIsCreatingLeague(false);
+        });
+    });
+  };
+
   // async function getLeagueMembersHelper() {
   //   leagueProxyContract.
   // }
@@ -311,17 +378,19 @@ export default function LeaguePlayRouter() {
         <Matchups
           daysTillLock={daysTillLock}
           daysTillUnlock={daysTillUnlock}
+          // LeagueProxyContract={leagueProxyContract}
+          // AthleteContract={athleteContract}
         ></Matchups>
       );
       break;
     case "myTeam":
       return <MyTeam></MyTeam>;
       break;
-    case "schedule":
+    case "home":
       return (
         <>
           {isLoading ? (
-            <LoadingPrompt loading={"Your Schedule"} />
+            <LoadingPrompt loading={"Your League Home"} />
           ) : (
             <>
               <ViewLeagueTeamsTable
@@ -339,7 +408,14 @@ export default function LeaguePlayRouter() {
                 weeklyMatchups={selectedWeekMatchups}
               ></ViewLeagueTeamMatchup>
               {isLeagueAdmin && (
-                <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
                   <br></br>
                   <Typography
                     variant="h4"
@@ -348,12 +424,37 @@ export default function LeaguePlayRouter() {
                   >
                     Admin Functions
                   </Typography>
-                  <AddToWhitelist
-                    setInviteListValues={setInviteListValues}
-                    inviteListValues={inviteListValues}
-                    connectedAccount={connectedAccount}
-                  ></AddToWhitelist>
-                </>
+                  {!isPublic ? (
+                    <>
+                      <Typography textAlign="left" variant="h6">
+                        Manage Whitelist
+                      </Typography>
+                      <AddToWhitelist
+                        setInviteListValues={setInviteListValues}
+                        inviteListValues={inviteListValues}
+                        connectedAccount={connectedAccount}
+                      ></AddToWhitelist>
+
+                      <Fab
+                        sx={{
+                          float: "right",
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                        }}
+                        variant="extended"
+                        size="medium"
+                        onClick={whitelistSubmitHandler}
+                      >
+                        Submit
+                      </Fab>
+                    </>
+                  ) : (
+                    <Typography>
+                      This a public league. Anyone with a wallet address can
+                      join this league.
+                    </Typography>
+                  )}
+                </Box>
               )}
               <br></br>
             </>

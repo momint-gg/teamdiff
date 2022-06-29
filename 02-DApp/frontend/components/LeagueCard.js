@@ -4,9 +4,7 @@ import {
   CardActionArea,
   CardContent,
   CardHeader,
-  Divider,
-  Link,
-  Typography
+  Link
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -88,11 +86,7 @@ export default function LeagueCard({ leagueAddress }) {
             minWidth: "15rem",
           }}
           // onClick={handleClick}
-          title={
-            leagueName
-              ? leagueName
-              : "(Untitled)"
-          }
+          title={leagueName || "(Untitled)"}
           subheader={"WEEK " + weekNum}
         ></CardHeader>
         {/* </CardActionArea> */}
@@ -111,18 +105,18 @@ export default function LeagueCard({ leagueAddress }) {
               variant="body1"
               color="secondary"
             >
-                MY TEAM
-                <Image src={logo} alt="logo" width="30px" height="30px" />
+              MY TEAM
+              <Image src={logo} alt="logo" width="30px" height="30px" />
             </Link>
             <Link
-                  href={"./leagues/" + leagueAddress + "/schedule"}
-                  fontSize={18}
-                  fontWeight={"bold"}
-                  variant="body1"
-                  color="secondary"
-                >
-                  VIEW LEAGUE
-                  <Image src={logo} alt="logo" width="30px" height="30px" />
+              href={"./leagues/" + leagueAddress + "/home"}
+              fontSize={18}
+              fontWeight={"bold"}
+              variant="body1"
+              color="secondary"
+            >
+              VIEW LEAGUE
+              <Image src={logo} alt="logo" width="30px" height="30px" />
             </Link>
             {/* <Box
               component="div"
@@ -206,7 +200,7 @@ export default function LeagueCard({ leagueAddress }) {
                 sx={{ marginTop: 5, marginBottom: "-6%" }}
                 variant="middle"
                 color="white"
-              /> */}                
+              /> */}
           </Box>
         </CardContent>
       </Fragment>

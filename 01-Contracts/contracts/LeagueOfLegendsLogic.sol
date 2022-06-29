@@ -79,6 +79,12 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         _;
     }
 
+    // Only our wallet can call, need this because the "owner" of the proxy contract isn't us
+    modifier onlyTeamDiffOrAdmin() {
+        require(msg.sender == teamDiffAddress || msg.sender == admin, "Caller is not TeamDiff or Admin");
+        _;
+    }
+
     //Initialize all parameters of proxy
     function initialize(
         string calldata _name,
@@ -104,8 +110,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         erc20 = IERC20(_ierc20Address);
         teamDiffAddress = _teamDiffAddress;
         gameItemsContract = GameItems(_gameItemsContractAddress);
-        // userToLineup = [100, 100, 100, 100, 100];
-        // adminStake(_admin); // Moving admin stake to leaguemaker bc admin will be sender
         console.log("Proxy initialized!");
     }
 
@@ -113,17 +117,28 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
     // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
-    function setLeagueSchedule() external onlyTeamDiff {
+    // function setLeagueSchedule() external onlyTeamDiffOrAdmin {
+    //     require(!leagueEntryIsClosed, "League entry is not closed")
+    //     MOBALogicLibrary.setLeagueSchedule(
+    //         schedule,
+    //         leagueMembers,
+    //         numWeeks,
+    //         leagueName
+    //     );
+
+    // }
+
+
+
+    function setLeagueEntryIsClosed() external onlyTeamDiffOrAdmin {
+        require(!leagueEntryIsClosed, "League entry has already been closed");
+        leagueEntryIsClosed = true;
         MOBALogicLibrary.setLeagueSchedule(
             schedule,
             leagueMembers,
             numWeeks,
             leagueName
         );
-    }
-
-    function setLeagueEntryIsClosed() external onlyTeamDiff {
-        leagueEntryIsClosed = true;
     }
 
     function lockLineup() external onlyTeamDiff {
@@ -137,6 +152,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
     function evaluateMatches() external onlyTeamDiff {
+        require(leagueEntryIsClosed, "league entry not closed, and schedule not set for this league");
         MOBALogicLibrary.evaluateMatches(
             currentWeekNum,
             athletesContract,
@@ -305,6 +321,12 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
     /*****************************************************************/
+    function setLeagueEntryIsOpen() external onlyAdmin {
+        require(leagueEntryIsClosed, "League entry is already open");
+        leagueEntryIsClosed = false;
+    }
+
+
     // Removing a user from the whitelist before the season starts
     function removeFromWhitelist(address _userToRemove) external onlyAdmin {
         require(

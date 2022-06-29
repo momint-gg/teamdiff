@@ -160,7 +160,7 @@ export default function LeagueDetails() {
         console.log("isInLeage: " + isInLeague);
         if (isInLeague) {
           // router.push("./" + router.query.leagueAddress + "/myTeam");
-          router.push("./" + router.query.leagueAddress + "/matchups");
+          router.push("./" + router.query.leagueAddress + "/home");
         }
         // // console.log("isInLeague: " + isInLeague)
         // Get whitelist of Proxy, to confirm connected user is on whitelist
@@ -300,7 +300,7 @@ export default function LeagueDetails() {
           setIsJoiningLeague(true);
           window.setTimeout(() => {
             setIsTransactionDelayed(true);
-          }, 20 * 1000);
+          }, 30 * 1000);
         })
         .catch((error) => {
           setIsJoiningLeague(false);

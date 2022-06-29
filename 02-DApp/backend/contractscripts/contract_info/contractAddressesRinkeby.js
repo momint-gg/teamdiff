@@ -1,8 +1,8 @@
 exports.GameItems = '0x4c5fA3e55c55f50A12696298aadd794AAb558C7A';
-exports.MOBALogicLibrary = '0x6cd2DfeBd046FBfFAf1c128f85646ECa83A4f8b5';
-exports.LeagueOfLegendsLogic = '0x900Db32d9ce0AA67A3D3595473948cD7ba35c5d5';
-exports.LeagueMaker = '0xFC13E43d4D969636E7375df5A2b7be3CaACdB7A3';
-exports.Beacon = '0xc1251c5C1CC46E2c2a66FEfCB66a4d6fBc2647D2';
+exports.MOBALogicLibrary = '0x266825F899dAFDCECf4Cb2d9388c1737B2D7566B';
+exports.LeagueOfLegendsLogic = '0x142D73D9d73692C85e86A929fCEEf87b02b81a86';
+exports.LeagueMaker = '0xd0A6fbc5591540b4B3530B1B702253460bF501F6';
+exports.Beacon = '0xc9B440A093C33c3D7De1A4C279440D83AcEDc4a0';
 exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';
 exports.chainlinkTokenAddress = '0x01BE23585060835E02B77ef475b0Cc51aA1e0709';
 exports.rinkebyUSDCAddress = '0xeb8f08a975Ab53E34D8a0330E0D34de942C95926';

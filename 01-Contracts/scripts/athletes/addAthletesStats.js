@@ -35,6 +35,7 @@ async function main() {
   week_num = 0;
 
   // Getting our contract
+  // const AthletesContract = await ethers.getContractAt("Athletes", "0x67476486754E9EE711b0EF307c86E4cC9FFe545F");
   const AthletesContract = await ethers.getContractAt("Athletes", Athletes);
 
   // Parsing excel
@@ -147,7 +148,7 @@ async function main() {
       finalStatsToPush[i].points, // their points for the week,
       week_num, // Week number passed in
       {
-        gasLimit: 20000000
+        gasLimit: 27000000
       }
     );
     console.log(
