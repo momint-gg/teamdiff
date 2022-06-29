@@ -34,7 +34,7 @@ async function main() {
   let txn;
   for (let i = 0; i < AllLeagueInstances.length; i++) {
     currLeague = AllLeagueInstances[i];
-    txn = await currLeague.setLeagueSchedule();
+    txn = await currLeague.setLeagueEntryIsClosed();
     await txn.wait();
 
     // let schedule = await currLeague.getScheduleForWeek(0);
