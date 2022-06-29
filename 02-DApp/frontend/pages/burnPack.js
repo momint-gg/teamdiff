@@ -12,11 +12,11 @@ import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // import CONSTANTS from "../Constants.js";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/GameItems.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import GameItemsJSON from "../../backend/contractscripts/contract_info/maticAbis/GameItems.json";
 import cardImage from "../assets/images/mystery_card.png";
 import OpenSea from "../assets/images/opensea.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
@@ -31,14 +31,14 @@ function getAthleteImage(id) {
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
-  const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
-  );
   // const provider = new ethers.providers.AlchemyProvider(
-  //   "matic",
-  //   process.env.POLYGON_ALCHEMY_KEY
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
   // );
+  const provider = new ethers.providers.AlchemyProvider(
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
+  );
   // Router
   const router = useRouter();
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
@@ -200,7 +200,11 @@ export default function BurnPack({ setDisplay }) {
         // // const revealStartDate = new Date("June 6, 2022 21:00:00");
         // const today = new Date();
         // const isBeforeRevealDate = today.getTime() < revealStartDate.getTime();
-        const isRevealPhase = await GameItemsContract.packsReadyToOpen();
+        const isRevealPhase = await GameItemsContract.packsReadyToOpen().catch(
+          (e) => {
+            console.error(e);
+          }
+        );
 
         setIsPreRevealPhase(!isRevealPhase);
         console.log("isPreveal: " + isRevealPhase);
@@ -325,12 +329,12 @@ export default function BurnPack({ setDisplay }) {
                       size="large"
                       aria-label="add"
                       onClick={burnStarterPack}
-                      // disabled={
-                      //   !ownsStarterPack ||
-                      //   hasAlreadyBurnedPack ||
-                      //   isPreRevealPhase ||
-                      //   !isPolygon
-                      // }
+                      disabled={
+                        !ownsStarterPack ||
+                        hasAlreadyBurnedPack ||
+                        isPreRevealPhase ||
+                        !isPolygon
+                      }
                       // onClick={() => setDisplayMint(true)}
                       sx={{
                         marginRight: 1,

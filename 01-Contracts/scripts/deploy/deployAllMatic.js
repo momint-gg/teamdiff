@@ -78,7 +78,7 @@ const main = async () => {
 
   // Write data in 'Output.txt' .
   fs.writeFileSync(
-    "../02-DApp/backend/contractscripts/contract_info/maticContractAddresses.js",
+    "../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic.js",
     textData,
     (err) => {
       // In case of a error throw err.
@@ -113,6 +113,8 @@ const main = async () => {
       console.log("done writing to file");
     });
   });
+
+  console.log("deploy script complete");
 };
 
 const runMain = async () => {

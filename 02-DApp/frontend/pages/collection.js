@@ -1,15 +1,15 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
-  Box,
-  Card,
-  Fab,
-  FormControl,
-  Grid,
-  Link,
-  MenuItem,
-  Select,
-  TextField,
-  Typography
+    Box,
+    Card,
+    Fab,
+    FormControl,
+    Grid,
+    Link,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
 } from "@mui/material";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
@@ -19,7 +19,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
 import OpenSea from "../assets/images/opensea.png";
 import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";

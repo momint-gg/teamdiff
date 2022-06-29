@@ -1,9 +1,9 @@
 import {
-  Box,
-  CircularProgress,
-  Container,
-  Grid,
-  Typography
+    Box,
+    CircularProgress,
+    Container,
+    Grid,
+    Typography
 } from "@mui/material";
 
 // Web3 Imports
@@ -14,9 +14,9 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import AthletesJSON from "../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerStateModal from "../components/PlayerStateModal";
@@ -28,9 +28,13 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   // Router params
   const router = useRouter();
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
 
   // Web2 endpoints

@@ -1,15 +1,15 @@
 import {
-  Box,
-  Button,
-  CardMedia,
-  Fab,
-  Link,
-  Modal,
-  Typography
+    Box,
+    Button,
+    CardMedia,
+    Fab,
+    Link,
+    Modal,
+    Typography
 } from "@mui/material";
 import Image from "next/image";
 import { IoCloseOutline } from "react-icons/io5";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
 import OpenSea from "../assets/images/opensea.png";
 
 export default function AthleteCardModal({

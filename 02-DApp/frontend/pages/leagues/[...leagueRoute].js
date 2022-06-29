@@ -4,10 +4,10 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
+import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import AthletesJSON from "../../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+import WhitelistJSON from "../../../backend/contractscripts/contract_info/maticAbis/Whitelist.json";
 import AddToWhitelist from "../../components/AddToWhitelist.js";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import ViewLeagueTeamMatchup from "../../components/ViewLeagueTeamMatchups.js";
@@ -40,9 +40,13 @@ export default function LeaguePlayRouter() {
   let isPublic;
   const [leagueMembersLong, setLeagueMembersLong] = useState([]);
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   useEffect(() => {
     if (router.isReady) {

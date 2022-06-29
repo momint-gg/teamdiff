@@ -5,10 +5,10 @@ import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import WhitelistJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+import WhitelistJSON from "../../backend/contractscripts/contract_info/maticAbis/Whitelist.json";
 // Component Imports
 import PendingLeagueCard from "../components/PendingLeagueCard";
 
@@ -21,9 +21,13 @@ export default function JoinLeague({ setDisplay }) {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
 
   useEffect(() => {
@@ -187,16 +191,14 @@ export default function JoinLeague({ setDisplay }) {
   }, [isConnected, connectedAccount]);
 
   const publicListItems = publicLeagueList.map((leagueAddress, index) => (
-    <Box key={index} 
-      sx={{ marginRight: 3, marginBottom: 3 }}>
+    <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
       <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
   // Create list of league cards for all pending leagues
   const pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
-    <Box key={index} 
-      sx={{ marginRight: 3, marginBottom: 3 }}>
+    <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
       <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));

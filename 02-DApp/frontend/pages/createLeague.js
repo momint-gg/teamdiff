@@ -29,11 +29,11 @@ import { useEffect, useState } from "react";
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
 import WAValidator from "wallet-address-validator";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-// import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
-import ERC20JSON from "../../backend/contractscripts/contract_info/rinkebyAbis/ERC20.json";
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+// import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/maticAbis/RinkebyUSDCJSON.json";
+import ERC20JSON from "../../backend/contractscripts/contract_info/maticAbis/ERC20.json";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 import AddToWhitelist from "../components/AddToWhitelist.js";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt.js";
@@ -88,9 +88,13 @@ export default function CreateLeague({ setDisplay }) {
   // WAGMI Hooks
 
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
 
   // Router
@@ -257,11 +261,16 @@ export default function CreateLeague({ setDisplay }) {
 
       // Request that user approves their new league to withdraw USDC on behalf of their wallet
       // Required for staking
-      const stakeAmount = await LeagueProxyContractWithSigner.stakeAmount();
+      const stakeAmount =
+        await LeagueProxyContractWithSigner.stakeAmount().catch((error) => {
+          //  console.log("Join League error: " + error.error.message);
+          alert("Stake amount error: " + error.message);
+          setIsJoiningLeague(false);
+        });
       // TODO: set correct stakeamount
-      const approvalTxn = await TokenContract.approve(
+      await TokenContract.approve(
         newLeagueProxyAddress,
-        stakeAmount * 1000000
+        stakeAmount // * 1000000
       ).catch((error) => {
         //  console.log("Join League error: " + error.error.message);
         alert("Approve USDC error: " + error.message);
@@ -323,19 +332,19 @@ export default function CreateLeague({ setDisplay }) {
       let stakeTokenAddress;
       switch (formValues.token) {
         case "usdc":
-          stakeTokenAddress = CONTRACT_ADDRESSES.rinkebyUSDCAddress;
-          // stakeTokenAddress = CONTRACT_ADDRESSES.polygonUSDCAddress;
+          // stakeTokenAddress = CONTRACT_ADDRESSES.rinkebyUSDCAddress;
+          stakeTokenAddress = CONTRACT_ADDRESSES.polygonUSDCAddress;
           break;
         case "ETH":
-          stakeTokenAddress = CONTRACT_ADDRESSES.chainlinkTokenAddress;
-          // stakeTokenAddress = CONTRACT_ADDRESSES.wrappedEthAddress;
+          // stakeTokenAddress = CONTRACT_ADDRESSES.chainlinkTokenAddress;
+          stakeTokenAddress = CONTRACT_ADDRESSES.wrappedEthAddress;
           break;
         // TODO update for prod
-        // case "MATIC":
-        //   // stakeTokenAddress = CONTRACT_ADDRESSES.maticAddress
-        //   break;
+        case "MATIC":
+          stakeTokenAddress = CONTRACT_ADDRESSES.maticAddress;
+          break;
         default:
-          stakeTokenAddress = CONTRACT_ADDRESSES.rinkebyUSDCAddress;
+          stakeTokenAddress = CONTRACT_ADDRESSES.polygonUSDCAddress;
           break;
       }
       // Connect to leagueMaker with connect wallet
@@ -592,9 +601,9 @@ export default function CreateLeague({ setDisplay }) {
                     <MenuItem key="ETH" value="ETH">
                       ETH
                     </MenuItem>
-                    {/* <MenuItem key="MATIC" value="MATIC">
+                    <MenuItem key="MATIC" value="MATIC">
                       MATIC
-                    </MenuItem> */}
+                    </MenuItem>
                   </Select>
                   {/* </FormControl> */}
                 </FormControl>
@@ -738,7 +747,7 @@ export default function CreateLeague({ setDisplay }) {
             <a
               className="primary-link"
               href={
-                "https://rinkeby.etherscan.io/address/" +
+                "https://polygonscan.io/address/" +
                 newLeagueAddress +
                 "#internaltx"
               }

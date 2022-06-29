@@ -3,7 +3,7 @@
   "scripts": {
     "test-all": "mocha --exit --recursive",
     "deploy-rinkeby": "hardhat run scripts/deploy/deployAll.js --network rinkeby",
-    "deploy-polygon": "hardhat run scripts/deploy/deployAll.js --network polygon",
+    "deploy-polygon": "hardhat run scripts/deploy/deployAllMatic.js --network polygon",
     "deploy-GameItems-polygon": "hardhat run scripts/deploy/deployGameItems.js --network polygon",
     "verify-rinkeby": "hardhat verify --network rinkeby",
     "update-athlete-stats": "hardhat run ./scripts/athletes/addAthletesStats.js --network rinkeby",

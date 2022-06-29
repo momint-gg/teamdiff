@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import logo from "../assets/images/logo-horizontal.png";
 import WalletLogin from "../components/WalletLogin";
 import Footer from "./Footer";
@@ -9,7 +8,7 @@ import NavLink from "./NavLink";
 
 const Layout = ({ children, isMobile }) => {
   const pages = [
-    { name: "PLAY", href: "/play" },
+    // { name: "PLAY", href: "/play" },
     { name: "MY COLLECTION", href: "/collection" },
     { name: "MINT", href: "/mintHome" },
     { name: "OPEN", href: "/burnPack" },

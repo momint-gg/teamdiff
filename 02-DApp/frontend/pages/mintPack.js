@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/maticAbis/GameItems.json";
 import OpenSea from "../assets/images/opensea.png";
 import profilePic from "../assets/images/starter-pack.png";
@@ -365,12 +365,12 @@ export default function MintPack() {
                     paddingLeft: 8,
                   }}
                   // disabled={!isPolygon}
-                  // disabled={
-                  //   // hasAlreadyMintedPack ||
-                  //   // // (!isOnWhitelist && isPresalePhase) ||
-                  //   // !(isPresalePhase || isPublicSalePhase) ||
-                  //   // !isPolygon
-                  // }
+                  disabled={
+                    hasAlreadyMintedPack ||
+                    // (!isOnWhitelist && isPresalePhase) ||
+                    !(isPresalePhase || isPublicSalePhase) ||
+                    !isPolygon
+                  }
                 >
                   Mint
                 </Fab>
