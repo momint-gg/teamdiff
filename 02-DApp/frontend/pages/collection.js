@@ -133,8 +133,8 @@ export default function Collection() {
       const getNFTData = async () => {
         setIsLoading(true);
         //         console.log("entering getNftData function")
-        // const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
-        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK); // .catch(
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
+        // const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK); // .catch(
         //   (error) => {
         //     // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
         //     // setNFTData([]);
