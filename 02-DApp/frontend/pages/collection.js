@@ -1,4 +1,4 @@
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import { createAlchemyWeb3 } from '@alch/alchemy-web3';
 import {
   Box,
   Card,
@@ -9,23 +9,23 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography
-} from "@mui/material";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
-import InputLabel from "@mui/material/InputLabel";
-import { ethers } from "ethers";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import OpenSea from "../assets/images/opensea.png";
-import AthleteCardModal from "../components/AthleteCardModal";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
-import LoadingPrompt from "../components/LoadingPrompt";
-import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
-import constants from "../constants/index";
+  Typography,
+} from '@mui/material';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import InputLabel from '@mui/material/InputLabel';
+import { ethers } from 'ethers';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
+import * as CONTRACT_ADDRESSES from '../../backend/contractscripts/contract_info/contractAddressesRinkeby.js';
+import OpenSea from '../assets/images/opensea.png';
+import AthleteCardModal from '../components/AthleteCardModal';
+import ConnectWalletPrompt from '../components/ConnectWalletPrompt';
+import LoadingPrompt from '../components/LoadingPrompt';
+import MetaMaskRedirectInstructions from '../components/MetaMaskRedirectInstructions';
+import constants from '../constants/index';
 // import styles from "../styles/collection.module.css"
 
 // const StyledImageListItem = styled(ImageListItem)`
@@ -48,7 +48,24 @@ export default function Collection() {
   const [isLoading, setIsLoading] = useState(true);
   const [isNoMetaMask, setIsNoMetaMask] = useState();
 
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   /**
    * Handles a change in injected etheruem provider from MetaMask
@@ -56,7 +73,7 @@ export default function Collection() {
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
-      console.log("Ethereum successfully detected!");
+      console.log('Ethereum successfully detected!');
       // Access the decentralized web!
     } else {
       setIsNoMetaMask(true);
@@ -64,14 +81,14 @@ export default function Collection() {
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
       // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
-      console.log("Please install MetaMask!");
+      console.log('Please install MetaMask!');
     }
   }
-  const [searchQuery, setSeachQuery] = useState("");
+  const [searchQuery, setSeachQuery] = useState('');
   const [isPreparingAthletes, setIsPreparingAthletes] = useState(true);
   const [allTeamFilterOptions, setAllTeamFilterOptions] = useState([]);
-  const [teamFilterSelection, setTeamFilterSelection] = useState("");
-  const [teamPositionSelection, setTeamPositionSelection] = useState("");
+  const [teamFilterSelection, setTeamFilterSelection] = useState('');
+  const [teamPositionSelection, setTeamPositionSelection] = useState('');
   const [athleteNFTsWrapper, setAthleteNFTsWrapper] = useState([]);
   const [loadingError, setLoadingError] = useState(false);
 
@@ -98,15 +115,15 @@ export default function Collection() {
         setIsLoading(false);
       };
       setAccountData();
-      provider.provider.on("accountsChanged", () => {
+      provider.provider.on('accountsChanged', () => {
         setAccountData();
       });
-      provider.provider.on("disconnect", () => {
-        console.log("disconnected");
+      provider.provider.on('disconnect', () => {
+        console.log('disconnected');
         setIsConnected(false);
       });
     } else {
-      window.addEventListener("ethereum#initialized", handleEthereum, {
+      window.addEventListener('ethereum#initialized', handleEthereum, {
         once: true,
       });
 
@@ -157,11 +174,11 @@ export default function Collection() {
             // setNFTData([]);
             setLoadingError(true);
             setIsPreparingAthletes(false);
-            console.log("get nfts error");
+            console.log('get nfts error');
           });
 
         setNFTResp(nfts);
-        console.log("nftresp", nfts);
+        console.log('nftresp', nfts);
         for (const nft of nfts?.ownedNfts) {
           const token = nft?.id?.tokenId;
           const response = await web3.alchemy.getNftMetadata({
@@ -176,7 +193,7 @@ export default function Collection() {
           // );
 
           // Check metadata of ERC-1155, and assing to create State list
-          if (response.title?.includes("Pack")) {
+          if (response.title?.includes('Pack')) {
             setPackNFTs((packNFTs) => [...packNFTs, response]);
           } else {
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
@@ -194,9 +211,9 @@ export default function Collection() {
         // setNFTData([]);
         // setIsPreparingAthletes(false);
         setLoadingError(true);
-        console.log("fetch NFT DATA error");
+        console.log('fetch NFT DATA error');
       });
-      console.log("done with preparing atheletes");
+      console.log('done with preparing atheletes');
       // console.log(athleteNFTs, 'hmm')
       // setAthleteNFTsWrapper(athleteNFTs)
       setIsPreparingAthletes(false);
@@ -214,7 +231,7 @@ export default function Collection() {
         const attributesRaw = athlete.metadata.attributes;
         for (const a of attributesRaw) {
           if (
-            a.trait_type.toLowerCase() === "team" &&
+            a.trait_type.toLowerCase() === 'team' &&
             a.value === inputs.team
           ) {
             return true;
@@ -228,7 +245,7 @@ export default function Collection() {
         const attributesRaw = athlete.metadata.attributes;
         for (const a of attributesRaw) {
           if (
-            a.trait_type.toLowerCase() === "position" &&
+            a.trait_type.toLowerCase() === 'position' &&
             a.value === inputs.position
           ) {
             return true;
@@ -255,7 +272,7 @@ export default function Collection() {
       const attributesRaw = athlete.metadata.attributes;
       // console.log(attributesRaw, "***");
       for (const a of attributesRaw) {
-        if (a.trait_type.toLowerCase() === "team") {
+        if (a.trait_type.toLowerCase() === 'team') {
           arr.push(a.value);
         }
       }
@@ -284,11 +301,11 @@ export default function Collection() {
   // }
 
   const ALL_POSITION_FILTER_OPTIONS = [
-    "Top",
-    "ADC",
-    "Mid",
-    "Jungle",
-    "Support",
+    'Top',
+    'ADC',
+    'Mid',
+    'Jungle',
+    'Support',
   ];
 
   // handles any change in filter/query
@@ -327,9 +344,9 @@ export default function Collection() {
       // https://mui.com/material-ui/react-select/
       <Box>
         <Typography
-          variant={isMobile ? "h4" : "h3"}
-          color="secondary"
-          component="div"
+          variant={isMobile ? 'h4' : 'h3'}
+          color='secondary'
+          component='div'
           style={{ marginTop: 10 }}
         >
           My TeamDiff Athlete Cards
@@ -337,8 +354,8 @@ export default function Collection() {
 
         <hr
           style={{
-            color: "white",
-            backgroundColor: "white",
+            color: 'white',
+            backgroundColor: 'white',
             height: 5,
           }}
         />
@@ -346,13 +363,13 @@ export default function Collection() {
         <Grid
           container
           spacing={isMobile ? 1 : 3}
-          sx={{ marginBottom: "50px" }}
+          sx={{ marginBottom: '50px' }}
         >
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <Typography
-              variant={isMobile ? "h6" : "h4"}
-              color="secondary.light"
-              component="div"
+              variant={isMobile ? 'h6' : 'h4'}
+              color='secondary.light'
+              component='div'
               // fontSize={"50px"}
             >
               Filter Athletes:
@@ -360,21 +377,21 @@ export default function Collection() {
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <TextField
-              label="Name"
+              label='Name'
               value={searchQuery}
               onChange={handleQueryChange}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <FormControl sx={{ minWidth: 250 }}>
-              <InputLabel id="position-filter">Position</InputLabel>
+              <InputLabel id='position-filter'>Position</InputLabel>
               <Select
-                labelId="position-filter"
+                labelId='position-filter'
                 value={teamPositionSelection}
-                label="Position"
+                label='Position'
                 onChange={handlePositionFilterChange}
               >
-                <MenuItem value="">
+                <MenuItem value=''>
                   <em>None</em>
                 </MenuItem>
                 {ALL_POSITION_FILTER_OPTIONS.map((positionOption) => (
@@ -385,14 +402,14 @@ export default function Collection() {
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <FormControl sx={{ minWidth: 250 }}>
-              <InputLabel id="team-filter">Team</InputLabel>
+              <InputLabel id='team-filter'>Team</InputLabel>
               <Select
-                labelId="team-filter"
+                labelId='team-filter'
                 value={teamFilterSelection}
-                label="Team"
+                label='Team'
                 onChange={handleTeamFilterChange}
               >
-                <MenuItem value="">
+                <MenuItem value=''>
                   <em>None</em>
                 </MenuItem>
                 {allTeamFilterOptions.map((teamOption) => (
@@ -464,11 +481,11 @@ export default function Collection() {
 
           </Box> */}
         <Typography
-          variant={isMobile ? "h8" : "h6"}
-          color="secondary.light"
-          component="div"
+          variant={isMobile ? 'h8' : 'h6'}
+          color='secondary.light'
+          component='div'
           sx={{
-            marginBottom: "20px",
+            marginBottom: '20px',
           }}
         >
           Showing {athleteNFTsWrapper.length} out of {athleteNFTs.length} total
@@ -477,34 +494,34 @@ export default function Collection() {
 
         <ImageList
           sx={{
-            width: "100%",
-            borderColor: "white",
-            color: "white",
+            width: '100%',
+            borderColor: 'white',
+            color: 'white',
             borderRadius: 2,
             border: 1,
           }}
           cols={isMobile ? 1 : 3}
         >
           {athleteNFTsWrapper?.map((athleteData) => (
-            <ImageListItem sx={{ margin: "5%" }} className="athlete-image">
+            <ImageListItem sx={{ margin: '5%' }} className='athlete-image'>
               <img
                 src={
-                  "/cards/" +
+                  '/cards/' +
                   athleteData?.title +
-                  ".png?w=164&h=164&fit=crop&auto=format"
+                  '.png?w=164&h=164&fit=crop&auto=format'
                 }
-                alt={"Athlete card"}
-                loading="lazy"
+                alt={'Athlete card'}
+                loading='lazy'
                 onClick={() => {
                   setCurrAthlete({
                     image:
-                      "/cards/" +
+                      '/cards/' +
                       athleteData?.title +
-                      ".png?w=164&h=164&fit=crop&auto=format",
+                      '.png?w=164&h=164&fit=crop&auto=format',
                     athleteData: athleteData,
                   });
                   console.log(
-                    "athleteData: " + JSON.stringify(athleteData, null, 2)
+                    'athleteData: ' + JSON.stringify(athleteData, null, 2)
                   );
                   setModalOpen(true);
                 }}
@@ -530,35 +547,35 @@ export default function Collection() {
           handleModalClose={handleModalClose}
         />
         <Typography
-          variant={isMobile ? "h4" : "h3"}
-          color="secondary"
-          component="div"
+          variant={isMobile ? 'h4' : 'h3'}
+          color='secondary'
+          component='div'
         >
           My TeamDiff Starter Packs
         </Typography>
         <hr
           style={{
-            color: "white",
-            backgroundColor: "white",
+            color: 'white',
+            backgroundColor: 'white',
             height: 5,
           }}
         />
         <ImageList
           sx={{
-            width: "100%",
-            borderColor: "white",
-            color: "white",
+            width: '100%',
+            borderColor: 'white',
+            color: 'white',
             borderRadius: 2,
             border: 1,
           }}
           cols={isMobile ? 1 : 3}
         >
           {packNFTs?.map((_) => (
-            <ImageListItem sx={{ margin: "5%" }}>
+            <ImageListItem sx={{ margin: '5%' }}>
               <img
-                src={"/starter-pack.png?w=164&h=164&fit=crop&auto=format"}
-                alt={"Starter pack image"}
-                loading="lazy"
+                src={'/starter-pack.png?w=164&h=164&fit=crop&auto=format'}
+                alt={'Starter pack image'}
+                loading='lazy'
               />
             </ImageListItem>
           ))}
@@ -577,25 +594,25 @@ export default function Collection() {
     );
   } else if (isConnected && nftResp && !loadingError && !isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box display='flex' justifyContent='center' alignItems='center'>
         <Card
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             padding: 3,
-            color: "white",
-            width: "30rem",
+            color: 'white',
+            width: '30rem',
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          <Typography variant='h4' sx={{ fontWeight: 'bold' }}>
             Empty Collection
           </Typography>
           <Typography
-            variant="h6"
+            variant='h6'
             sx={{
-              fontSize: "1.1rem",
-              marginTop: ".4rem",
-              marginBottom: ".4rem",
-              overflowWrap: "break-word",
+              fontSize: '1.1rem',
+              marginTop: '.4rem',
+              marginBottom: '.4rem',
+              overflowWrap: 'break-word',
             }}
           >
             You don't currently own any TeamDiff NFT's! Mint a starter pack, or
@@ -603,15 +620,15 @@ export default function Collection() {
           </Typography>
           <Box sx={{ marginTop: 2 }}>
             <Fab
-              variant="extended"
-              size="large"
-              aria-label="add"
-              onClick={() => router.push("./mintPack")}
+              variant='extended'
+              size='large'
+              aria-label='add'
+              onClick={() => router.push('./mintPack')}
               sx={{
                 fontSize: 20,
                 background:
-                  "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                color: "white",
+                  'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
+                color: 'white',
               }}
             >
               Mint Starter Pack
@@ -619,25 +636,25 @@ export default function Collection() {
           </Box>
           <Box sx={{ marginTop: 2 }}>
             <Link
-              href={"https://opensea.io/collection/teamdiff"}
-              sx={{ textDecoration: "none" }}
-              target={"_blank"}
+              href={'https://opensea.io/collection/teamdiff'}
+              sx={{ textDecoration: 'none' }}
+              target={'_blank'}
             >
               <Fab
-                variant="extended"
-                size="large"
-                color={"info"}
-                aria-label="add"
+                variant='extended'
+                size='large'
+                color={'info'}
+                aria-label='add'
                 sx={{
                   fontSize: 20,
-                  color: "white",
+                  color: 'white',
                 }}
               >
                 <Image
                   src={OpenSea}
-                  alt={"opensea"}
-                  width="30rem"
-                  height="30rem"
+                  alt={'opensea'}
+                  width='30rem'
+                  height='30rem'
                 />
                 <Box sx={{ marginLeft: 1 }}>Buy on OpenSea</Box>
               </Fab>
@@ -647,28 +664,28 @@ export default function Collection() {
       </Box>
     );
   } else if (isConnected && !loadingError && isLoading) {
-    return <LoadingPrompt loading={"Your Collection"} />;
+    return <LoadingPrompt loading={'Your Collection'} />;
   } else if (loadingError) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box display='flex' justifyContent='center' alignItems='center'>
         <Card
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             padding: 3,
-            color: "white",
-            width: "30rem",
+            color: 'white',
+            width: '30rem',
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          <Typography variant='h4' sx={{ fontWeight: 'bold' }}>
             Uh oh, there's been an error...
           </Typography>
           <Typography
-            variant="h6"
+            variant='h6'
             sx={{
-              fontSize: "1.1rem",
-              marginTop: ".4rem",
-              marginBottom: ".4rem",
-              overflowWrap: "break-word",
+              fontSize: '1.1rem',
+              marginTop: '.4rem',
+              marginBottom: '.4rem',
+              overflowWrap: 'break-word',
             }}
           >
             We encountered an unexpected error while loading your collection.
@@ -681,5 +698,5 @@ export default function Collection() {
     );
   }
 
-  return <ConnectWalletPrompt accessing={"your collection"} />;
+  return <ConnectWalletPrompt accessing={'your collection'} />;
 }

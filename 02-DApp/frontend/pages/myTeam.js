@@ -1,5 +1,5 @@
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { makeStyles } from "@material-ui/core";
+import { createAlchemyWeb3 } from '@alch/alchemy-web3';
+import { makeStyles } from '@material-ui/core';
 import {
   Button,
   CircularProgress,
@@ -11,23 +11,23 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 // Web3 Imports
-import { ethers } from "ethers";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
+import { ethers } from 'ethers';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import logo from "../assets/images/mystery_card.png";
-import LoadingPrompt from "../components/LoadingPrompt.js";
-import PlayerSelectModal from "../components/PlayerSelectModal";
-import PlayerStateModal from "../components/PlayerStateModal";
-import constants from "../constants";
+import * as CONTRACT_ADDRESSES from '../../backend/contractscripts/contract_info/contractAddressesRinkeby.js';
+import AthletesJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json';
+import LeagueOfLegendsLogicJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json';
+import logo from '../assets/images/mystery_card.png';
+import LoadingPrompt from '../components/LoadingPrompt.js';
+import PlayerSelectModal from '../components/PlayerSelectModal';
+import PlayerStateModal from '../components/PlayerStateModal';
+import constants from '../constants';
 
 // TODO get data from backend
 
@@ -36,11 +36,11 @@ export default function MyTeam() {
   const router = useRouter();
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
+    'rinkeby',
     process.env.RINKEBY_ALCHEMY_KEY
   );
 
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
   const useStyles = makeStyles({
     cell: {
       fontSize: 36,
@@ -71,7 +71,7 @@ export default function MyTeam() {
   const [isLineupLocked, setIsLineupLocked] = useState();
   const [isSettingAthlete, setIsSettingAthlete] = useState();
 
-  const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
+  const positions = ['ADC', 'Jungle', 'Mid', 'Support', 'Top'];
 
   // DAte
   const d = new Date();
@@ -88,6 +88,23 @@ export default function MyTeam() {
   if (daysTillLock > 5) {
     daysTillUnlock = 7 - daysTillLock;
   }
+
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -106,10 +123,10 @@ export default function MyTeam() {
       }
     };
     setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+    provider.provider.on('accountsChanged', (accounts) => {
       setAccountData();
     });
-    provider.provider.on("disconnect", () => {
+    provider.provider.on('disconnect', () => {
       // console.log("disconnected");
       setIsConnected(false);
     });
@@ -132,7 +149,7 @@ export default function MyTeam() {
       //   provider
       // );
       setLeagueProxyContract(LeagueProxyContract);
-      LeagueProxyContract.on("AthleteSetInLineup", athleteSetCallback);
+      LeagueProxyContract.on('AthleteSetInLineup', athleteSetCallback);
 
       // Initialize connections to Athlete datastore contract
       const AthleteContract = new ethers.Contract(
@@ -154,7 +171,7 @@ export default function MyTeam() {
         setIsLeagueMember(isInLeague);
         // TODO if is not league member, refresh the page
         if (!isInLeague) {
-          router.push("/leagues/" + router.query.leagueRoute[0]);
+          router.push('/leagues/' + router.query.leagueRoute[0]);
         }
         const currentWeekNum = await LeagueProxyContract.currentWeekNum();
         setCurrentWeekNum(currentWeekNum);
@@ -163,7 +180,7 @@ export default function MyTeam() {
           const id = await LeagueProxyContract.userToLineup(
             connectedAccount,
             i
-          ).catch((e) => console.log("error: " + e));
+          ).catch((e) => console.log('error: ' + e));
           starterIds[i] = id;
         }
         setStarterAthleteIds(starterIds);
@@ -196,7 +213,7 @@ export default function MyTeam() {
           //     " metadata: " +
           //     JSON.stringify(response, null, 2)
           // );
-          if (!response.title?.includes("Pack")) {
+          if (!response.title?.includes('Pack')) {
             athleteMetadata[parseInt(token)] = response.metadata;
             setAthleteNFTs((athleteNFTs) => [...athleteNFTs, response]);
           }
@@ -250,7 +267,7 @@ export default function MyTeam() {
         // // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
       } else if (id != 100) {
-        ownedAthletesMetadata[id].prevPoints = "n/a";
+        ownedAthletesMetadata[id].prevPoints = 'n/a';
       }
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
@@ -279,16 +296,16 @@ export default function MyTeam() {
     if (sender == connectedAccount) {
       setIsSettingAthlete(false);
       alert(
-        "Successfully set Athlete id #" +
+        'Successfully set Athlete id #' +
           id +
-          " in posiiton: " +
+          ' in posiiton: ' +
           positions[position] +
-          ". " +
-          "\nPlease refresh to see changes."
+          '. ' +
+          '\nPlease refresh to see changes.'
       );
       // router.push()
     } else {
-      console.log("event triggered but filtered");
+      console.log('event triggered but filtered');
     }
   };
 
@@ -314,9 +331,9 @@ export default function MyTeam() {
       })
       .catch((error) => {
         if (error.data) {
-          alert("Set Lineup error: " + error.data.message);
+          alert('Set Lineup error: ' + error.data.message);
         } else {
-          alert("error: " + error.message);
+          alert('error: ' + error.message);
         }
       });
   };
@@ -346,13 +363,13 @@ export default function MyTeam() {
   return (
     <>
       {isLoading ? (
-        <LoadingPrompt loading={"Your Team"} />
+        <LoadingPrompt loading={'Your Team'} />
       ) : (
         <Container
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}
         >
           {isSettingAthlete && (
@@ -363,32 +380,32 @@ export default function MyTeam() {
           )}
           <Container>
             <Button
-              variant="contained"
+              variant='contained'
               onClick={() =>
-                router.push("/leagues/" + router.query.leagueRoute[0] + "/home")
+                router.push('/leagues/' + router.query.leagueRoute[0] + '/home')
               }
-              size="small"
+              size='small'
               // color="secondary"
               // filled
               style={{
                 // background:
                 //   "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
-                background: "#480D48",
-                borderRadius: "30px",
-                padding: "10px 40px",
-                fontWeight: "200",
-                fontSize: "15px",
-                position: "absolute",
-                left: "25px",
+                background: '#480D48',
+                borderRadius: '30px',
+                padding: '10px 40px',
+                fontWeight: '200',
+                fontSize: '15px',
+                position: 'absolute',
+                left: '25px',
               }}
             >
               Back to league page
             </Button>
           </Container>
           <Typography
-            variant="h4"
-            color="white"
-            component="div"
+            variant='h4'
+            color='white'
+            component='div'
             sx={{
               fontSize: 64,
             }}
@@ -396,8 +413,8 @@ export default function MyTeam() {
             {leagueName}
           </Typography>
           <Typography
-            color="white"
-            component="div"
+            color='white'
+            component='div'
             sx={{
               fontSize: 36,
             }}
@@ -405,35 +422,35 @@ export default function MyTeam() {
             My Team
           </Typography>
           <Typography
-            color="white"
-            component="div"
+            color='white'
+            component='div'
             sx={{
               fontSize: 36,
             }}
           >
-            {"Week #" +
+            {'Week #' +
               currentWeekNum +
               (isLineupLocked
-                ? ": Rosters unlock in " + daysTillUnlock + " Days"
-                : ": Rosters Locks in " + daysTillLock + " Days")}
+                ? ': Rosters unlock in ' + daysTillUnlock + ' Days'
+                : ': Rosters Locks in ' + daysTillLock + ' Days')}
           </Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow sx={{ background: "#473D3D" }}>
-                  <TableCell className={classes.cell} align="center">
+                <TableRow sx={{ background: '#473D3D' }}>
+                  <TableCell className={classes.cell} align='center'>
                     Position
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  <TableCell align='center' className={classes.cell}>
                     Player
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  <TableCell align='center' className={classes.cell}>
                     Last Week Points
                   </TableCell>
                   {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
                   </TableCell> */}
-                  <TableCell align="center" className={classes.cell}>
+                  <TableCell align='center' className={classes.cell}>
                     Action
                   </TableCell>
                 </TableRow>
@@ -445,54 +462,54 @@ export default function MyTeam() {
                   // set an athlete in that position for this week in their proxy
                   const athlete = ownedAthletesMetadata[id];
                   console.log(
-                    "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
+                    'starterID #' + id + ': ' + JSON.stringify(athlete, null, 2)
                   );
                   return (
                     <TableRow
                       key={index.toString()}
-                      sx={{ background: index % 2 ? "#473D3D" : "#8E8E8E" }}
+                      sx={{ background: index % 2 ? '#473D3D' : '#8E8E8E' }}
                     >
-                      <TableCell align="center">
+                      <TableCell align='center'>
                         <Typography fontSize={30}>
-                          {" "}
+                          {' '}
                           {positions[index]}
                         </Typography>
                       </TableCell>
                       <TableCell
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          flexDirection: "column",
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexDirection: 'column',
                           // justifyContent: "space-around",
                           // justifyContent: "center",
                         }}
-                        align="center"
+                        align='center'
                       >
                         <Image
                           src={id != 100 ? athlete?.image : logo}
-                          width={"40"}
+                          width={'40'}
                           // layout="fill"
-                          height={"40"}
+                          height={'40'}
                         />
                         <div>
                           <Typography
                             fontSize={30}
                             onClick={() => handleStateModal(athlete, index)}
                           >
-                            {id != 100 ? athlete?.name : "(none)"}
+                            {id != 100 ? athlete?.name : '(none)'}
                           </Typography>
-                          <Typography component="div">
+                          <Typography component='div'>
                             {id != 100 && athlete?.score}
                           </Typography>
                         </div>
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align='center'>
                         <div>
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
                             {id != 100 && currentWeekNum != 0
                               ? athlete?.prevPoints
-                              : "(0)"}
+                              : '(0)'}
                           </Typography>
                           {/* <Typography>
                             {id != 100  && "69/69/69"}
@@ -501,32 +518,32 @@ export default function MyTeam() {
                       </TableCell>
                       {/* <TableCell align="center">
                         <div>
-                          <Typography fontSize={30} textTransform="uppercase">
+                          <Typography fontSize={30} textTransform='uppercase'>
                             {id != 100 &&
                               // currentWeekNum != 0 &&
-                              "*pull opp from backend"}
+                              '*pull opp from backend'}
                           </Typography>
                           <Typography>
                             {id != 100 &&
                               // currentWeekNum != 0 &&
-                              "*pull date from backend"}
+                              '*pull date from backend'}
                           </Typography>
                         </div>
                       </TableCell> */}
-                      <TableCell align="center">
+                      <TableCell align='center'>
                         <Button
                           onClick={() => handleSubModal(athlete, index)}
                           style={{
                             background:
-                              "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
-                            borderRadius: "50px",
-                            padding: "10px 40px",
-                            fontWeight: "600",
-                            fontSize: "20px",
+                              'linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)',
+                            borderRadius: '50px',
+                            padding: '10px 40px',
+                            fontWeight: '600',
+                            fontSize: '20px',
                           }}
                           disabled={isLineupLocked}
                         >
-                          {id != 100 ? "SUB" : "SET"}
+                          {id != 100 ? 'SUB' : 'SET'}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -544,7 +561,7 @@ export default function MyTeam() {
                 playerName={
                   starterAthleteIds[currentPositionIndex] != 0
                     ? selectedPlayer?.name
-                    : "(none)"
+                    : '(none)'
                 }
                 handleModalClose={handleStateModalClose}
               />
