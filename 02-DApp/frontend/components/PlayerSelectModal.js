@@ -214,12 +214,25 @@ export default function PlayerSelectModal({
                     fontWeight={300}
                     align="left"
                   >
+                    PREVIOUS POINTS
+                  </Typography>
+                  <Typography color={"white"} fontSize={24} align="left">
+                    {selectedPlayer ? selectedPlayer.prevPoints : "none"}
+                  </Typography>
+                </Box>
+                {/* <Box sx={{ marginTop: "20px" }}>
+                  <Typography
+                    color={"white"}
+                    fontSize={18}
+                    fontWeight={300}
+                    align="left"
+                  >
                     OPPONENT
                   </Typography>
                   <Typography color={"white"} fontSize={24} align="left">
                     {selectedPlayer ? "*pull from backend" : "none"}
                   </Typography>
-                </Box>
+                </Box> */}
               </Box>
               <Box>
                 <Box>
@@ -235,19 +248,6 @@ export default function PlayerSelectModal({
                     {selectedPlayer
                       ? selectedPlayer.attributes[1].value
                       : "none"}
-                  </Typography>
-                </Box>
-                <Box sx={{ marginTop: "20px" }}>
-                  <Typography
-                    color={"white"}
-                    fontSize={18}
-                    fontWeight={300}
-                    align="left"
-                  >
-                    PREVIOUS POINTS
-                  </Typography>
-                  <Typography color={"white"} fontSize={24} align="left">
-                    {selectedPlayer ? selectedPlayer.prevPoints : "none"}
                   </Typography>
                 </Box>
               </Box>
