@@ -1,27 +1,27 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { Box, Container, Fab, Link, Paper, Typography } from "@mui/material";
-import "bootstrap/dist/css/bootstrap.css";
-import { ethers } from "ethers";
-import Image from "next/image";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Box, Container, Fab, Link, Paper, Typography } from '@mui/material';
+import 'bootstrap/dist/css/bootstrap.css';
+import { ethers } from 'ethers';
+import Image from 'next/image';
 // Router
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby";
-import GameItemsJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/GameItems.json";
-import OpenSea from "../assets/images/opensea.png";
-import profilePic from "../assets/images/starter-pack.png";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
-import LoadingPrompt from "../components/LoadingPrompt";
-import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
+import * as CONTRACT_ADDRESSES from '../../backend/contractscripts/contract_info/contractAddressesRinkeby';
+import GameItemsJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/GameItems.json';
+import OpenSea from '../assets/images/opensea.png';
+import profilePic from '../assets/images/starter-pack.png';
+import ConnectWalletPrompt from '../components/ConnectWalletPrompt';
+import LoadingPrompt from '../components/LoadingPrompt';
+import MetaMaskRedirectInstructions from '../components/MetaMaskRedirectInstructions';
 
 export default function MintPack() {
   // Router
   const router = useRouter();
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
 
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
+    'rinkeby',
     process.env.RINKEBY_ALCHEMY_KEY
   );
   // const provider = new ethers.providers.AlchemyProvider(
@@ -48,13 +48,30 @@ export default function MintPack() {
   const [isPublicSalePhase, setIsPublicSalePhase] = useState(false);
   const [isNoMetaMask, setIsNoMetaMask] = useState();
 
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   /**
    * Handles a change in injected etheruem provider from MetaMask
    */
   function handleEthereum() {
     const { ethereum } = window;
     if (ethereum && ethereum.isMetaMask) {
-      console.log("Ethereum successfully detected!");
+      console.log('Ethereum successfully detected!');
       // Access the decentralized web!
     } else {
       setIsNoMetaMask(true);
@@ -62,7 +79,7 @@ export default function MintPack() {
 
       // alert("Close this alert to redirect to MetaMask Mobile Browser");
       // window.open("https://metamask.app.link/dapp/teamdiff.xyz/");
-      console.log("Please install MetaMask!");
+      console.log('Please install MetaMask!');
     }
   }
 
@@ -99,19 +116,19 @@ export default function MintPack() {
         // setIsLoading(false);
       };
       setAccountData();
-      provider.provider.on("accountsChanged", (accounts) => {
+      provider.provider.on('accountsChanged', (accounts) => {
         setAccountData();
       });
-      provider.provider.on("disconnect", () => {
-        console.log("disconnected");
+      provider.provider.on('disconnect', () => {
+        console.log('disconnected');
         setIsConnected(false);
       });
-      provider.on("network", async (newNetwork, oldNetwork) => {
+      provider.on('network', async (newNetwork, oldNetwork) => {
         // When a Provider makes its initial connection, it emits a "network"
         // event with a null oldNetwork along with the newNetwork. So, if the
         // oldNetwork exists, it represents a changing network
         if (oldNetwork) {
-          console.log("changed network");
+          console.log('changed network');
           // window.location.reload();
           // const { chainId } = await provider.getNetwork()
           // setCurrentChain(chainId)
@@ -119,7 +136,7 @@ export default function MintPack() {
         }
       });
     } else {
-      window.addEventListener("ethereum#initialized", handleEthereum, {
+      window.addEventListener('ethereum#initialized', handleEthereum, {
         once: true,
       });
 
@@ -204,7 +221,7 @@ export default function MintPack() {
         );
         setIsPresalePhase(isPresale);
         setIsPublicSalePhase(isPublicSale);
-        console.log("ispublic: " + isPublicSale);
+        console.log('ispublic: ' + isPublicSale);
 
         setIsLoading(false);
       };
@@ -230,7 +247,7 @@ export default function MintPack() {
       //   ],
       // };
       // GameItemsContract.on(filter, packMintedCallback);
-      GameItemsContract.on("starterPackMinted", packMintedCallback);
+      GameItemsContract.on('starterPackMinted', packMintedCallback);
     } else {
       // console.log("no account connected");
       setIsLoading(false);
@@ -259,9 +276,9 @@ export default function MintPack() {
       })
       .catch((error) => {
         if (error.data?.message) {
-          alert("error: " + error.data.message);
+          alert('error: ' + error.data.message);
         } else {
-          alert("error: " + error.message);
+          alert('error: ' + error.message);
         }
         // console.log("error: " + JSON.stringify(error, null, 2));
       });
@@ -270,20 +287,20 @@ export default function MintPack() {
   return (
     <Box>
       {isLoading ? (
-        <LoadingPrompt loading={"Mint Page"} />
+        <LoadingPrompt loading={'Mint Page'} />
       ) : (
         <>
           {isNoMetaMask && <MetaMaskRedirectInstructions />}
           {isConnected && !hasMinted && (
             <Box
-              justifyContent="center"
-              alignItems="center"
+              justifyContent='center'
+              alignItems='center'
               sx={{
-                display: "flex",
-                flexWrap: "wrap",
+                display: 'flex',
+                flexWrap: 'wrap',
                 marginBottom: 4,
                 marginTop: 4,
-                "& > :not(style)": {
+                '& > :not(style)': {
                   m: 1,
                   width: 260,
                   height: 320,
@@ -294,72 +311,72 @@ export default function MintPack() {
                 elevation={0}
                 style={{
                   background:
-                    "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                  filter: "blur(35px)",
+                    'linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)',
+                  filter: 'blur(35px)',
                 }}
               />
-              <Container sx={{ position: "absolute" }}>
+              <Container sx={{ position: 'absolute' }}>
                 <Image
                   src={profilePic}
-                  alt="Picture of the author"
-                  position="absolute"
+                  alt='Picture of the author'
+                  position='absolute'
                 />
               </Container>
             </Box>
           )}
           {isConnected && !(isMinting || hasMinted) && packsAvailable != 0 && (
             <Container
-              maxWidth="lg"
-              justifyContent="center"
-              alignItems="center"
+              maxWidth='lg'
+              justifyContent='center'
+              alignItems='center'
             >
               <Box
-                justifyContent="center"
-                alignItems="center"
-                flexDirection="column"
+                justifyContent='center'
+                alignItems='center'
+                flexDirection='column'
                 sx={{
-                  display: "flex",
-                  textAlign: "center",
+                  display: 'flex',
+                  textAlign: 'center',
                 }}
               >
                 <Typography
-                  variant="h3"
-                  color="white"
-                  textAlign="center"
-                  component="div"
+                  variant='h3'
+                  color='white'
+                  textAlign='center'
+                  component='div'
                 >
                   Mint TeamDiff Starter Pack
                 </Typography>
                 {packsAvailable != null && (
-                  <Typography variant="h6" color="white" component="div">
-                    There are{" "}
-                    <Box fontWeight="fontWeightBold" display="inline">
+                  <Typography variant='h6' color='white' component='div'>
+                    There are{' '}
+                    <Box fontWeight='fontWeightBold' display='inline'>
                       {packsAvailable}
-                    </Box>{" "}
+                    </Box>{' '}
                     packs still available
                   </Typography>
                 )}
               </Box>
 
               <Box
-                justifyContent="center"
-                alignItems="center"
+                justifyContent='center'
+                alignItems='center'
                 sx={{
-                  display: "flex",
-                  paddingTop: "20px",
+                  display: 'flex',
+                  paddingTop: '20px',
                 }}
               >
                 <Fab
-                  variant="extended"
-                  size="large"
-                  aria-label="add"
+                  variant='extended'
+                  size='large'
+                  aria-label='add'
                   onClick={mintStarterPack}
                   // onClick={() => setDisplayMint(true)}
                   sx={{
                     marginRight: 1,
                     background:
-                      "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                    color: "white",
+                      'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
+                    color: 'white',
                     fontSize: 20,
                     paddingRight: 8,
                     paddingLeft: 8,
@@ -379,63 +396,63 @@ export default function MintPack() {
               <br></br>
               {isPresalePhase && !isPublicSalePhase && (
                 <Typography
-                  textAlign="center"
-                  variant="subtitle1"
-                  color="secondary"
+                  textAlign='center'
+                  variant='subtitle1'
+                  color='secondary'
                 >
                   Presale ends June 11th, 5:00 pm EST
                 </Typography>
               )}
               {!(isPresalePhase || isPublicSalePhase) && (
                 <Typography
-                  textAlign="center"
-                  variant="subtitle1"
-                  color="secondary"
+                  textAlign='center'
+                  variant='subtitle1'
+                  color='secondary'
                 >
                   Presale starts June 10th, at 8:00 pm EST
                 </Typography>
               )}
               <Box
-                justifyContent="center"
-                alignItems="center"
+                justifyContent='center'
+                alignItems='center'
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  paddingTop: "20px",
-                  textAlign: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  paddingTop: '20px',
+                  textAlign: 'center',
                 }}
               >
                 {hasAlreadyMintedPack ? (
-                  <Typography color="primary" variant="h5">
+                  <Typography color='primary' variant='h5'>
                     {
-                      "Oops! Looks like you have already minted 1 TeamDiff Starter Pack. Trade for more cards on "
+                      'Oops! Looks like you have already minted 1 TeamDiff Starter Pack. Trade for more cards on '
                     }
                     <Link>
                       <a
-                        className="primary-link"
-                        target="_blank"
+                        className='primary-link'
+                        target='_blank'
                         href={
-                          "https://opensea.io/assets/matic/" +
+                          'https://opensea.io/assets/matic/' +
                           gameItemsContract.address
                         }
-                        rel="noreferrer"
+                        rel='noreferrer'
                       >
                         OpenSea
                       </a>
                     </Link>
-                    {" or wait until our next drop."}
+                    {' or wait until our next drop.'}
                   </Typography>
                 ) : (
                   <>
                     {!isOnWhitelist && isPresalePhase && !isPublicSalePhase && (
-                      <Typography color="primary" variant="h5">
+                      <Typography color='primary' variant='h5'>
                         {"Oops! Looks like you aren't on the whitelist for the premint. Contact us on Discord if " +
-                          " you think this is wrong, or come back tomorrow for public sale! "}
+                          ' you think this is wrong, or come back tomorrow for public sale! '}
                       </Typography>
                     )}
                     {!(isPresalePhase || isPublicSalePhase) && (
-                      <Typography color="primary" variant="h5">
-                        {"Please come back when presale begins!"}
+                      <Typography color='primary' variant='h5'>
+                        {'Please come back when presale begins!'}
                       </Typography>
                     )}
                   </>
@@ -445,9 +462,9 @@ export default function MintPack() {
                   // !(!isOnWhitelist && isPresalePhase) &&
                   // (isPresalePhase || isPublicSalePhase) && (
                   <Typography
-                    variant="h5"
+                    variant='h5'
                     style={{
-                      color: "red",
+                      color: 'red',
                       fontSize: 16,
                     }}
                   >
@@ -455,9 +472,9 @@ export default function MintPack() {
                     with minting. If you don't already have Polygon configured
                     in your wallet, follow these instructions `}
                     <Link
-                      href="https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask#polygon-scan"
-                      rel="noreferrer"
-                      target="_blank"
+                      href='https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask#polygon-scan'
+                      rel='noreferrer'
+                      target='_blank'
                     >
                       here.
                     </Link>
@@ -469,11 +486,11 @@ export default function MintPack() {
           {isMinting && (
             <Box sx={{ marginTop: 5 }}>
               <LoadingPrompt
-                completeTitle={"Minting Pack in Progress"}
+                completeTitle={'Minting Pack in Progress'}
                 bottomText={
                   isMinting && isTransactionDelayed
-                    ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
-                    : ""
+                    ? 'This is taking longer than normal. Please check your wallet to check the status of this transaction.'
+                    : ''
                 }
               />
             </Box>
@@ -481,17 +498,17 @@ export default function MintPack() {
           {hasMinted && (
             <Container
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: isMobile ? "column" : "row",
-                  alignItems: "center",
-                  justifyContent: "space-evenly",
+                  display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-evenly',
                 }}
               >
                 <Box
@@ -501,36 +518,36 @@ export default function MintPack() {
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginBottom: "2rem",
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginBottom: '2rem',
                     }}
                   >
                     <Typography
-                      sx={{ marginRight: 2, textAlign: "center" }}
-                      variant="h5"
-                      color="white"
-                      component="div"
+                      sx={{ marginRight: 2, textAlign: 'center' }}
+                      variant='h5'
+                      color='white'
+                      component='div'
                     >
                       Acquired Starter Pack!
                     </Typography>
                     {!isMobile && (
                       <CheckCircleIcon
-                        fontSize="large"
-                        sx={{ color: "#13db13" }}
+                        fontSize='large'
+                        sx={{ color: '#13db13' }}
                       />
                     )}
                   </Box>
                   {isMobile && (
                     <Box
-                      justifyContent="center"
-                      alignItems="center"
+                      justifyContent='center'
+                      alignItems='center'
                       sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
+                        display: 'flex',
+                        flexWrap: 'wrap',
                         marginBottom: 4,
-                        "& > :not(style)": {
+                        '& > :not(style)': {
                           m: 1,
                           width: 260,
                           height: 330,
@@ -541,15 +558,15 @@ export default function MintPack() {
                         elevation={0}
                         style={{
                           background:
-                            "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                          filter: "blur(35px)",
+                            'linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)',
+                          filter: 'blur(35px)',
                         }}
                       />
-                      <Container sx={{ position: "absolute" }}>
+                      <Container sx={{ position: 'absolute' }}>
                         <Image
                           src={profilePic}
-                          alt="TeamDiff Pack"
-                          position="absolute"
+                          alt='TeamDiff Pack'
+                          position='absolute'
                         />
                       </Container>
                     </Box>
@@ -557,61 +574,61 @@ export default function MintPack() {
                   <Box>
                     <Box
                       sx={{
-                        display: "flex",
-                        flexDirection: isMobile ? "column" : "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                       }}
                     >
                       <Box
                         sx={{
                           flex: 1,
                           marginRight: 3,
-                          textAlign: "center",
-                          marginBottom: isMobile ? "1rem" : "0",
+                          textAlign: 'center',
+                          marginBottom: isMobile ? '1rem' : '0',
                         }}
                       >
-                        <Typography color="primary" variant="h5">
-                          {" "}
+                        <Typography color='primary' variant='h5'>
+                          {' '}
                           Pack #
                         </Typography>
                         <Typography
-                          variant="h5"
-                          color="secondary"
-                          sx={{ fontWeight: "bold" }}
+                          variant='h5'
+                          color='secondary'
+                          sx={{ fontWeight: 'bold' }}
                         >
-                          {" "}
-                          {500 - packsAvailable}{" "}
+                          {' '}
+                          {500 - packsAvailable}{' '}
                           {/** TODO: sett this to packs minted instead */}
                         </Typography>
                       </Box>
                       <Box
                         sx={{
                           flex: 3,
-                          textAlign: "center",
+                          textAlign: 'center',
                         }}
                       >
                         <Link
                           href={
-                            "https://opensea.io/assets/matic/" +
+                            'https://opensea.io/assets/matic/' +
                             gameItemsContract.address +
-                            "/50" // the pack Id is after the athletes (not 0)
+                            '/50' // the pack Id is after the athletes (not 0)
                           }
-                          sx={{ textDecoration: "none" }}
-                          target={"_blank"}
+                          sx={{ textDecoration: 'none' }}
+                          target={'_blank'}
                         >
                           <Fab
-                            variant="extended"
-                            size="large"
-                            aria-label="add"
-                            color={"info"}
-                            sx={{ fontSize: 20, color: "white" }}
+                            variant='extended'
+                            size='large'
+                            aria-label='add'
+                            color={'info'}
+                            sx={{ fontSize: 20, color: 'white' }}
                           >
                             <Image
                               src={OpenSea}
-                              alt={"opensea"}
-                              width="30rem"
-                              height="30rem"
+                              alt={'opensea'}
+                              width='30rem'
+                              height='30rem'
                             />
                             <Box sx={{ marginLeft: 1 }}>View on OpenSea</Box>
                           </Fab>
@@ -620,29 +637,29 @@ export default function MintPack() {
                     </Box>
                   </Box>
 
-                  <Box sx={{ textAlign: "center" }}>
+                  <Box sx={{ textAlign: 'center' }}>
                     <Fab
-                      variant="extended"
-                      size="large"
-                      aria-label="add"
-                      onClick={() => router.push("./burnPack")}
+                      variant='extended'
+                      size='large'
+                      aria-label='add'
+                      onClick={() => router.push('./burnPack')}
                       sx={{
                         marginTop: isMobile ? 3 : 5,
                         marginRight: isMobile ? 0 : 2,
                         background:
-                          "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                        color: "white",
+                          'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
+                        color: 'white',
                         fontSize: 20,
                       }}
                     >
                       Open Pack
                     </Fab>
                     <Fab
-                      variant="extended"
-                      size="large"
-                      color="white"
-                      aria-label="add"
-                      onClick={() => router.push("./collection")}
+                      variant='extended'
+                      size='large'
+                      color='white'
+                      aria-label='add'
+                      onClick={() => router.push('./collection')}
                       sx={{ marginTop: isMobile ? 3 : 5, fontSize: 20 }}
                     >
                       Go To My Collection
@@ -651,14 +668,14 @@ export default function MintPack() {
                 </Box>
                 {!isMobile && (
                   <Box
-                    justifyContent="center"
-                    alignItems="center"
+                    justifyContent='center'
+                    alignItems='center'
                     sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
+                      display: 'flex',
+                      flexWrap: 'wrap',
                       marginLeft: 5,
                       marginTop: 2,
-                      "& > :not(style)": {
+                      '& > :not(style)': {
                         m: 1,
                         width: 260,
                         height: 320,
@@ -669,15 +686,15 @@ export default function MintPack() {
                       elevation={0}
                       style={{
                         background:
-                          "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                        filter: "blur(35px)",
+                          'linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)',
+                        filter: 'blur(35px)',
                       }}
                     />
-                    <Container sx={{ position: "absolute" }}>
+                    <Container sx={{ position: 'absolute' }}>
                       <Image
                         src={profilePic}
-                        alt="TeamDiff Pack"
-                        position="absolute"
+                        alt='TeamDiff Pack'
+                        position='absolute'
                       />
                     </Container>
                   </Box>
@@ -688,13 +705,13 @@ export default function MintPack() {
           {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
             <Box>
               <ConnectWalletPrompt
-                accessing={"minting a TeamDiff Starter Pack"}
+                accessing={'minting a TeamDiff Starter Pack'}
               />
             </Box>
           )}
           {packsAvailable == 0 && (
             <Box>
-              <Typography color="primary" variant="h5">
+              <Typography color='primary' variant='h5'>
                 Sorry, all packs have already been minted :(
               </Typography>
             </Box>

@@ -1,17 +1,17 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-import "bootstrap/dist/css/bootstrap.css";
+import { Box, CircularProgress, Typography } from '@mui/material';
+import 'bootstrap/dist/css/bootstrap.css';
 // import LeagueDetails from "./leagueDetails";
 // Web3 Imports
-import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
 // Wagmi imports
-import { useSigner } from "wagmi";
+import { useSigner } from 'wagmi';
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import LeagueCard from "../components/LeagueCard";
-import PendingLeagueCard from "../components/PendingLeagueCard";
+import * as CONTRACT_ADDRESSES from '../../backend/contractscripts/contract_info/contractAddressesRinkeby.js';
+import LeagueMakerJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json';
+import LeagueOfLegendsLogicJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json';
+import LeagueCard from '../components/LeagueCard';
+import PendingLeagueCard from '../components/PendingLeagueCard';
 
 export default function MyLeagues({ setDisplay }) {
   const [leagueOpen, setLeagueOpen] = useState(false);
@@ -24,6 +24,23 @@ export default function MyLeagues({ setDisplay }) {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -42,18 +59,18 @@ export default function MyLeagues({ setDisplay }) {
       }
     };
     setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+    provider.provider.on('accountsChanged', (accounts) => {
       setAccountData();
     });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
+    provider.provider.on('disconnect', () => {
+      console.log('disconnected');
       setIsConnected(false);
     });
   }, []);
 
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
+    'rinkeby',
     process.env.RINKEBY_ALCHEMY_KEY
   );
   const { data: signerData } = useSigner();
@@ -75,7 +92,7 @@ export default function MyLeagues({ setDisplay }) {
       async function fetchData() {
         setIsLoading(true);
         let i = 0;
-        let error = "none";
+        let error = 'none';
 
         // Continue to add leagues to activeLEagueList and pendingLeagueList
         // until we hit an error (because i is out of range presumably)
@@ -91,7 +108,7 @@ export default function MyLeagues({ setDisplay }) {
             // console.log("User To League Map Error: " + _error.message);
           });
 
-          if (error == "none") {
+          if (error == 'none') {
             i++;
             // console.log("member #" + i + ": " + leagueMembers)
             // console.log("white: " + whitelistedLeague);
@@ -106,9 +123,9 @@ export default function MyLeagues({ setDisplay }) {
             const isInLeague = await LeagueProxyContract.inLeague(
               connectedAccount
             );
-            console.log("isInleague:" + isInLeague);
+            console.log('isInleague:' + isInLeague);
             const admin = await LeagueProxyContract.admin();
-            console.log("admin: " + admin);
+            console.log('admin: ' + admin);
             // Add League address  to appropriate state list
             // TODO we
             isInLeague
@@ -117,14 +134,14 @@ export default function MyLeagues({ setDisplay }) {
               : !pendingLeaguesTemp.includes(whitelistedLeague) &&
                 pendingLeaguesTemp.push(whitelistedLeague);
           }
-        } while (error == "none");
+        } while (error == 'none');
         setActiveLeagueList(activeLeaguesTemp);
         setPendingLeagueList(pendingLeaguesTemp);
         setIsLoading(false);
       }
       fetchData();
     } else {
-      console.log("no account data");
+      console.log('no account data');
     }
   }, [isConnected, connectedAccount]);
 
@@ -150,15 +167,15 @@ export default function MyLeagues({ setDisplay }) {
     <Box>
       {!leagueOpen && (
         <Box>
-          <Typography variant="h4" color="secondary" component="div">
+          <Typography variant='h4' color='secondary' component='div'>
             Active Leagues
           </Typography>
           <hr
             style={{
-              color: "white",
-              backgroundColor: "secondary",
+              color: 'white',
+              backgroundColor: 'secondary',
               height: 5,
-              flexBasis: "100%",
+              flexBasis: '100%',
             }}
           />
           {isLoading ? (
@@ -171,31 +188,27 @@ export default function MyLeagues({ setDisplay }) {
               ...(activeLeagueList.length > 0 ? (
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
                   }}
                 >
                   {activeListItems}
                 </Box>
               ) : (
-                <Typography variant="h6" color="primary" component="div">
+                <Typography variant='h6' color='primary' component='div'>
                   (No Active Leagues)
                 </Typography>
               )),
             }
           )}
-          <Typography
-            variant="h4"
-            color="secondary"
-            component="div"
-          >
+          <Typography variant='h4' color='secondary' component='div'>
             Pending Leagues
           </Typography>
           <hr
             style={{
-              color: "white",
-              backgroundColor: "secondary",
+              color: 'white',
+              backgroundColor: 'secondary',
               height: 5,
             }}
           />
@@ -209,15 +222,15 @@ export default function MyLeagues({ setDisplay }) {
               ...(pendingLeagueList.length > 0 ? (
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
                   }}
                 >
                   {pendingListItems}
                 </Box>
               ) : (
-                <Typography variant="h6" color="primary" component="div">
+                <Typography variant='h6' color='primary' component='div'>
                   (No Pending Leagues)
                 </Typography>
               )),

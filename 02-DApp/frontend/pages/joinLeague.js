@@ -1,16 +1,16 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-import "bootstrap/dist/css/bootstrap.css";
+import { Box, CircularProgress, Typography } from '@mui/material';
+import 'bootstrap/dist/css/bootstrap.css';
 // import LeagueDetails from "./leagueDetails";
 // Web3 Imports
-import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import WhitelistJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
+import * as CONTRACT_ADDRESSES from '../../backend/contractscripts/contract_info/contractAddressesRinkeby.js';
+import LeagueMakerJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json';
+import LeagueOfLegendsLogicJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json';
+import WhitelistJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json';
 // Component Imports
-import PendingLeagueCard from "../components/PendingLeagueCard";
+import PendingLeagueCard from '../components/PendingLeagueCard';
 
 export default function JoinLeague({ setDisplay }) {
   const [publicLeagueList, setPublicLeagueList] = useState([]);
@@ -22,7 +22,7 @@ export default function JoinLeague({ setDisplay }) {
   const [isLoading, setIsLoading] = useState(true);
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
+    'rinkeby',
     process.env.RINKEBY_ALCHEMY_KEY
   );
 
@@ -33,7 +33,7 @@ export default function JoinLeague({ setDisplay }) {
       const accounts = await provider.listAccounts();
 
       if (accounts.length > 0) {
-        console.log("updating accounts");
+        console.log('updating accounts');
         const accountAddress = await signer.getAddress();
         setSigner(signer);
         setConnectedAccount(accountAddress);
@@ -43,11 +43,11 @@ export default function JoinLeague({ setDisplay }) {
       }
     };
     setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+    provider.provider.on('accountsChanged', (accounts) => {
       setAccountData();
     });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
+    provider.provider.on('disconnect', () => {
+      console.log('disconnected');
       setIsConnected(false);
     });
   }, [connectedAccount]);
@@ -69,7 +69,7 @@ export default function JoinLeague({ setDisplay }) {
       async function fetchData() {
         setIsLoading(true);
         let i = 0;
-        let error = "none";
+        let error = 'none';
         // Continue to add leagues to activeLEagueList and pendingLeagueList
         // until we hit an error (because i is out of range presumably)
         do {
@@ -79,10 +79,10 @@ export default function JoinLeague({ setDisplay }) {
           ).catch((_error) => {
             error = _error;
             // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-            console.log("User To League Map Error: " + _error.message);
+            console.log('User To League Map Error: ' + _error.message);
           });
 
-          if (error == "none") {
+          if (error == 'none') {
             i++;
             // console.log("member #" + i + ": " + leagueMembers)
             // console.log("white: " + whitelistedLeague);
@@ -105,12 +105,12 @@ export default function JoinLeague({ setDisplay }) {
               ]);
           }
           // console.log("error value at end:" + error);
-        } while (error == "none");
+        } while (error == 'none');
         setIsLoading(false);
       }
       fetchData();
     } else {
-      console.log("no account data");
+      console.log('no account data');
     }
   }, [isConnected, connectedAccount]);
 
@@ -129,7 +129,7 @@ export default function JoinLeague({ setDisplay }) {
       // Fetch League membership data for connected wallet
       async function fetchData() {
         let i = 0;
-        let error = "none";
+        let error = 'none';
         // Continue to add leagues to activeLEagueList and pendingLeagueList
         // until we hit an error (because i is out of range presumably)
         do {
@@ -138,10 +138,10 @@ export default function JoinLeague({ setDisplay }) {
           ).catch((_error) => {
             error = _error;
             // alert("Error! Currently connected address has no active or pending leagues. (" + _error.reason + ")");
-            console.log("User To League Map Error: " + _error.message);
+            console.log('User To League Map Error: ' + _error.message);
           });
 
-          if (error == "none") {
+          if (error == 'none') {
             i++;
             // console.log("league #" + i + ": " + leagueAddress)
             // console.log("white: " + whitelistedLeague);
@@ -178,38 +178,53 @@ export default function JoinLeague({ setDisplay }) {
               ]);
           }
           // console.log("error value at end:" + error);
-        } while (error == "none");
+        } while (error == 'none');
       }
       fetchData();
     } else {
-      console.log("no account data");
+      console.log('no account data');
     }
   }, [isConnected, connectedAccount]);
 
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   const publicListItems = publicLeagueList.map((leagueAddress, index) => (
-    <Box key={index} 
-      sx={{ marginRight: 3, marginBottom: 3 }}>
+    <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
       <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
   // Create list of league cards for all pending leagues
   const pendingListItems = pendingLeagueList.map((leagueAddress, index) => (
-    <Box key={index} 
-      sx={{ marginRight: 3, marginBottom: 3 }}>
+    <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
       <PendingLeagueCard leagueAddress={leagueAddress} />
     </Box>
   ));
 
   return (
     <Box>
-      <Typography variant="h4" color="secondary" component="div" marginTop={2}>
+      <Typography variant='h4' color='secondary' component='div' marginTop={2}>
         Your Whitelisted Leagues
       </Typography>
       <hr
         style={{
-          color: "white",
-          backgroundColor: "secondary",
+          color: 'white',
+          backgroundColor: 'secondary',
           height: 5,
         }}
       />
@@ -223,27 +238,27 @@ export default function JoinLeague({ setDisplay }) {
           ...(pendingLeagueList.length > 0 ? (
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
               }}
             >
               {pendingListItems}
             </Box>
           ) : (
-            <Typography variant="h6" color="primary" component="div">
+            <Typography variant='h6' color='primary' component='div'>
               (No Pending Leagues)
             </Typography>
           )),
         }
       )}
-      <Typography variant="h4" color="secondary" component="div">
+      <Typography variant='h4' color='secondary' component='div'>
         Public Leagues
       </Typography>
       <hr
         style={{
-          color: "white",
-          backgroundColor: "secondary",
+          color: 'white',
+          backgroundColor: 'secondary',
           height: 5,
         }}
       />
@@ -257,15 +272,15 @@ export default function JoinLeague({ setDisplay }) {
           ...(publicLeagueList.length > 0 ? (
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                flexWrap: "wrap",
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
               }}
             >
               {publicListItems}
             </Box>
           ) : (
-            <Typography variant="h6" color="primary" component="div">
+            <Typography variant='h6' color='primary' component='div'>
               (No Active Leagues)
             </Typography>
           )),
