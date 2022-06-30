@@ -430,9 +430,9 @@ export default function MyTeam() {
                   <TableCell align="center" className={classes.cell}>
                     Last Week Points
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.cell}>
                     Action
                   </TableCell>
@@ -499,7 +499,7 @@ export default function MyTeam() {
                           </Typography> */}
                         </div>
                       </TableCell>
-                      <TableCell align="center">
+                      {/* <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
                             {id != 100 &&
@@ -512,7 +512,7 @@ export default function MyTeam() {
                               "*pull date from backend"}
                           </Typography>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="center">
                         <Button
                           onClick={() => handleSubModal(athlete, index)}

@@ -31,6 +31,14 @@ import constants from "../../../constants";
 
 // TODO get data from backend
 
+const shortenAddress = (address) => {
+    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+      address.length - 4,
+      address.length
+    )}`;
+    return shortenedAddress1;
+  };
+
 export default function MyTeam() {
   // Router params
   const router = useRouter();
@@ -399,7 +407,7 @@ export default function MyTeam() {
               fontSize: 36,
             }}
           >
-            {router.query.leagueAddress + "'s Team"}
+            {shortenAddress(router.query.leagueAddress) + "'s Team"}
           </Typography>
           <Typography
             color="white"
@@ -427,9 +435,9 @@ export default function MyTeam() {
                   <TableCell align="center" className={classes.cell}>
                     Last Week Points
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.cell}>
                     Action
                   </TableCell>
@@ -496,7 +504,7 @@ export default function MyTeam() {
                           </Typography> */}
                         </div>
                       </TableCell>
-                      <TableCell align="center">
+                      {/* <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
                             {id != 100 &&
@@ -509,7 +517,7 @@ export default function MyTeam() {
                               "*pull date from backend"}
                           </Typography>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="center">
                         <Button
                           onClick={() => handleSubModal(athlete, index)}
