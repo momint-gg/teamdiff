@@ -172,6 +172,7 @@ export default function MyTeam() {
           starterIds[i] = id;
         }
         setStarterAthleteIds(starterIds);
+        
         // This ussually takes the longest, so set isLoading to false here
         setIsLoading(false);
       }
@@ -247,15 +248,15 @@ export default function MyTeam() {
     starterAthleteIds.forEach(async (id, index) => {
       if (id != 100 && currentWeekNum > 0) {
         const prevPoints = await athleteContract
-          .athleteToScores(id, currentWeekNum - 1)
-          .catch((error) => {
-            // console.log(JSON.stringify(error, null, 2));
-            // prevPoints = null;
-          });
+          .athleteToScores(id, currentWeekNum - 1);
         // // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
       } else if (id != 100) {
-        ownedAthletesMetadata[id].prevPoints = "n/a";
+        try {
+            ownedAthletesMetadata[id].prevPoints = "n/a";
+        } catch (e) {
+            console.log(e)
+        }
       }
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
@@ -474,7 +475,7 @@ export default function MyTeam() {
                         align="center"
                       >
                         <Image
-                          src={id != 100 ? athlete?.image : logo}
+                          src={id != 100 ? (athlete?.image ?? logo) : logo}
                           width={"40"}
                           // layout="fill"
                           height={"40"}
