@@ -81,7 +81,10 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // Only our wallet can call, need this because the "owner" of the proxy contract isn't us
     modifier onlyTeamDiffOrAdmin() {
-        require(msg.sender == teamDiffAddress || msg.sender == admin, "Caller is not TeamDiff or Admin");
+        require(
+            msg.sender == teamDiffAddress || msg.sender == admin,
+            "Caller is not TeamDiff or Admin"
+        );
         _;
     }
 
@@ -128,8 +131,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // }
 
-
-
     function setLeagueEntryIsClosed() external onlyTeamDiffOrAdmin {
         require(!leagueEntryIsClosed, "League entry has already been closed");
         leagueEntryIsClosed = true;
@@ -152,7 +153,10 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
     function evaluateMatches() external onlyTeamDiff {
-        require(leagueEntryIsClosed, "league entry not closed, and schedule not set for this league");
+        require(
+            leagueEntryIsClosed,
+            "league entry not closed, and schedule not set for this league"
+        );
         MOBALogicLibrary.evaluateMatches(
             currentWeekNum,
             athletesContract,
@@ -179,10 +183,10 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return erc20.balanceOf(address(this));
     }
 
+    // Called when the league is over 
     function onLeagueEnd() public onlyTeamDiff {
         uint256 contractBalance = erc20.balanceOf(address(this));
 
-        console.log("CALCULATING LEAGUE WINNERS");
         // Calculating the winner(s) of the league
         MOBALogicLibrary.calculateLeagueWinners(
             leagueMembers,
@@ -259,7 +263,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         leagueMakerContract.updateUserToLeagueMapping(msg.sender);
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-        userToLineup[msg.sender] = [100,100,100,100,100];
+        userToLineup[msg.sender] = [100, 100, 100, 100, 100];
         // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
         // rinkebyUSDC.transfer(address(this), stakeAmount);
         erc20.transferFrom(msg.sender, address(this), stakeAmount);
@@ -326,7 +330,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         leagueEntryIsClosed = false;
     }
 
-
     // Removing a user from the whitelist before the season starts
     function removeFromWhitelist(address _userToRemove) external onlyAdmin {
         require(
@@ -350,7 +353,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     }
 
     /*testing*/
-        // Add user to whitelist
+    // Add user to whitelist
     // function addUserToLeague(address _userToAdd) public {
     //     inLeague[_userToAdd] = true;
     //     leagueMembers.push(_userToAdd);

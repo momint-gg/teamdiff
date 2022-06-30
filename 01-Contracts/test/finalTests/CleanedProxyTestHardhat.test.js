@@ -641,8 +641,4 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
       );
     }
   });
-
-  // Doing a full 8 week test with a league of x members, making sure everything works as planned and prize pot is given out
-  // Probably going to do this in a separate test
-  it("Now simulating an 8 week split and giving out prize pot", async () => {});
 });
