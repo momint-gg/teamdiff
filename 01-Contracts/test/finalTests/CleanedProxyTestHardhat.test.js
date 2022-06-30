@@ -365,7 +365,7 @@ describe("Proxy and LeagueMaker Functionality Testing (Hardhat)", async () => {
     let txn;
     for (let i = 0; i < AllLeagueInstances.length; i++) {
       currLeague = AllLeagueInstances[i].connect(owner);
-      txn = await currLeague.setLeagueSchedule();
+      txn = await currLeague.setLeagueEntryIsClosed();
     }
 
     // Checking state for a proxy to see if above ^ worked
