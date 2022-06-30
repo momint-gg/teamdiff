@@ -20,14 +20,14 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import logo from "../assets/images/mystery_card.png";
-import LoadingPrompt from "../components/LoadingPrompt.js";
-import PlayerSelectModal from "../components/PlayerSelectModal";
-import PlayerStateModal from "../components/PlayerStateModal";
-import constants from "../constants";
+import * as CONTRACT_ADDRESSES from "../../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import AthletesJSON from "../../../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
+import LeagueOfLegendsLogicJSON from "../../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import logo from "../../../assets/images/mystery_card.png";
+import LoadingPrompt from "../../../components/LoadingPrompt.js";
+import PlayerSelectModal from "../../../components/PlayerSelectModal";
+import PlayerStateModal from "../../../components/PlayerStateModal";
+import constants from "../../../constants";
 
 // TODO get data from backend
 
@@ -358,6 +358,30 @@ export default function MyTeam() {
               <CircularProgress></CircularProgress>
             </>
           )}
+          <Container>
+            <Button
+              variant="contained"
+              onClick={() =>
+                router.push("/leagues/" + router.query.leagueAddress + "/home")
+              }
+              size="small"
+              // color="secondary"
+              // filled
+              style={{
+                // background:
+                //   "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
+                background: "#480D48",
+                borderRadius: "30px",
+                padding: "10px 40px",
+                fontWeight: "200",
+                fontSize: "15px",
+                position: "absolute",
+                left: "25px",
+              }}
+            >
+              Back to league page
+            </Button>
+          </Container>
           <Typography
             variant="h4"
             color="white"
@@ -488,7 +512,7 @@ export default function MyTeam() {
                             fontWeight: "600",
                             fontSize: "20px",
                           }}
-                          disabled={isLineupLocked || !isInLeague}
+                          disabled={isLineupLocked || !isLeagueMember || connectedAccount !== router.query.teamAddress}
                         >
                           {id != 100 ? "SUB" : "SET"}
                         </Button>
