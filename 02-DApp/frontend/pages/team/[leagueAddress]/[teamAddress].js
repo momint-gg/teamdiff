@@ -399,6 +399,15 @@ export default function MyTeam() {
               fontSize: 36,
             }}
           >
+            {router.query.leagueAddress + "'s Team"}
+          </Typography>
+          <Typography
+            color="white"
+            component="div"
+            sx={{
+              fontSize: 36,
+            }}
+          >
             {"Week #" +
               currentWeekNum +
               (isLineupLocked
