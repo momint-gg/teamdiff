@@ -52,7 +52,7 @@ const ViewLeagueTeamMatchup = ({
       {leagueScheduleIsSet ? (
         <TableContainer
           component={Paper}
-          style={{ width: 800, borderRadius: 25 }}
+          style={{ width: 900, borderRadius: 25 }}
         >
           <Table>
             <TableHead>
