@@ -1,4 +1,4 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   Box,
   Button,
@@ -11,32 +11,32 @@ import {
   Paper,
   styled,
   Switch,
-  Typography
-} from "@mui/material";
-import FormControl from "@mui/material/FormControl";
+  Typography,
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 // import Link from '@mui/material/Link'
-import InputAdornment from "@mui/material/InputAdornment";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 // import 'bootstrap/dist/css/bootstrap.css'
-import TextField from "@mui/material/TextField";
-import "bootstrap/dist/css/bootstrap.css";
-import { ethers } from "ethers";
+import TextField from '@mui/material/TextField';
+import 'bootstrap/dist/css/bootstrap.css';
+import { ethers } from 'ethers';
 // Router
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 // import wallet_address_validator from 'wallet-address-validator';
 // https://www.npmjs.com/package/wallet-address-validator
-import WAValidator from "wallet-address-validator";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import WAValidator from 'wallet-address-validator';
+import * as CONTRACT_ADDRESSES from '../../backend/contractscripts/contract_info/contractAddressesRinkeby.js';
 // import RinkebyUSDCJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
-import ERC20JSON from "../../backend/contractscripts/contract_info/rinkebyAbis/ERC20.json";
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import AddToWhitelist from "../components/AddToWhitelist.js";
-import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
-import LoadingPrompt from "../components/LoadingPrompt.js";
+import ERC20JSON from '../../backend/contractscripts/contract_info/rinkebyAbis/ERC20.json';
+import LeagueMakerJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json';
+import LeagueOfLegendsLogicJSON from '../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json';
+import AddToWhitelist from '../components/AddToWhitelist.js';
+import ConnectWalletPrompt from '../components/ConnectWalletPrompt.js';
+import LoadingPrompt from '../components/LoadingPrompt.js';
 
 // https://codesandbox.io/s/outlinedinput-border-color-29715?fontsize=14&hidenavigation=1&theme=dark&file=/demo.js:747-767
 // https://codesandbox.io/s/textfield-outlined-forked-0o0bdi?file=/src/index.js
@@ -77,19 +77,19 @@ const StyledButton = styled(Button)`
 
 export default function CreateLeague({ setDisplay }) {
   const defaultValues = {
-    leagueName: "",
-    token: "usdc",
-    buyInCost: "",
-    payoutSplit: "default",
+    leagueName: '',
+    token: 'usdc',
+    buyInCost: '',
+    payoutSplit: 'default',
     whitelistedAddresses: [],
-    inviteListStatus: "open",
+    inviteListStatus: 'open',
   };
 
   // WAGMI Hooks
 
   // TODO change to matic network for prod
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
+    'rinkeby',
     process.env.RINKEBY_ALCHEMY_KEY
   );
 
@@ -125,8 +125,25 @@ export default function CreateLeague({ setDisplay }) {
   const [isConnected, setIsConnected] = useState(false);
 
   const preparedInviteListValues = inviteListValues.filter(
-    (address) => address !== ""
+    (address) => address !== ''
   );
+
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     // setIsCreatingLeague(false);
@@ -156,11 +173,11 @@ export default function CreateLeague({ setDisplay }) {
       }
     };
     setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+    provider.provider.on('accountsChanged', (accounts) => {
       setAccountData();
     });
-    provider.provider.on("disconnect", () => {
-      console.log("disconnected");
+    provider.provider.on('disconnect', () => {
+      console.log('disconnected');
       setIsConnected(false);
     });
   }, []);
@@ -191,7 +208,7 @@ export default function CreateLeague({ setDisplay }) {
 
     // LeagueMakerContract.on(filter, leagueCreatedCallback);
     // TODO this still triggers more than once sometimes idk whyyyyy
-    LeagueMakerContract.once("LeagueCreated", leagueCreatedCallback);
+    LeagueMakerContract.once('LeagueCreated', leagueCreatedCallback);
   }, []);
 
   // Callback for when a STaked event is fired from leagueProxy contract (occurs when user stakes USDC to joinLeague)
@@ -213,7 +230,7 @@ export default function CreateLeague({ setDisplay }) {
 
       // setStakerAddress(stakerAddress)
     } else {
-      console.log(stakerAddress + " != " + currentAddress);
+      console.log(stakerAddress + ' != ' + currentAddress);
     }
   };
 
@@ -246,7 +263,7 @@ export default function CreateLeague({ setDisplay }) {
         LeagueOfLegendsLogicJSON.abi,
         signer
       );
-      LeagueProxyContractWithSigner.once("Staked", stakedEventCallback);
+      LeagueProxyContractWithSigner.once('Staked', stakedEventCallback);
 
       const TokenContract = new ethers.Contract(
         stakeTokenAddress,
@@ -264,7 +281,7 @@ export default function CreateLeague({ setDisplay }) {
         stakeAmount * 1000000
       ).catch((error) => {
         //  console.log("Join League error: " + error.error.message);
-        alert("Approve USDC error: " + error.message);
+        alert('Approve USDC error: ' + error.message);
         setIsJoiningLeague(false);
       });
 
@@ -274,14 +291,14 @@ export default function CreateLeague({ setDisplay }) {
         gasLimit: 1000000,
       })
         .then((res) => {
-          console.log("joining newly created league...");
+          console.log('joining newly created league...');
           window.setTimeout(() => {
             setIsTransactionDelayed(true);
           }, 30 * 1000);
         })
         .catch((error) => {
           //  console.log("Join League error: " + error.error.message);
-          alert("Join League error: " + error.message);
+          alert('Join League error: ' + error.message);
           setIsJoiningLeague(false);
         });
 
@@ -299,7 +316,7 @@ export default function CreateLeague({ setDisplay }) {
             ()
             .catch((error) => {
               // console.log("")
-              alert("Add User To WhiteList error: " + error.message);
+              alert('Add User To WhiteList error: ' + error.message);
               // setIsCreatingLeague(false);
             });
       });
@@ -312,21 +329,21 @@ export default function CreateLeague({ setDisplay }) {
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()
 
-    console.log("league name" + formValues.leagueName);
-    if (formValues.leagueName === "") {
-      alert("Please enter valid league name.");
-    } else if (formValues.token === "") {
-      alert("Please select a token.");
+    console.log('league name' + formValues.leagueName);
+    if (formValues.leagueName === '') {
+      alert('Please enter valid league name.');
+    } else if (formValues.token === '') {
+      alert('Please select a token.');
     } else if (formValues.buyInCost > 100) {
-      alert("Please enter a buy-in cost below 100 USDC.");
+      alert('Please enter a buy-in cost below 100 USDC.');
     } else {
       let stakeTokenAddress;
       switch (formValues.token) {
-        case "usdc":
+        case 'usdc':
           stakeTokenAddress = CONTRACT_ADDRESSES.rinkebyUSDCAddress;
           // stakeTokenAddress = CONTRACT_ADDRESSES.polygonUSDCAddress;
           break;
-        case "ETH":
+        case 'ETH':
           stakeTokenAddress = CONTRACT_ADDRESSES.chainlinkTokenAddress;
           // stakeTokenAddress = CONTRACT_ADDRESSES.wrappedEthAddress;
           break;
@@ -366,13 +383,13 @@ export default function CreateLeague({ setDisplay }) {
             setIsTransactionDelayed(true);
           }, 15 * 1000);
 
-          console.log("League Creation in progress...");
+          console.log('League Creation in progress...');
           // console.log("With invite values: " + inviteListValues);
           // how to tell if transaction failed?
           // TODO print message to alert if it takes mroe than 60 seconds
         })
         .catch((error) => {
-          alert("Create League error: " + error.message);
+          alert('Create League error: ' + error.message);
         });
     }
   };
@@ -396,7 +413,7 @@ export default function CreateLeague({ setDisplay }) {
   }, [formValues.leagueName]);
 
   useEffect(() => {
-    if (formValues.buyInCost === "") {
+    if (formValues.buyInCost === '') {
       setIsValidBuyInCost(true);
     } else if (
       isNaN(formValues.buyInCost) ||
@@ -415,10 +432,10 @@ export default function CreateLeague({ setDisplay }) {
   const validateFormValues = () => {
     return (
       isValidBuyInCost &&
-      formValues.buyInCost !== "" &&
+      formValues.buyInCost !== '' &&
       isValidLeagueName &&
-      formValues.leagueName !== "" &&
-      (formValues.inviteListStatus === "open" ||
+      formValues.leagueName !== '' &&
+      (formValues.inviteListStatus === 'open' ||
         (preparedInviteListValues.length > 0 && validAddressesStatus))
     );
   };
@@ -426,11 +443,11 @@ export default function CreateLeague({ setDisplay }) {
   useEffect(() => {
     let flag = true;
     inviteListValues.forEach((e) => {
-      if (WAValidator.validate(e, "ETH")) {
+      if (WAValidator.validate(e, 'ETH')) {
         // console.log("validated")
       } else {
         // console.log("invalid")
-        if (e !== "") {
+        if (e !== '') {
           flag = false;
           setValidAddressesStatus(false);
         }
@@ -483,8 +500,8 @@ export default function CreateLeague({ setDisplay }) {
   return (
     <Box
       sx={{
-        justifyContent: "center",
-        textAlign: "center",
+        justifyContent: 'center',
+        textAlign: 'center',
       }}
     >
       {isConnected && !(isCreatingLeague || hasCreatedLeague) && (
@@ -493,9 +510,9 @@ export default function CreateLeague({ setDisplay }) {
           <Grid item xs s> */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-evenly",
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
               // alignItems: "flex-start"
             }}
           >
@@ -508,39 +525,39 @@ export default function CreateLeague({ setDisplay }) {
               // noValidate
               // autoComplete="off"
             >
-              <Typography variant="h4" color="white" component="div">
+              <Typography variant='h4' color='white' component='div'>
                 Form
               </Typography>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: "5px",
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  padding: '5px',
                 }}
               >
                 <br></br>
                 <Typography
                   sx={{
-                    minWidth: "15vw",
-                    marginRight: "2vw",
+                    minWidth: '15vw',
+                    marginRight: '2vw',
                   }}
-                  color="primary"
+                  color='primary'
                 >
                   League Name
                 </Typography>
                 <FormControl fullWidth required>
                   {/* <StyledInputLabel htmlFor="league-name">League Name</StyledInputLabel> */}
                   <TextField
-                    id="league-name"
+                    id='league-name'
                     value={formValues.leaguename}
                     onChange={handleInputChange}
-                    label="League Name*"
-                    placeholder="My Awesome League"
+                    label='League Name*'
+                    placeholder='My Awesome League'
                     hiddenLabel
                     // focused
-                    color="secondary"
-                    name="leagueName"
+                    color='secondary'
+                    name='leagueName'
                     // variant="filled"
                     error={!isValidLeagueName}
                   />
@@ -557,39 +574,39 @@ export default function CreateLeague({ setDisplay }) {
 
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: "5px",
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  padding: '5px',
                 }}
               >
                 <Typography
                   sx={{
-                    minWidth: "15vw",
-                    marginRight: "2vw",
+                    minWidth: '15vw',
+                    marginRight: '2vw',
                   }}
-                  color="primary"
+                  color='primary'
                 >
                   Token
                 </Typography>
                 <FormControl fullWidth required>
                   {/* <FormControl fullWidth required > */}
-                  <InputLabel id="token-select-label">Token</InputLabel>
+                  <InputLabel id='token-select-label'>Token</InputLabel>
                   <Select
-                    color="secondary"
-                    labelId="token-select-label"
-                    id="token-select"
+                    color='secondary'
+                    labelId='token-select-label'
+                    id='token-select'
                     // value={"USDC"}
                     value={formValues.token}
                     // defaultValue="USDC"
-                    label="token"
-                    name="token"
+                    label='token'
+                    name='token'
                     onChange={handleInputChange}
                   >
-                    <MenuItem key="usdc" value="usdc">
+                    <MenuItem key='usdc' value='usdc'>
                       USDC
                     </MenuItem>
-                    <MenuItem key="ETH" value="ETH">
+                    <MenuItem key='ETH' value='ETH'>
                       ETH
                     </MenuItem>
                     {/* <MenuItem key="MATIC" value="MATIC">
@@ -601,35 +618,35 @@ export default function CreateLeague({ setDisplay }) {
               </Box>
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: "5px",
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  padding: '5px',
                 }}
               >
                 <Typography
                   sx={{
-                    minWidth: "15vw",
-                    marginRight: "2vw",
+                    minWidth: '15vw',
+                    marginRight: '2vw',
                   }}
-                  color="primary"
+                  color='primary'
                 >
                   Buy-in Cost
                 </Typography>
                 <FormControl fullWidth required>
                   {/* <StyledInputLabel htmlFor="buy-in">Buy-In Cost</StyledInputLabel> */}
                   <TextField
-                    id="buy-in"
-                    type="number"
-                    color="secondary"
+                    id='buy-in'
+                    type='number'
+                    color='secondary'
                     value={formValues.leaguename}
                     onChange={handleInputChange}
-                    label="Buy-In Cost"
+                    label='Buy-In Cost'
                     // hiddenLabel
-                    name="buyInCost"
-                    placeholder="10"
+                    name='buyInCost'
+                    placeholder='10'
                     endAdornment={
-                      <InputAdornment position="end">USDC</InputAdornment>
+                      <InputAdornment position='end'>USDC</InputAdornment>
                     }
                     error={!isValidBuyInCost}
                   ></TextField>
@@ -650,14 +667,14 @@ export default function CreateLeague({ setDisplay }) {
               // noValidate
               // autoComplete="off"
             >
-              <Typography variant="h4" color="primary">
+              <Typography variant='h4' color='primary'>
                 Invite List (Whitelist)
               </Typography>
               <Box>
-                <FormControl component="fieldset">
-                  <FormGroup aria-label="position" row>
+                <FormControl component='fieldset'>
+                  <FormGroup aria-label='position' row>
                     <FormControlLabel
-                      value="start"
+                      value='start'
                       control={
                         <Switch
                           onChange={() => {
@@ -669,21 +686,21 @@ export default function CreateLeague({ setDisplay }) {
                           }}
                         />
                       }
-                      sx={{ color: "white" }}
-                      label="Invite-Only"
-                      labelPlacement="start"
+                      sx={{ color: 'white' }}
+                      label='Invite-Only'
+                      labelPlacement='start'
                     />
                   </FormGroup>
                 </FormControl>
               </Box>
               {/* TODO: Abstract this into another component, controlled by createLeague page */}
               {!isPrivate ? (
-                <Typography variant="h7" color="lightgrey">
+                <Typography variant='h7' color='lightgrey'>
                   Anybody with a wallet address can search and join this league.
                 </Typography>
               ) : (
                 <>
-                  <Typography variant="h7" color="lightgrey">
+                  <Typography variant='h7' color='lightgrey'>
                     Only Address manually added to the whitelist can join this
                     league
                   </Typography>
@@ -700,14 +717,14 @@ export default function CreateLeague({ setDisplay }) {
         </Grid> */}
           <Fab
             sx={{
-              float: "right",
-              background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+              float: 'right',
+              background: 'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
             }}
             onClick={() => {
               createLeagueSubmitHandler();
             }}
-            variant="extended"
-            size="medium"
+            variant='extended'
+            size='medium'
           >
             Create League
           </Fab>
@@ -716,56 +733,56 @@ export default function CreateLeague({ setDisplay }) {
       )}
       {isCreatingLeague && (
         <LoadingPrompt
-          completeTitle={"Creating Your League..."}
+          completeTitle={'Creating Your League...'}
           bottomText={
             isCreatingLeague && isTransactionDelayed
-              ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
-              : ""
+              ? 'This is taking longer than normal. Please check your wallet to check the status of this transaction.'
+              : ''
           }
         />
       )}
       {hasCreatedLeague && (
         <Box
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
+          justifyContent='center'
+          alignItems='center'
+          flexDirection='column'
           sx={{
-            display: "flex",
+            display: 'flex',
           }}
         >
           <br></br>
           <Link>
             <a
-              className="primary-link"
+              className='primary-link'
               href={
-                "https://rinkeby.etherscan.io/address/" +
+                'https://rinkeby.etherscan.io/address/' +
                 newLeagueAddress +
-                "#internaltx"
+                '#internaltx'
               }
-              target={"_blank"}
-              rel="noreferrer"
+              target={'_blank'}
+              rel='noreferrer'
               sx={{
-                textDecoration: "none",
+                textDecoration: 'none',
               }}
             >
               <Paper
                 elevation={5}
                 sx={{
                   background:
-                    "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                    'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
 
                   marginRight: 3,
                   padding: 2,
                 }}
               >
-                <Typography variant="h6">
+                <Typography variant='h6'>
                   {'Your TeamDiff league "' +
                     newLeagueName +
                     '" has been created'}
                   <CheckCircleIcon
-                    fontSize={"large"}
+                    fontSize={'large'}
                     sx={{ marginLeft: 1 }}
-                    color="secondary"
+                    color='secondary'
                   ></CheckCircleIcon>
                 </Typography>
               </Paper>
@@ -774,48 +791,48 @@ export default function CreateLeague({ setDisplay }) {
           <br></br>
           {isJoiningLeague && (
             <LoadingPrompt
-              completeTitle={"Joining Newly Created League..."}
+              completeTitle={'Joining Newly Created League...'}
               bottomText={
                 isJoiningLeague && isTransactionDelayed
-                  ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
-                  : ""
+                  ? 'This is taking longer than normal. Please check your wallet to check the status of this transaction.'
+                  : ''
               }
             />
           )}
           {hasJoinedLeague && (
             <>
               <Link
-                href={"http://localhost:3000/leagues/" + newLeagueAddress}
-                target={"_blank"}
-                rel="noreferrer"
+                href={'http://localhost:3000/leagues/' + newLeagueAddress}
+                target={'_blank'}
+                rel='noreferrer'
               >
                 <Paper
                   elevation={5}
                   sx={{
                     background:
-                      "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                      'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
                     flex: 1,
                     marginRight: 3,
                     padding: 2,
                   }}
                 >
-                  <Typography variant="h6">
+                  <Typography variant='h6'>
                     {'Succesfully joined league: "' + newLeagueName + '"'}
                     <CheckCircleIcon
-                      fontSize={"large"}
+                      fontSize={'large'}
                       sx={{ marginLeft: 1 }}
-                      color="secondary"
+                      color='secondary'
                     ></CheckCircleIcon>
                   </Typography>
                 </Paper>
-                <Typography align="center" variant="subtitle1">
+                <Typography align='center' variant='subtitle1'>
                   Click to view league on TeamDiff
                 </Typography>
               </Link>
               <br></br>
               <Fab
-                variant="extended"
-                size="large"
+                variant='extended'
+                size='large'
                 // sx={{
                 //   background: "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
                 // }}
@@ -831,7 +848,7 @@ export default function CreateLeague({ setDisplay }) {
         </Box>
       )}
       {!isConnected && !hasCreatedLeague && !isCreatingLeague && (
-        <ConnectWalletPrompt accessing={"creating a league"} />
+        <ConnectWalletPrompt accessing={'creating a league'} />
       )}
     </Box>
   );
