@@ -9,8 +9,8 @@ import { useEffect, useState } from "react";
 import WAValidator from "wallet-address-validator";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import ERC20JSON from "../../../backend/contractscripts/contract_info/maticAbis/ERC20.json";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
-import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/maticAbis/RinkebyUSDCJSON.json";
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/maticAbis/Whitelist.json";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import constants from "../../constants/index.js";
@@ -274,13 +274,13 @@ export default function LeagueDetails() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
-    const RinkebyUSDCContract = new ethers.Contract(
-      "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
-      RinkebyUSDCJSON,
+    const PolygonUSDCContract = new ethers.Contract(
+      CONTRACT_ADDRESSES.polygonUSDCAddress,
+      ERC20JSON,
       signer
     );
     const stakeAmount = await leagueProxyContract.stakeAmount();
-    const approvalTxn = await RinkebyUSDCContract.approve(
+    const approvalTxn = await PolygonUSDCContract.approve(
       router.query.leagueAddress,
       stakeAmount * 1000000
     ).catch((error) => {

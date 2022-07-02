@@ -1,10 +1,10 @@
 import {
-    Box,
-    Card,
-    CardActionArea,
-    CardContent,
-    CardHeader,
-    Typography
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardHeader,
+  Typography
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -30,6 +30,7 @@ export default function PendingLeagueCard({ leagueAddress }) {
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
   const [leagueSize, setLeagueSize] = useState(1);
+  const [stakeAmount, setStakeAmount] = useState(0);
 
   useEffect(() => {
     if (leagueAddress) {
@@ -44,6 +45,9 @@ export default function PendingLeagueCard({ leagueAddress }) {
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
+        const stakeAmount = await LeagueProxyContract.stakeAmount();
+        setStakeAmount(stakeAmount);
+
         let i = 0;
         let error = "none";
 
@@ -109,6 +113,15 @@ export default function PendingLeagueCard({ leagueAddress }) {
                 component="div"
               >
                 {leagueSize + "/8 players"}
+              </Typography>
+              <Typography
+                fontSize={18}
+                fontStyle={"italic"}
+                variant="body1"
+                color="inherit"
+                component="div"
+              >
+                {"Buy-in: " + stakeAmount + " USDC"}
               </Typography>
             </Box>
           </Box>

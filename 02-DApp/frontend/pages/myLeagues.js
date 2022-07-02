@@ -26,11 +26,11 @@ export default function MyLeagues({ setDisplay }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Making sure we're conncted to correct network
-  const chainId = "4";
+  const chainId = "137";
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please connect to Rinkeby!");
+        alert("Please switch to Polygon network!");
         window.location = "/";
       }
     } catch (error) {

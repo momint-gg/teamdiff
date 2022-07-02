@@ -1,15 +1,15 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
-  Box,
-  Card,
-  Fab,
-  FormControl,
-  Grid,
-  Link,
-  MenuItem,
-  Select,
-  TextField,
-  Typography
+    Box,
+    Card,
+    Fab,
+    FormControl,
+    Grid,
+    Link,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
 } from "@mui/material";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
@@ -51,11 +51,11 @@ export default function Collection() {
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
   // Making sure we're conncted to correct network
-  const chainId = "4";
+  const chainId = "137";
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please connect to Rinkeby!");
+        alert("Please switch to Polygon network!");
         window.location = "/";
       }
     } catch (error) {

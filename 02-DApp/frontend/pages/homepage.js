@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import cardAndPack from '../assets/images/card_and_pack.png';
 import bootstrap from '../styles/sass/custom_bootstrap.module.scss';
 import styles from '../styles/sass/home_styles.module.scss';
-import React, { useEffect, useState } from 'react';
 
 export default function Homepage() {
   //Making sure we're conncted to correct network
@@ -11,7 +11,7 @@ export default function Homepage() {
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert('Please connect to Rinkeby!');
+        alert('Please switch to Polygon network to use this DApp!');
       }
     } catch (error) {
       console.log(error);

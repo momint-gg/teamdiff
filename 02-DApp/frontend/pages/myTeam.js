@@ -1,17 +1,17 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { makeStyles } from "@material-ui/core";
 import {
-  Button,
-  CircularProgress,
-  Container,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography
+    Button,
+    CircularProgress,
+    Container,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -94,11 +94,11 @@ export default function MyTeam() {
   }
 
   // Making sure we're conncted to correct network
-  const chainId = "4";
+  const chainId = "137";
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please connect to Rinkeby!");
+        alert("Please switch to Polygon network!");
         window.location = "/";
       }
     } catch (error) {

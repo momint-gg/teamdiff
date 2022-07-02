@@ -1,21 +1,21 @@
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import {
   Box,
   Card,
   CardActions,
   CardContent,
   Grid,
-  Typography,
-} from '@mui/material';
-import { ethers } from 'ethers';
+  Typography
+} from "@mui/material";
+import { ethers } from "ethers";
 // Router
-import { useRouter } from 'next/router';
-import React, { Fragment, useEffect, useState } from 'react';
-import { FaCrown } from 'react-icons/fa';
-import { useMediaQuery } from 'react-responsive';
-import { useAccount, useDisconnect } from 'wagmi';
-import ConnectWalletPrompt from '../components/ConnectWalletPrompt';
+import { useRouter } from "next/router";
+import { Fragment, useEffect, useState } from "react";
+import { FaCrown } from "react-icons/fa";
+import { useMediaQuery } from "react-responsive";
+import { useAccount, useDisconnect } from "wagmi";
+import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
 
 export default function Play() {
   // Router
@@ -51,15 +51,15 @@ export default function Play() {
     setMenu(false);
   };
 
-  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
 
-  //Making sure we're conncted to correct network
-  const chainId = '4';
+  // Making sure we're conncted to correct network
+  const chainId = "137";
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert('Please connect to Rinkeby!');
-        window.location = '/';
+        alert("Please connect to Polygon to use this DApp!");
+        window.location = "/";
       }
     } catch (error) {
       console.log(error);
@@ -86,14 +86,14 @@ export default function Play() {
       }
     };
     setAccountData();
-    provider.provider.on('accountsChanged', (accounts) => {
+    provider.provider.on("accountsChanged", (accounts) => {
       setAccountData();
     });
-    provider.provider.on('disconnect', () => {
-      console.log('disconnected');
+    provider.provider.on("disconnect", () => {
+      console.log("disconnected");
       setIsConnected(false);
     });
-    provider.on('network', (newNetwork, oldNetwork) => {
+    provider.on("network", (newNetwork, oldNetwork) => {
       // When a Provider makes its initial connection, it emits a "network"
       // event with a null oldNetwork along with the newNetwork. So, if the
       // oldNetwork exists, it represents a changing network
@@ -112,32 +112,32 @@ export default function Play() {
           <Grid item xs={4}>
             <Card
               sx={{
-                background: 'linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)',
+                background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
-              variant='outlined'
-              onClick={() => router.push('/myLeagues')}
+              variant="outlined"
+              onClick={() => router.push("/myLeagues")}
             >
               <Fragment>
-                <CardContent sx={{ textAlign: 'center' }}>
+                <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
-                    <Typography color='secondary' component='div' fontSize={18}>
+                    <Typography color="secondary" component="div" fontSize={18}>
                       My Leagues
                     </Typography>
                   ) : (
-                    <Typography variant='h4' color='secondary' component='div'>
+                    <Typography variant="h4" color="secondary" component="div">
                       My Leagues
                     </Typography>
                   )}
-                  <EmojiEventsIcon fontSize={'large'} />
+                  <EmojiEventsIcon fontSize={"large"} />
                 </CardContent>
               </Fragment>
             </Card>
             <br></br>
             <Typography
-              color='primary'
+              color="primary"
               sx={{
-                textAlign: 'center',
+                textAlign: "center",
                 paddingLeft: 2,
                 paddingRight: 2,
               }}
@@ -150,32 +150,32 @@ export default function Play() {
           <Grid item xs={4}>
             <Card
               sx={{
-                background: 'linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)',
+                background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
-              variant='outlined'
-              onClick={() => router.push('/joinLeague')}
+              variant="outlined"
+              onClick={() => router.push("/joinLeague")}
             >
               <Fragment>
-                <CardContent sx={{ textAlign: 'center' }}>
+                <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
-                    <Typography color='secondary' component='div' fontSize={18}>
+                    <Typography color="secondary" component="div" fontSize={18}>
                       Join League
                     </Typography>
                   ) : (
-                    <Typography variant='h4' color='secondary' component='div'>
+                    <Typography variant="h4" color="secondary" component="div">
                       Join League
                     </Typography>
                   )}
-                  <GroupAddIcon fontSize={'large'} />
+                  <GroupAddIcon fontSize={"large"} />
                 </CardContent>
               </Fragment>
             </Card>
             <br></br>
             <Typography
-              color='primary'
+              color="primary"
               sx={{
-                textAlign: 'center',
+                textAlign: "center",
                 paddingLeft: 2,
                 paddingRight: 2,
               }}
@@ -187,34 +187,34 @@ export default function Play() {
           </Grid>
           <Grid item xs={4}>
             <Card
-              variant='outlined'
+              variant="outlined"
               sx={{
-                background: 'linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)',
+                background: "linear-gradient(15deg, #5A165B 0%, #AA10AD 100%)",
                 borderRadius: 2,
               }}
-              onClick={() => router.push('/createLeague')}
+              onClick={() => router.push("/createLeague")}
             >
               <Fragment>
-                <CardContent sx={{ textAlign: 'center' }}>
+                <CardContent sx={{ textAlign: "center" }}>
                   {isMobile ? (
-                    <Typography color='secondary' component='div' fontSize={18}>
+                    <Typography color="secondary" component="div" fontSize={18}>
                       Create League
                     </Typography>
                   ) : (
-                    <Typography variant='h4' color='secondary' component='div'>
+                    <Typography variant="h4" color="secondary" component="div">
                       Create League
                     </Typography>
                   )}
-                  <FaCrown size={'2rem'} />
+                  <FaCrown size={"2rem"} />
                 </CardContent>
                 <CardActions></CardActions>
               </Fragment>
             </Card>
             <br></br>
             <Typography
-              color='primary'
+              color="primary"
               sx={{
-                textAlign: 'center',
+                textAlign: "center",
                 paddingLeft: 2,
                 paddingRightt: 2,
               }}
@@ -225,7 +225,7 @@ export default function Play() {
           </Grid>
         </Grid>
       ) : (
-        <ConnectWalletPrompt accessing={'the Play Page'} />
+        <ConnectWalletPrompt accessing={"the Play Page"} />
       )}
     </Box>
   );

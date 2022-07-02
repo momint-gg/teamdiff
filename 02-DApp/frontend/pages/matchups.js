@@ -1,9 +1,9 @@
 import {
-  Box,
-  CircularProgress,
-  Container,
-  Grid,
-  Typography
+    Box,
+    CircularProgress,
+    Container,
+    Grid,
+    Typography
 } from "@mui/material";
 
 // Web3 Imports
@@ -33,13 +33,8 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   //   process.env.RINKEBY_ALCHEMY_KEY
   // );
   const provider = new ethers.providers.AlchemyProvider(
-<<<<<<< HEAD
     "matic",
     process.env.POLYGON_ALCHEMY_KEY
-=======
-    'rinkeby',
-    process.env.RINKEBY_ALCHEMY_KEY
->>>>>>> master
   );
 
   // Web2 endpoints
@@ -142,7 +137,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert('Please connect to Rinkeby!');
+        alert('Please switch to Polygon network to use this DApp!');
         window.location = '/';
       }
     } catch (error) {

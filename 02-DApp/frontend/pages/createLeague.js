@@ -133,11 +133,11 @@ export default function CreateLeague({ setDisplay }) {
   );
 
   // Making sure we're conncted to correct network
-  const chainId = "4";
+  const chainId = "137";
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please connect to Rinkeby!");
+        alert("Please switch to Polygon network!");
         window.location = "/";
       }
     } catch (error) {
@@ -615,12 +615,12 @@ export default function CreateLeague({ setDisplay }) {
                     <MenuItem key="usdc" value="usdc">
                       USDC
                     </MenuItem>
-                    <MenuItem key="ETH" value="ETH">
+                    {/* <MenuItem key="ETH" value="ETH">
                       ETH
                     </MenuItem>
                     <MenuItem key="MATIC" value="MATIC">
                       MATIC
-                    </MenuItem>
+                    </MenuItem> */}
                   </Select>
                   {/* </FormControl> */}
                 </FormControl>
