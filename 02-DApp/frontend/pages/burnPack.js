@@ -1,4 +1,4 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   Box,
   Container,
@@ -11,9 +11,7 @@ import {
 import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useMediaQuery } from "react-responsive";
 // import CONSTANTS from "../Constants.js";
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
 import GameItemsJSON from "../../backend/contractscripts/contract_info/maticAbis/GameItems.json";
@@ -22,7 +20,6 @@ import OpenSea from "../assets/images/opensea.png";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt.js";
 import LoadingPrompt from "../components/LoadingPrompt";
 import MetaMaskRedirectInstructions from "../components/MetaMaskRedirectInstructions";
-import AthletesToIndex from "../constants/AlthletesToIndex.json";
 
 function getAthleteImage(id) {
   const athleteName = AthletesToIndex[id];
@@ -31,6 +28,13 @@ function getAthleteImage(id) {
 
 export default function BurnPack({ setDisplay }) {
   // TODO change to matic network for prod
+<<<<<<< HEAD
+=======
+  const provider = new ethers.providers.AlchemyProvider(
+    'rinkeby',
+    process.env.RINKEBY_ALCHEMY_KEY
+  );
+>>>>>>> master
   // const provider = new ethers.providers.AlchemyProvider(
   //   "rinkeby",
   //   process.env.RINKEBY_ALCHEMY_KEY
@@ -41,7 +45,7 @@ export default function BurnPack({ setDisplay }) {
   );
   // Router
   const router = useRouter();
-  const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
 
   // State Hooks
   const [mintedPackId, setMintedPackId] = useState(null);
@@ -60,6 +64,23 @@ export default function BurnPack({ setDisplay }) {
   const [hasAlreadyBurnedPack, setHasAlreadyBurnedPack] = useState();
 
   const [isNoMetaMask, setIsNoMetaMask] = useState();
+
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   /**
    * Handles a change in injected etheruem provider from MetaMask
@@ -125,15 +146,15 @@ export default function BurnPack({ setDisplay }) {
         // setIsLoading(false);
       };
       setAccountData();
-      provider.provider.on("accountsChanged", (accounts) => {
+      provider.provider.on('accountsChanged', (accounts) => {
         setAccountData();
       });
-      provider.provider.on("disconnect", () => {
+      provider.provider.on('disconnect', () => {
         // console.log("disconnected");
         setIsConnected(false);
       });
     } else {
-      window.addEventListener("ethereum#initialized", handleEthereum, {
+      window.addEventListener('ethereum#initialized', handleEthereum, {
         once: true,
       });
 
@@ -207,14 +228,14 @@ export default function BurnPack({ setDisplay }) {
         );
 
         setIsPreRevealPhase(!isRevealPhase);
-        console.log("isPreveal: " + isRevealPhase);
+        console.log('isPreveal: ' + isRevealPhase);
         setIsLoading(false);
       };
       fetchData();
       // console.log("isPreveal out: " + isPreRevealPhase);
 
       // Listen to event for when pack burn function is called
-      GameItemsContract.on("starterPackBurned", packBurnedCallback);
+      GameItemsContract.on('starterPackBurned', packBurnedCallback);
     } else {
       // console.log("no account data found!");
       setIsLoading(false);
@@ -248,9 +269,9 @@ export default function BurnPack({ setDisplay }) {
       })
       .catch((error) => {
         if (error.data?.message) {
-          alert("error: " + error.data.message);
+          alert('error: ' + error.data.message);
         } else {
-          alert("error:" + error.message);
+          alert('error:' + error.message);
         }
       });
   };
@@ -258,25 +279,25 @@ export default function BurnPack({ setDisplay }) {
   return (
     <Box>
       {isLoading ? (
-        <LoadingPrompt loading={"Open Page"} />
+        <LoadingPrompt loading={'Open Page'} />
       ) : (
         <>
           {isNoMetaMask && <MetaMaskRedirectInstructions />}
 
           {isConnected && !hasMinted && (
             <Container
-              maxWidth="lg"
-              justifyContent="center"
-              alignItems="center"
+              maxWidth='lg'
+              justifyContent='center'
+              alignItems='center'
             >
               <Box
-                justifyContent="center"
-                alignItems="center"
+                justifyContent='center'
+                alignItems='center'
                 sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
+                  display: 'flex',
+                  flexWrap: 'wrap',
                   marginTop: 4,
-                  "& > :not(style)": {
+                  '& > :not(style)': {
                     m: 1,
                     width: 260,
                     height: 300,
@@ -287,47 +308,47 @@ export default function BurnPack({ setDisplay }) {
                   elevation={0}
                   style={{
                     background:
-                      "linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)",
-                    filter: "blur(35px)",
+                      'linear-gradient(95.66deg, #5A165B 60%, #AA10AD 100%)',
+                    filter: 'blur(35px)',
                   }}
                 />
-                <Container sx={{ position: "absolute" }}>
+                <Container sx={{ position: 'absolute' }}>
                   <Image
                     src={cardImage}
-                    alt="Picture of the author"
-                    position="absolute"
+                    alt='Picture of the author'
+                    position='absolute'
                   />
                 </Container>
               </Box>
               {!(isMinting || hasMinted) && (
                 <>
                   <Box
-                    justifyContent="center"
-                    alignItems="center"
-                    flexDirection="column"
+                    justifyContent='center'
+                    alignItems='center'
+                    flexDirection='column'
                     sx={{
-                      display: "flex",
-                      textAlign: "center",
+                      display: 'flex',
+                      textAlign: 'center',
                       marginTop: 4,
                     }}
                   >
-                    <Typography variant="h4" color="white" component="div">
+                    <Typography variant='h4' color='white' component='div'>
                       Open TeamDiff Starter Pack
                     </Typography>
                   </Box>
                   <Box
-                    justifyContent="center"
-                    alignItems="center"
+                    justifyContent='center'
+                    alignItems='center'
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      paddingTop: "20px",
+                      display: 'flex',
+                      flexDirection: 'column',
+                      paddingTop: '20px',
                     }}
                   >
                     <Fab
-                      variant="extended"
-                      size="large"
-                      aria-label="add"
+                      variant='extended'
+                      size='large'
+                      aria-label='add'
                       onClick={burnStarterPack}
                       disabled={
                         !ownsStarterPack ||
@@ -340,8 +361,8 @@ export default function BurnPack({ setDisplay }) {
                         marginRight: 1,
                         marginBottom: 2,
                         background:
-                          "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
-                        color: "white",
+                          'linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)',
+                        color: 'white',
                         fontSize: 20,
                         paddingRight: 6,
                         paddingLeft: 6,
@@ -351,17 +372,17 @@ export default function BurnPack({ setDisplay }) {
                     </Fab>
                   </Box>
                   <Box
-                    justifyContent="center"
-                    alignItems="center"
+                    justifyContent='center'
+                    alignItems='center'
                     sx={{
-                      display: "flex",
-                      paddingTop: "20px",
+                      display: 'flex',
+                      paddingTop: '20px',
                     }}
                   >
                     {!isPolygon && (
                       <Typography
                         style={{
-                          color: "red",
+                          color: 'red',
                           fontSize: 16,
                         }}
                       >
@@ -374,54 +395,54 @@ export default function BurnPack({ setDisplay }) {
               )}
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  textAlign: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  textAlign: 'center',
                 }}
               >
                 {isPreRevealPhase && (
                   <>
-                    <Typography variant="subtitle1" color="secondary">
+                    <Typography variant='subtitle1' color='secondary'>
                       Revealing TeamDiff Starter Packs unlocks June 13th, at
                       5:00 pm EST
                     </Typography>
-                    <Typography color="primary">
+                    <Typography color='primary'>
                       Come back after the reveal date to open your pack!
                     </Typography>
                   </>
                 )}
                 <br></br>
                 {!ownsStarterPack && !hasAlreadyBurnedPack && (
-                  <Typography color="primary">
+                  <Typography color='primary'>
                     {"\nLooks like you don't have a starter pack yet. Head "}
                     <Link>
-                      <a className="primary-link" href="/mintPack">
+                      <a className='primary-link' href='/mintPack'>
                         here
                       </a>
                     </Link>
-                    {" to mint one now!"}
+                    {' to mint one now!'}
                   </Typography>
                 )}
                 {hasAlreadyBurnedPack && (
-                  <Typography color="primary" variant="h5">
+                  <Typography color='primary' variant='h5'>
                     {
-                      "Oops! Looks like you have already opened 1 TeamDiff Starter Pack. Trade for more cards on "
+                      'Oops! Looks like you have already opened 1 TeamDiff Starter Pack. Trade for more cards on '
                     }
                     <Link>
                       <a
-                        className="primary-link"
-                        target="_blank"
+                        className='primary-link'
+                        target='_blank'
                         href={
-                          "https://opensea.io/assets/matic/" +
+                          'https://opensea.io/assets/matic/' +
                           gameItemsContract.address
                         }
-                        rel="noreferrer"
+                        rel='noreferrer'
                       >
                         OpenSea
                       </a>
                     </Link>
-                    {" or wait until our next drop."}
+                    {' or wait until our next drop.'}
                   </Typography>
                 )}
               </Box>
@@ -430,11 +451,11 @@ export default function BurnPack({ setDisplay }) {
           {isMinting && (
             <Box sx={{ marginTop: 5 }}>
               <LoadingPrompt
-                completeTitle={"Opening Pack..."}
+                completeTitle={'Opening Pack...'}
                 bottomText={
                   isTransactionDelayed && isMinting
-                    ? "This is taking longer than normal. Please check your wallet to check the status of this transaction."
-                    : ""
+                    ? 'This is taking longer than normal. Please check your wallet to check the status of this transaction.'
+                    : ''
                 }
               />
             </Box>
@@ -443,18 +464,18 @@ export default function BurnPack({ setDisplay }) {
             <>
               <Container
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
                 }}
               >
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-evenly",
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly',
                   }}
                 >
                   <Box
@@ -464,53 +485,53 @@ export default function BurnPack({ setDisplay }) {
                   >
                     <Box
                       sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                     >
                       <Typography
                         sx={{ marginRight: 2 }}
-                        variant="h3"
-                        color="white"
-                        component="div"
+                        variant='h3'
+                        color='white'
+                        component='div'
                       >
                         Acquired 5 TeamDiff Athletes!
                       </Typography>
                       {!isMobile && (
                         <CheckCircleIcon
-                          fontSize="large"
-                          sx={{ color: "#13db13" }}
+                          fontSize='large'
+                          sx={{ color: '#13db13' }}
                         />
                       )}
                     </Box>
                     <Box
                       sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         marginTop: 2,
                         marginBottom: 2,
                       }}
                     >
                       <Typography
-                        variant="h4"
-                        sx={{ color: "#cdcdcd", marginRight: 1 }}
+                        variant='h4'
+                        sx={{ color: '#cdcdcd', marginRight: 1 }}
                       >
                         Click any card to view on OpenSea
                       </Typography>
                       {!isMobile && (
                         <Image
                           src={OpenSea}
-                          alt={"opensea"}
-                          width="30rem"
-                          height="30rem"
+                          alt={'opensea'}
+                          width='30rem'
+                          height='30rem'
                         />
                       )}
                     </Box>
-                    <Typography color="primary" sx={{ marginBottom: 5 }}>
+                    <Typography color='primary' sx={{ marginBottom: 5 }}>
                       *Note, it can take a few minutes for the NFT metadata and
                       image to populate on OpenSea
                     </Typography>
@@ -520,20 +541,20 @@ export default function BurnPack({ setDisplay }) {
                           <Grid item xs={isMobile ? 12 : 4}>
                             <Link
                               href={
-                                "https://opensea.io/assets/matic/" +
+                                'https://opensea.io/assets/matic/' +
                                 gameItemsContract.address +
-                                "/" +
+                                '/' +
                                 index
                               }
-                              target="_blank"
+                              target='_blank'
                             >
                               <img
                                 src={getAthleteImage(index)}
-                                alt={"image"}
-                                loading="lazy"
-                                width="300px"
+                                alt={'image'}
+                                loading='lazy'
+                                width='300px'
                                 style={{
-                                  filter: "drop-shadow(0 0 0.75rem crimson)",
+                                  filter: 'drop-shadow(0 0 0.75rem crimson)',
                                 }}
                               />
                             </Link>
@@ -543,12 +564,12 @@ export default function BurnPack({ setDisplay }) {
                       <br></br>
                     </Box>
                     <Fab
-                      variant="extended"
-                      size="large"
-                      color="white"
-                      aria-label="add"
+                      variant='extended'
+                      size='large'
+                      color='white'
+                      aria-label='add'
                       //  target={"_blank"}
-                      onClick={() => router.push("./collection")}
+                      onClick={() => router.push('./collection')}
                       sx={{
                         marginTop: 5,
                         fontSize: 20,
@@ -590,7 +611,7 @@ export default function BurnPack({ setDisplay }) {
           )}
           {!isConnected && !hasMinted && !isMinting && !isNoMetaMask && (
             <ConnectWalletPrompt
-              accessing={"opening a TeamDiff Starter pack"}
+              accessing={'opening a TeamDiff Starter pack'}
             />
           )}
         </>

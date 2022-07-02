@@ -1,15 +1,15 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
-    Box,
-    Card,
-    Fab,
-    FormControl,
-    Grid,
-    Link,
-    MenuItem,
-    Select,
-    TextField,
-    Typography
+  Box,
+  Card,
+  Fab,
+  FormControl,
+  Grid,
+  Link,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
 } from "@mui/material";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
@@ -49,6 +49,23 @@ export default function Collection() {
   const [isNoMetaMask, setIsNoMetaMask] = useState();
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please connect to Rinkeby!");
+        window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   /**
    * Handles a change in injected etheruem provider from MetaMask

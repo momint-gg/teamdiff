@@ -48,6 +48,23 @@ export default function MintPack() {
   const [isPublicSalePhase, setIsPublicSalePhase] = useState(false);
   const [isNoMetaMask, setIsNoMetaMask] = useState();
 
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please connect to Rinkeby!");
+        window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   /**
    * Handles a change in injected etheruem provider from MetaMask
    */

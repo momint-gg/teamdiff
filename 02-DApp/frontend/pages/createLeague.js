@@ -132,6 +132,23 @@ export default function CreateLeague({ setDisplay }) {
     (address) => address !== ""
   );
 
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please connect to Rinkeby!");
+        window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   useEffect(() => {
     // setIsCreatingLeague(false);
     // setHasCreatedLeague(true);

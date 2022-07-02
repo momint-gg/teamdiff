@@ -93,6 +93,23 @@ export default function MyTeam() {
     daysTillUnlock = 7 - daysTillLock;
   }
 
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please connect to Rinkeby!");
+        window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const setAccountData = async () => {
@@ -406,6 +423,15 @@ export default function MyTeam() {
               fontSize: 36,
             }}
           >
+            My Team
+          </Typography>
+          <Typography
+            color="white"
+            component="div"
+            sx={{
+              fontSize: 36,
+            }}
+          >
             {"Week #" +
               currentWeekNum +
               (isLineupLocked
@@ -425,9 +451,9 @@ export default function MyTeam() {
                   <TableCell align="center" className={classes.cell}>
                     Last Week Points
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.cell}>
                     Action
                   </TableCell>
@@ -494,20 +520,20 @@ export default function MyTeam() {
                           </Typography> */}
                         </div>
                       </TableCell>
-                      <TableCell align="center">
+                      {/* <TableCell align="center">
                         <div>
-                          <Typography fontSize={30} textTransform="uppercase">
+                          <Typography fontSize={30} textTransform='uppercase'>
                             {id != 100 &&
                               // currentWeekNum != 0 &&
-                              "*pull opp from backend"}
+                              '*pull opp from backend'}
                           </Typography>
                           <Typography>
                             {id != 100 &&
                               // currentWeekNum != 0 &&
-                              "*pull date from backend"}
+                              '*pull date from backend'}
                           </Typography>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="center">
                         <Button
                           onClick={() => handleSubModal(athlete, index)}

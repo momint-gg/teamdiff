@@ -1,17 +1,17 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { makeStyles } from "@material-ui/core";
 import {
-    Button,
-    CircularProgress,
-    Container,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Typography
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -30,6 +30,14 @@ import PlayerStateModal from "../components/PlayerStateModal";
 import constants from "../constants";
 
 // TODO get data from backend
+
+const shortenAddress = (address) => {
+  const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+    address.length - 4,
+    address.length
+  )}`;
+  return shortenedAddress1;
+};
 
 export default function MyTeam() {
   // Router params
@@ -168,6 +176,7 @@ export default function MyTeam() {
           starterIds[i] = id;
         }
         setStarterAthleteIds(starterIds);
+
         // This ussually takes the longest, so set isLoading to false here
         setIsLoading(false);
       }
@@ -242,16 +251,18 @@ export default function MyTeam() {
     // console.log("starterID: " + starterAthleteIds);
     starterAthleteIds.forEach(async (id, index) => {
       if (id != 100 && currentWeekNum > 0) {
-        const prevPoints = await athleteContract
-          .athleteToScores(id, currentWeekNum - 1)
-          .catch((error) => {
-            // console.log(JSON.stringify(error, null, 2));
-            // prevPoints = null;
-          });
+        const prevPoints = await athleteContract.athleteToScores(
+          id,
+          currentWeekNum - 1
+        );
         // // console.log("prevpoints: " + prevPoints);
         ownedAthletesMetadata[id].prevPoints = prevPoints;
       } else if (id != 100) {
-        ownedAthletesMetadata[id].prevPoints = "n/a";
+        try {
+          ownedAthletesMetadata[id].prevPoints = "n/a";
+        } catch (e) {
+          console.log(e);
+        }
       }
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
@@ -362,6 +373,30 @@ export default function MyTeam() {
               <CircularProgress></CircularProgress>
             </>
           )}
+          <Container>
+            <Button
+              variant="contained"
+              onClick={() =>
+                router.push("/leagues/" + router.query.leagueAddress + "/home")
+              }
+              size="small"
+              // color="secondary"
+              // filled
+              style={{
+                // background:
+                //   "linear-gradient(135deg, #00FFFF 0%, #FF00FF 0.01%, #480D48 100%)",
+                background: "#480D48",
+                borderRadius: "30px",
+                padding: "10px 40px",
+                fontWeight: "200",
+                fontSize: "15px",
+                position: "absolute",
+                left: "25px",
+              }}
+            >
+              Back to league page
+            </Button>
+          </Container>
           <Typography
             variant="h4"
             color="white"
@@ -371,6 +406,15 @@ export default function MyTeam() {
             }}
           >
             {leagueName}
+          </Typography>
+          <Typography
+            color="white"
+            component="div"
+            sx={{
+              fontSize: 36,
+            }}
+          >
+            {shortenAddress(router.query.leagueAddress) + "'s Team"}
           </Typography>
           <Typography
             color="white"
@@ -398,9 +442,9 @@ export default function MyTeam() {
                   <TableCell align="center" className={classes.cell}>
                     Last Week Points
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.cell}>
                     Action
                   </TableCell>
@@ -437,7 +481,7 @@ export default function MyTeam() {
                         align="center"
                       >
                         <Image
-                          src={id != 100 ? athlete?.image : logo}
+                          src={id != 100 ? athlete?.image ?? logo : logo}
                           width={"40"}
                           // layout="fill"
                           height={"40"}
@@ -467,7 +511,7 @@ export default function MyTeam() {
                           </Typography> */}
                         </div>
                       </TableCell>
-                      <TableCell align="center">
+                      {/* <TableCell align="center">
                         <div>
                           <Typography fontSize={30} textTransform="uppercase">
                             {id != 100 &&
@@ -480,7 +524,7 @@ export default function MyTeam() {
                               "*pull date from backend"}
                           </Typography>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="center">
                         <Button
                           onClick={() => handleSubModal(athlete, index)}
@@ -492,7 +536,11 @@ export default function MyTeam() {
                             fontWeight: "600",
                             fontSize: "20px",
                           }}
-                          disabled={isLineupLocked || !isInLeague}
+                          disabled={
+                            isLineupLocked ||
+                            !isLeagueMember ||
+                            connectedAccount !== router.query.teamAddress
+                          }
                         >
                           {id != 100 ? "SUB" : "SET"}
                         </Button>

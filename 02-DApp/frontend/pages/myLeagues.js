@@ -25,6 +25,23 @@ export default function MyLeagues({ setDisplay }) {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please connect to Rinkeby!");
+        window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const signer = provider.getSigner()

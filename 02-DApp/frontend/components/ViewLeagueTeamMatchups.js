@@ -52,7 +52,7 @@ const ViewLeagueTeamMatchup = ({
       {leagueScheduleIsSet ? (
         <TableContainer
           component={Paper}
-          style={{ width: 800, borderRadius: 25 }}
+          style={{ width: 900, borderRadius: 25 }}
         >
           <Table>
             <TableHead>
@@ -113,9 +113,9 @@ const ViewLeagueTeamMatchup = ({
                             alignItems: "flex-end",
                           }}
                         >
-                          <Typography fontSize={25}>
+                          {/* <Typography fontSize={25}>
                             {Object.keys(matchup)[0]}
-                          </Typography>
+                          </Typography> */}
                           {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
                           </Typography> */}
@@ -143,9 +143,9 @@ const ViewLeagueTeamMatchup = ({
                             alignItems: "flex-start",
                           }}
                         >
-                          <Typography fontSize={25}>
+                          {/* <Typography fontSize={25}>
                             {Object.keys(matchup)[1]}
-                          </Typography>
+                          </Typography> */}
                           {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
                           </Typography> */}

@@ -1,9 +1,9 @@
 import {
-    Box,
-    CircularProgress,
-    Container,
-    Grid,
-    Typography
+  Box,
+  CircularProgress,
+  Container,
+  Grid,
+  Typography
 } from "@mui/material";
 
 // Web3 Imports
@@ -33,21 +33,26 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   //   process.env.RINKEBY_ALCHEMY_KEY
   // );
   const provider = new ethers.providers.AlchemyProvider(
+<<<<<<< HEAD
     "matic",
     process.env.POLYGON_ALCHEMY_KEY
+=======
+    'rinkeby',
+    process.env.RINKEBY_ALCHEMY_KEY
+>>>>>>> master
   );
 
   // Web2 endpoints
   const playerStatsApi = axios.create({
-    baseURL: "https://teamdiff-backend-api.vercel.app/api",
+    baseURL: 'https://teamdiff-backend-api.vercel.app/api',
   });
   playerStatsApi.defaults.baseURL =
-    "https://teamdiff-backend-api.vercel.app/api";
+    'https://teamdiff-backend-api.vercel.app/api';
 
   axiosRetry(playerStatsApi, {
     retries: 2,
     retryDelay: (count) => {
-      console.log("retrying player stat api call: " + count);
+      console.log('retrying player stat api call: ' + count);
       return count * 1000;
     },
   });
@@ -98,7 +103,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   const [hasFetchedComp1Scores, setHasFetchedComp1Scores] = useState(false);
   const [hasFetchedComp2Scores, setHasFetchedComp2Scores] = useState(false);
   const [leagueSize, setLeagueSize] = useState();
-  const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
+  const positions = ['ADC', 'Jungle', 'Mid', 'Support', 'Top'];
   let shifter = 0;
   // let leagueSize = 0;
 
@@ -123,14 +128,31 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
       }
     };
     setAccountData();
-    provider.provider.on("accountsChanged", (accounts) => {
+    provider.provider.on('accountsChanged', (accounts) => {
       setAccountData();
     });
-    provider.provider.on("disconnect", () => {
+    provider.provider.on('disconnect', () => {
       // console.log("disconnected");
       setIsConnected(false);
     });
   }, [isConnected]);
+
+  //Making sure we're conncted to correct network
+  const chainId = '4';
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert('Please connect to Rinkeby!');
+        window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     // setAthleteNFTs([]);
@@ -196,7 +218,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
         ).catch((e) => {
-          console.error("get schedule for week error: " + e);
+          console.error('get schedule for week error: ' + e);
           setIsLoading(false);
           setIsError(true);
         });
@@ -217,7 +239,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             setLeagueScheduleIsSet(true);
             getSelectedMatchupStarterIds(weekMatchups, LeagueProxyContract);
           } else {
-            console.log("leagueSchedule not set");
+            console.log('leagueSchedule not set');
             setLeagueScheduleIsSet(false);
           }
         }
@@ -226,7 +248,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
         // TODO if is not league member, refresh the page
         if (!isInLeague) {
-          router.push("/leagues/" + router.query.leagueRoute[0]);
+          router.push('/leagues/' + router.query.leagueRoute[0]);
         }
       }
 
@@ -249,12 +271,12 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
       // If playing bye week, set starter ids to  null
       if (
-        competitorAccount == "0x0000000000000000000000000000000000000000" &&
+        competitorAccount == '0x0000000000000000000000000000000000000000' &&
         j == 0
       )
         setCompetitor1StarterAthleteIds([100, 100, 100, 100, 100]);
       else if (
-        competitorAccount == "0x0000000000000000000000000000000000000000" &&
+        competitorAccount == '0x0000000000000000000000000000000000000000' &&
         j == 1
       ) {
         setCompetitor2StarterAthleteIds([100, 100, 100, 100, 100]);
@@ -267,7 +289,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             competitorAccount,
             i
           ).catch((e) => {
-            console.error("userToLineup error: " + e);
+            console.error('userToLineup error: ' + e);
             setIsError(true);
           });
           // TODO this will return 100 if starter is not set for position,
@@ -291,7 +313,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
           selectedWeekMatchups,
           leagueProxyContract
         );
-        console.log("got selected matchupstarterids");
+        console.log('got selected matchupstarterids');
         setIsLoading(false);
       };
       getNFTData();
@@ -336,7 +358,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
 
   const getLeagueSizeHelper = async (LeagueProxyContract) => {
     let i = 0;
-    let error = "none";
+    let error = 'none';
     do {
       await LeagueProxyContract.leagueMembers(i).catch((_error) => {
         error = _error;
@@ -344,11 +366,11 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         // console.log("User To League Map Error: " + _error.message);
       });
 
-      if (error == "none") {
+      if (error == 'none') {
         i++;
       }
       // console.log("error value at end:" + error);
-    } while (error == "none");
+    } while (error == 'none');
     return i;
   };
 
@@ -448,71 +470,71 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   return (
     <>
       {isError && (
-        <Typography textAlign="center">
-          {" "}
+        <Typography textAlign='center'>
+          {' '}
           Oops! We encountered an error when loading you league stats. Please
           cheeck your internet connections and try again.
         </Typography>
       )}
       {isLoading ? (
-        <LoadingPrompt loading={"Your Matchup"} />
+        <LoadingPrompt loading={'Your Matchup'} />
       ) : (
         <Container
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}
         >
           <Typography
-            variant="h4"
-            color="white"
-            component="div"
+            variant='h4'
+            color='white'
+            component='div'
             sx={{
-              fontSize: "64px",
+              fontSize: '64px',
             }}
           >
             {leagueName}
           </Typography>
           <Typography
-            color="white"
+            color='white'
             sx={{
-              fontSize: "36px",
+              fontSize: '36px',
             }}
           >
-            {"Week #" +
+            {'Week #' +
               currentWeekNum +
               (isLineupLocked
-                ? ": Rosters unlock in " + daysTillUnlock + " Days"
-                : ": Rosters Locks in " + daysTillLock + " Days")}{" "}
+                ? ': Rosters unlock in ' + daysTillUnlock + ' Days'
+                : ': Rosters Locks in ' + daysTillLock + ' Days')}{' '}
           </Typography>
           {leagueScheduleIsSet ? (
             <>
               <Box
                 sx={{
-                  background: "#473D3D",
-                  borderRadius: "16px",
-                  width: "85vw",
+                  background: '#473D3D',
+                  borderRadius: '16px',
+                  width: '85vw',
                 }}
               >
                 <Container
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "10px",
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
                   }}
                 >
                   {selectedMatchup > 0 && (
                     <AiOutlineArrowLeft
-                      size={"1.5rem"}
+                      size={'1.5rem'}
                       onClick={() =>
                         setSelectedMatchup(
                           (selectedMatchup) => selectedMatchup - 1
                         )
                       }
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                     />
                   )}
                   <Typography fontSize={30}>
@@ -520,40 +542,40 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                   </Typography>
                   {selectedMatchup + 2 < leagueSize && (
                     <AiOutlineArrowRight
-                      size={"1.5rem"}
+                      size={'1.5rem'}
                       onClick={() =>
                         setSelectedMatchup(
                           (selectedMatchup) => selectedMatchup + 1
                         )
                       }
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                     />
                   )}
                 </Container>
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-around",
+                    display: 'flex',
+                    justifyContent: 'space-around',
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                     }}
                   >
-                    <Typography color={"white"} fontSize={48}>
+                    <Typography color={'white'} fontSize={48}>
                       {/* idk what the first zero is for, but otherwise it is undefined, second 0 controls which player in matchup */}
                       {shortenAddress(
                         selectedWeekMatchups[selectedMatchup][0][0]
                       )}
                     </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Typography
-                        color={"white"}
+                        color={'white'}
                         fontSize={64}
-                        fontWeight="700"
+                        fontWeight='700'
                       >
                         {competitor1TeamScore}
                       </Typography>
@@ -561,21 +583,21 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                   </Box>
                   <Box
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                     }}
                   >
-                    <Typography color={"white"} fontSize={48}>
+                    <Typography color={'white'} fontSize={48}>
                       {shortenAddress(
                         selectedWeekMatchups[selectedMatchup][0][1]
                       )}
                     </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Typography
-                        color={"white"}
+                        color={'white'}
                         fontSize={64}
-                        fontWeight="700"
+                        fontWeight='700'
                       >
                         {competitor2TeamScore}
                       </Typography>
@@ -625,13 +647,13 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                       return (
                         <Grid
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            color: "white",
-                            borderTop: "2px solid #FFFFFF",
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: 'white',
+                            borderTop: '2px solid #FFFFFF',
                           }}
                         >
-                          <Grid item xs={1} textAlign="center">
+                          <Grid item xs={1} textAlign='center'>
                             <Image
                               src={
                                 competitor1StarterId != 100
@@ -639,7 +661,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                                   : // ? competitor1Athlete?.image
                                     logo
                               }
-                              alt="logo"
+                              alt='logo'
                               width={50}
                               height={50}
                             />
@@ -647,15 +669,15 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           <Grid
                             item
                             xs={2}
-                            textAlign="left"
+                            textAlign='left'
                             onClick={() => handleModalOpen(competitor1Athlete)}
-                            sx={{ cursor: "pointer" }}
+                            sx={{ cursor: 'pointer' }}
                           >
                             <Typography fontSize={34}>
                               {competitor1StarterId != 100
                                 ? competitor1Athlete
                                 : // ? competitor1Athlete?.name
-                                  "(none)"}
+                                  '(none)'}
                             </Typography>
                           </Grid>
                           {/* <Grid item xs={1} textAlign="center">
@@ -664,44 +686,44 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                               competitor1Athlete?.attributes[0].value}
                           </Typography>
                         </Grid> */}
-                          <Grid item xs={1} textAlign="center">
+                          <Grid item xs={1} textAlign='center'>
                             <Typography>
                               {competitor1StarterId != 100 &&
-                                "Loss vs **backend**"}
+                                'Loss vs **backend**'}
                             </Typography>
                           </Grid>
-                          <Grid item xs={1} textAlign="center">
-                            <Typography color="#D835D8" fontSize={48}>
+                          <Grid item xs={1} textAlign='center'>
+                            <Typography color='#D835D8' fontSize={48}>
                               {competitor1StarterId != 100
                                 ? String(competitor1StarterAthleteScores[index])
-                                : "(0)"}{" "}
+                                : '(0)'}{' '}
                             </Typography>
                           </Grid>
                           {/* middle column */}
-                          <Grid item xs={2} textAlign="center">
+                          <Grid item xs={2} textAlign='center'>
                             <Typography
                               fontSize={42}
                               sx={{
-                                borderLeft: "1px solid #FFFFFF",
-                                borderRight: "1px solid #FFFFFF",
-                                fontWeight: "bold",
+                                borderLeft: '1px solid #FFFFFF',
+                                borderRight: '1px solid #FFFFFF',
+                                fontWeight: 'bold',
                               }}
                             >
                               {position}
                             </Typography>
                           </Grid>
                           {/* opponents athlete stats */}
-                          <Grid item xs={1} textAlign="center">
-                            <Typography color="#D835D8" fontSize={48}>
+                          <Grid item xs={1} textAlign='center'>
+                            <Typography color='#D835D8' fontSize={48}>
                               {competitor2StarterId != 100
                                 ? String(competitor2StarterAthleteScores[index])
-                                : "(0)"}{" "}
+                                : '(0)'}{' '}
                             </Typography>
                           </Grid>
-                          <Grid item xs={1} textAlign="center">
+                          <Grid item xs={1} textAlign='center'>
                             <Typography>
                               {competitor2StarterId != 100 &&
-                                "Loss vs **backend**"}
+                                'Loss vs **backend**'}
                             </Typography>
                           </Grid>
                           {/* <Grid item xs={1} textAlign="center">
@@ -713,17 +735,17 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                           <Grid
                             item
                             xs={2}
-                            textAlign="right"
+                            textAlign='right'
                             onClick={() => handleModalOpen(competitor2Athlete)}
-                            sx={{ cursor: "pointer" }}
+                            sx={{ cursor: 'pointer' }}
                           >
                             <Typography fontSize={34}>
                               {competitor2StarterId != 100
                                 ? competitor2Athlete
-                                : "(none)"}
+                                : '(none)'}
                             </Typography>
                           </Grid>
-                          <Grid item xs={1} textAlign="center">
+                          <Grid item xs={1} textAlign='center'>
                             <Image
                               src={
                                 competitor2StarterId != 100
@@ -731,7 +753,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                                   : // ? competitor2Athlete?.image
                                     logo
                               }
-                              alt="logo"
+                              alt='logo'
                               width={50}
                               height={50}
                             />
@@ -743,14 +765,14 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
                 ) : (
                   <Box
                     sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
-                    <Typography textAlign="center">
-                      {" "}
-                      Fetching scores{" "}
+                    <Typography textAlign='center'>
+                      {' '}
+                      Fetching scores{' '}
                     </Typography>
                     <CircularProgress></CircularProgress>
                   </Box>
@@ -763,7 +785,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
               />
             </>
           ) : (
-            <Typography textAlign={"center"} color="primary">
+            <Typography textAlign={'center'} color='primary'>
               Oops! Your league's schedule has not been set yet. Please request
               help in Discord if this issue persists past the end of the week.
             </Typography>

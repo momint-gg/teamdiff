@@ -190,6 +190,23 @@ export default function JoinLeague({ setDisplay }) {
     }
   }, [isConnected, connectedAccount]);
 
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please connect to Rinkeby!");
+        window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   const publicListItems = publicLeagueList.map((leagueAddress, index) => (
     <Box key={index} sx={{ marginRight: 3, marginBottom: 3 }}>
       <PendingLeagueCard leagueAddress={leagueAddress} />
