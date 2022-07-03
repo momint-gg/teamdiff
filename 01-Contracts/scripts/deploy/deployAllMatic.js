@@ -7,7 +7,7 @@ const fs = require("fs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-
+  textData += "exports.GameItems = '0x5b790947E251f8472a2083787eb6ECc7925B5c30';\n"
 
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(

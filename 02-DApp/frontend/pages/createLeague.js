@@ -764,7 +764,7 @@ export default function CreateLeague({ setDisplay }) {
             <a
               className="primary-link"
               href={
-                "https://polygonscan.io/address/" +
+                "https://polygonscan.com/address/" +
                 newLeagueAddress +
                 "#internaltx"
               }
