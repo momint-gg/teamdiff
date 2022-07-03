@@ -137,8 +137,8 @@ export default function CreateLeague({ setDisplay }) {
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please switch to Polygon network!");
-        window.location = "/";
+        // alert("Please switch to Polygon network!");
+        // window.location = "/";
       }
     } catch (error) {
       console.log(error);
@@ -342,7 +342,7 @@ export default function CreateLeague({ setDisplay }) {
     if (formValues.leagueName === "") {
       alert("Please enter valid league name.");
     } else if (formValues.token === "") {
-      alert("Please select a token.");
+      // alert("Please select a token.");
     } else if (formValues.buyInCost > 100) {
       alert("Please enter a buy-in cost below 100 USDC.");
     } else {

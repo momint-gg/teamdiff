@@ -1,12 +1,12 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  Grid,
-  Typography
+    Box,
+    Card,
+    CardActions,
+    CardContent,
+    Grid,
+    Typography
 } from "@mui/material";
 import { ethers } from "ethers";
 // Router
@@ -58,8 +58,8 @@ export default function Play() {
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please connect to Polygon to use this DApp!");
-        window.location = "/";
+        // alert("Please connect to Polygon to use this DApp!");
+        // window.location = "/";
       }
     } catch (error) {
       console.log(error);

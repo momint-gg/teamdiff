@@ -66,8 +66,8 @@ export default function BurnPack({ setDisplay }) {
     try {
       if (window.ethereum.networkVersion !== chainId) {
         console.log(window.ethereum.networkVersion);
-        alert("Please switch to Polygon network to use this DApp!");
-        window.location = "/";
+        // // alert("Please switch to Polygon network to use this DApp!");
+        // window.location = "/";
       }
     } catch (error) {
       console.log(error);

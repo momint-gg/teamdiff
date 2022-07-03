@@ -195,8 +195,8 @@ export default function JoinLeague({ setDisplay }) {
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please switch to Polygon network!");
-        window.location = "/";
+        // alert("Please switch to Polygon network!");
+        // window.location = "/";
       }
     } catch (error) {
       console.log(error);

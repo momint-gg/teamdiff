@@ -53,8 +53,8 @@ export default function MintPack() {
   const checkNetwork = async () => {
     try {
       if (window.ethereum.networkVersion !== chainId) {
-        alert("Please switch to Polygon network!");
-        window.location = "/";
+        // alert("Please switch to Polygon network!");
+        // window.location = "/";
       }
     } catch (error) {
       console.log(error);
@@ -158,7 +158,7 @@ export default function MintPack() {
       //   );
       // }
       // } else {
-      //   alert("Please switch to the Polygon network to proceed with the mint!")
+      //   // alert("Please switch to the Polygon network to proceed with the mint!")
       // }
     }
   };
