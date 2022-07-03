@@ -7,8 +7,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Link
+  Typography
 } from "@mui/material";
 
 // fake data - data structure is a best guess at what contract data is formatted as
@@ -60,16 +59,22 @@ import {
 // const leagueName = "WashU Esports"
 
 const shortenAddress = (address) => {
-    // console.log("address to shorten: " + address);
-    const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
-      address.length - 4,
-      address.length
-    )}`;
-    return shortenedAddress1;
-    // setIsConnected(true);
-  };
+  // console.log("address to shorten: " + address);
+  const shortenedAddress1 = `${address.slice(0, 6)}...${address.slice(
+    address.length - 4,
+    address.length
+  )}`;
+  return shortenedAddress1;
+  // setIsConnected(true);
+};
 
-const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, teamNames, teamRecords }) => {
+const ViewLeagueTeamsTable = ({
+  connectedAccount,
+  leagueAddress,
+  leagueName,
+  teamNames,
+  teamRecords,
+}) => {
   return (
     <Container
       sx={{
@@ -107,20 +112,23 @@ const ViewLeagueTeamsTable = ({ connectedAccount, leagueAddress, leagueName, tea
           <TableBody>
             {teamNames?.map((team, idx) => {
               const record = teamRecords[idx];
-              const teamURL = connectedAccount === team 
-                            ? "/leagues/" + leagueAddress + "/myTeam"
-                            : "/team/"+leagueAddress+"/"+team
+              const teamURL =
+                connectedAccount === team
+                  ? "/leagues/" + leagueAddress + "/myTeam"
+                  : "/team/" + leagueAddress + "/" + team;
               return (
                 <TableRow
                   key={team}
                   sx={{ background: idx % 2 ? "#473D3D" : "#8E8E8E" }}
                 >
                   <TableCell align="center">
-                    <Link
+                    {/* <Link
                       href={teamURL}
-                    >
-                    <Typography fontSize={30}>{shortenAddress(team)}</Typography>
-                    </Link>
+                    > */}
+                    <Typography fontSize={30}>
+                      {shortenAddress(team)}
+                    </Typography>
+                    {/* </Link> */}
                   </TableCell>
                   <TableCell align="center">
                     <Typography fontSize={30}>
