@@ -8,7 +8,7 @@ import NavLink from "./NavLink";
 
 const Layout = ({ children, isMobile }) => {
   const pages = [
-    // { name: "PLAY", href: "/play" },
+    { name: "PLAY", href: "/play" },
     { name: "MY COLLECTION", href: "/collection" },
     { name: "MINT", href: "/mintHome" },
     { name: "OPEN", href: "/burnPack" },
