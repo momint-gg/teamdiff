@@ -63,7 +63,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     event AthleteSetInLineup(address sender, uint256 id, uint256 position);
     event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
-
+    event scheduleSet(address sender, address leagueAddress);
     //*****************/
     //*** Modifiers ***/
     /******************/
@@ -247,8 +247,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
         require(!inLeague[msg.sender], "You have already joined this league");
         require(
-            erc20.balanceOf(msg.sender) > stakeAmount ||
-                whitelistContract.isPublic(),
+            erc20.balanceOf(msg.sender) >= stakeAmount,
             "Insufficent funds for staking"
         );
         // require(

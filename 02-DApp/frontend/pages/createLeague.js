@@ -287,7 +287,7 @@ export default function CreateLeague({ setDisplay }) {
       // TODO: set correct stakeamount
       await TokenContract.approve(
         newLeagueProxyAddress,
-        stakeAmount // * 1000000
+        stakeAmount * 1000000
       ).catch((error) => {
         //  console.log("Join League error: " + error.error.message);
         alert("Approve USDC error: " + error.message);

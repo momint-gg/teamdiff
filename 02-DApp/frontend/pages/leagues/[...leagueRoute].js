@@ -37,8 +37,9 @@ export default function LeaguePlayRouter() {
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
   const [leagueMembers, setLeagueMembers] = useState([]);
   const [whitelistAddress, setWhitelistAddress] = useState([]);
-  let isPublic;
+  const [isPublic, setIsPublic] = useState();
   const [leagueMembersLong, setLeagueMembersLong] = useState([]);
+  const [leagueHasStarted, setLeagueHasStarted] = useState();
   // TODO change to matic network for prod
   // const provider = new ethers.providers.AlchemyProvider(
   //   "rinkeby",
@@ -165,6 +166,12 @@ export default function LeaguePlayRouter() {
             });
           setWhitelistAddress(whitelistContractAddress);
         }
+
+        // Get if league has started
+        const leagueHasStartedTemp =
+          await LeagueProxyContract.leagueEntryIsClosed();
+        setLeagueHasStarted(leagueHasStartedTemp);
+
         // Get selected weeks matchups from league proxy schedule
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
@@ -211,9 +218,10 @@ export default function LeaguePlayRouter() {
         provider
       );
       const fetchData = async () => {
-        isPublic = await WhitelistContract.isPublic().catch((e) => {
+        const isPublicTemp = await WhitelistContract.isPublic().catch((e) => {
           console.error(e);
         });
+        setIsPublic(isPublicTemp);
       };
       fetchData();
     }
@@ -356,9 +364,17 @@ export default function LeaguePlayRouter() {
     });
   };
 
-  // async function getLeagueMembersHelper() {
-  //   leagueProxyContract.
-  // }
+  const startLeagueClickHandler = async () => {
+    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
+
+    await leagueProxyContractWithSigner.setLeagueEntryIsClosed().catch((e) => {
+      alert("Start League error: " + e.message);
+      console.error(e);
+    });
+    alert(
+      "Setting league schedule... please check your wallet for the status of this transaction, and refresh when complete."
+    );
+  };
 
   // DAte
   const d = new Date();
@@ -406,7 +422,7 @@ export default function LeaguePlayRouter() {
               ></ViewLeagueTeamsTable>
               <br></br>
               <ViewLeagueTeamMatchup
-                leagueScheduleIsSet={leagueScheduleIsSet}
+                leagueScheduleIsSet={leagueHasStarted}
                 week={currentWeekNum}
                 setWeek={setCurrentWeekNum}
                 weeklyMatchups={selectedWeekMatchups}
@@ -428,11 +444,11 @@ export default function LeaguePlayRouter() {
                   >
                     Admin Functions
                   </Typography>
+                  <Typography textAlign="left" variant="h6">
+                    Manage Whitelist
+                  </Typography>
                   {!isPublic ? (
                     <>
-                      <Typography textAlign="left" variant="h6">
-                        Manage Whitelist
-                      </Typography>
                       <AddToWhitelist
                         setInviteListValues={setInviteListValues}
                         inviteListValues={inviteListValues}
@@ -457,6 +473,41 @@ export default function LeaguePlayRouter() {
                       This a public league. Anyone with a wallet address can
                       join this league.
                     </Typography>
+                  )}
+                  <br></br>
+                  <Typography textAlign="left" variant="h6">
+                    Start League
+                  </Typography>
+                  {!leagueHasStarted ? (
+                    <>
+                      <Typography textAlign="center">
+                        This will league lock entry, and set the league schedule
+                        for your league. This cannot be reversed, so make sure
+                        you have everyone you want in the league before
+                        starting.
+                      </Typography>
+                      <Typography textAlign="center">
+                        If you don't want to manually start your league,
+                        TeamDiff will be locking league entry and automatically
+                        starting leagues at the end of each week (Sunday) after
+                        the first week.
+                      </Typography>
+
+                      <Fab
+                        sx={{
+                          float: "right",
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                        }}
+                        variant="extended"
+                        size="medium"
+                        onClick={startLeagueClickHandler}
+                      >
+                        Start League
+                      </Fab>
+                    </>
+                  ) : (
+                    <Typography>This league has already started.</Typography>
                   )}
                 </Box>
               )}

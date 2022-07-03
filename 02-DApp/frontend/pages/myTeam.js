@@ -1,17 +1,17 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { makeStyles } from "@material-ui/core";
 import {
-    Button,
-    CircularProgress,
-    Container,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Typography
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -195,7 +195,7 @@ export default function MyTeam() {
       // declare the async data fetching function
       const getNFTData = async () => {
         setIsLoading(true);
-        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
           owner: connectedAccount,
