@@ -113,7 +113,6 @@ export default function LeaguePlayRouter() {
       );
       setAthleteContract(AthleteContract);
 
-      let weekMatchups = [];
       async function fetchData() {
         setIsLoading(true);
 
@@ -173,6 +172,8 @@ export default function LeaguePlayRouter() {
         setLeagueHasStarted(leagueHasStartedTemp);
 
         // Get selected weeks matchups from league proxy schedule
+        let weekMatchups = [];
+
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
         ).catch((e) => {
@@ -181,11 +182,16 @@ export default function LeaguePlayRouter() {
           setIsError(true);
         });
 
+        console.log("weekmatchups " + weekMatchups);
+
         // let shifter
         // Slice array, by finding how many slots in return weekMatchups array to skip (due to setLeagueSchedule algorithm)
         const shifter = 4 - Math.round(leagueSize / 2);
+        console.log("shifter" + shifter);
         if (weekMatchups) {
-          weekMatchups = weekMatchups.slice(shifter);
+          console.log("in here");
+          // weekMatchups = weekMatchups.slice(shifter);
+          console.log("weekMatchup nowL " + weekMatchups);
           // weekMatchups.map((matchup, index) => {
           //   console.log("matchup #" + index + ": " + matchup);
           // });
@@ -193,6 +199,8 @@ export default function LeaguePlayRouter() {
           if (weekMatchups.length > 0) {
             setLeagueScheduleIsSet(true);
           }
+        } else {
+          console.log("weekMatchups is null");
         }
 
         // const WhitelistContract = new ethers.Contract(
@@ -207,6 +215,7 @@ export default function LeaguePlayRouter() {
         setIsLoading(false);
       }
       fetchData();
+      console.log("selected week " + selectedWeekMatchups);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
@@ -331,10 +340,10 @@ export default function LeaguePlayRouter() {
         // console.log("User To League Map Error: " + _error.message);
       });
 
-    const shifter = 4 - Math.round(leagueSize / 2);
+    // const shifter = 4 - Math.round(leagueSize / 2);
     // console.log("shifter size: " + shifter);
 
-    weekMatchups = weekMatchups.slice(shifter);
+    // weekMatchups = weekMatchups.slice(shifter);
     // weekMatchups.map((matchup, index) => {
     //   console.log("matchup #" + index + ": " + matchup);
     // });

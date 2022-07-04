@@ -2,7 +2,8 @@ const { ethers } = require("hardhat");
 // import { providers } from "ethers";
 const CONTRACT_ADDRESSES = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby.js");
 // const { GameItems } = require('../../../02-DApp/backend/contractscripts/contract_info/contractAddresses');
-const LeagueOfLegendsLogicJSON = require('../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json');
+const LeagueOfLegendsLogicJSON = require('../../../02-DApp/backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json');
+// const LeagueOfLegendsLogicJSON = require('../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json');
 const AthletesJSON = require('../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json');
 const XLSX = require('xlsx');
 // const web3 = require('web3');
@@ -13,35 +14,43 @@ const main = async () => {
     // Create GameItems Instance
   // const contract = await ethers.getContractAt("LeagueBeaconProxy", "0x39aa9eFAF4136aaA2E2760D69Afe6732A085f9E5")
   // const contract = await ethers.getContractAt("GameItems", CONTRACT_ADDRESSES.GameItems)
-  /*
+  
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
-  const signer = new ethers.Wallet(process.env.RINKEBY_PRIVATE_KEY, provider);
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
+  const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+  // const signer = new ethers.Wallet(process.env.RINKEBY_PRIVATE_KEY, provider);
 
   //Create league proxy instance
   const LeagueProxyContract = new ethers.Contract(
-    "0x56783cc09C773FeC7FFA3396e2C8Aec629dfeFF0",
+    "0x9c59110700D885604eCb0279961782Be1200Acca",
     LeagueOfLegendsLogicJSON.abi,
     signer
   );
 
   //Set League SChedule
   console.log("setting schedule")
-  let txn = await LeagueProxyContract.setLeagueSchedule({
-    gasLimit: 20000000
-  }).catch((e) => {
+  let txn = await LeagueProxyContract.setLeagueEntryIsClosed().catch((e) => {
     console.error("errpor: " + e)
   })
+  // let txn = await LeagueProxyContract.setLeagueEntryIsClosed({
+  //   gasLimit: 20000000
+  // }).catch((e) => {
+  //   console.error("errpor: " + e)
+  // })
   await txn.wait();
-  */
+  
 //  Deploying athletes contract
-  const AthletesContractFactory = await ethers.getContractFactory("Athletes");
-  const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
-  await AthletesContractInstance.deployed();
-  // AthletesContractInstance.connect(owner);
-  console.log("Athletes Deployed to: " + AthletesContractInstance.address);
+  // const AthletesContractFactory = await ethers.getContractFactory("Athletes");
+  // const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  // await AthletesContractInstance.deployed();
+  // // AthletesContractInstance.connect(owner);
+  // console.log("Athletes Deployed to: " + AthletesContractInstance.address);
   // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
   // textData +=
   //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
