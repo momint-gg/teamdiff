@@ -22,7 +22,9 @@ import { useMediaQuery } from "react-responsive";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
 import AthletesJSON from "../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerSelectModal from "../components/PlayerSelectModal";
@@ -163,6 +165,11 @@ export default function MyTeam() {
       );
       setAthleteContract(AthleteContract);
 
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
       async function fetchData() {
         setIsLoading(true);
 
@@ -177,7 +184,7 @@ export default function MyTeam() {
         if (!isInLeague) {
           router.push("/leagues/" + router.query.leagueRoute[0]);
         }
-        const currentWeekNum = await LeagueProxyContract.currentWeekNum();
+        const currentWeekNum = await LeagueMakerContract.currentWeek();
         setCurrentWeekNum(currentWeekNum);
         const starterIds = [null, null, null, null, null];
         for (let i = 0; i <= 4; i++) {

@@ -1,10 +1,10 @@
 import {
-    Box,
-    Card,
-    CardActionArea,
-    CardContent,
-    CardHeader,
-    Link
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardHeader,
+  Link
 } from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
@@ -12,6 +12,8 @@ import Image from "next/image";
 // Router
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 import logo from "../assets/images/logoIcon.png";
 
@@ -42,11 +44,18 @@ export default function LeagueCard({ leagueAddress }) {
         provider
       );
       setLeagueProxyContract(LeagueProxyContract);
+
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        const weekNum = await LeagueProxyContract.currentWeekNum();
-        setWeekNum(parseInt(weekNum) + 1);
+        const weekNum = await LeagueMakerContract.currentWeek();
+        setWeekNum(parseInt(weekNum));
         let i = 0;
         let error = "none";
 

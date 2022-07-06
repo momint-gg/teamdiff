@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 // Contract imports
 import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesMatic.js";
 import AthletesJSON from "../../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueMakerJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
 import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+
 import WhitelistJSON from "../../../backend/contractscripts/contract_info/maticAbis/Whitelist.json";
 import AddToWhitelist from "../../components/AddToWhitelist.js";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
@@ -54,7 +56,7 @@ export default function LeaguePlayRouter() {
       // console.log("router: " + JSON.stringify(router.query, null, 2));
       setRoutedPage(router.query.leagueRoute[1]);
     } else {
-      console.log("router not set");
+      // console.log("router not set");
     }
   }, [router]);
 
@@ -113,6 +115,12 @@ export default function LeaguePlayRouter() {
       );
       setAthleteContract(AthleteContract);
 
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+
       async function fetchData() {
         setIsLoading(true);
 
@@ -139,7 +147,7 @@ export default function LeaguePlayRouter() {
         }
         // setIsLeagueMember(isInLeague);
 
-        const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
+        const currentWeekNum = await LeagueMakerContract.currentWeek().catch(
           (e) => {
             console.error(e);
             setIsLoading(false);
@@ -182,16 +190,16 @@ export default function LeaguePlayRouter() {
           setIsError(true);
         });
 
-        console.log("weekmatchups " + weekMatchups);
+        // console.log("weekmatchups " + weekMatchups);
 
         // let shifter
         // Slice array, by finding how many slots in return weekMatchups array to skip (due to setLeagueSchedule algorithm)
         const shifter = 4 - Math.round(leagueSize / 2);
-        console.log("shifter" + shifter);
+        // console.log("shifter" + shifter);
         if (weekMatchups) {
-          console.log("in here");
+          // console.log("in here");
           // weekMatchups = weekMatchups.slice(shifter);
-          console.log("weekMatchup nowL " + weekMatchups);
+          // console.log("weekMatchup nowL " + weekMatchups);
           // weekMatchups.map((matchup, index) => {
           //   console.log("matchup #" + index + ": " + matchup);
           // });
@@ -200,7 +208,7 @@ export default function LeaguePlayRouter() {
             setLeagueScheduleIsSet(true);
           }
         } else {
-          console.log("weekMatchups is null");
+          // console.log("weekMatchups is null");
         }
 
         // const WhitelistContract = new ethers.Contract(
@@ -215,7 +223,7 @@ export default function LeaguePlayRouter() {
         setIsLoading(false);
       }
       fetchData();
-      console.log("selected week " + selectedWeekMatchups);
+      // console.log("selected week " + selectedWeekMatchups);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
@@ -297,6 +305,7 @@ export default function LeaguePlayRouter() {
     let losses = 0;
     let ties = 0;
     rawRecord.map((result, index) => {
+      if (result === undefined) console.log("result is undefined");
       switch (result) {
         case 2:
           ties++;
@@ -311,8 +320,8 @@ export default function LeaguePlayRouter() {
           break;
       }
     });
-    // Losses should equal the total number of games player - the wins and the ties
-    losses = currentWeekNum - wins - ties;
+    // Losses should equal the total number of games player - the wins and the ties and the startWeek
+    losses = currentWeekNum - wins - ties - 3;
     return [wins, losses, ties];
   };
 
@@ -330,7 +339,7 @@ export default function LeaguePlayRouter() {
     // Get league size
     const leagueSize = await getLeagueSizeHelper(leagueProxyContract);
 
-    console.log("league size: " + leagueSize);
+    // console.log("league size: " + leagueSize);
     let weekMatchups = [];
     weekMatchups = await leagueProxyContract
       .getScheduleForWeek(currentWeekNum)
@@ -355,7 +364,7 @@ export default function LeaguePlayRouter() {
 
   const whitelistSubmitHandler = async () => {
     inviteListValues.forEach(async (whitelistAddress) => {
-      console.log("adding " + whitelistAddress + " to whitelies");
+      // console.log("adding " + whitelistAddress + " to whitelies");
       const LeagueProxyContractWithSigner = leagueProxyContract.connect(signer);
       // const addUsersToWhitelistTxn =
       await LeagueProxyContractWithSigner.addUserToWhitelist(whitelistAddress, {

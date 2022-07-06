@@ -19,7 +19,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
-    uint256 public currentWeekNum;
     address public admin;
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
@@ -139,6 +138,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             numWeeks,
             leagueName
         );
+        emit scheduleSet(msg.sender, address(this));
     }
 
     function lockLineup() external onlyTeamDiff {
@@ -151,7 +151,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
-    function evaluateMatches() external onlyTeamDiff {
+    function evaluateMatches(uint256 currentWeekNum) external onlyTeamDiff {
         require(leagueEntryIsClosed, "league entry not closed, and schedule not set for this league");
         MOBALogicLibrary.evaluateMatches(
             currentWeekNum,
@@ -164,11 +164,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
 
         // League is over
-        if (currentWeekNum == numWeeks - 1) {
-            onLeagueEnd();
-            return;
-        }
-        currentWeekNum++;
+        // if (currentWeekNum == numWeeks - 1) {
+        //     onLeagueEnd();
+        //     return;
+        // }
+        // currentWeekNum++;
     }
 
     /******************************************************/

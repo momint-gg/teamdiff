@@ -30,11 +30,9 @@ contract LeagueBeaconProxy is
     Ownable,
     AccessControl
 {
-
-    string public leagueName;
+   string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
-    uint256 public currentWeekNum;
     address public admin;
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
