@@ -789,8 +789,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             </>
           ) : (
             <Typography textAlign={"center"} color="primary">
-              Oops! Your league's schedule has not been set yet. Please request
-              help in Discord if this issue persists past the end of the week.
+              Oops! Your league's schedule has not been set yet. Please tell
+              your league admin to start the league. Please request help in
+              Discord if you encounter any issues.
             </Typography>
           )}
         </Container>
