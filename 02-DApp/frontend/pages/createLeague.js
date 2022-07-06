@@ -811,7 +811,7 @@ export default function CreateLeague({ setDisplay }) {
           {hasJoinedLeague && (
             <>
               <Link
-                href={"http://localhost:3000/leagues/" + newLeagueAddress}
+                href={"http://teamdiff.xyz/leagues/" + newLeagueAddress}
                 target={"_blank"}
                 rel="noreferrer"
               >

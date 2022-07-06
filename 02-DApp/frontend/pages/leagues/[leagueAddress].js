@@ -437,7 +437,7 @@ export default function LeagueDetails() {
                     <a
                       className="primary-link"
                       href={
-                        "http://localhost:3000/leagues/" +
+                        "http://teamdiff.xyz/leagues/" +
                         router.query.leagueAddress
                       }
                       target={"_blank"}
