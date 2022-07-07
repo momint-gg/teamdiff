@@ -13,6 +13,8 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
+import axios from "axios";
+import axiosRetry from "axios-retry";
 // Web3 Imports
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -46,6 +48,21 @@ export default function MyTeam() {
     process.env.POLYGON_ALCHEMY_KEY
   );
 
+  // Web2 endpoints
+  const playerStatsApi = axios.create({
+    baseURL: "https://teamdiff-backend-api.vercel.app/api",
+  });
+  playerStatsApi.defaults.baseURL =
+    "https://teamdiff-backend-api.vercel.app/api";
+
+  axiosRetry(playerStatsApi, {
+    retries: 2,
+    retryDelay: (count) => {
+      console.log("retrying player stat api call: " + count);
+      return count * 1000;
+    },
+  });
+
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const useStyles = makeStyles({
     cell: {
@@ -76,7 +93,7 @@ export default function MyTeam() {
   const [selectedPlayer, setSelectedPlayer] = useState();
   const [isLineupLocked, setIsLineupLocked] = useState();
   const [isSettingAthlete, setIsSettingAthlete] = useState();
-
+  const [previousScores, setPreviousScores] = useState([]);
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
   // DAte
@@ -186,7 +203,7 @@ export default function MyTeam() {
         }
         const currentWeekNum = await LeagueMakerContract.currentWeek();
         setCurrentWeekNum(currentWeekNum);
-        const starterIds = [null, null, null, null, null];
+        const starterIds = [100, 100, 100, 100, 100];
         for (let i = 0; i <= 4; i++) {
           const id = await LeagueProxyContract.userToLineup(
             connectedAccount,
@@ -257,28 +274,50 @@ export default function MyTeam() {
   useEffect(() => {
     // // console.log("isLoading: " + isLoading);
     if (starterAthleteIds) {
-      getStarterAthleteData();
-      // setCurrentPositionIndex(1);
-      // // console.log(
-      //   "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
-      // );
+      getStarterAthleteScores();
     }
   }, [starterAthleteIds]);
 
+  const getStarterAthleteScores = async () => {
+    // setHasFetchedComp1Scores(false);
+    // setHasFetchedComp2Scores(false);
+    const { data } = await playerStatsApi.get(`/allAthletes/${currentWeekNum}`);
+    // Create scores array for competitor 1 starter athletes
+    const c1Scores = [-1, -1, -1, -1, -1];
+    let score;
+
+    // const c1Scores = competitor1StarterAthleteScores;
+    starterAthleteIds.forEach(async (id, index) => {
+      console.log("index #" + index + ": " + id);
+      if (id != 100) {
+        // TODO if id #100 is passed in, return -1
+        const athleteData = data.find((element) => element.id == id);
+        score = athleteData?.points;
+        // console.log("score for id#" + id + ": " + score);
+        c1Scores[index] = score;
+      }
+      // if(score)
+      // this if statement should always evaulate eventually
+      if (index == 4) {
+        setPreviousScores(c1Scores);
+        // setHasFetchedComp1Scores(true);
+      }
+    });
+  };
+
   const getStarterAthleteData = async () => {
     // console.log("starterID: " + starterAthleteIds);
+
     starterAthleteIds.forEach(async (id, index) => {
       if (id != 100 && currentWeekNum > 0) {
-        const prevPoints = await athleteContract
-          .athleteToScores(id, currentWeekNum - 1)
-          .catch((error) => {
-            // console.log(JSON.stringify(error, null, 2));
-            // prevPoints = null;
-          });
-        // // console.log("prevpoints: " + prevPoints);
-        ownedAthletesMetadata[id].prevPoints = prevPoints;
-      } else if (id != 100) {
-        ownedAthletesMetadata[id].prevPoints = "n/a";
+        // const prevPoints = await athleteContract
+        //   .athleteToScores(id, currentWeekNum - 1)
+        //   .catch((error) => {
+        //     // console.log(JSON.stringify(error, null, 2));
+        //     // prevPoints = null;
+        //   });
+        // // // console.log("prevpoints: " + prevPoints);
+        // ownedAthletesMetadata[id].prevPoints = prevPoints;
       }
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
@@ -472,9 +511,9 @@ export default function MyTeam() {
                   // NOTE: if id == 0, that means the connectedAccount has not
                   // set an athlete in that position for this week in their proxy
                   const athlete = ownedAthletesMetadata[id];
-                  console.log(
-                    "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
-                  );
+                  // console.log(
+                  //   "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
+                  // );
                   return (
                     <TableRow
                       key={index.toString()}
@@ -519,8 +558,9 @@ export default function MyTeam() {
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
                             {id != 100 && currentWeekNum != 0
-                              ? parseInt(athlete?.prevPoints)
-                              : "(0)"}
+                              ? previousScores[index]
+                              : // ? parseInt(athlete?.prevPoints)
+                                "(0)"}
                           </Typography>
                           {/* <Typography>
                             {id != 100  && "69/69/69"}

@@ -15,24 +15,26 @@ const fs = require("fs");
 const axios = require("axios");
 
 // TODO: comment out which contracts/ABIs you're not using
-const abi = require("../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json");
-// const {
-//   Athletes,
-// } = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
-// const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
-// const {
-//   CONTRACT_ADDRESSES,
-// } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
+//MATIC
 const {
   Athletes,
-} = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
+  LeagueMaker
+} = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
+const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
+
+//RINKEBY
+// const {
+//   Athletes,
+// } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
+// const abi = require("../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json");
 
 async function main() {
-  // console.log("Athletes: " + Athletes)
-  // TODO:
-  // Need to hardcode this week num for now since can't pass in.. to do: pull from contract (LeagueMaker) or Athletes (add function for week number in athletes)
-  // Maybe when eval match is called, we can also increment some value in the athletes contract? -- do later...
-  week_num = 0;
+  
+  const LeagueMakerContract = await ethers.getContractAt("LeagueMaker", LeagueMaker);
+  let week_num = await LeagueMakerContract.currentWeek();
+  console.log("updating Athletes data for week #" + week_num)
+
+  week_num = 2;
 
   // Getting our contract
   // const AthletesContract = await ethers.getContractAt("Athletes", "0x67476486754E9EE711b0EF307c86E4cC9FFe545F");
