@@ -519,7 +519,7 @@ export default function MyTeam() {
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
                             {id != 100 && currentWeekNum != 0
-                              ? athlete?.prevPoints
+                              ? parseInt(athlete?.prevPoints)
                               : "(0)"}
                           </Typography>
                           {/* <Typography>
