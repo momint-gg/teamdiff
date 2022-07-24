@@ -10,7 +10,6 @@ import "./MOBALogicLibrary.sol";
 import "./GameItems.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./TestUSDC.sol";
 
 // TODO: Change all TestUSDC to maticUSDC when deploying to mainnet
 contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
@@ -60,7 +59,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /***************/
     event Staked(address sender, uint256 amount, address leagueAddress);
     event AthleteSetInLineup(address sender, uint256 id, uint256 position);
-    event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
     event scheduleSet(address sender, address leagueAddress);
     //*****************/
@@ -215,15 +213,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     function setAthleteInLineup(uint256 athleteId, uint256 position) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
-
         // Requiring the user has ownership of the athletes
-        // for (uint256 i; i < athleteIds.length; i++) {
         require(
             gameItemsContract.balanceOf(msg.sender, athleteId) > 0,
             "Caller does not own given athleteIds"
         );
-        // }
-
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
         require(
             athleteId >= (position * 10) &&
@@ -232,7 +226,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
 
         userToLineup[msg.sender][position] = athleteId;
-        //TODO add event
         emit AthleteSetInLineup(msg.sender, athleteId, position);
     }
 
@@ -277,33 +270,33 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return userToRecord[_user];
     }
 
-    function getUserPoints(address _user) external view returns (uint256) {
-        return userToPoints[_user];
-    }
+    // function getUserPoints(address _user) external view returns (uint256) {
+    //     return userToPoints[_user];
+    // }
 
-    function getUserWeekScore(address _user)
-        external
-        view
-        returns (uint256[8] memory)
-    {
-        return userToWeekScore[_user];
-    }
+    // function getUserWeekScore(address _user)
+    //     external
+    //     view
+    //     returns (uint256[8] memory)
+    // {
+    //     return userToWeekScore[_user];
+    // }
 
-    function getUserLineup(address _user)
-        external
-        view
-        returns (uint256[5] memory)
-    {
-        return userToLineup[_user];
-    }
+    // function getUserLineup(address _user)
+    //     external
+    //     view
+    //     returns (uint256[5] memory)
+    // {
+    //     return userToLineup[_user];
+    // }
 
-    function getLeagueMembersLength() external view returns (uint256) {
-        return leagueMembers.length;
-    }
+    // function getLeagueMembersLength() external view returns (uint256) {
+    //     return leagueMembers.length;
+    // }
 
-    function getLineupIsLocked() external view returns (bool) {
-        return lineupIsLocked;
-    }
+    // function getLineupIsLocked() external view returns (bool) {
+    //     return lineupIsLocked;
+    // }
 
     function getScheduleForWeek(uint256 _week)
         external
@@ -313,9 +306,9 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return schedule[_week];
     }
 
-    function getAdmin() public view returns (address) {
-        return admin;
-    }
+    // function getAdmin() public view returns (address) {
+    //     return admin;
+    // }
 
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
@@ -348,11 +341,4 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         // // whitelist[_userToAdd] = true;
     }
 
-    /*testing*/
-        // Add user to whitelist
-    // function addUserToLeague(address _userToAdd) public {
-    //     inLeague[_userToAdd] = true;
-    //     leagueMembers.push(_userToAdd);
-    //     userToLineup[_userToAdd] = [100,100,100,100,100];
-    // }
 }

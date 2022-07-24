@@ -35,7 +35,7 @@ contract LeagueMaker is Ownable {
     uint256 numWeeks;
 
     uint256 _numWeeks = 8;
-    uint256 public currentWeek = 3;
+    uint256 public currentWeek = 0;
     address _polygonUSDCAddress = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; // When we deploy to mainnet
     address _rinkebyUSDCAddress = 0xeb8f08a975Ab53E34D8a0330E0D34de942C95926;
 
@@ -119,6 +119,11 @@ contract LeagueMaker is Ownable {
     // Season starting late
     function incrementCurrentWeek() external onlyTeamDiff {
         currentWeek++;
+    }
+    
+    // Season starting late 
+    function decrementCurrentWeek() external onlyTeamDiff {
+        currentWeek--;
     }
 
 }

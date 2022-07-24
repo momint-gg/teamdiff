@@ -30,7 +30,7 @@ contract LeagueBeaconProxy is
     Ownable,
     AccessControl
 {
-   string public leagueName;
+    string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
     address public admin;
@@ -74,10 +74,9 @@ contract LeagueBeaconProxy is
     /***************/
     event Staked(address sender, uint256 amount, address leagueAddress);
     event AthleteSetInLineup(address sender, uint256 id, uint256 position);
-    event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
     event scheduleSet(address sender, address leagueAddress);
-    /**
+        /**
      * @dev Initializes the proxy with `beacon`.
      *
      * If `data` is nonempty, it's used as data in a delegate call to the implementation returned by the beacon. This
