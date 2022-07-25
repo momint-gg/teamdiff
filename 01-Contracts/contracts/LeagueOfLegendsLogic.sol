@@ -11,7 +11,6 @@ import "./GameItems.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-// TODO: Change all TestUSDC to maticUSDC when deploying to mainnet
 contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     using SafeMath for uint256;
 
@@ -113,20 +112,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
-    // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
-    // function setLeagueSchedule() external onlyTeamDiffOrAdmin {
-    //     require(!leagueEntryIsClosed, "League entry is not closed")
-    //     MOBALogicLibrary.setLeagueSchedule(
-    //         schedule,
-    //         leagueMembers,
-    //         numWeeks,
-    //         leagueName
-    //     );
-
-    // }
-
-
-
     function setLeagueEntryIsClosed() external onlyTeamDiffOrAdmin {
         require(!leagueEntryIsClosed, "League entry has already been closed");
         leagueEntryIsClosed = true;
@@ -160,13 +145,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             userToWeekScore,
             schedule
         );
-
-        // League is over
-        // if (currentWeekNum == numWeeks - 1) {
-        //     onLeagueEnd();
-        //     return;
-        // }
-        // currentWeekNum++;
     }
 
     /******************************************************/
@@ -200,10 +178,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         }
     }
 
-    //Test function
-    function getLeagueMember(uint256 index) public view returns (address) {
-        return leagueMembers[index];
-    }
 
     //****************************************************/
     //*************** LEAGUE PLAY FUNCTIONS **************/
@@ -243,25 +217,20 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             erc20.balanceOf(msg.sender) >= stakeAmount,
             "Insufficent funds for staking"
         );
-        // require(
-        //     testUSDC.balanceOf(msg.sender) > stakeAmount, // TODO: Delete TestUSDC and RinkebyUSDC for MATIC USDC
-        //     "Insufficent funds for staking"
-        // );
 
         leagueMakerContract.updateUserToLeagueMapping(msg.sender);
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
+        //Setting default lineups to 100 to represent unset positions
         userToLineup[msg.sender] = [100,100,100,100,100];
-        // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-        // rinkebyUSDC.transfer(address(this), stakeAmount);
         erc20.transferFrom(msg.sender, address(this), stakeAmount);
-
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
+    //Returns the result (win, loss, tie) for each week of the given user
     function getUserRecord(address _user)
         external
         view
@@ -270,33 +239,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return userToRecord[_user];
     }
 
-    // function getUserPoints(address _user) external view returns (uint256) {
-    //     return userToPoints[_user];
-    // }
-
-    // function getUserWeekScore(address _user)
-    //     external
-    //     view
-    //     returns (uint256[8] memory)
-    // {
-    //     return userToWeekScore[_user];
-    // }
-
-    // function getUserLineup(address _user)
-    //     external
-    //     view
-    //     returns (uint256[5] memory)
-    // {
-    //     return userToLineup[_user];
-    // }
-
-    // function getLeagueMembersLength() external view returns (uint256) {
-    //     return leagueMembers.length;
-    // }
-
-    // function getLineupIsLocked() external view returns (bool) {
-    //     return lineupIsLocked;
-    // }
+    
 
     function getScheduleForWeek(uint256 _week)
         external
@@ -306,9 +249,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return schedule[_week];
     }
 
-    // function getAdmin() public view returns (address) {
-    //     return admin;
-    // }
 
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
@@ -335,10 +275,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             "Nobody can enter/exit the league anymore. The season has started!"
         );
         whitelistContract.addAddressToWhitelist(_userToAdd);
-
-        //TODO this mapp contain users to league and whitelisted leagues
+        //update user to league mapping in leagueMaker
         leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
-        // // whitelist[_userToAdd] = true;
     }
 
 }

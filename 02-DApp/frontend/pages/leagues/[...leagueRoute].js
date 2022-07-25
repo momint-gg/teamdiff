@@ -321,7 +321,7 @@ export default function LeaguePlayRouter() {
       }
     });
     // Losses should equal the total number of games player - the wins and the ties and the startWeek
-    losses = currentWeekNum - wins - ties - 3;
+    losses = currentWeekNum - wins - ties;
     return [wins, losses, ties];
   };
 
