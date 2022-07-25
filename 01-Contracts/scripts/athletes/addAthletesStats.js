@@ -25,28 +25,33 @@ const abi = require("../../../02-DApp/backend/contractscripts/contract_info/rink
 // } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
 const {
   Athletes,
+  LeagueMaker,
 } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
 
 async function main() {
-  // console.log("Athletes: " + Athletes)
-  // TODO:
-  // Need to hardcode this week num for now since can't pass in.. to do: pull from contract (LeagueMaker) or Athletes (add function for week number in athletes)
-  // Maybe when eval match is called, we can also increment some value in the athletes contract? -- do later...
-  week_num = 0;
-
   // Getting our contract
   // const AthletesContract = await ethers.getContractAt("Athletes", "0x67476486754E9EE711b0EF307c86E4cC9FFe545F");
   const AthletesContract = await ethers.getContractAt("Athletes", Athletes);
+  const LeagueMakerContract = await ethers.getContractAt(
+    "LeagueMaker",
+    LeagueMaker
+  );
+
+  // week_num = Number(await LeagueMakerContract.getCurrentWeek()); //TODO Change back
+  week_num = [1, 2, 3, 4]; // All of the weeks we are doing data insert for
 
   // Parsing excel
   finalStatsToPush = [];
   const parseExcel = (filename) => {
     const excelData = XLSX.readFile(filename);
 
-    return Object.keys(excelData.Sheets).map((name) => ({
+    // All of the sheets in our excel file
+    excelSheets = Object.keys(excelData.Sheets).map((name) => ({
       name,
       data: XLSX.utils.sheet_to_json(excelData.Sheets[name]),
     }));
+
+    return excelSheets;
   };
 
   // Getting an object key by its value
@@ -54,113 +59,117 @@ async function main() {
     return Object.keys(object).find((key) => object[key] === value);
   }
 
-  parseExcel("./scripts/athletes/week_dummy_data.xlsx").forEach((element) => {
-    data = element.data;
+  const allSheets = []; // Going to add all of our sheet objects here (diff weeks)
+  parseExcel(`./scripts/athletes/Week1_Week4.xlsx`).forEach((element) => {
+    allSheets.push({ name: element.name, data: element.data });
   });
 
-  // Array to check if athlete was benched or not for the week
-  // In next step we will loop through and set any athlete that hasn't been benched to true
-  // Resulting athletes (AKA athletes who val is still false) will be added with points of 0
-  const athleteToBoolArr = new Array(50);
-  for (let i = 0; i < athleteToBoolArr.length; i++) {
-    athleteToBoolArr[i] = false;
-  }
-
-  // Looping through all of our athletes
-  for (let i = 0; i < 50; i++) {
-    // Main stats
-    const name = data[i]["Player"].toLowerCase(); // Gamer name columnn
-    let points = Math.round(data[i]["Points"]); // Total points column (rounded)
-    if (points < 0) points = 0; // Can't push negative number to contract...
-    const id = athleteToId[name];
-    // Minor stats
-    const avg_kills = data[i]["Avg kills"];
-    const avg_deaths = data[i]["Avg deaths"];
-    const avg_assists = data[i]["Avg assists"];
-    const CSM = data[i]["CSM"];
-    const VSPM = data[i]["VSPM"];
-    const FBpercent = data[i]["FB %"];
-    const pentakills = data[i]["Penta Kills"];
-
-    // console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
-    if (id !== undefined) {
-      // Only IDs in our league should be updated
-      finalStatsToPush.push({
-        id,
-        name,
-        points,
-        avg_kills,
-        avg_deaths,
-        avg_assists,
-        CSM,
-        VSPM,
-        FBpercent,
-        pentakills,
-        week_num,
-      });
-      athleteToBoolArr[id] = true;
-    } else {
-      // Athletes that aren't in TeamDiff (starters are benched)
-      console.log("Athlete named ", name, " is not in TeamDiff");
+  allSheets.forEach((sheet) => {
+    data = sheet.data;
+    // Array to check if athlete was benched or not for the week
+    // In next step we will loop through and set any athlete that hasn't been benched to true
+    // Resulting athletes (AKA athletes who val is still false) will be added with points of 0
+    const athleteToBoolArr = new Array(50);
+    for (let i = 0; i < athleteToBoolArr.length; i++) {
+      athleteToBoolArr[i] = false;
     }
-  }
 
-  // Adding the benched starters with point vals of 0
-  for (let i = 0; i < athleteToBoolArr.length; i++) {
-    if (!athleteToBoolArr[i]) {
-      finalStatsToPush.push({
-        id: i,
-        name: getKeyByValue(athleteToId, i),
-        points: 0,
-        avg_kills: 0,
-        avg_deaths: 0,
-        avg_assists: 0,
-        CSM: 0,
-        VSPM: 0,
-        FBpercent: 0,
-        pentakills: 0,
-        week_num,
-      });
-      console.log("Athlete with id ", i, " was benched for the week");
-    }
-  }
+    // Looping through all of our athletes
+    for (let i = 0; i < 50; i++) {
+      // Main stats
+      const name = data[i]["Player"].toLowerCase(); // Gamer name columnn
+      let points = Math.round(data[i]["Points"]); // Total points column (rounded)
+      if (points < 0) points = 0; // Can't push negative number to contract...
+      const id = athleteToId[name];
+      // Minor stats
+      const avg_kills = data[i]["Avg kills"];
+      const avg_deaths = data[i]["Avg deaths"];
+      const avg_assists = data[i]["Avg assists"];
+      const CSM = data[i]["CSM"];
+      const VSPM = data[i]["VSPM"];
+      const FBpercent = data[i]["FB %"];
+      const pentakills = data[i]["Penta Kills"];
 
-  const finalObj = {};
-  finalObj["data"] = finalStatsToPush;
-
-  // Pushing the data to our Web2 API for frontend rendering
-  try {
-    await axios.put(
-      `https://teamdiff-backend-api.vercel.app/api/athleteData/${JSON.stringify(
-        finalObj
-      )}`
-    );
-    console.log("Stats pushed to Web2 API!");
-  } catch (error) {
-    console.log("Error: ", error);
-  }
-
-  // Finally, pushing stats to the contract
-  console.log("Now pushing stats to contract");
-  for (let i = 0; i < finalStatsToPush.length; i++) {
-    const addAthletesStatsTxn = await AthletesContract.appendStats(
-      finalStatsToPush[i].id, // index of athlete
-      finalStatsToPush[i].points, // their points for the week,
-      week_num, // Week number passed in
-      {
-        gasLimit: 27000000
+      // console.log('Name is ', name, ' \n and points are ', points, '\n id ', id);
+      if (id !== undefined) {
+        // Only IDs in our league should be updated
+        finalStatsToPush.push({
+          id,
+          name,
+          points,
+          avg_kills,
+          avg_deaths,
+          avg_assists,
+          CSM,
+          VSPM,
+          FBpercent,
+          pentakills,
+          week_num,
+        });
+        athleteToBoolArr[id] = true;
+      } else {
+        // Athletes that aren't in TeamDiff (starters are benched)
+        console.log("Athlete named ", name, " is not in TeamDiff");
       }
-    );
-    console.log(
-      "Adding points: ",
-      finalStatsToPush[i].points,
-      " for athlete id ",
-      finalStatsToPush[i].id,
-      `(${finalStatsToPush[i].name})`
-    );
-    // Waiting for txn to mine
-    await addAthletesStatsTxn.wait();
-  }
+    }
+
+    // Adding the benched starters with point vals of 0
+    for (let i = 0; i < athleteToBoolArr.length; i++) {
+      if (!athleteToBoolArr[i]) {
+        finalStatsToPush.push({
+          id: i,
+          name: getKeyByValue(athleteToId, i),
+          points: 0,
+          avg_kills: 0,
+          avg_deaths: 0,
+          avg_assists: 0,
+          CSM: 0,
+          VSPM: 0,
+          FBpercent: 0,
+          pentakills: 0,
+          week_num,
+        });
+        console.log("Athlete with id ", i, " was benched for the week");
+      }
+    }
+
+    const finalObj = {};
+    finalObj["data"] = finalStatsToPush;
+
+    // Pushing the data to our Web2 API for frontend rendering
+    // try {
+    //   await axios.put(
+    //     `https://teamdiff-backend-api.vercel.app/api/athleteData/${JSON.stringify(
+    //       finalObj
+    //     )}`
+    //   );
+    //   console.log("Stats pushed to Web2 API!");
+    // } catch (error) {
+    //   console.log("Error: ", error);
+    // }
+
+    // // Finally, pushing stats to the contract
+    // console.log("Now pushing stats to contract");
+    // for (let i = 0; i < finalStatsToPush.length; i++) {
+    //   const addAthletesStatsTxn = await AthletesContract.appendStats(
+    //     finalStatsToPush[i].id, // index of athlete
+    //     finalStatsToPush[i].points, // their points for the week,
+    //     week_num, // Week number passed in
+    //     {
+    //       gasLimit: 27000000,
+    //     }
+    //   );
+    //   console.log(
+    //     "Adding points: ",
+    //     finalStatsToPush[i].points,
+    //     " for athlete id ",
+    //     finalStatsToPush[i].id,
+    //     `(${finalStatsToPush[i].name})`
+    //   );
+    //   // Waiting for txn to mine
+    //   await addAthletesStatsTxn.wait();
+    // }
+  });
 }
 
 // Quick check to make sure contract updates
