@@ -33,7 +33,6 @@ contract LeagueBeaconProxy is
     string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
-    uint256 public currentWeekNum;
     address public admin;
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
@@ -74,11 +73,10 @@ contract LeagueBeaconProxy is
     //*** Events ***/
     /***************/
     event Staked(address sender, uint256 amount, address leagueAddress);
-    event athleteSetInLineup(address sender, uint256 index, uint256 position);
-    event testUSDCDeployed(address sender, address contractAddress);
+    event AthleteSetInLineup(address sender, uint256 id, uint256 position);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
-
-    /**
+    event scheduleSet(address sender, address leagueAddress);
+        /**
      * @dev Initializes the proxy with `beacon`.
      *
      * If `data` is nonempty, it's used as data in a delegate call to the implementation returned by the beacon. This

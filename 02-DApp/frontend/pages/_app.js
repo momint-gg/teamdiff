@@ -4,7 +4,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { ethers } from "ethers";
 import Head from "next/head";
-import { default as React } from "react";
 import { useMediaQuery } from "react-responsive";
 import { chain, createClient, defaultChains, Provider } from "wagmi";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
@@ -51,9 +50,13 @@ function MyApp({ Component, pageProps }) {
   });
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   // const provider = new ethers.providers.AlchemyProvider(
   //   "matic",

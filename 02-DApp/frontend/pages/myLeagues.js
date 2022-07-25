@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 // Wagmi imports
 import { useSigner } from "wagmi";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import LeagueMakerJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueMaker.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 import LeagueCard from "../components/LeagueCard";
 import PendingLeagueCard from "../components/PendingLeagueCard";
 
@@ -24,6 +24,23 @@ export default function MyLeagues({ setDisplay }) {
   const [connectedAccount, setConnectedAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Making sure we're conncted to correct network
+  const chainId = "137";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        // alert("Please switch to Polygon network!");
+        // window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -52,9 +69,13 @@ export default function MyLeagues({ setDisplay }) {
   }, []);
 
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   const { data: signerData } = useSigner();
 
@@ -185,11 +206,7 @@ export default function MyLeagues({ setDisplay }) {
               )),
             }
           )}
-          <Typography
-            variant="h4"
-            color="secondary"
-            component="div"
-          >
+          <Typography variant="h4" color="secondary" component="div">
             Pending Leagues
           </Typography>
           <hr

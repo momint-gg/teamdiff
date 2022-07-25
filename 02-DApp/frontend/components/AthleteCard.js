@@ -6,7 +6,7 @@ import {
   CardMedia,
   Typography
 } from "@mui/material";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 
 export default function AthleteCard({ athleteData, setAthlete, setModalOpen }) {
   // console.log("Athlete Data:" + athleteData);

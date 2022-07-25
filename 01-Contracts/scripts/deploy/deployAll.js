@@ -6,7 +6,7 @@ const fs = require("fs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-  textData += "exports.GameItems = '0x4c5fA3e55c55f50A12696298aadd794AAb558C7A';\n";
+  textData += "exports.GameItems = '0x5b790947e251f8472a2083787eb6ecc7925b5c30';\n";
 
   // Create GameItems Instance
   /*const gameContractFactory = await hre.ethers.getContractFactory("GameItems");

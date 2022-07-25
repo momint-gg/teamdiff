@@ -4,10 +4,12 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
+import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import AthletesJSON from "../../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueMakerJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+
+import WhitelistJSON from "../../../backend/contractscripts/contract_info/maticAbis/Whitelist.json";
 import AddToWhitelist from "../../components/AddToWhitelist.js";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import ViewLeagueTeamMatchup from "../../components/ViewLeagueTeamMatchups.js";
@@ -37,19 +39,24 @@ export default function LeaguePlayRouter() {
   const [leagueScheduleIsSet, setLeagueScheduleIsSet] = useState();
   const [leagueMembers, setLeagueMembers] = useState([]);
   const [whitelistAddress, setWhitelistAddress] = useState([]);
-  let isPublic;
+  const [isPublic, setIsPublic] = useState();
   const [leagueMembersLong, setLeagueMembersLong] = useState([]);
+  const [leagueHasStarted, setLeagueHasStarted] = useState();
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   useEffect(() => {
     if (router.isReady) {
       // console.log("router: " + JSON.stringify(router.query, null, 2));
       setRoutedPage(router.query.leagueRoute[1]);
     } else {
-      console.log("router not set");
+      // console.log("router not set");
     }
   }, [router]);
 
@@ -108,7 +115,12 @@ export default function LeaguePlayRouter() {
       );
       setAthleteContract(AthleteContract);
 
-      let weekMatchups = [];
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+
       async function fetchData() {
         setIsLoading(true);
 
@@ -135,7 +147,7 @@ export default function LeaguePlayRouter() {
         }
         // setIsLeagueMember(isInLeague);
 
-        const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
+        const currentWeekNum = await LeagueMakerContract.currentWeek().catch(
           (e) => {
             console.error(e);
             setIsLoading(false);
@@ -161,7 +173,15 @@ export default function LeaguePlayRouter() {
             });
           setWhitelistAddress(whitelistContractAddress);
         }
+
+        // Get if league has started
+        const leagueHasStartedTemp =
+          await LeagueProxyContract.leagueEntryIsClosed();
+        setLeagueHasStarted(leagueHasStartedTemp);
+
         // Get selected weeks matchups from league proxy schedule
+        let weekMatchups = [];
+
         weekMatchups = await LeagueProxyContract.getScheduleForWeek(
           currentWeekNum
         ).catch((e) => {
@@ -170,11 +190,16 @@ export default function LeaguePlayRouter() {
           setIsError(true);
         });
 
+        // console.log("weekmatchups " + weekMatchups);
+
         // let shifter
         // Slice array, by finding how many slots in return weekMatchups array to skip (due to setLeagueSchedule algorithm)
         const shifter = 4 - Math.round(leagueSize / 2);
+        // console.log("shifter" + shifter);
         if (weekMatchups) {
-          weekMatchups = weekMatchups.slice(shifter);
+          // console.log("in here");
+          // weekMatchups = weekMatchups.slice(shifter);
+          // console.log("weekMatchup nowL " + weekMatchups);
           // weekMatchups.map((matchup, index) => {
           //   console.log("matchup #" + index + ": " + matchup);
           // });
@@ -182,6 +207,8 @@ export default function LeaguePlayRouter() {
           if (weekMatchups.length > 0) {
             setLeagueScheduleIsSet(true);
           }
+        } else {
+          // console.log("weekMatchups is null");
         }
 
         // const WhitelistContract = new ethers.Contract(
@@ -196,6 +223,7 @@ export default function LeaguePlayRouter() {
         setIsLoading(false);
       }
       fetchData();
+      // console.log("selected week " + selectedWeekMatchups);
     }
   }, [isConnected, router.isReady, connectedAccount]);
 
@@ -207,9 +235,10 @@ export default function LeaguePlayRouter() {
         provider
       );
       const fetchData = async () => {
-        isPublic = await WhitelistContract.isPublic().catch((e) => {
+        const isPublicTemp = await WhitelistContract.isPublic().catch((e) => {
           console.error(e);
         });
+        setIsPublic(isPublicTemp);
       };
       fetchData();
     }
@@ -276,6 +305,7 @@ export default function LeaguePlayRouter() {
     let losses = 0;
     let ties = 0;
     rawRecord.map((result, index) => {
+      if (result === undefined) console.log("result is undefined");
       switch (result) {
         case 2:
           ties++;
@@ -290,7 +320,7 @@ export default function LeaguePlayRouter() {
           break;
       }
     });
-    // Losses should equal the total number of games player - the wins and the ties
+    // Losses should equal the total number of games player - the wins and the ties and the startWeek
     losses = currentWeekNum - wins - ties;
     return [wins, losses, ties];
   };
@@ -309,7 +339,7 @@ export default function LeaguePlayRouter() {
     // Get league size
     const leagueSize = await getLeagueSizeHelper(leagueProxyContract);
 
-    console.log("league size: " + leagueSize);
+    // console.log("league size: " + leagueSize);
     let weekMatchups = [];
     weekMatchups = await leagueProxyContract
       .getScheduleForWeek(currentWeekNum)
@@ -319,10 +349,10 @@ export default function LeaguePlayRouter() {
         // console.log("User To League Map Error: " + _error.message);
       });
 
-    const shifter = 4 - Math.round(leagueSize / 2);
+    // const shifter = 4 - Math.round(leagueSize / 2);
     // console.log("shifter size: " + shifter);
 
-    weekMatchups = weekMatchups.slice(shifter);
+    // weekMatchups = weekMatchups.slice(shifter);
     // weekMatchups.map((matchup, index) => {
     //   console.log("matchup #" + index + ": " + matchup);
     // });
@@ -334,7 +364,7 @@ export default function LeaguePlayRouter() {
 
   const whitelistSubmitHandler = async () => {
     inviteListValues.forEach(async (whitelistAddress) => {
-      console.log("adding " + whitelistAddress + " to whitelies");
+      // console.log("adding " + whitelistAddress + " to whitelies");
       const LeagueProxyContractWithSigner = leagueProxyContract.connect(signer);
       // const addUsersToWhitelistTxn =
       await LeagueProxyContractWithSigner.addUserToWhitelist(whitelistAddress, {
@@ -352,9 +382,17 @@ export default function LeaguePlayRouter() {
     });
   };
 
-  // async function getLeagueMembersHelper() {
-  //   leagueProxyContract.
-  // }
+  const startLeagueClickHandler = async () => {
+    const leagueProxyContractWithSigner = leagueProxyContract.connect(signer);
+
+    await leagueProxyContractWithSigner.setLeagueEntryIsClosed().catch((e) => {
+      alert("Start League error: " + e.message);
+      console.error(e);
+    });
+    alert(
+      "Setting league schedule... please check your wallet for the status of this transaction, and refresh when complete."
+    );
+  };
 
   // DAte
   const d = new Date();
@@ -402,7 +440,7 @@ export default function LeaguePlayRouter() {
               ></ViewLeagueTeamsTable>
               <br></br>
               <ViewLeagueTeamMatchup
-                leagueScheduleIsSet={leagueScheduleIsSet}
+                leagueScheduleIsSet={leagueHasStarted}
                 week={currentWeekNum}
                 setWeek={setCurrentWeekNum}
                 weeklyMatchups={selectedWeekMatchups}
@@ -424,11 +462,11 @@ export default function LeaguePlayRouter() {
                   >
                     Admin Functions
                   </Typography>
+                  <Typography textAlign="left" variant="h6">
+                    Manage Whitelist
+                  </Typography>
                   {!isPublic ? (
                     <>
-                      <Typography textAlign="left" variant="h6">
-                        Manage Whitelist
-                      </Typography>
                       <AddToWhitelist
                         setInviteListValues={setInviteListValues}
                         inviteListValues={inviteListValues}
@@ -453,6 +491,41 @@ export default function LeaguePlayRouter() {
                       This a public league. Anyone with a wallet address can
                       join this league.
                     </Typography>
+                  )}
+                  <br></br>
+                  <Typography textAlign="left" variant="h6">
+                    Start League
+                  </Typography>
+                  {!leagueHasStarted ? (
+                    <>
+                      <Typography textAlign="center">
+                        This will league lock entry, and set the league schedule
+                        for your league. This cannot be reversed, so make sure
+                        you have everyone you want in the league before
+                        starting.
+                      </Typography>
+                      <Typography textAlign="center">
+                        If you don't want to manually start your league,
+                        TeamDiff will be locking league entry and automatically
+                        starting leagues at the end of each week (Sunday) after
+                        the first week.
+                      </Typography>
+
+                      <Fab
+                        sx={{
+                          float: "right",
+                          background:
+                            "linear-gradient(95.66deg, #5A165B 0%, #AA10AD 100%)",
+                        }}
+                        variant="extended"
+                        size="medium"
+                        onClick={startLeagueClickHandler}
+                      >
+                        Start League
+                      </Fab>
+                    </>
+                  ) : (
+                    <Typography>This league has already started.</Typography>
                   )}
                 </Box>
               )}

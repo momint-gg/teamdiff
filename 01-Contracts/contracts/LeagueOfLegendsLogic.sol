@@ -10,16 +10,13 @@ import "./MOBALogicLibrary.sol";
 import "./GameItems.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./TestUSDC.sol";
 
-// TODO: Change all TestUSDC to maticUSDC when deploying to mainnet
 contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     using SafeMath for uint256;
 
     string public leagueName;
     uint256 public numWeeks; // Current week of the split
     uint256 public stakeAmount;
-    uint256 public currentWeekNum;
     address public admin;
     address public teamDiffAddress;
     bool public leagueEntryIsClosed;
@@ -61,9 +58,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /***************/
     event Staked(address sender, uint256 amount, address leagueAddress);
     event AthleteSetInLineup(address sender, uint256 id, uint256 position);
-    event testUSDCDeployed(address sender, address contractAddress);
     event leagueEnded(address[] winner, uint256 prizePotPerWinner);
-
+    event scheduleSet(address sender, address leagueAddress);
     //*****************/
     //*** Modifiers ***/
     /******************/
@@ -119,18 +115,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     /*************************************************/
     /************ TEAM DIFF ONLY FUNCTIONS ***********/
     /*************************************************/
-    // Instead of onlyOwner, only LeagueMakerLibrary should be able to call these functions
-    // function setLeagueSchedule() external onlyTeamDiffOrAdmin {
-    //     require(!leagueEntryIsClosed, "League entry is not closed")
-    //     MOBALogicLibrary.setLeagueSchedule(
-    //         schedule,
-    //         leagueMembers,
-    //         numWeeks,
-    //         leagueName
-    //     );
-
-    // }
-
     function setLeagueEntryIsClosed() external onlyTeamDiffOrAdmin {
         require(!leagueEntryIsClosed, "League entry has already been closed");
         leagueEntryIsClosed = true;
@@ -140,6 +124,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             numWeeks,
             leagueName
         );
+        emit scheduleSet(msg.sender, address(this));
     }
 
     function lockLineup() external onlyTeamDiff {
@@ -152,11 +137,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
 
     // Evaluating all of the matches for a given week
     // On the last week, delegate the prize pot to the winner
-    function evaluateMatches() external onlyTeamDiff {
-        require(
-            leagueEntryIsClosed,
-            "league entry not closed, and schedule not set for this league"
-        );
+    function evaluateMatches(uint256 currentWeekNum) external onlyTeamDiff {
+        require(leagueEntryIsClosed, "league entry not closed, and schedule not set for this league");
         MOBALogicLibrary.evaluateMatches(
             currentWeekNum,
             athletesContract,
@@ -166,13 +148,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             userToWeekScore,
             schedule
         );
-
-        // League is over
-        if (currentWeekNum == numWeeks - 1) {
-            onLeagueEnd();
-            return;
-        }
-        currentWeekNum++;
     }
 
     /******************************************************/
@@ -206,10 +181,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         }
     }
 
-    //Test function
-    function getLeagueMember(uint256 index) public view returns (address) {
-        return leagueMembers[index];
-    }
 
     //****************************************************/
     //*************** LEAGUE PLAY FUNCTIONS **************/
@@ -219,15 +190,11 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
     function setAthleteInLineup(uint256 athleteId, uint256 position) external {
         require(!lineupIsLocked, "lineup is locked for the week!");
         require(inLeague[msg.sender], "User is not in League.");
-
         // Requiring the user has ownership of the athletes
-        // for (uint256 i; i < athleteIds.length; i++) {
         require(
             gameItemsContract.balanceOf(msg.sender, athleteId) > 0,
             "Caller does not own given athleteIds"
         );
-        // }
-
         // Making sure they can't set incorrect positions (e.g. set a top where a mid should be)
         require(
             athleteId >= (position * 10) &&
@@ -236,7 +203,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
 
         userToLineup[msg.sender][position] = athleteId;
-        //TODO add event
         emit AthleteSetInLineup(msg.sender, athleteId, position);
     }
 
@@ -251,29 +217,23 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         );
         require(!inLeague[msg.sender], "You have already joined this league");
         require(
-            erc20.balanceOf(msg.sender) > stakeAmount ||
-                whitelistContract.isPublic(),
+            erc20.balanceOf(msg.sender) >= stakeAmount,
             "Insufficent funds for staking"
         );
-        // require(
-        //     testUSDC.balanceOf(msg.sender) > stakeAmount, // TODO: Delete TestUSDC and RinkebyUSDC for MATIC USDC
-        //     "Insufficent funds for staking"
-        // );
 
         leagueMakerContract.updateUserToLeagueMapping(msg.sender);
         inLeague[msg.sender] = true;
         leagueMembers.push(msg.sender);
-        userToLineup[msg.sender] = [100, 100, 100, 100, 100];
-        // rinkebyUSDC.transferFrom(msg.sender, address(this), stakeAmount);
-        // rinkebyUSDC.transfer(address(this), stakeAmount);
+        //Setting default lineups to 100 to represent unset positions
+        userToLineup[msg.sender] = [100,100,100,100,100];
         erc20.transferFrom(msg.sender, address(this), stakeAmount);
-
         emit Staked(msg.sender, stakeAmount, address(this));
     }
 
     /*****************************************************/
     /***************** GETTER FUNCTIONS ******************/
     /*****************************************************/
+    //Returns the result (win, loss, tie) for each week of the given user
     function getUserRecord(address _user)
         external
         view
@@ -282,33 +242,7 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return userToRecord[_user];
     }
 
-    function getUserPoints(address _user) external view returns (uint256) {
-        return userToPoints[_user];
-    }
-
-    function getUserWeekScore(address _user)
-        external
-        view
-        returns (uint256[8] memory)
-    {
-        return userToWeekScore[_user];
-    }
-
-    function getUserLineup(address _user)
-        external
-        view
-        returns (uint256[5] memory)
-    {
-        return userToLineup[_user];
-    }
-
-    function getLeagueMembersLength() external view returns (uint256) {
-        return leagueMembers.length;
-    }
-
-    function getLineupIsLocked() external view returns (bool) {
-        return lineupIsLocked;
-    }
+    
 
     function getScheduleForWeek(uint256 _week)
         external
@@ -318,9 +252,6 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
         return schedule[_week];
     }
 
-    function getAdmin() public view returns (address) {
-        return admin;
-    }
 
     /*****************************************************************/
     /*******************WHITELIST FUNCTIONS  *************************/
@@ -346,17 +277,8 @@ contract LeagueOfLegendsLogic is Initializable, ReentrancyGuard {
             "Nobody can enter/exit the league anymore. The season has started!"
         );
         whitelistContract.addAddressToWhitelist(_userToAdd);
-
-        //TODO this mapp contain users to league and whitelisted leagues
+        //update user to league mapping in leagueMaker
         leagueMakerContract.updateUserToLeagueMapping(_userToAdd);
-        // // whitelist[_userToAdd] = true;
     }
 
-    /*testing*/
-    // Add user to whitelist
-    // function addUserToLeague(address _userToAdd) public {
-    //     inLeague[_userToAdd] = true;
-    //     leagueMembers.push(_userToAdd);
-    //     userToLineup[_userToAdd] = [100,100,100,100,100];
-    // }
 }

@@ -1,15 +1,15 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import {
-  Box,
-  Card,
-  Fab,
-  FormControl,
-  Grid,
-  Link,
-  MenuItem,
-  Select,
-  TextField,
-  Typography
+    Box,
+    Card,
+    Fab,
+    FormControl,
+    Grid,
+    Link,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
 } from "@mui/material";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
@@ -19,7 +19,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
 import OpenSea from "../assets/images/opensea.png";
 import AthleteCardModal from "../components/AthleteCardModal";
 import ConnectWalletPrompt from "../components/ConnectWalletPrompt";
@@ -49,6 +49,23 @@ export default function Collection() {
   const [isNoMetaMask, setIsNoMetaMask] = useState();
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+
+  // Making sure we're conncted to correct network
+  const chainId = "137";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        // // alert("Please switch to Polygon network!");
+        // window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   /**
    * Handles a change in injected etheruem provider from MetaMask
@@ -133,8 +150,8 @@ export default function Collection() {
       const getNFTData = async () => {
         setIsLoading(true);
         //         console.log("entering getNftData function")
-        // const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
-        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK); // .catch(
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
+        // const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK); // .catch(
         //   (error) => {
         //     // alert("fetch create alchemy web3 error: " + JSON.stringify(error, null, 2));
         //     // setNFTData([]);

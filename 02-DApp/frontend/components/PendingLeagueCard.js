@@ -1,10 +1,17 @@
-import { Box, Card, CardContent, Typography, CardActionArea, CardHeader } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardHeader,
+  Typography
+} from "@mui/material";
 // Web3 Imports
 import { ethers } from "ethers";
 // Router
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 
 // export default function LeagueCard({ leagueAddress, setMountedLeagueAddress, setLeague, setLeagueOpen }) {
 export default function PendingLeagueCard({ leagueAddress }) {
@@ -12,13 +19,18 @@ export default function PendingLeagueCard({ leagueAddress }) {
   const router = useRouter();
 
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
   const [leagueSize, setLeagueSize] = useState(1);
+  const [stakeAmount, setStakeAmount] = useState(0);
 
   useEffect(() => {
     if (leagueAddress) {
@@ -33,6 +45,9 @@ export default function PendingLeagueCard({ leagueAddress }) {
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
+        const stakeAmount = await LeagueProxyContract.stakeAmount();
+        setStakeAmount(stakeAmount);
+
         let i = 0;
         let error = "none";
 
@@ -61,48 +76,56 @@ export default function PendingLeagueCard({ leagueAddress }) {
 
   const card = (
     <Fragment>
-      <CardActionArea
-      href={"/leagues/" + leagueAddress}
-    >
-      <CardHeader
-        sx={{
-          background: "#343434 !important",
-          p: "15%",
-          height: "3rem",
-          borderBottom: "solid white 0.01rem",
-          minWidth: "15rem",
-        }}
-        title={
-          leagueName
-            ? leagueName
-            : "(Untitled)"
-        }
-        subheader={"CLICK TO JOIN"}
-      />
-      <CardContent  >
-        <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          p: "10%",
-          alignItems: "center",
-        }}>
-          <Box component="div" sx={{
-            wordWrap: 'break-word',
-            maxWidth: '15rem',
-            textAlign: 'center',
-          }}>
-          <Typography fontSize={18} 
-            fontStyle={"italic"} 
-            variant="body1" 
-            color="inherit"
-            component="div"
+      <CardActionArea href={"/leagues/" + leagueAddress}>
+        <CardHeader
+          sx={{
+            background: "#343434 !important",
+            p: "15%",
+            height: "3rem",
+            borderBottom: "solid white 0.01rem",
+            minWidth: "15rem",
+          }}
+          title={leagueName || "(Untitled)"}
+          subheader={"CLICK TO JOIN"}
+        />
+        <CardContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: "10%",
+              alignItems: "center",
+            }}
           >
-            {leagueSize + "/8 players"}
-          </Typography>
+            <Box
+              component="div"
+              sx={{
+                wordWrap: "break-word",
+                maxWidth: "15rem",
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                fontSize={18}
+                fontStyle={"italic"}
+                variant="body1"
+                color="inherit"
+                component="div"
+              >
+                {leagueSize + "/8 players"}
+              </Typography>
+              <Typography
+                fontSize={18}
+                fontStyle={"italic"}
+                variant="body1"
+                color="inherit"
+                component="div"
+              >
+                {"Buy-in: " + stakeAmount + " USDC"}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </CardContent>
+        </CardContent>
       </CardActionArea>
     </Fragment>
   );
@@ -114,11 +137,14 @@ export default function PendingLeagueCard({ leagueAddress }) {
   };
 
   return (
-    <Card variant="outlined"
-    sx={{
-      background: "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
-      borderRadius: "10%",
-      }}>
+    <Card
+      variant="outlined"
+      sx={{
+        background:
+          "linear-gradient(124.78deg, rgba(47, 13, 50, 0.75) 6.52%, rgba(116, 14, 122, 0.75) 78.06%, rgba(0, 255, 255, 0.75) 168.56%)",
+        borderRadius: "10%",
+      }}
+    >
       {card}
     </Card>
   );

@@ -34,6 +34,7 @@ async function main() {
   let currLeague;
   let txn;
   for (let i = 0; i < AllLeagueInstances.length; i++) {
+    //TODO we need to get the current week from LeagueMaker as the source of truth for all leagues
     txn = await currLeague.evaluateMatches();
     await txn.wait();
   }

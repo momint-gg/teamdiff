@@ -5,6 +5,22 @@ import bootstrap from "../styles/sass/custom_bootstrap.module.scss";
 import styles from "../styles/sass/home_styles.module.scss";
 
 export default function Homepage() {
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        alert("Please switch to Polygon network to use this DApp!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // useEffect(() => {
+  //   checkNetwork();
+  // }, []);
+
   return (
     <div className={styles.homepage}>
       <div className={bootstrap.homepagebs}>

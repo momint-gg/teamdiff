@@ -8,10 +8,10 @@ import { useEffect, useState } from "react";
 // NPM import
 import WAValidator from "wallet-address-validator";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
-import RinkebyUSDCJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/RinkebyUSDCJSON.json";
-import WhitelistJSON from "../../../backend/contractscripts/contract_info/rinkebyAbis/Whitelist.json";
+import * as CONTRACT_ADDRESSES from "../../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import ERC20JSON from "../../../backend/contractscripts/contract_info/maticAbis/ERC20.json";
+import LeagueOfLegendsLogicJSON from "../../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+import WhitelistJSON from "../../../backend/contractscripts/contract_info/maticAbis/Whitelist.json";
 import LoadingPrompt from "../../components/LoadingPrompt.js";
 import constants from "../../constants/index.js";
 // export default function LeagueDetails({ leagueData, leagueAddress, isJoined, setLeagueOpen }) {
@@ -20,9 +20,13 @@ export default function LeagueDetails() {
   const router = useRouter();
 
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   // const { data: signerData1, error: signerError, isLoading: signerLoading, isFetching, isSuccess, refetch } = useSigner()
 
@@ -270,13 +274,13 @@ export default function LeagueDetails() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
-    const RinkebyUSDCContract = new ethers.Contract(
-      "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
-      RinkebyUSDCJSON,
+    const PolygonUSDCContract = new ethers.Contract(
+      CONTRACT_ADDRESSES.polygonUSDCAddress,
+      ERC20JSON,
       signer
     );
     const stakeAmount = await leagueProxyContract.stakeAmount();
-    const approvalTxn = await RinkebyUSDCContract.approve(
+    const approvalTxn = await PolygonUSDCContract.approve(
       router.query.leagueAddress,
       stakeAmount * 1000000
     ).catch((error) => {
@@ -433,7 +437,7 @@ export default function LeagueDetails() {
                     <a
                       className="primary-link"
                       href={
-                        "http://localhost:3000/leagues/" +
+                        "http://teamdiff.xyz/leagues/" +
                         router.query.leagueAddress
                       }
                       target={"_blank"}

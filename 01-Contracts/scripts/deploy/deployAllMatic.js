@@ -7,7 +7,7 @@ const fs = require("fs");
 const main = async () => {
   console.log("deploying...");
   let textData = "";
-
+  textData += "exports.GameItems = '0x5b790947E251f8472a2083787eb6ECc7925B5c30';\n"
 
   //Create MOBA Logic Library instance
   const MOBALogicLibraryFactory = await ethers.getContractFactory(
@@ -78,7 +78,7 @@ const main = async () => {
 
   // Write data in 'Output.txt' .
   fs.writeFileSync(
-    "../02-DApp/backend/contractscripts/contract_info/maticContractAddresses.js",
+    "../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic.js",
     textData,
     (err) => {
       // In case of a error throw err.
@@ -113,6 +113,8 @@ const main = async () => {
       console.log("done writing to file");
     });
   });
+
+  console.log("deploy script complete");
 };
 
 const runMain = async () => {

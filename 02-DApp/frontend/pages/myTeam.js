@@ -13,6 +13,8 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
+import axios from "axios";
+import axiosRetry from "axios-retry";
 // Web3 Imports
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -20,9 +22,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 // Contract imports
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import AthletesJSON from "../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
+
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerSelectModal from "../components/PlayerSelectModal";
@@ -35,10 +39,29 @@ export default function MyTeam() {
   // Router params
   const router = useRouter();
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
+
+  // Web2 endpoints
+  const playerStatsApi = axios.create({
+    baseURL: "https://teamdiff-backend-api.vercel.app/api",
+  });
+  playerStatsApi.defaults.baseURL =
+    "https://teamdiff-backend-api.vercel.app/api";
+
+  axiosRetry(playerStatsApi, {
+    retries: 2,
+    retryDelay: (count) => {
+      console.log("retrying player stat api call: " + count);
+      return count * 1000;
+    },
+  });
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
   const useStyles = makeStyles({
@@ -70,7 +93,7 @@ export default function MyTeam() {
   const [selectedPlayer, setSelectedPlayer] = useState();
   const [isLineupLocked, setIsLineupLocked] = useState();
   const [isSettingAthlete, setIsSettingAthlete] = useState();
-
+  const [previousScores, setPreviousScores] = useState([]);
   const positions = ["ADC", "Jungle", "Mid", "Support", "Top"];
 
   // DAte
@@ -88,6 +111,23 @@ export default function MyTeam() {
   if (daysTillLock > 5) {
     daysTillUnlock = 7 - daysTillLock;
   }
+
+  // Making sure we're conncted to correct network
+  const chainId = "137";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        // alert("Please switch to Polygon network!");
+        // window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -142,6 +182,11 @@ export default function MyTeam() {
       );
       setAthleteContract(AthleteContract);
 
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
       async function fetchData() {
         setIsLoading(true);
 
@@ -156,9 +201,9 @@ export default function MyTeam() {
         if (!isInLeague) {
           router.push("/leagues/" + router.query.leagueRoute[0]);
         }
-        const currentWeekNum = await LeagueProxyContract.currentWeekNum();
+        const currentWeekNum = await LeagueMakerContract.currentWeek();
         setCurrentWeekNum(currentWeekNum);
-        const starterIds = [null, null, null, null, null];
+        const starterIds = [100, 100, 100, 100, 100];
         for (let i = 0; i <= 4; i++) {
           const id = await LeagueProxyContract.userToLineup(
             connectedAccount,
@@ -174,7 +219,7 @@ export default function MyTeam() {
       // declare the async data fetching function
       const getNFTData = async () => {
         setIsLoading(true);
-        const web3 = createAlchemyWeb3(constants.RINKEBY_ALCHEMY_LINK);
+        const web3 = createAlchemyWeb3(constants.POLYGON_ALCHEMY_LINK);
 
         const nfts = await web3.alchemy.getNfts({
           owner: connectedAccount,
@@ -229,28 +274,50 @@ export default function MyTeam() {
   useEffect(() => {
     // // console.log("isLoading: " + isLoading);
     if (starterAthleteIds) {
-      getStarterAthleteData();
-      // setCurrentPositionIndex(1);
-      // // console.log(
-      //   "get filter:" + JSON.stringify(getFilteredOwnedAthletes(), null, 2)
-      // );
+      getStarterAthleteScores();
     }
   }, [starterAthleteIds]);
 
+  const getStarterAthleteScores = async () => {
+    // setHasFetchedComp1Scores(false);
+    // setHasFetchedComp2Scores(false);
+    const { data } = await playerStatsApi.get(`/allAthletes/${currentWeekNum}`);
+    // Create scores array for competitor 1 starter athletes
+    const c1Scores = [-1, -1, -1, -1, -1];
+    let score;
+
+    // const c1Scores = competitor1StarterAthleteScores;
+    starterAthleteIds.forEach(async (id, index) => {
+      console.log("index #" + index + ": " + id);
+      if (id != 100) {
+        // TODO if id #100 is passed in, return -1
+        const athleteData = data.find((element) => element.id == id);
+        score = athleteData?.points;
+        // console.log("score for id#" + id + ": " + score);
+        c1Scores[index] = score;
+      }
+      // if(score)
+      // this if statement should always evaulate eventually
+      if (index == 4) {
+        setPreviousScores(c1Scores);
+        // setHasFetchedComp1Scores(true);
+      }
+    });
+  };
+
   const getStarterAthleteData = async () => {
     // console.log("starterID: " + starterAthleteIds);
+
     starterAthleteIds.forEach(async (id, index) => {
       if (id != 100 && currentWeekNum > 0) {
-        const prevPoints = await athleteContract
-          .athleteToScores(id, currentWeekNum - 1)
-          .catch((error) => {
-            // console.log(JSON.stringify(error, null, 2));
-            // prevPoints = null;
-          });
-        // // console.log("prevpoints: " + prevPoints);
-        ownedAthletesMetadata[id].prevPoints = prevPoints;
-      } else if (id != 100) {
-        ownedAthletesMetadata[id].prevPoints = "n/a";
+        // const prevPoints = await athleteContract
+        //   .athleteToScores(id, currentWeekNum - 1)
+        //   .catch((error) => {
+        //     // console.log(JSON.stringify(error, null, 2));
+        //     // prevPoints = null;
+        //   });
+        // // // console.log("prevpoints: " + prevPoints);
+        // ownedAthletesMetadata[id].prevPoints = prevPoints;
       }
     });
     // ownedAthletesMetadata.forEach((athlete, index) => {
@@ -402,6 +469,15 @@ export default function MyTeam() {
               fontSize: 36,
             }}
           >
+            My Team
+          </Typography>
+          <Typography
+            color="white"
+            component="div"
+            sx={{
+              fontSize: 36,
+            }}
+          >
             {"Week #" +
               currentWeekNum +
               (isLineupLocked
@@ -421,9 +497,9 @@ export default function MyTeam() {
                   <TableCell align="center" className={classes.cell}>
                     Last Week Points
                   </TableCell>
-                  <TableCell align="center" className={classes.cell}>
+                  {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.cell}>
                     Action
                   </TableCell>
@@ -435,9 +511,9 @@ export default function MyTeam() {
                   // NOTE: if id == 0, that means the connectedAccount has not
                   // set an athlete in that position for this week in their proxy
                   const athlete = ownedAthletesMetadata[id];
-                  console.log(
-                    "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
-                  );
+                  // console.log(
+                  //   "starterID #" + id + ": " + JSON.stringify(athlete, null, 2)
+                  // );
                   return (
                     <TableRow
                       key={index.toString()}
@@ -482,28 +558,29 @@ export default function MyTeam() {
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
                             {id != 100 && currentWeekNum != 0
-                              ? athlete?.prevPoints
-                              : "(0)"}
+                              ? previousScores[index]
+                              : // ? parseInt(athlete?.prevPoints)
+                                "(0)"}
                           </Typography>
                           {/* <Typography>
                             {id != 100  && "69/69/69"}
                           </Typography> */}
                         </div>
                       </TableCell>
-                      <TableCell align="center">
+                      {/* <TableCell align="center">
                         <div>
-                          <Typography fontSize={30} textTransform="uppercase">
+                          <Typography fontSize={30} textTransform='uppercase'>
                             {id != 100 &&
                               // currentWeekNum != 0 &&
-                              "*pull opp from backend"}
+                              '*pull opp from backend'}
                           </Typography>
                           <Typography>
                             {id != 100 &&
                               // currentWeekNum != 0 &&
-                              "*pull date from backend"}
+                              '*pull date from backend'}
                           </Typography>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="center">
                         <Button
                           onClick={() => handleSubModal(athlete, index)}

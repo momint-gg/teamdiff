@@ -12,7 +12,9 @@ import Image from "next/image";
 // Router
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 import logo from "../assets/images/logoIcon.png";
 
 export default function LeagueCard({ leagueAddress }) {
@@ -20,9 +22,13 @@ export default function LeagueCard({ leagueAddress }) {
   const router = useRouter();
 
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
   const [leagueProxyContract, setLeagueProxyContract] = useState(null);
   const [leagueName, setLeagueName] = useState(null);
@@ -38,11 +44,18 @@ export default function LeagueCard({ leagueAddress }) {
         provider
       );
       setLeagueProxyContract(LeagueProxyContract);
+
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+
       async function fetchData() {
         const leagueName = await LeagueProxyContract.leagueName();
         setLeagueName(leagueName);
-        const weekNum = await LeagueProxyContract.currentWeekNum();
-        setWeekNum(parseInt(weekNum) + 1);
+        const weekNum = await LeagueMakerContract.currentWeek();
+        setWeekNum(parseInt(weekNum));
         let i = 0;
         let error = "none";
 

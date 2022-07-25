@@ -52,7 +52,7 @@ const ViewLeagueTeamMatchup = ({
       {leagueScheduleIsSet ? (
         <TableContainer
           component={Paper}
-          style={{ width: 800, borderRadius: 25 }}
+          style={{ width: 900, borderRadius: 25 }}
         >
           <Table>
             <TableHead>
@@ -113,9 +113,9 @@ const ViewLeagueTeamMatchup = ({
                             alignItems: "flex-end",
                           }}
                         >
-                          <Typography fontSize={25}>
+                          {/* <Typography fontSize={25}>
                             {Object.keys(matchup)[0]}
-                          </Typography>
+                          </Typography> */}
                           {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
                           </Typography> */}
@@ -143,9 +143,9 @@ const ViewLeagueTeamMatchup = ({
                             alignItems: "flex-start",
                           }}
                         >
-                          <Typography fontSize={25}>
+                          {/* <Typography fontSize={25}>
                             {Object.keys(matchup)[1]}
-                          </Typography>
+                          </Typography> */}
                           {/* <Typography fontSize={15}>
                             {"[Insert team record here]"}
                           </Typography> */}
@@ -160,8 +160,9 @@ const ViewLeagueTeamMatchup = ({
         </TableContainer>
       ) : (
         <Typography textAlign={"center"} color="primary">
-          Oops! Your league's schedule has not been set yet. Please request help
-          in Discord if this issue persists past the end of the week.
+              Oops! Your league's schedule has not been set yet. Please tell
+              your league admin to start the league. Please request help in
+              Discord if you encounter any issues.
         </Typography>
       )}
     </Container>

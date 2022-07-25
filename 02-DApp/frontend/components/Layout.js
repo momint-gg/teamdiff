@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import logo from "../assets/images/logo-horizontal.png";
 import WalletLogin from "../components/WalletLogin";
 import Footer from "./Footer";

@@ -1,17 +1,17 @@
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  Grid,
-  Typography
+    Box,
+    Card,
+    CardActions,
+    CardContent,
+    Grid,
+    Typography
 } from "@mui/material";
 import { ethers } from "ethers";
 // Router
 import { useRouter } from "next/router";
-import React, { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { FaCrown } from "react-icons/fa";
 import { useMediaQuery } from "react-responsive";
 import { useAccount, useDisconnect } from "wagmi";
@@ -52,6 +52,23 @@ export default function Play() {
   };
 
   const isMobile = useMediaQuery({ query: "(max-width: 600px)" });
+
+  // Making sure we're conncted to correct network
+  const chainId = "137";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        // alert("Please connect to Polygon to use this DApp!");
+        // window.location = "/";
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);

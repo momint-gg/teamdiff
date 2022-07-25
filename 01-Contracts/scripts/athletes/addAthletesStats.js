@@ -15,13 +15,16 @@ const fs = require("fs");
 const axios = require("axios");
 
 // TODO: comment out which contracts/ABIs you're not using
-const abi = require("../../../02-DApp/backend/contractscripts/contract_info/rinkebyAbis/Athletes.json");
+//MATIC
+const {
+  Athletes,
+  LeagueMaker,
+} = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
+const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
+
+//RINKEBY
 // const {
 //   Athletes,
-// } = require(".../../../02-DApp/backend/contractscripts/contract_info/contractAddressesMatic");
-// const abi = require("../../../02-DApp/backend/contractscripts/contract_info/maticAbis/Athletes.json");
-// const {
-//   CONTRACT_ADDRESSES,
 // } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
 const {
   Athletes,

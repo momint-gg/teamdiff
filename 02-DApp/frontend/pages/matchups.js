@@ -14,9 +14,10 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesRinkeby.js";
-import AthletesJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/Athletes.json";
-import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/rinkebyAbis/LeagueOfLegendsLogic.json";
+import * as CONTRACT_ADDRESSES from "../../backend/contractscripts/contract_info/contractAddressesMatic.js";
+import AthletesJSON from "../../backend/contractscripts/contract_info/maticAbis/Athletes.json";
+import LeagueMakerJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueMaker.json";
+import LeagueOfLegendsLogicJSON from "../../backend/contractscripts/contract_info/maticAbis/LeagueOfLegendsLogic.json";
 import logo from "../assets/images/mystery_card.png";
 import LoadingPrompt from "../components/LoadingPrompt.js";
 import PlayerStateModal from "../components/PlayerStateModal";
@@ -28,9 +29,13 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
   // Router params
   const router = useRouter();
   // TODO change to matic network for prod
+  // const provider = new ethers.providers.AlchemyProvider(
+  //   "rinkeby",
+  //   process.env.RINKEBY_ALCHEMY_KEY
+  // );
   const provider = new ethers.providers.AlchemyProvider(
-    "rinkeby",
-    process.env.RINKEBY_ALCHEMY_KEY
+    "matic",
+    process.env.POLYGON_ALCHEMY_KEY
   );
 
   // Web2 endpoints
@@ -128,6 +133,23 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
     });
   }, [isConnected]);
 
+  // Making sure we're conncted to correct network
+  const chainId = "4";
+  const checkNetwork = async () => {
+    try {
+      if (window.ethereum.networkVersion !== chainId) {
+        // alert('Please switch to Polygon network to use this DApp!');
+        // window.location = '/';
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkNetwork();
+  }, []);
+
   useEffect(() => {
     // setAthleteNFTs([]);
     if (isConnected && router.isReady) {
@@ -153,6 +175,13 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         provider
       );
       setAthleteContract(AthleteContract);
+
+      const LeagueMakerContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.LeagueMaker,
+        LeagueMakerJSON.abi,
+        provider
+      );
+
       let weekMatchups = [];
 
       async function fetchData() {
@@ -174,7 +203,7 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
         });
         // setIsLeagueMember(isInLeague);
 
-        const currentWeekNum = await LeagueProxyContract.currentWeekNum().catch(
+        const currentWeekNum = await LeagueMakerContract.currentWeek().catch(
           (e) => {
             console.error(e);
             setIsLoading(false);
@@ -760,8 +789,9 @@ export default function Matchups({ daysTillLock, daysTillUnlock }) {
             </>
           ) : (
             <Typography textAlign={"center"} color="primary">
-              Oops! Your league's schedule has not been set yet. Please request
-              help in Discord if this issue persists past the end of the week.
+              Oops! Your league's schedule has not been set yet. Please tell
+              your league admin to start the league. Please request help in
+              Discord if you encounter any issues.
             </Typography>
           )}
         </Container>

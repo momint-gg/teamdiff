@@ -88,7 +88,6 @@ contract LeagueMaker is Ownable {
         isProxyMap[address(proxy)] = true;
 
         emit LeagueCreated(_name, address(proxy), _admin, _whitelistUsers, _erc20Address);
-        // delete parameters;
         return address(proxy);
     }
 
@@ -98,14 +97,11 @@ contract LeagueMaker is Ownable {
 
     function updateUserToLeagueMapping(address user) external {
         require(isProxyMap[msg.sender], "Caller is not a valid proxy address.");
-        //Require that user has not already pushed to this array??
         userToLeagueMap[user].push(msg.sender);
     }
 
     function setBeacon(address logic) external returns (address) {
-        //parameters = Parameters({name: _name});
         UpgradeableBeacon newBeacon = new UpgradeableBeacon(logic);
-        //delete parameters;
         beaconAddress = address(newBeacon);
         return address(newBeacon);
     }
@@ -120,4 +116,10 @@ contract LeagueMaker is Ownable {
     function incrementCurrentWeek() external onlyTeamDiff {
         currentWeek++;
     }
+    
+    // Season starting late 
+    function decrementCurrentWeek() external onlyTeamDiff {
+        currentWeek--;
+    }
+
 }
