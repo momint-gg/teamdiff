@@ -23,6 +23,7 @@ const main = async () => {
   //   "rinkeby",
   //   process.env.RINKEBY_ALCHEMY_KEY
   // );
+  /*
   const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
   // const signer = new ethers.Wallet(process.env.RINKEBY_PRIVATE_KEY, provider);
 
@@ -44,14 +45,14 @@ const main = async () => {
   //   console.error("errpor: " + e)
   // })
   await txn.wait();
-  
+  */
 //  Deploying athletes contract
-  // const AthletesContractFactory = await ethers.getContractFactory("Athletes");
-  // const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
-  // await AthletesContractInstance.deployed();
-  // // AthletesContractInstance.connect(owner);
-  // console.log("Athletes Deployed to: " + AthletesContractInstance.address);
-  // textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
+  const AthletesContractFactory = await ethers.getContractFactory("Athletes");
+  const AthletesContractInstance = await AthletesContractFactory.deploy(); // Setting supply as 100
+  await AthletesContractInstance.deployed();
+  // AthletesContractInstance.connect(owner);
+  console.log("Athletes Deployed to: " + AthletesContractInstance.address);
+  textData += "exports.Athletes = \'" + AthletesContractInstance.address + "\';\n";
   // textData +=
   //   "exports.Athletes = '0xA35Cb8796d9C94fc06aA5f9AB646d97f4F3aD0ef';\n";
 

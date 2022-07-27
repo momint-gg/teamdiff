@@ -281,6 +281,7 @@ export default function MyTeam() {
   const getStarterAthleteScores = async () => {
     // setHasFetchedComp1Scores(false);
     // setHasFetchedComp2Scores(false);
+    // const { data } = await playerStatsApi.get(`/allAthletes/0`);
     const { data } = await playerStatsApi.get(`/allAthletes/${currentWeekNum}`);
     // Create scores array for competitor 1 starter athletes
     const c1Scores = [-1, -1, -1, -1, -1];
@@ -495,7 +496,7 @@ export default function MyTeam() {
                     Player
                   </TableCell>
                   <TableCell align="center" className={classes.cell}>
-                    Last Week Points
+                    This Week Points
                   </TableCell>
                   {/* <TableCell align="center" className={classes.cell}>
                     This Week Opponent
@@ -557,7 +558,8 @@ export default function MyTeam() {
                         <div>
                           <Typography fontSize={30}>
                             {/* todo get score from datafetch */}
-                            {id != 100 && currentWeekNum != 0
+                            {/* {id != 100 && currentWeekNum != 0 */}
+                            {id != 100
                               ? previousScores[index]
                               : // ? parseInt(athlete?.prevPoints)
                                 "(0)"}

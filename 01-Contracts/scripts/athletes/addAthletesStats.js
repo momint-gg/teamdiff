@@ -32,6 +32,7 @@ const athletesABI = require("../../../02-DApp/backend/contractscripts/contract_i
 // } = require("../../../02-DApp/backend/contractscripts/contract_info/contractAddressesRinkeby");
 
 async function main(week_num) {
+  console.log("\nRunning mane for week #" + week_num);
   // Getting MATIC contracts this way (old way glitching)
   // const provider = new ethers.providers.AlchemyProvider(
   //   "matic",
@@ -42,10 +43,11 @@ async function main(week_num) {
   //   process.env.RINKEBY_ALCHEMY_KEY
   // );
   // const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-  AthletesContract = await ethers.getContractAt("Athletes", Athletes);
+  const AthletesContract = await ethers.getContractAt("Athletes", Athletes);
   // AthletesContract = new ethers.Contract(Athletes, athletesABI.abi, signer);
-  // LeagueMakerContract = await ethers.getContractAt("LeagueMaker", LeagueMaker);
-
+  // const LeagueMakerContract = await ethers.getContractAt("LeagueMaker", LeagueMaker);
+  // const week_num = await LeagueMakerContract.currentWeek();
+  // week_num = 0;
   // Parsing excel
   finalStatsToPush = [];
   const parseExcel = (filename) => {
@@ -171,7 +173,7 @@ async function main(week_num) {
       week_num
       // week_num, // Week number passed in
       // {
-      //   gasLimit: 27000000,
+      //   gasLimit: 30000000,
       // }
     );
     console.log(
@@ -185,14 +187,17 @@ async function main(week_num) {
     await addAthletesStatsTxn.wait();
   }
 
-  testContract();
+  testContract(week_num);
 }
 
 // Quick check to make sure contract updates
-const testContract = async () => {
+const testContract = async (week_num) => {
+  const AthletesContract = await ethers.getContractAt("Athletes", Athletes);
+
   console.log("Testing the contract...");
   // Making sure 50 athletes
   let txn = await AthletesContract.getAthletes();
+  // await txn.await();
   console.log("Number of athletes is ", txn);
 
   // Making sure new stats that were pushed match finalStatsToPush(just checking 5 athletess)
@@ -237,9 +242,9 @@ const testContract = async () => {
 const runMain = async () => {
   try {
     console.log("Running main...\n");
-    await main(0);
-    await main(1);
-    await main(2);
+    // await main(0);
+    // await main(1);
+    // await main(2);
     await main(3);
     process.exit(0);
   } catch (error) {
